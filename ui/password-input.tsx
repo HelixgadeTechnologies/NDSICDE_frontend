@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { VscEyeClosed, VscEye } from "react-icons/vsc";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 type PasswordProps = {
     value: string;
@@ -36,8 +36,8 @@ export default function PasswordInput ({
             placeholder={placeholder}
             className="h-12 w-full outline-none border border-gray-300 focus:border-[var(--primary-light)] rounded-[6px] p-4 text-sm"
             />
-            <span onClick={handlePasswordVisibility} className="absolute right-4 top-[50%] hover:cursor-pointer text-gray-500 text-xl">
-                {isHidden ? <VscEyeClosed/> : <VscEye/>}
+            <span onClick={handlePasswordVisibility} className="absolute right-4 top-[50%] hover:cursor-pointer text-gray-500 ">
+                {isHidden ? <EyeOffIcon size={18}/> : <EyeIcon size={18}/>}
             </span>
         </div>
     )

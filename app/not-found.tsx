@@ -20,7 +20,7 @@ export default function NotFound() {
         <p className="text-[#1c0d0e] text-lg mb-6 font-semibold">
           Oops! The page you&apos;re looking for does not exist.
         </p>
-        <Button content="Return to Homepage" href="/login" isSecondary />
+        <Button content="Return to Homepage" href="/dashboard" isSecondary />
         <span className="my-10 text-sm">Having trouble? Contact our <br/> <Link href={"#"} className="text-[var(--primary)] underline">help center</Link></span>
       </div>
     </div>

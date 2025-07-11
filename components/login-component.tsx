@@ -62,6 +62,7 @@ export default function Login() {
                 <div className="mt-4">
                     <Button
                     content="Log into Account"
+                    href="/dashboard"
                     />
                 </div>
                 <Link href={"/reset-password"} className="text-[var(--primary)] block md:hidden text-xs font-medium hover:underline whitespace-nowrap text-center">Forgot Password?</Link>

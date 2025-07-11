@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/quin/dev/NDSICDE_frontend/app/loading.tsx"],"sourcesContent":["\nexport default function Loading() {\n    return (\n        <section className=\"flex justify-center items-center h-screen\">\n            <div className=\"dots\">\n                <div></div>\n                <div></div>\n                <div></div>\n            </div>\n        </section>\n    )\n}\n"],"names":[],"mappings":";;;;;AACe,SAAS;IACpB,qBACI,8OAAC;QAAQ,WAAU;kBACf,cAAA,8OAAC;YAAI,WAAU;;8BACX,8OAAC;;;;;8BACD,8OAAC;;;;;8BACD,8OAAC;;;;;;;;;;;;;;;;AAIjB","debugId":null}}]
+}
