@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/quin/dev/NDSICDE_frontend/app/dashboard/layout.tsx"],"sourcesContent":["import Sidebar from \"@/components/sidebar\";\n\nexport default function DashboardLayout({\n  children,\n}: Readonly<{\n  children: React.ReactNode;\n}>) {\n  return (\n    <div className=\"flex min-h-screen flex-col md:flex-row\">\n      {/* Sidebar */}\n      <div className=\"w-64 flex-none transition-all duration-300 ease-in-out\">\n        {/* <Sidebar /> */}\n      </div>\n\n      {/* Main content */}\n      <section className=\"flex-grow flex flex-col overflow-hidden\">\n        {/* <Navigation /> */}\n        <div className=\"flex-grow overflow-y-auto p-6 bg-gray-50\">\n          {/* <Breadcrumb /> */}\n          {children}\n        </div>\n      </section>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;AAEe,SAAS,gBAAgB,EACtC,QAAQ,EAGR;IACA,qBACE,8OAAC;QAAI,WAAU;;0BAEb,8OAAC;gBAAI,WAAU;;;;;;0BAKf,8OAAC;gBAAQ,WAAU;0BAEjB,cAAA,8OAAC;oBAAI,WAAU;8BAEZ;;;;;;;;;;;;;;;;;AAKX","debugId":null}}]
-}
