@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 39, "column": 0}, "map": {"version":3,"sources":["file:///home/quin/dev/NDSICDE_frontend/ui/button.tsx"],"sourcesContent":["\"use client\";\n\nimport Link from \"next/link\";\n\ntype ButtonProps = {\n  content: string;\n  href?: string;\n  onClick?: () => void;\n  isSecondary?: boolean;\n};\n\nexport default function Button({ \n    content, \n    href, \n    onClick, \n    isSecondary,\n}: ButtonProps) {\n  const classes = `${isSecondary ? 'bg-white text-[#D2091E] border border-[#D2091E] hover:bg-gray-100' : 'bg-[#D2091E] text-white hover:bg-[#C2071A] '} rounded-[8px] h-[50px] w-full px-5 md:px-6 leading-6 font-medium hover:cursor-pointer text-sm md:text-base block transition-colors duration-300`;\n\n  if (href) {\n    return (\n      <Link href={href}>\n        <button className={classes}>{content}</button>\n      </Link>\n    );\n  }\n\n  return (\n    <button onClick={onClick} className={classes}>\n      {content}\n    </button>\n  );\n}"],"names":[],"mappings":";;;;AAEA;AAFA;;;AAWe,SAAS,OAAO,EAC3B,OAAO,EACP,IAAI,EACJ,OAAO,EACP,WAAW,EACD;IACZ,MAAM,UAAU,GAAG,cAAc,sEAAsE,8CAA8C,gJAAgJ,CAAC;IAEtS,IAAI,MAAM;QACR,qBACE,8OAAC,4JAAA,CAAA,UAAI;YAAC,MAAM;sBACV,cAAA,8OAAC;gBAAO,WAAW;0BAAU;;;;;;;;;;;IAGnC;IAEA,qBACE,8OAAC;QAAO,SAAS;QAAS,WAAW;kBAClC;;;;;;AAGP","debugId":null}}]
+}
