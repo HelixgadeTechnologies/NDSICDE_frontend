@@ -11,7 +11,7 @@ type ModalProps = {
   header: string;
   message: string;
   buttonContent: string;
-  icon: ReactNode;
+  icon?: ReactNode;
 };
 
 export default function Modal({ 

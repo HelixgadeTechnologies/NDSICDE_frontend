@@ -23,7 +23,7 @@ export default function NotificationTab() {
                     animate={{ y: 0, opacity: 1 }}  
                     exit={{ y: -10, opacity: 0 }}  
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute right-0 -bottom-80 bg-white rounded-[6px] border border-[#E5E5E5] shadow-md h-[300px] w-[400px] p-4"
+                    className="absolute right-0 top-16 bg-white rounded-[6px] border border-[#E5E5E5] shadow-md h-[400px] w-[300px] p-4"
                     ></motion.div>
                 </AnimatePresence>
             )}

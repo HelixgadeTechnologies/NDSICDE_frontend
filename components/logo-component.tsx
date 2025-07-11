@@ -9,7 +9,7 @@ export default function Logo() {
                 alt="NDSICDE logo"
                 height={26}
                 width={26}
-                style={{ width: "auto", height: "auto"}}
+                style={{ width: "auto", height: "auto", objectFit: "cover"}}
                 priority
                 />
             </div>

@@ -16,7 +16,7 @@ export default function DashboardLayout({
       {/* Main content */}
       <section className="flex-grow flex flex-col overflow-hidden">
         <Navigation />
-        <div className="flex-grow overflow-y-auto p-6 bg-gray-50">
+        <div className="flex-grow overflow-y-auto p-6 bg-white">
           {/* <Breadcrumb /> */}
           {children}
         </div>
