@@ -1,27 +1,17 @@
 'use client';
 
 import { motion, AnimatePresence } from "framer-motion";
-import Button from "@/ui/button";
-import { Icon } from "@iconify/react";
 
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onClick: () => void;
-  header: string;
-  message: string;
-  buttonContent: string;
-  icon?: string;
+  children: React.ReactNode;
 };
 
 export default function Modal({ 
     isOpen, 
     onClose, 
-    header,
-    message,
-    buttonContent = "Okay",
-    icon,
-    onClick,
+    children,
 }: ModalProps) {
   return (
     <AnimatePresence>
@@ -44,16 +34,7 @@ export default function Modal({
               transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()} // prevent modal close when clicking inside
             >
-              <div className="flex justify-center text-[var(--primary)] mb-4">
-                {icon && <Icon icon={icon} width={96} height={96} />}
-              </div>
-              <h2 className="text-[28px] font-semibold mb-2 text-center text-gray-900">
-                {header}
-              </h2>
-              <p className="text-sm text-center text-gray-500">{message}</p>
-              <div className="mt-6 flex justify-end gap-2">
-                <Button onClick={onClick} content={buttonContent} />
-              </div>
+              {children}
             </motion.div>
           </motion.div>
         </>

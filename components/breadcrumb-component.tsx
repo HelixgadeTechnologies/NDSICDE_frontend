@@ -21,7 +21,7 @@ export default function Breadcrumb({
   return (
     <section className="">
       <div>
-        <h2 className="font-bold text-base md:text-[23px] text-[#242424]">
+        <h2 className="font-bold text-base md:text-[22px] text-[#242424]">
           {matched?.header || fallbackTitle}
         </h2>
       </div>

@@ -387,7 +387,7 @@ function NotificationTab() {
                             duration: 0.2,
                             ease: "easeOut"
                         },
-                        className: "absolute right-0 top-16 bg-white rounded-[6px] border border-[#E5E5E5] shadow-md h-[400px] w-[300px] p-4"
+                        className: "absolute right-0 top-16 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md h-[400px] w-[300px] p-4"
                     }, void 0, false, {
                         fileName: "[project]/components/notification-tab.tsx",
                         lineNumber: 24,
@@ -689,7 +689,7 @@ function Breadcrumb({ fallbackTitle = "NDSICDE Platform" }) {
         className: "",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                className: "font-bold text-base md:text-[23px] text-[#242424]",
+                className: "font-bold text-base md:text-[22px] text-[#242424]",
                 children: matched?.header || fallbackTitle
             }, void 0, false, {
                 fileName: "[project]/components/breadcrumb-component.tsx",
