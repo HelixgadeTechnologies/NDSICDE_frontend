@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { topNavigations, bottomNavigations } from "@/lib/config/sidebar";
 import Logo from "@/components/logo-component";
 import { useSidebar } from "@/context/SidebarContext";
+import {Icon } from "@iconify/react";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -33,7 +34,6 @@ export default function Sidebar() {
           <div className="space-y-1 border-b border-gray-200 pb-2">
             {topNavigations.map((nav, index) => {
               const isActive = pathname.startsWith(nav.href);
-              const Icon = nav.icon;
 
               return (
                 <Link
@@ -46,7 +46,7 @@ export default function Sidebar() {
                       : "hover:bg-gray-50 text-gray-600"
                   }`}
                 >
-                  <Icon size={20} />
+                  <Icon icon={nav.icon} width={20} height={20} color={isActive ? "#D2091E" : "#737373"} />
                   <span className="text-xs">{nav.name}</span>
                 </Link>
               );
@@ -56,18 +56,18 @@ export default function Sidebar() {
           <div className="space-y-1">
             {bottomNavigations.map((nav, index) => {
               const isActive = pathname.startsWith(nav.href);
-              const Icon =  nav.icon;
+
               return (
                 <Link
                   key={index}
                   href={nav.href}
                   className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 ${
                     isActive
-                      ? "bg-[FFECE5] text-[#D2091E]"
+                      ? "bg-[#FFECE5] text-[#D2091E]"
                       : "hover:bg-gray-50 text-gray-600"
                   }`}
                 >
-                    <Icon size={20} />
+                    <Icon icon={nav.icon} width={20} height={20} color={isActive ? "#D2091E" : "#737373"} />
                   <span className="text-xs">{nav.name}</span>
                 </Link>
               );

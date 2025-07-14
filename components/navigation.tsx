@@ -1,11 +1,10 @@
 
 "use client";
 
-import { Menu } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import NotificationTab from "@/components/notification-tab";
 import Avatar from "@/ui/avatar";
-import { ChevronDown } from "lucide-react";
+import { Icon } from "@iconify/react";
 
 export default function Navigation() {
     const { openMobile } = useSidebar();
@@ -20,9 +19,9 @@ export default function Navigation() {
                 <h3 className="font-medium text-gray-900 leading-5 text-xs">Super Admin</h3>
                 <p className="text-[#737373] text-[11px]">admin@sdn.org</p>
             </div>
-            <ChevronDown size={18} />
+            <Icon icon={"formkit:down"} height={18} width={18}/>
           </div>
-          <Menu onClick={openMobile} size={22} className="md:hidden" />
+          <Icon icon={"famicons:menu"} onClick={openMobile} height={22} width={22} className="md:hidden" />
         </div>
         </header>
     )

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import EmailInput from "@/ui/email-input";
 import Button from "@/ui/button";
 import Modal from "@/ui/modal";
-import { CircleCheck } from "lucide-react";
+
 
 export default function ResetPassword() {
     const router = useRouter();
@@ -54,7 +54,7 @@ export default function ResetPassword() {
 
             {isOpen && 
             (<Modal
-                icon={<CircleCheck size={80}/>}
+                icon="simple-line-icons:check"
                 isOpen={isOpen}
                 onClose={handleModalClose}
                 header="Congratulations!"

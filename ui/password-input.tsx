@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { Icon } from "@iconify/react";
 
 type PasswordProps = {
     value: string;
@@ -37,7 +37,8 @@ export default function PasswordInput ({
             className="h-12 w-full outline-none border border-gray-300 focus:border-[var(--primary-light)] rounded-[6px] p-4 text-sm"
             />
             <span onClick={handlePasswordVisibility} className="absolute right-4 top-[50%] hover:cursor-pointer text-gray-500 ">
-                {isHidden ? <EyeOffIcon size={18}/> : <EyeIcon size={18}/>}
+                {/* {isHidden ? <EyeOffIcon size={18}/> : <EyeIcon size={18}/>} */}
+                <Icon icon={isHidden ? "fluent:eye-off-32-regular" :"fluent:eye-32-regular"} width={20} height={20}/>
             </span>
         </div>
     )

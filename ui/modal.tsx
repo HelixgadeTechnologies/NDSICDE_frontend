@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/ui/button";
-import { ReactNode } from "react";
+import { Icon } from "@iconify/react";
 
 type ModalProps = {
   isOpen: boolean;
@@ -11,7 +11,7 @@ type ModalProps = {
   header: string;
   message: string;
   buttonContent: string;
-  icon?: ReactNode;
+  icon?: string;
 };
 
 export default function Modal({ 
@@ -44,7 +44,9 @@ export default function Modal({
               transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()} // prevent modal close when clicking inside
             >
-              <div className="flex justify-center text-8xl text-[var(--primary)] mb-4">{icon}</div>
+              <div className="flex justify-center text-[var(--primary)] mb-4">
+                {icon && <Icon icon={icon} width={96} height={96} />}
+              </div>
               <h2 className="text-[28px] font-semibold mb-2 text-center text-gray-900">
                 {header}
               </h2>

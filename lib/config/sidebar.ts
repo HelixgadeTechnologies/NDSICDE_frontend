@@ -1,69 +1,55 @@
-
-import {
-  House,
-  ChartNoAxesCombined,
-  FolderClosed,
-  UsersRound,
-  Radar,
-  CircleDollarSign,
-  Settings,
-  ClipboardList,
-  Gift,
-  Cog,
-} from "lucide-react";
-
 export const topNavigations = [
-    {
-      name: "Dashboard",
-      href: "/dashboard",
-      icon: House,
-    },
-    {
-      name: "Strategic Objectives and KPIs",
-      href: "/dashboard/strategic-objectives",
-      icon: ChartNoAxesCombined,
-    },
-    {
-      name: "Project Management",
-      href: "/dashboard/proejct-management",
-      icon: FolderClosed,
-    },
-    {
-      name: "User Management",
-      href: "/dashboard/user-management",
-      icon: UsersRound,
-    },
-    {
-      name: "Data Validation",
-      href: "/dashboard/data-validation",
-      icon: Radar,
-    },
-    {
-      name: "Financial Reporting",
-      href: "/dashboard/financial-reporting",
-      icon: CircleDollarSign,
-    },
-    {
-      name: "Performance Analytics & Reports",
-      href: "/dashboard/performance",
-      icon: Cog,
-    },
-    {
-      name: "Organizational KPI",
-      href: "/dashboard/organizational-kpi",
-      icon: ClipboardList,
-    },
-  ];
+  {
+    name: "Dashboard",
+    href: "/admin/dashboard",
+    icon: "lucide:home",
+  },
+  {
+    name: "Strategic Objectives and KPIs",
+    href: "/admin/strategic-objectives",
+    icon: "fluent:arrow-growth-24-regular",
+  },
+  {
+    name: "Project Management",
+    href: "/admin/project-management",
+    icon: "iconoir:folder",
+  },
+  {
+    name: "User Management",
+    href: "/admin/user-management",
+    icon: "bi:people",
+  },
+  {
+    name: "Data Validation",
+    href: "/admin/data-validation",
+    icon: "fluent:radar-checkmark-20-regular",
+  },
+  {
+    name: "Financial Reporting",
+    href: "/admin/financial-reporting",
+    icon: "solar:money-bag-linear",
+  },
+  {
+    name: "Performance Analytics & Reports",
+    href: "/admin/performance",
+    icon: "bi:gear",
+  },
+  {
+    name: "Organizational KPI",
+    href: "/admin/organizational-kpi",
+    icon: "carbon:result-new",
+  },
+];
 
-  export const bottomNavigations = [
-    {
-        name: "Settings",
-        href: "/dashboard/settings",
-        icon: Settings,
-    },
-    {
-        name: "Logout",
-        href: "/login",
-        icon: Gift,
-    }
-  ]
+export const bottomNavigations = [
+  {
+    name: "Settings",
+    href: "/admin/settings",
+    icon: "bi:gear",
+  },
+  {
+    name: "Logout",
+    href: "/login",
+    icon: "heroicons-solid:logout",
+  },
+];
