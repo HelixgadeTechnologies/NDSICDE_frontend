@@ -8,6 +8,7 @@ type InputProps = {
     name: string
     placeholder?: string;
     isUppercase?: boolean;
+    isBigger?: boolean;
 }
 
 export default function TextInput ({
@@ -17,6 +18,7 @@ export default function TextInput ({
     name,
     placeholder,
     isUppercase,
+    isBigger = false,
 }: InputProps) {
 
     return (
@@ -28,7 +30,7 @@ export default function TextInput ({
             onChange={onChange}
             name={name}
             placeholder={placeholder}
-            className="h-12 w-full outline-none border border-gray-300 focus:border-[var(--primary-light)] rounded-[6px] p-4 text-sm"
+            className={`${isBigger ? 'h-12': 'h-10'} w-full outline-none border border-gray-300 focus:border-[var(--primary-light)] rounded-[6px] p-4 text-sm`}
             />
         </div>
     )

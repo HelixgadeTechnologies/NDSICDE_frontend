@@ -46,7 +46,7 @@ export default function EditRole() {
         
         // If any individual permission is unchecked, uncheck fullAccess
         if (!checked) {
-          newState.fullAccess = false
+          newState.fullAccess = false;
         }
         // If all individual permissions are checked, check fullAccess
         else if (newState.view && newState.edit && newState.delete) {
