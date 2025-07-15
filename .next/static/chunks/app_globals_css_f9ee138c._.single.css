@@ -31,6 +31,8 @@
       --tw-ring-offset-shadow: 0 0 #0000;
       --tw-duration: initial;
       --tw-ease: initial;
+      --tw-text-shadow-color: initial;
+      --tw-text-shadow-alpha: 100%;
     }
   }
 }
@@ -40,7 +42,6 @@
     --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --color-red-500: oklch(63.7% .237 25.331);
-    --color-red-900: oklch(39.6% .141 25.723);
     --color-green-500: oklch(72.3% .219 149.579);
     --color-gray-50: oklch(98.5% .002 247.839);
     --color-gray-100: oklch(96.7% .003 264.542);
@@ -49,6 +50,7 @@
     --color-gray-400: oklch(70.7% .022 261.325);
     --color-gray-500: oklch(55.1% .027 264.364);
     --color-gray-600: oklch(44.6% .03 256.802);
+    --color-gray-700: oklch(37.3% .034 259.733);
     --color-gray-800: oklch(27.8% .033 256.848);
     --color-gray-900: oklch(21% .034 264.665);
     --color-black: #000;
@@ -71,7 +73,9 @@
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
+    --radius-md: .375rem;
     --radius-lg: .5rem;
+    --radius-xl: .75rem;
     --radius-2xl: 1rem;
     --ease-in-out: cubic-bezier(.4, 0, .2, 1);
     --default-transition-duration: .15s;
@@ -298,6 +302,10 @@
     top: calc(var(--spacing) * -2);
   }
 
+  .-top-8 {
+    top: calc(var(--spacing) * -8);
+  }
+
   .top-0 {
     top: calc(var(--spacing) * 0);
   }
@@ -362,10 +370,6 @@
     z-index: 50;
   }
 
-  .my-4 {
-    margin-block: calc(var(--spacing) * 4);
-  }
-
   .my-5 {
     margin-block: calc(var(--spacing) * 5);
   }
@@ -376,6 +380,14 @@
 
   .my-10 {
     margin-block: calc(var(--spacing) * 10);
+  }
+
+  .my-20 {
+    margin-block: calc(var(--spacing) * 20);
+  }
+
+  .my-24 {
+    margin-block: calc(var(--spacing) * 24);
   }
 
   .mt-1 {
@@ -404,6 +416,10 @@
 
   .mt-10 {
     margin-top: calc(var(--spacing) * 10);
+  }
+
+  .mt-24 {
+    margin-top: calc(var(--spacing) * 24);
   }
 
   .mb-2 {
@@ -446,6 +462,10 @@
     display: inline-block;
   }
 
+  .h-2 {
+    height: calc(var(--spacing) * 2);
+  }
+
   .h-4 {
     height: calc(var(--spacing) * 4);
   }
@@ -478,6 +498,18 @@
     height: calc(var(--spacing) * 14);
   }
 
+  .h-72 {
+    height: calc(var(--spacing) * 72);
+  }
+
+  .h-80 {
+    height: calc(var(--spacing) * 80);
+  }
+
+  .h-96 {
+    height: calc(var(--spacing) * 96);
+  }
+
   .h-\[22px\] {
     height: 22px;
   }
@@ -498,8 +530,16 @@
     height: 60px;
   }
 
+  .h-\[80\] {
+    height: 80px;
+  }
+
   .h-\[126px\] {
     height: 126px;
+  }
+
+  .h-\[250px\] {
+    height: 250px;
   }
 
   .h-\[320px\] {
@@ -508,6 +548,10 @@
 
   .h-\[400px\] {
     height: 400px;
+  }
+
+  .h-\[417\], .h-\[417px\] {
+    height: 417px;
   }
 
   .h-\[480px\] {
@@ -534,6 +578,10 @@
     min-height: 100vh;
   }
 
+  .w-2 {
+    width: calc(var(--spacing) * 2);
+  }
+
   .w-4 {
     width: calc(var(--spacing) * 4);
   }
@@ -558,10 +606,6 @@
     width: calc(var(--spacing) * 64);
   }
 
-  .w-\[18\] {
-    width: 18px;
-  }
-
   .w-\[22px\] {
     width: 22px;
   }
@@ -574,28 +618,28 @@
     width: 90%;
   }
 
-  .w-\[125px\] {
-    width: 125px;
-  }
-
-  .w-\[182px\] {
-    width: 182px;
-  }
-
   .w-\[228px\] {
     width: 228px;
+  }
+
+  .w-\[250px\] {
+    width: 250px;
   }
 
   .w-\[300px\] {
     width: 300px;
   }
 
-  .w-\[450px\] {
-    width: 450px;
+  .w-\[350px\] {
+    width: 350px;
   }
 
-  .w-\[full\] {
-    width: full;
+  .w-\[356px\] {
+    width: 356px;
+  }
+
+  .w-\[450px\] {
+    width: 450px;
   }
 
   .w-fit {
@@ -811,6 +855,14 @@
     border-radius: var(--radius-lg);
   }
 
+  .rounded-md {
+    border-radius: var(--radius-md);
+  }
+
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
@@ -859,6 +911,10 @@
     border-color: var(--color-gray-300);
   }
 
+  .bg-\[\#003B99\] {
+    background-color: #003b99;
+  }
+
   .bg-\[\#D2091E\] {
     background-color: #d2091e;
   }
@@ -867,12 +923,20 @@
     background-color: #f5f7fa;
   }
 
+  .bg-\[\#F8F8F8\] {
+    background-color: #f8f8f8;
+  }
+
   .bg-\[\#FFECE5\] {
     background-color: #ffece5;
   }
 
   .bg-\[\#f1f5f9\] {
     background-color: #f1f5f9;
+  }
+
+  .bg-\[\#fff\] {
+    background-color: #fff;
   }
 
   .bg-\[var\(--primary\)\] {
@@ -967,6 +1031,10 @@
     padding-block: calc(var(--spacing) * 8);
   }
 
+  .py-\[6px\] {
+    padding-block: 6px;
+  }
+
   .py-\[35px\] {
     padding-block: 35px;
   }
@@ -1019,6 +1087,10 @@
 
   .text-\[11px\] {
     font-size: 11px;
+  }
+
+  .text-\[15px\] {
+    font-size: 15px;
   }
 
   .text-\[22px\] {
@@ -1105,6 +1177,10 @@
     color: #242424;
   }
 
+  .text-\[\#667185\] {
+    color: #667185;
+  }
+
   .text-\[\#737373\] {
     color: #737373;
   }
@@ -1129,6 +1205,10 @@
     color: var(--color-gray-600);
   }
 
+  .text-gray-700 {
+    color: var(--color-gray-700);
+  }
+
   .text-gray-800 {
     color: var(--color-gray-800);
   }
@@ -1145,12 +1225,12 @@
     color: var(--color-red-500);
   }
 
-  .text-red-900 {
-    color: var(--color-red-900);
-  }
-
   .text-white {
     color: var(--color-white);
+  }
+
+  .capitalize {
+    text-transform: capitalize;
   }
 
   .uppercase {
@@ -1239,6 +1319,16 @@
     outline-style: none;
   }
 
+  .text-shadow-gray-900 {
+    --tw-text-shadow-color: oklch(21% .034 264.665);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .text-shadow-gray-900 {
+      --tw-text-shadow-color: color-mix(in oklab, var(--color-gray-900) var(--tw-text-shadow-alpha), transparent);
+    }
+  }
+
   @media (hover: hover) {
     .hover\:cursor-pointer:hover {
       cursor: pointer;
@@ -1285,6 +1375,11 @@
     border-color: var(--primary-light);
   }
 
+  .focus\:outline-none:focus {
+    --tw-outline-style: none;
+    outline-style: none;
+  }
+
   @media (width >= 48rem) {
     .md\:block {
       display: block;
@@ -1324,18 +1419,6 @@
   @media (width >= 48rem) {
     .md\:w-\[40px\] {
       width: 40px;
-    }
-  }
-
-  @media (width >= 48rem) {
-    .md\:w-\[125px\] {
-      width: 125px;
-    }
-  }
-
-  @media (width >= 48rem) {
-    .md\:w-\[180px\] {
-      width: 180px;
     }
   }
 
@@ -1734,6 +1817,17 @@ body {
 @property --tw-ease {
   syntax: "*";
   inherits: false
+}
+
+@property --tw-text-shadow-color {
+  syntax: "*";
+  inherits: false
+}
+
+@property --tw-text-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
 }
 
 /*# sourceMappingURL=app_globals_css_f9ee138c._.single.css.map*/

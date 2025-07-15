@@ -2,6 +2,7 @@
 
 import Table from "@/ui/table";
 import DropDown from "@/ui/form/select-dropdown";
+import DateRangePicker from "@/ui/form/date-range";
 import { useOrgKPIFormState } from "@/store/organizational-kpi-store";
 
 const head = [
@@ -58,7 +59,8 @@ export default function TableSection () {
 
     return (
         <section>
-            <div className="flex flex-col md:flex-row mb-5 gap-4 md:items-center w-full mt-6">
+            {/* when api comes, add this on shared parent component if needed */}
+            <div className="flex flex-col md:flex-row mb-5 gap-4 md:items-center w-full mt-10">
                 <DropDown
                 label="Strategic Objective"
                 value={allStrategicObjective}
@@ -82,6 +84,9 @@ export default function TableSection () {
                 name="indicators"
                 onChange={(value: string) => setField("indicators", value)}
                 options={[]}
+                />
+                <DateRangePicker
+                label="Date Range"
                 />
                 <DropDown
                 label="Disaggregation"

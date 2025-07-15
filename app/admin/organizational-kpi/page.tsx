@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import OrganizationalKPIComponent from "@/components/organizational-kpi/orgkpi-component";
+import ChartsAndTableParent from "@/components/organizational-kpi/charts-table-parent";
 
 export const metadata = {
   title: "Organizational KPI - NDSICDE",
@@ -62,7 +62,7 @@ export default function OrganizationalKPI() {
           </div>
         ))}
       </div>
-      <OrganizationalKPIComponent />
+      <ChartsAndTableParent />
     </section>
   );
 }
