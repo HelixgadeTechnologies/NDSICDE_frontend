@@ -4,9 +4,9 @@ import { Icon } from "@iconify/react";
 import { ChangeEvent, useState } from "react";
 import { useUIStore } from "@/store/ui-store";
 import Modal from "@/ui/popup-modal";
-import TextInput from "@/ui/text-input";
-import Checkbox from "@/ui/checkbox";
-import Button from "@/ui/button";
+import TextInput from "@/ui/form/text-input";
+import Checkbox from "@/ui/form/checkbox";
+import Button from "@/ui/form/button";
 
 export default function EditRole() {
   const { isEditModalOpen, closeEditModal } = useUIStore();
@@ -29,7 +29,7 @@ export default function EditRole() {
   };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    if (name === 'fullAccess') {
+    if (name === "fullAccess") {
       setEditRole((prev) => ({
         ...prev,
         view: checked,
@@ -43,7 +43,7 @@ export default function EditRole() {
           ...prev,
           [name]: checked,
         };
-        
+
         // If any individual permission is unchecked, uncheck fullAccess
         if (!checked) {
           newState.fullAccess = false;
@@ -52,7 +52,7 @@ export default function EditRole() {
         else if (newState.view && newState.edit && newState.delete) {
           newState.fullAccess = true;
         }
-        
+
         return newState;
       });
     }
@@ -122,7 +122,7 @@ export default function EditRole() {
             />
           </div>
         </div>
-        <Button content="Edit Role"/>
+        <Button content="Edit Role" />
       </form>
     </Modal>
   );

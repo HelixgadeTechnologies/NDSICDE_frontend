@@ -1,10 +1,11 @@
-import Button from "@/ui/button";
+import Button from "@/ui/form/button";
 import Link from "next/link";
 
 export const metadata = {
   title: "404 - NDSICDE",
-  description: "Seems you've naviagted to the wrong page. Please click the button tohead back to the site."
-}
+  description:
+    "Seems you've naviagted to the wrong page. Please click the button tohead back to the site.",
+};
 
 export default function NotFound() {
   return (
@@ -20,8 +21,17 @@ export default function NotFound() {
         <p className="text-[#1c0d0e] text-lg mb-6 font-semibold">
           Oops! The page you&apos;re looking for does not exist.
         </p>
-        <Button content="Return to Homepage" href="/admin/dashboard" isSecondary />
-        <span className="my-10 text-sm">Having trouble? Contact our <br/> <Link href={"#"} className="text-[var(--primary)] underline">help center</Link></span>
+        <Button
+          content="Return to Homepage"
+          href="/admin/dashboard"
+          isSecondary
+        />
+        <span className="my-10 text-sm">
+          Having trouble? Contact our <br />{" "}
+          <Link href={"#"} className="primary underline">
+            help center
+          </Link>
+        </span>
       </div>
     </div>
   );

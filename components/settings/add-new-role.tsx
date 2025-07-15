@@ -4,9 +4,9 @@ import { Icon } from "@iconify/react";
 import { ChangeEvent, useState } from "react";
 import { useUIStore } from "@/store/ui-store";
 import Modal from "@/ui/popup-modal";
-import TextInput from "@/ui/text-input";
-import Checkbox from "@/ui/checkbox";
-import Button from "@/ui/button";
+import TextInput from "@/ui/form/text-input";
+import Checkbox from "@/ui/form/checkbox";
+import Button from "@/ui/form/button";
 
 export default function AddNewRole() {
   const { isAddModalOpen, closeAddModal } = useUIStore();
@@ -29,7 +29,7 @@ export default function AddNewRole() {
   };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    if (name === 'fullAccess') {
+    if (name === "fullAccess") {
       // If fullAccess is checked, check all permissions
       setAddNewRole((prev) => ({
         ...prev,
@@ -45,7 +45,7 @@ export default function AddNewRole() {
           ...prev,
           [name]: checked,
         };
-        
+
         // If any individual permission is unchecked, uncheck fullAccess
         if (!checked) {
           newState.fullAccess = false;
@@ -54,7 +54,7 @@ export default function AddNewRole() {
         else if (newState.view && newState.edit && newState.delete) {
           newState.fullAccess = true;
         }
-        
+
         return newState;
       });
     }
@@ -124,7 +124,7 @@ export default function AddNewRole() {
             />
           </div>
         </div>
-        <Button content="Create Role"/>
+        <Button content="Create Role" />
       </form>
     </Modal>
   );

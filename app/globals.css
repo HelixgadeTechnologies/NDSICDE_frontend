@@ -86,4 +86,8 @@ body {
   }
 }
 
+.primary {
+  color: var(--primary);
+}
+
 

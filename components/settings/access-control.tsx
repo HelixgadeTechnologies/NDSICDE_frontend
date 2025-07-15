@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/ui/button";
+import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { useUIStore } from "@/store/ui-store";
 import AddNewRole from "./add-new-role";
@@ -26,20 +26,24 @@ export default function AccessControl() {
     },
   ];
 
-   const {
-    isAddModalOpen,
-    isEditModalOpen,
-    openAddModal,
-    openEditModal,
-  } = useUIStore();
+  const { isAddModalOpen, isEditModalOpen, openAddModal, openEditModal } =
+    useUIStore();
 
   return (
     <section>
       <CardComponent>
         <div className="flex flex-col md:flex-row justify-between items-start mb-10 gap-4 md:gap-0">
-          <Heading heading="User Roles & Permissions" subtitle="Manage user roles and their associated permissions" spacing="1" />
+          <Heading
+            heading="User Roles & Permissions"
+            subtitle="Manage user roles and their associated permissions"
+            spacing="1"
+          />
           <div className="w-[228px]">
-            <Button content="Add New Role" icon="cil:plus" onClick={openAddModal} />
+            <Button
+              content="Add New Role"
+              icon="cil:plus"
+              onClick={openAddModal}
+            />
           </div>
         </div>
 
@@ -60,15 +64,20 @@ export default function AccessControl() {
                   {row.status}
                 </span>
               </td>
-              <td onClick={openEditModal} className="px-6 cursor-pointer hover:text-[#111928]">Edit</td>
+              <td
+                onClick={openEditModal}
+                className="px-6 cursor-pointer hover:text-[#111928]"
+              >
+                Edit
+              </td>
             </>
           )}
         />
       </CardComponent>
-      
-      {isAddModalOpen && <AddNewRole/>}
 
-      {isEditModalOpen && <EditRole/>}
+      {isAddModalOpen && <AddNewRole />}
+
+      {isEditModalOpen && <EditRole />}
     </section>
   );
 }

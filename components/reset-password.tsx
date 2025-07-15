@@ -2,8 +2,8 @@
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import EmailInput from "@/ui/email-input";
-import Button from "@/ui/button";
+import EmailInput from "@/ui/form/email-input";
+import Button from "@/ui/form/button";
 import Modal from "@/ui/popup-modal";
 import { Icon } from "@iconify/react";
 
@@ -56,7 +56,7 @@ export default function ResetPassword() {
 
       {isOpen && (
         <Modal isOpen={isOpen} onClose={handleModalClose}>
-          <div className="flex justify-center text-[var(--primary)] mb-4">
+          <div className="flex justify-center primary mb-4">
             <Icon icon={"simple-line-icons:check"} width={96} height={96} />
           </div>
           <h2 className="text-[28px] font-semibold mb-2 text-center text-gray-900">

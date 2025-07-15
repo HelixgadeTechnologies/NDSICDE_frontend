@@ -1,9 +1,5 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/admin/settings/page": "app/admin/settings/page.js",
-  "/admin/user-management/page": "app/admin/user-management/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/login/page": "app/login/page.js",
-  "/reset-password/page": "app/reset-password/page.js"
+  "/admin/organizational-kpi/page": "app/admin/organizational-kpi/page.js",
+  "/admin/settings/page": "app/admin/settings/page.js"
 }

@@ -11,12 +11,14 @@ interface TabType {
 type TabProps = {
   data: Array<TabType>;
   renderContent?: (activeTabId: number) => React.ReactNode;
+  width?: string;
 //   onTabChange?: (tabId: number) => void;
 };
 
 export default function TabComponent({ 
     data,
     renderContent,
+    width,
     // onTabChange,
  }: TabProps) {
 
@@ -29,7 +31,7 @@ export default function TabComponent({
   return (
     <div className="w-full space-y-4">
       {/* Tabs */}
-      <div className="relative w-full h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg overflow-x-auto">
+      <div className={`${width ? `w-${width}`: 'w-full'} relative h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg overflow-x-auto`}>
         {data.map((d) => {
           const isActive = activeTab === d.id;
           return (
