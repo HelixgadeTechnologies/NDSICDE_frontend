@@ -17,7 +17,7 @@ var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
-function TabComponent({ data, renderContent }) {
+function TabComponent({ data, renderContent, width }) {
     _s();
     const [activeTab, setActiveTab] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(1);
     const handleTabChange = (index)=>{
@@ -28,7 +28,7 @@ function TabComponent({ data, renderContent }) {
         className: "w-full space-y-4",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative w-full h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg overflow-x-auto",
+                className: `${width ? `w-${width}` : 'w-full'} relative h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg overflow-x-auto`,
                 children: data.map((d)=>{
                     const isActive = activeTab === d.id;
                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -45,27 +45,27 @@ function TabComponent({ data, renderContent }) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/tab-component.tsx",
-                                lineNumber: 38,
+                                lineNumber: 40,
                                 columnNumber: 17
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: `relative z-10 px-6 h-10 flex items-center justify-center font-bold text-sm cursor-pointer ${isActive ? "text-[#242424]" : "text-[#7A7A7A]"}`,
+                                className: `relative z-10 px-3 md:px-6 h-10 flex items-center justify-center font-bold text-xs md:text-sm cursor-pointer whitespace-nowrap ${isActive ? "text-[#242424]" : "text-[#7A7A7A]"}`,
                                 children: d.tabName
                             }, void 0, false, {
                                 fileName: "[project]/components/tab-component.tsx",
-                                lineNumber: 44,
+                                lineNumber: 46,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, d.id, true, {
                         fileName: "[project]/components/tab-component.tsx",
-                        lineNumber: 36,
+                        lineNumber: 38,
                         columnNumber: 13
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/components/tab-component.tsx",
-                lineNumber: 32,
+                lineNumber: 34,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AnimatePresence"], {
@@ -89,18 +89,18 @@ function TabComponent({ data, renderContent }) {
                     children: renderContent?.(activeTab)
                 }, activeTab, false, {
                     fileName: "[project]/components/tab-component.tsx",
-                    lineNumber: 58,
+                    lineNumber: 60,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/tab-component.tsx",
-                lineNumber: 57,
+                lineNumber: 59,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/tab-component.tsx",
-        lineNumber: 30,
+        lineNumber: 32,
         columnNumber: 5
     }, this);
 }

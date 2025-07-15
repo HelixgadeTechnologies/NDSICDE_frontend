@@ -6,7 +6,7 @@ import { useUIStore } from "@/store/ui-store";
 import AddNewRole from "./add-new-role";
 import EditRole from "./edit-role";
 import Heading from "@/ui/text-heading";
-import CardComponent from "@/ui/card";
+import CardComponent from "@/ui/card-wrapper";
 
 export default function AccessControl() {
   const head = ["Role Name", "Permission Level", "Users", "Status", "Actions"];

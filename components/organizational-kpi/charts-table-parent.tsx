@@ -1,6 +1,6 @@
 "use client";
 
-import CardComponent from "@/ui/card";
+import CardComponent from "@/ui/card-wrapper";
 import TabComponent from "@/components/tab-component";
 import TableSection from "./table-section";
 import ChartsComponent from "./charts-section";
@@ -31,7 +31,7 @@ export default function ChartsAndTableParent() {
   ];
   return (
     <div className="space-y-5">
-        {/* tabs */}
+      {/* tabs */}
       <CardComponent>
         <TabComponent
           width="80"
@@ -92,7 +92,11 @@ export default function ChartsAndTableParent() {
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{ borderRadius: "8px", fontSize: "0.875rem", textTransform: "capitalize" }}
+                contentStyle={{
+                  borderRadius: "8px",
+                  fontSize: "0.875rem",
+                  textTransform: "capitalize",
+                }}
                 labelStyle={{ fontWeight: "bold", color: "#374151" }}
               />
               <Line

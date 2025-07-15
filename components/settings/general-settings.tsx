@@ -1,11 +1,12 @@
 "use client";
 
 import Heading from "@/ui/text-heading";
-import CardComponent from "@/ui/card";
+import CardComponent from "@/ui/card-wrapper";
 import TextInput from "@/ui/form/text-input";
 import { useSettingsFormState } from "@/store/settings-store";
 import RadioComponent from "@/ui/form/switch-component";
 import Button from "@/ui/form/button";
+import DropDown from "@/ui/form/select-dropdown";
 
 export default function GeneralSettings() {
   const {
@@ -32,12 +33,13 @@ export default function GeneralSettings() {
           spacing="2"
         />
         <form action="" className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TextInput
+          <DropDown
             label="Organization Name"
             value={organizationName}
-            onChange={(e) => setField("organizationName", e.target.value)}
+            onChange={(value: string) => setField("organizationName", value)}
             name="organizationName"
             placeholder="NDSICDE"
+            options={[]}
           />
           <TextInput
             label="Contact email"
@@ -71,33 +73,37 @@ export default function GeneralSettings() {
           spacing="2"
         />
         <form action="" className="my-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TextInput
+          <DropDown
             label="Default Currency"
             value={defaultCurrency}
-            onChange={(e) => setField("defaultCurrency", e.target.value)}
-            name="defaultCurrency"
             placeholder="USD ($)"
+            name="defaultCurrency"
+            onChange={(value: string) => setField("defaultCurrency", value)}
+            options={[]}
           />
-          <TextInput
+          <DropDown
             label="Default Timezone"
             value={defaultTimezone}
-            onChange={(e) => setField("defaultTimezone", e.target.value)}
-            name="defaultTimezone"
             placeholder="Pacific Time (UTC - 8)"
+            name="defaultTimezone"
+            onChange={(value: string) => setField("defaultTimezone", value)}
+            options={[]}
           />
-          <TextInput
+          <DropDown
             label="Data Rentention Policy"
             value={dataRententionPolicy}
-            onChange={(e) => setField("dataRententionPolicy", e.target.value)}
+            onChange={(value: string) => setField("dataRententionPolicy", value)}
             name="dataRententionPolicy"
             placeholder="1 Year"
+            options={[]}
           />
-          <TextInput
+          <DropDown
             label="Audit Log Rentention"
             value={auditLogRetention}
-            onChange={(e) => setField("auditLogRetention", e.target.value)}
+            onChange={(value: string) => setField("auditLogRetention", value)}
             name="auditLogRetention"
             placeholder="3 Years"
+            options={[]}
           />
         </form>
       </CardComponent>

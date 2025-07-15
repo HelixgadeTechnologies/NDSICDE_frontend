@@ -42,7 +42,7 @@ const topNavigations = [
     },
     {
         name: "Performance Analytics & Reports",
-        href: "/admin/performance",
+        href: "/admin/performance-analytics",
         icon: "bi:gear"
     },
     {

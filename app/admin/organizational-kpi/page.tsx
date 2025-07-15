@@ -1,5 +1,5 @@
-import { Icon } from "@iconify/react";
 import ChartsAndTableParent from "@/components/organizational-kpi/charts-table-parent";
+import DashboardStat from "@/ui/dashboard-stat-card";
 
 export const metadata = {
   title: "Organizational KPI - NDSICDE",
@@ -41,26 +41,7 @@ export default function OrganizationalKPI() {
   return (
     <section>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-5">
-        {dashboardData.map((d, i) => (
-          <div
-            key={i}
-            className="h-[126px] w-full rounded-lg border border-[#E5E5E5] p-2 md:p-4 space-y-2.5"
-          >
-            <div className="flex justify-between items-center">
-              <p className="text-xs md:text-sm font-medium leading-5 text-[#242424] whitespace-nowrap">
-                {d.title}
-              </p>
-              <Icon icon={d.icon} height={20} width={20} color="#667185" />
-            </div>
-            <h4 className="primary font-bold leading-8 text-[22px]">
-              {d.value}
-            </h4>
-            <p className="font-medium text-[10px] md:text-sm md:leading-5 space-x-1">
-                <span className="text-[#22C55E]">+{d.percentage}%</span>
-                <span className="text-[#7A7A7A]">{d.percentInfo}</span>
-            </p>
-          </div>
-        ))}
+        <DashboardStat data={dashboardData} icon="basil:plus-solid" />
       </div>
       <ChartsAndTableParent />
     </section>

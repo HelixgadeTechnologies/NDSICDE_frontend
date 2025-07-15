@@ -55,7 +55,7 @@ export default function DropDown({
   const displayValue = selectedOption ? selectedOption.label : placeholder;
 
   return (
-    <div className="space-y-2 relative" ref={dropdownRef}>
+    <div className="space-y-2 relative flex-1" ref={dropdownRef}>
       {label && (
         <label htmlFor={id} className="text-xs font-medium text-[#242424] block">
           {label}
@@ -67,7 +67,7 @@ export default function DropDown({
         onClick={handleToggle}
         className={`${
           isBigger ? "h-12" : "h-10"
-        } w-full min-w-[180px] md:w-fit outline-none border border-[#B6D8FF] focus:border-[var(--primary-light)] hover:border-[var(--primary-light)] rounded-[6px] px-4 text-sm cursor-pointer flex items-center justify-between gap-5 bg-white transition-colors duration-200`}
+        } min-w-full md:w-fit outline-none border border-[#B6D8FF] focus:border-[var(--primary-light)] hover:border-[var(--primary-light)] rounded-[6px] px-4 text-sm cursor-pointer flex items-center justify-between gap-5 bg-white transition-colors duration-200`}
       >
         <span className="text-gray-500 whitespace-nowrap">{displayValue}</span>
         <Icon

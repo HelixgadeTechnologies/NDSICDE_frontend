@@ -41,14 +41,66 @@ __turbopack_context__.n(__turbopack_context__.i("[project]/app/admin/layout.tsx 
 var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
-    "default": (()=>PerformanceAnalytics)
+    "default": (()=>PerformanceAnalytics),
+    "metadata": (()=>metadata)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js [app-rsc] (ecmascript)");
 ;
+const metadata = {
+    title: "Performance Analytics & Reports - NDSICDE",
+    description: "View real time analytics of performances from pervious projects"
+};
 function PerformanceAnalytics() {
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Fragment"], {
-        children: "PerformanceAnalytics"
-    }, void 0, false);
+    const dashboardData = [
+        {
+            title: "Total Submissions",
+            value: 24,
+            percentage: 20.1,
+            percentInfo: "from last month",
+            icon: "proicons:graph"
+        },
+        {
+            title: "Pending Review",
+            value: 0,
+            percentage: 0,
+            percentInfo: "of total submissions",
+            icon: "material-symbols:planner-review-rounded"
+        },
+        {
+            title: "Approved",
+            value: 7,
+            percentage: 33,
+            percentInfo: "approval rate",
+            icon: "duo-icons:approved"
+        },
+        {
+            title: "Rejected",
+            value: 2,
+            percentage: 23,
+            percentInfo: "rejection rate",
+            icon: "marketeq:rejected-file-2"
+        }
+    ];
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "grid grid-cols-2 md:grid-cols-4 gap-4 my-5",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(DashboardStat, {
+                data: dashboardData
+            }, void 0, false, {
+                fileName: "[project]/app/admin/performance-analytics/page.tsx",
+                lineNumber: 41,
+                columnNumber: 17
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/app/admin/performance-analytics/page.tsx",
+            lineNumber: 40,
+            columnNumber: 13
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/app/admin/performance-analytics/page.tsx",
+        lineNumber: 39,
+        columnNumber: 9
+    }, this);
 }
 }}),
 "[project]/app/admin/performance-analytics/page.tsx [app-rsc] (ecmascript, Next.js server component)": ((__turbopack_context__) => {
