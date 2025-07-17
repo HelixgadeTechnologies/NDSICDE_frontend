@@ -27,6 +27,13 @@ export default function DropDown({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const id = `select-${name}`;
 
+  // ensure first option is always selected
+  useEffect(() => {
+    if (!value && options.length > 0) {
+      onChange(options[0].value);
+    }
+  }, [options, value, onChange]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

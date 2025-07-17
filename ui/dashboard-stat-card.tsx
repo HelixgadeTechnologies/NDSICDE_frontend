@@ -17,7 +17,7 @@ export default function DashboardStat({ data, icon }: StatProps) {
     return data.map((d, index) => (
         <div key={index} className="h-[126px] w-full rounded-lg border border-[#E5E5E5] p-2 md:p-4 space-y-2.5">
             <div className="flex justify-between items-center">
-              <p className="text-xs md:text-sm font-medium leading-5 text-[#242424] whitespace-nowrap capitalize">
+              <p className="text-xs md:text-[13px] font-medium leading-5 text-[#242424] whitespace-nowrap capitalize">
                 {d.title}
               </p>
               {d.icon && <Icon icon={d.icon} height={20} width={20} color="#667185" />}

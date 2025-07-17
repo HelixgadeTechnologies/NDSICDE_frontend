@@ -26,9 +26,16 @@ type UIState = {
   resetDateRange: () => void;
 };
 
+const today = new Date();
+const startDate = new Date(today);
+const endDate = new Date(today);
+
+// Add 7 days to the end date
+endDate.setDate(endDate.getDate() + 7);
+
 const defaultDateRange: DateRange = {
-  startDate: new Date("2025-07-01"),
-  endDate: new Date("2025-07-07"),
+  startDate,
+  endDate,
   key: "selection",
 };
 
