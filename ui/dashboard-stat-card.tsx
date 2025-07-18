@@ -4,13 +4,13 @@ interface StatType {
     title: string;
     icon?: string;
     value: number | string;
-    percentage: number;
+    percentage?: number;
     percentInfo: string;
 }
 
 type StatProps = {
     data: Array<StatType>
-    icon: string;
+    icon?: string;
 }
 
 export default function DashboardStat({ data, icon }: StatProps) {
@@ -26,10 +26,10 @@ export default function DashboardStat({ data, icon }: StatProps) {
               {d.value}
             </h4>
             <p className="font-medium text-[10px] md:text-sm md:leading-5 space-x-1 flex items-center">
-                <span className={`${d.percentage > 0 ? "text-[#22C55E]" : "text-red-500"} flex items-center`}>
-                  <Icon icon={icon} width={20} height={20} />
+                {d.percentage && <span className={`${d.percentage >= 0 ? "text-[#22C55E]" : "text-red-500"} flex items-center`}>
+                  {icon && <Icon icon={icon} width={20} height={20} />}
                   {d.percentage}%
-                </span>
+                </span>}
                 <span className="text-[#7A7A7A]">{d.percentInfo}</span>
             </p>
         </div>

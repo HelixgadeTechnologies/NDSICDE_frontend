@@ -5,9 +5,8 @@ import DateRangePicker from "@/ui/form/date-range";
 import { useOrgKPIFormState } from "@/store/organizational-kpi-store";
 import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
-import BarChartComponent from "../bar-chart";
+import BarChartComponent from "../../ui/bar-chart";
 import { kPIOverview } from "@/lib/config/charts";
-
 
 export default function ChartsComponent() {
   const {
@@ -17,7 +16,6 @@ export default function ChartsComponent() {
     disaggregation,
     setField,
   } = useOrgKPIFormState();
-
 
   const bars = [
     { key: "baseline", label: "Baseline", color: "#003B99" },

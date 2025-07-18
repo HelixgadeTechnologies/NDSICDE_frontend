@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { topNavigations, bottomNavigations } from "@/lib/config/sidebar";
-import Logo from "@/components/logo-component";
+import Logo from "@/ui/logo-component";
 import { useSidebar } from "@/context/SidebarContext";
-import {Icon } from "@iconify/react";
+import { Icon } from "@iconify/react";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -26,7 +26,7 @@ export default function Sidebar() {
         } md:translate-x-0 transition-all duration-300 ease-in-out`}
       >
         <Link href="/dashboard" className="flex justify-start mt-2.5">
-          <Logo/>
+          <Logo />
         </Link>
 
         {/* top navigations */}
@@ -46,7 +46,12 @@ export default function Sidebar() {
                       : "hover:bg-gray-50 text-gray-600"
                   }`}
                 >
-                  <Icon icon={nav.icon} width={20} height={20} color={isActive ? "#D2091E" : "#737373"} />
+                  <Icon
+                    icon={nav.icon}
+                    width={20}
+                    height={20}
+                    color={isActive ? "#D2091E" : "#737373"}
+                  />
                   <span className="text-xs">{nav.name}</span>
                 </Link>
               );
@@ -67,7 +72,12 @@ export default function Sidebar() {
                       : "hover:bg-gray-50 text-gray-600"
                   }`}
                 >
-                    <Icon icon={nav.icon} width={20} height={20} color={isActive ? "#D2091E" : "#737373"} />
+                  <Icon
+                    icon={nav.icon}
+                    width={20}
+                    height={20}
+                    color={isActive ? "#D2091E" : "#737373"}
+                  />
                   <span className="text-xs">{nav.name}</span>
                 </Link>
               );

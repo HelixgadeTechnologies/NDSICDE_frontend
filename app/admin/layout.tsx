@@ -1,6 +1,6 @@
-import Sidebar from "@/components/sidebar";
-import Navigation from "@/components/navigation";
-import Breadcrumb from "@/components/breadcrumb-component";
+import Sidebar from "@/ui/sidebar";
+import Navigation from "@/ui/navigation";
+import Breadcrumb from "@/ui/breadcrumb-component";
 
 export default function DashboardLayout({
   children,

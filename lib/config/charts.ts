@@ -132,3 +132,4 @@ export const expenseCategoriesBreakdown = [
   { name: "Travel", value: 14 },
   { name: "Other", value: 14 },
 ];
+

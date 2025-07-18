@@ -19,12 +19,14 @@ type BarChartProps = {
     color: string;
   }[];
   xKey: string;
+  legend?: boolean;
 };
 
 export default function BarChartComponent({
   data,
   bars,
   xKey,
+  legend = true,
 }: BarChartProps) {
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -53,7 +55,7 @@ export default function BarChartComponent({
           }}
           labelStyle={{ fontWeight: 600 }}
         />
-        <Legend
+        {legend && <Legend
           verticalAlign="top"
           align="right"
           iconType="circle"
@@ -61,7 +63,7 @@ export default function BarChartComponent({
           formatter={(value) => (
             <span className="text-sm text-gray-700 capitalize">{value}</span>
           )}
-        />
+        />}
         {bars.map((bar) => (
           <Bar
             key={bar.key}

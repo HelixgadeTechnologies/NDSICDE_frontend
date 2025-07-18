@@ -95,7 +95,7 @@ export default function DropDown({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: "linear" }}
-            className="absolute top-full mt-1 w-full bg-white border border-gray-300 rounded-[6px] shadow-lg z-50 max-h-60 overflow-y-auto"
+            className="absolute top-full w-full bg-white border border-gray-300 rounded-[6px] shadow-lg z-50 max-h-60 overflow-y-auto"
           >
             {options.length === 0 ? (
               <div className="px-4 py-2 text-sm text-gray-500">

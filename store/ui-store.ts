@@ -31,7 +31,7 @@ const startDate = new Date(today);
 const endDate = new Date(today);
 
 // Add 7 days to the end date
-endDate.setDate(endDate.getDate() + 7);
+endDate.setDate(endDate.getDate() + 6);
 
 const defaultDateRange: DateRange = {
   startDate,

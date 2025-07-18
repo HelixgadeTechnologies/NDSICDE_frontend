@@ -1,19 +1,11 @@
 "use client";
 
 import CardComponent from "@/ui/card-wrapper";
-import TabComponent from "@/components/tab-component";
+import TabComponent from "@/ui/tab-component";
 import TableSection from "./table-section";
 import ChartsComponent from "./charts-section";
 import Heading from "@/ui/text-heading";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-} from "recharts";
+import LineChartComponent from "@/ui/line-chart";
 
 export default function ChartsAndTableParent() {
   const tabs = [
@@ -29,6 +21,15 @@ export default function ChartsAndTableParent() {
     { code: "INFRA 01", value: 50 },
     { code: "INFRA 02", value: 90 },
   ];
+
+  const lines = [
+    {
+      key: "value",
+      label: "Performance",
+      color: "#003B99",
+    },
+  ];
+
   return (
     <div className="space-y-5">
       {/* tabs */}
@@ -73,41 +74,12 @@ export default function ChartsAndTableParent() {
 
         {/* line chart */}
         <div className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="#E5E7EB"
-              />
-              <XAxis
-                dataKey="code"
-                tick={{ fill: "#6B7280", fontSize: 12 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: "#6B7280", fontSize: 12 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                contentStyle={{
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  textTransform: "capitalize",
-                }}
-                labelStyle={{ fontWeight: "bold", color: "#374151" }}
-              />
-              <Line
-                dataKey="value"
-                stroke="#003B99"
-                strokeWidth={2}
-                dot={{ fill: "#003B99", r: 4 }}
-                activeDot={{ r: 6 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <LineChartComponent
+            data={data}
+            lines={lines}
+            legend={false}
+            xKey="code"
+          />
         </div>
       </CardComponent>
     </div>

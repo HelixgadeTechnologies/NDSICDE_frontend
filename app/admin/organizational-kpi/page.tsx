@@ -18,7 +18,7 @@ export default function OrganizationalKPI() {
     {
         title: "Pending Review",
         value: 0,
-        percentage: 0,
+        percentage: 2,
         percentInfo: "of total submissions",
         icon: "material-symbols:planner-review-rounded",
     },
@@ -40,7 +40,7 @@ export default function OrganizationalKPI() {
 
   return (
     <section>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-5">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-5">
         <DashboardStat data={dashboardData} icon="basil:plus-solid" />
       </div>
       <ChartsAndTableParent />
