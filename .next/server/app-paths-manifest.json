@@ -1,4 +1,5 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/admin/data-validation/page": "app/admin/data-validation/page.js",
   "/admin/financial-reporting/page": "app/admin/financial-reporting/page.js",
   "/admin/organizational-kpi/page": "app/admin/organizational-kpi/page.js",

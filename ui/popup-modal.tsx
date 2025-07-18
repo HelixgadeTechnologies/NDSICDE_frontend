@@ -6,12 +6,16 @@ type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  width?: string;
+  maxWidth?: string;
 };
 
 export default function Modal({ 
     isOpen, 
     onClose, 
     children,
+    width = "90%",
+    maxWidth = "28rem",
 }: ModalProps) {
   return (
     <AnimatePresence>
@@ -27,12 +31,16 @@ export default function Modal({
           >
             {/* Modal */}
             <motion.div
-              className="bg-white rounded-2xl shadow-xl w-[90%] max-w-md p-6 z-50 relative text-black"
+              className="bg-white rounded-2xl shadow-xl p-6 z-50 relative text-black"
+              style={{ 
+                width: width,
+                maxWidth: maxWidth,
+              }}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              onClick={(e) => e.stopPropagation()} // prevent modal close when clicking inside
+              onClick={(e) => e.stopPropagation()}
             >
               {children}
             </motion.div>
