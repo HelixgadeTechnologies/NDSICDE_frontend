@@ -3,7 +3,7 @@
 import Table from "@/ui/table";
 import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
-import { typeChecker } from "@/utils/ui";
+import { typeChecker } from "@/utils/ui-utility";
 
 export default function BudgetVSActuals() {
   const head = [
@@ -49,22 +49,22 @@ export default function BudgetVSActuals() {
       <Heading heading="Budget vs. Actuals" />
       <div className="mt-5">
         <Table
-            tableHead={head}
-            tableData={data}
-            checkbox
-            idKey="id"
-            renderRow={(row) => {
+          tableHead={head}
+          tableData={data}
+          checkbox
+          idKey="id"
+          renderRow={(row) => {
             return (
-                <>
+              <>
                 <td className="px-6">{row.projectName}</td>
                 <td className="px-6">${row.approvedBudget}</td>
                 <td className="px-6">${row.actualExpenses}</td>
                 <td className="px-6">${row.varianceAmount}</td>
                 <td className="px-6">{row.variance}%</td>
                 <td className={typeChecker(row)}>{row.status}</td>
-                </>
+              </>
             );
-            }}
+          }}
         />
       </div>
     </CardComponent>

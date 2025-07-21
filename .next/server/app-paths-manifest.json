@@ -1,8 +1,8 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/admin/data-validation/page": "app/admin/data-validation/page.js",
   "/admin/financial-reporting/page": "app/admin/financial-reporting/page.js",
   "/admin/organizational-kpi/page": "app/admin/organizational-kpi/page.js",
   "/admin/performance-analytics/page": "app/admin/performance-analytics/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/admin/settings/page": "app/admin/settings/page.js",
+  "/admin/user-management/page": "app/admin/user-management/page.js"
 }

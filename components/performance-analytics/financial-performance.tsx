@@ -10,10 +10,9 @@ import {
 import PieChartComponent from "../../ui/pie-chart";
 import BarChartComponent from "../../ui/bar-chart";
 import Table from "@/ui/table";
-import { typeChecker } from "@/utils/ui";
+import { typeChecker } from "@/utils/ui-utility";
 
 export default function FinancialPerformance() {
-
   const bars = [
     { key: "budget", label: "Budget", color: "#003B99" },
     { key: "actual", label: "Actual", color: "#D2091E" },
