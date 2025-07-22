@@ -20,6 +20,13 @@ export default function DeleteTeamMember({
   user,
 }: DeleteProps) {
   const [checked, setChecked] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
+
+  const handleChecked = () => {
+    setChecked(!checked);
+    setIsDisabled(!isDisabled);
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
       <div className="space-y-3">
@@ -62,9 +69,9 @@ export default function DeleteTeamMember({
           label="I understand that this action is permanent"
           name="checkbox"
           isChecked={checked}
-          onChange={setChecked}
+          onChange={handleChecked}
         />
-        <Button content="Remove Member" />
+        <Button content="Remove Member" isDisabled={isDisabled} />
       </div>
     </Modal>
   );

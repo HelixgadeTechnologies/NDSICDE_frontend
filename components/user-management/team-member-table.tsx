@@ -150,7 +150,7 @@ export default function TeamMembersTable() {
             />
           ) : (
             <div className="text-center text-gray-500 py-10 text-sm rounded-lg">
-              No users found matching{" "}
+              No results found matching{" "}
               <span className="font-medium">{`"${query}"`}</span>.
             </div>
           )}
