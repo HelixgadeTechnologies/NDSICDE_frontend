@@ -5,6 +5,7 @@ export interface TeamMemberModalStates {
   editTeamMember: boolean;
   viewTeamMember: boolean;
   deleteTeamMember: boolean;
+  addTeamMember: boolean;
   selectedUser: UserDetails | null;
 }
 
@@ -12,10 +13,12 @@ export interface TeamMemberModalActions {
   setEditTeamMember: (value: boolean) => void;
   setViewTeamMember: (value: boolean) => void;
   setDeleteTeamMember: (value: boolean) => void;
+  setAddTeamMember: (value: boolean) => void;
   setSelectedUser: (user: UserDetails | null) => void;
   handleViewUser: (user: UserDetails, setActiveRowId?: (id: number | null) => void) => void;
   handleEditUser: (user: UserDetails, setActiveRowId?: (id: number | null) => void) => void;
   handleDeleteUser: (user: UserDetails, setActiveRowId?: (id: number | null) => void) => void;
+  handleAddUser: () => void;
   closeAllModals: () => void;
   resetModalState: () => void;
 }
@@ -25,6 +28,7 @@ export function useTeamMemberModal(): TeamMemberModalStates & TeamMemberModalAct
   const [editTeamMember, setEditTeamMember] = useState(false);
   const [viewTeamMember, setViewTeamMember] = useState(false);
   const [deleteTeamMember, setDeleteTeamMember] = useState(false);
+  const [addTeamMember, setAddTeamMember] = useState(false);
   
   // State to track the selected user
   const [selectedUser, setSelectedUser] = useState<UserDetails | null>(null);
@@ -50,6 +54,11 @@ export function useTeamMemberModal(): TeamMemberModalStates & TeamMemberModalAct
     setActiveRowId?.(null);
   };
 
+  // Function to handle adding a user
+  const handleAddUser = () => {
+    setAddTeamMember(true);
+  };
+
   // Function to close all modals
   const closeAllModals = () => {
     setEditTeamMember(false);
@@ -68,18 +77,21 @@ export function useTeamMemberModal(): TeamMemberModalStates & TeamMemberModalAct
     editTeamMember,
     viewTeamMember,
     deleteTeamMember,
+    addTeamMember,
     selectedUser,
     
     // State setters
     setEditTeamMember,
     setViewTeamMember,
     setDeleteTeamMember,
+    setAddTeamMember,
     setSelectedUser,
     
     // Action handlers
     handleViewUser,
     handleEditUser,
     handleDeleteUser,
+    handleAddUser,
     closeAllModals,
     resetModalState,
   };

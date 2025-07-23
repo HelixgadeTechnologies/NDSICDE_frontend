@@ -732,6 +732,10 @@
     width: 280px;
   }
 
+  .w-\[290px\] {
+    width: 290px;
+  }
+
   .w-\[300px\] {
     width: 300px;
   }
@@ -742,6 +746,10 @@
 
   .w-\[356px\] {
     width: 356px;
+  }
+
+  .w-\[430px\] {
+    width: 430px;
   }
 
   .w-\[440px\] {
@@ -762,6 +770,10 @@
 
   .min-w-\[180px\] {
     min-width: 180px;
+  }
+
+  .min-w-\[228px\] {
+    min-width: 228px;
   }
 
   .min-w-full {
@@ -1158,10 +1170,6 @@
 
   .bg-red-400 {
     background-color: var(--color-red-400);
-  }
-
-  .bg-red-500 {
-    background-color: var(--color-red-500);
   }
 
   .bg-white {
@@ -1573,12 +1581,6 @@
 
   .focus-within\:border-red-500:focus-within {
     border-color: var(--color-red-500);
-  }
-
-  @media (hover: hover) {
-    .hover\:cursor-not-allowed:hover {
-      cursor: not-allowed;
-    }
   }
 
   @media (hover: hover) {
