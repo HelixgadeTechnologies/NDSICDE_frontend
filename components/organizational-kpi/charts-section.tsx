@@ -5,7 +5,7 @@ import DateRangePicker from "@/ui/form/date-range";
 import { useOrgKPIFormState } from "@/store/organizational-kpi-store";
 import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
-import BarChartComponent from "../../ui/bar-chart";
+import BarChartGrouped from "../../ui/bar-chart-grouped";
 import { kPIOverview } from "@/lib/config/charts";
 
 export default function ChartsComponent() {
@@ -65,7 +65,7 @@ export default function ChartsComponent() {
       <CardComponent>
         <Heading heading="Key Performance Indicator Overview" />
         <div className="h-[417px]">
-          <BarChartComponent data={kPIOverview} xKey="name" bars={bars} />
+          <BarChartGrouped data={kPIOverview} xKey="name" bars={bars} />
         </div>
       </CardComponent>
     </section>

@@ -8,7 +8,7 @@ import {
   ECBColors,
 } from "@/lib/config/charts";
 import PieChartComponent from "../../ui/pie-chart";
-import BarChartComponent from "../../ui/bar-chart";
+import BarChartGrouped from "../../ui/bar-chart-grouped";
 import Table from "@/ui/table";
 import { typeChecker } from "@/utils/ui-utility";
 
@@ -64,7 +64,7 @@ export default function FinancialPerformance() {
               <Heading heading="Budget vs. Actual Spending" />
             </div>
             <div className="h-[530px]">
-              <BarChartComponent
+              <BarChartGrouped
                 data={budgetVSActualSpending}
                 bars={bars}
                 xKey="name"

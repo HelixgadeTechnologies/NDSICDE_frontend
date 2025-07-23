@@ -4,52 +4,19 @@ import CardComponent from "@/ui/card-wrapper";
 import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
 import Avatar from "@/ui/avatar";
+import { recentActivities } from "@/lib/config/charts";
 
 export default function RecentActivityTab() {
-    const recentActivities = [
-        {
-            id: 1,
-            activity: "John Doe submitted a new report",
-            project: "Water Sanitation",
-            time: "2 hours ago",
-        },
-        {
-            id: 2,
-            activity: "Alice Smith updated KPI targets",
-            project: "Food Security",
-            time: "5 hours ago",
-        },
-        {
-            id: 3,
-            activity: "Michael Brown approved the financial request",
-            project: "Infrastructure Development",
-            time: "5 hours ago",
-        },
-        {
-            id: 4,
-            activity: "Emily Johnson added a new team member",
-            project: "Health Outreach",
-            time: "1 day ago",
-        },
-        {
-            id: 5,
-            activity: "David Wilson completed the project review",
-            project: "Community Engagement",
-            time: "2 days ago",
-        },
-        {
-            id: 6,
-            activity: "Sarah Davis submitted a new proposal",
-            project: "Education Initiative",
-            time: "3 days ago",
-        },
-    ];
-
   return (
     <CardComponent>
         <Heading heading="Recent Activities" />
-        <div className="space-y-4">
-            {recentActivities.slice(0, 2).map((activity) => (
+        <div className="space-y-2">
+            { recentActivities.length <= 0 ? (
+                <div className="flex flex-col items-center justify-center h-32">
+                    <p className="text-lg text-gray-700">No recent activities found.</p>
+                    <p className="text-xs text-gray-500">Check back later for updates.</p>
+                </div>
+            ) : recentActivities.slice(0, 2).map((activity) => (
                 <div key={activity.id} className="flex gap-4 items-center my-4">
                     <Avatar
                     name="John Doe"

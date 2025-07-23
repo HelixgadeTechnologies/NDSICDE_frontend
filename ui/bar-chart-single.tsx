@@ -3,41 +3,35 @@
 import {
   ResponsiveContainer,
   BarChart,
-  CartesianGrid,
+  Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   Legend,
-  Bar,
+  Cell,
 } from "recharts";
 
-type BarChartProps = {
-  data: Record<string, unknown>[];
-  bars: {
-    key: string;
-    label?: string;
-    color: string;
-  }[];
-  xKey: string;
-  legend?: boolean;
+type Item = {
+  label: string;
+  value: number;
 };
 
-export default function BarChartComponent({
+type BarChartSingleColoredProps = {
+  data: Item[];
+};
+
+const COLORS = ["#22C55E", "#3B82F6", "#EF4444", "#FACC15"]; // green, blue, red, yellow
+
+export default function BarChartSingleColored({
   data,
-  bars,
-  xKey,
-  legend = true,
-}: BarChartProps) {
+}: BarChartSingleColoredProps) {
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data} barCategoryGap={20}>
-        <CartesianGrid
-          strokeDasharray="3 3"
-          stroke="#E5E7EB"
-          vertical={false}
-        />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
         <XAxis
-          dataKey={xKey}
+          dataKey="label"
           tick={{ fill: "#6B7280", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
@@ -55,7 +49,7 @@ export default function BarChartComponent({
           }}
           labelStyle={{ fontWeight: 600 }}
         />
-        {legend && <Legend
+        <Legend
           verticalAlign="top"
           align="right"
           iconType="circle"
@@ -63,16 +57,12 @@ export default function BarChartComponent({
           formatter={(value) => (
             <span className="text-sm text-gray-700 capitalize">{value}</span>
           )}
-        />}
-        {bars.map((bar) => (
-          <Bar
-            key={bar.key}
-            dataKey={bar.key}
-            fill={bar.color}
-            name={bar.label || bar.key}
-            radius={[4, 4, 0, 0]}
-          />
-        ))}
+        />
+        <Bar dataKey="value" radius={[4, 4, 0, 0]} name="Value">
+          {data.map((_, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Bar>
       </BarChart>
     </ResponsiveContainer>
   );

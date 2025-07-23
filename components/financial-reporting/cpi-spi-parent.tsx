@@ -5,50 +5,35 @@ import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
 import DropDown from "@/ui/form/select-dropdown";
 import { motion, AnimatePresence } from "framer-motion";
-import BarChartComponent from "@/ui/bar-chart";
+import BarChartGrouped from "@/ui/bar-chart-grouped";
 
-const bars = [
-  { key: "value", label: "Performance", color: "#EF4444" },
+const bars = [{ key: "value", label: "Performance", color: "#EF4444" }];
+
+const data = [
+  { name: "Project 1", value: 80 },
+  { name: "Project 2", value: 90 },
+  { name: "Project 3", value: 80 },
+  { name: "Project 4", value: 50 },
+  { name: "Project 5", value: 80 },
+  { name: "Project 6", value: 80 },
+  { name: "Project 7", value: 90 },
+  { name: "Project 8", value: 50 },
 ];
-
-
-  const data = [
-    { name: "Project 1", value: 80},
-    { name: "Project 2", value: 90},
-    { name: "Project 3", value: 80},
-    { name: "Project 4", value: 50},
-    { name: "Project 5", value: 80},
-    { name: "Project 6", value: 80},
-    { name: "Project 7", value: 90},
-    { name: "Project 8", value: 50},
-  ];
-
-
 
 function CPI() {
   return (
     <div className="h-[300px] mt-5">
-      <BarChartComponent
-      legend={false}
-      xKey="name"
-      data={data}
-      bars={bars}
-      />
+      <BarChartGrouped legend={false} xKey="name" data={data} bars={bars} />
     </div>
-  )
-};
+  );
+}
 
 function SPI() {
   return (
     <div className="h-[300px] mt-5">
-      <BarChartComponent
-      legend={false}
-      xKey="name"
-      data={data}
-      bars={bars}
-      />
+      <BarChartGrouped legend={false} xKey="name" data={data} bars={bars} />
     </div>
-  )
+  );
 }
 
 export default function FinancialPerformance() {
@@ -81,38 +66,38 @@ export default function FinancialPerformance() {
             options={[]}
             isBigger
           />
-          
+
           {/* Hardcoded Tabs */}
           <div className="w-full h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg">
-              {tabs.map((d) => {
-                const isActive = activeTab === d.id;
-                return (
+            {tabs.map((d) => {
+              const isActive = activeTab === d.id;
+              return (
+                <div
+                  key={d.id}
+                  onClick={() => handleTabChange(d.id)}
+                  className="relative"
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="tab"
+                      className="absolute inset-0 z-0 bg-white rounded-lg"
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30,
+                      }}
+                    />
+                  )}
                   <div
-                    key={d.id}
-                    onClick={() => handleTabChange(d.id)}
-                    className="relative"
+                    className={`relative z-10 px-3 md:px-6 h-10 flex items-center justify-center font-bold text-xs md:text-sm cursor-pointer whitespace-nowrap ${
+                      isActive ? "text-[#242424]" : "text-[#7A7A7A]"
+                    }`}
                   >
-                    {isActive && (
-                      <motion.div
-                        layoutId="tab"
-                        className="absolute inset-0 z-0 bg-white rounded-lg"
-                        transition={{
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 30,
-                        }}
-                      />
-                    )}
-                    <div
-                      className={`relative z-10 px-3 md:px-6 h-10 flex items-center justify-center font-bold text-xs md:text-sm cursor-pointer whitespace-nowrap ${
-                        isActive ? "text-[#242424]" : "text-[#7A7A7A]"
-                      }`}
-                    >
-                      {d.tabName}
-                    </div>
+                    {d.tabName}
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -124,8 +109,8 @@ export default function FinancialPerformance() {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.25 }}
         >
-          {activeTab === 1 && <CPI/>}
-          {activeTab === 2 && <SPI/>}
+          {activeTab === 1 && <CPI />}
+          {activeTab === 2 && <SPI />}
         </motion.div>
       </AnimatePresence>
     </CardComponent>

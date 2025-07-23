@@ -1,5 +1,7 @@
 import DashboardStat from "@/ui/dashboard-stat-card";
 import RecentActivityTab from "@/components/dashboard/recent-activity-tab";
+import PendingActivityCards from "@/components/dashboard/pending-activity-cards";
+import DashboardGraph from "@/components/dashboard/dashboard-graph";
 
 export const metadata = {
   title: "Dashboard - NDSICDE",
@@ -53,17 +55,19 @@ export default function DashboardPage() {
   ];
 
   return (
-    <section>
+    <section className="space-y-10">
       <div className="flex justify-center items-start gap-4">
         <div className="w-3/5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <DashboardStat data={dashboardData} icon="basil:plus-solid" />
           </div>
         </div>
-        <div className="w-2/5 mt-4">
+        <div className="w-2/5">
           <RecentActivityTab />
         </div>
       </div>
+      <DashboardGraph/>
+      <PendingActivityCards/>
     </section>
   );
 }
