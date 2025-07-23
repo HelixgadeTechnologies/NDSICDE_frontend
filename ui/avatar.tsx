@@ -5,6 +5,7 @@ import Link from "next/link";
 type AvatarProps = {
   src?: string;
   name: string;
+  href?: string;
 };
 
 function getInitials(fullName?: string) {
@@ -18,11 +19,11 @@ function getInitials(fullName?: string) {
 }
 
 
-export default function Avatar({ src, name }: AvatarProps) {
+export default function Avatar({ src, name, href = "/user/profile" }: AvatarProps) {
   const initials = getInitials(name);
 
   return (
-    <Link href="/user/profile">
+    <Link href={href}>
       {src ? (
         <div className="h-[30px] w-[30px] md:h-[40px] md:w-[40px] rounded-full overflow-hidden">
           <Image

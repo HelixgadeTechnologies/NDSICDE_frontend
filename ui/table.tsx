@@ -72,20 +72,32 @@ export default function Table<T>({
         </thead>
         <tbody>
           {tableData.map((row, i) => {
-            const id = idKey ? row[idKey] : i;
-            const isChecked = selectedIds.includes(id);
+            if (checkbox && !idKey) {
+              // If checkbox is enabled but no idKey is provided, skip rendering checkboxes
+              return (
+                <tr
+                  key={i}
+                  className="border-t border-[#E5E7EB] h-[60px] text-[#6B7280]"
+                >
+                  {renderRow(row, i, false)}
+                </tr>
+              );
+            }
+
+            const id = idKey ? row[idKey] : undefined;
+            const isChecked = idKey ? selectedIds.includes(row[idKey]) : false;
 
             return (
               <tr
                 key={i}
                 className="border-t border-[#E5E7EB] h-[60px] text-[#6B7280]"
               >
-                {checkbox && (
+                {checkbox && idKey && (
                   <td className="px-6">
                     <Checkbox
                       name={`checkbox-${i}`}
                       isChecked={isChecked}
-                      onChange={() => toggleRow(id)}
+                      onChange={() => id && toggleRow(id)}
                     />
                   </td>
                 )}
