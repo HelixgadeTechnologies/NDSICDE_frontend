@@ -1,9 +1,0 @@
-{
-  "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/admin/data-validation/page": "app/admin/data-validation/page.js",
-  "/admin/financial-reporting/page": "app/admin/financial-reporting/page.js",
-  "/admin/performance-analytics/page": "app/admin/performance-analytics/page.js",
-  "/admin/project-management/page": "app/admin/project-management/page.js",
-  "/admin/strategic-objectives/page": "app/admin/strategic-objectives/page.js",
-  "/admin/user-management/page": "app/admin/user-management/page.js"
-}

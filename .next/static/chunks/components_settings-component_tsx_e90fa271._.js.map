@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/quin/dev/NDSICDE_frontend/components/settings-component.tsx"],"sourcesContent":["\"use client\";\n\nimport TabComponent from \"@/components/tab-component\";\n\nexport default function SettingsComponent() {\n    const tabs = [\n        {name: \"General Settings\", id: 1},\n        {name: \"Access Control\", id: 2},\n    ];\n\n    return (\n        <section>\n            \n        </section>\n    )\n}"],"names":[],"mappings":";;;;AAAA;;AAIe,SAAS;IACpB,MAAM,OAAO;QACT;YAAC,MAAM;YAAoB,IAAI;QAAC;QAChC;YAAC,MAAM;YAAkB,IAAI;QAAC;KACjC;IAED,qBACI,6LAAC;;;;;AAIT;KAXwB","debugId":null}}]
-}
