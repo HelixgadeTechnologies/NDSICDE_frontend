@@ -16,12 +16,13 @@ type Props = {
 };
 
 export default function Breadcrumb({
-  fallbackTitle = "NDSICDE Platform",
+  fallbackTitle = "",
 }: Props) {
   const pathname = usePathname();
 
   const matched = breadcrumbs.find((item) =>
-    pathname.startsWith(item.href.replace(/\[.*?\]/, ""))
+    // pathname.startsWith(item.href.replace(/\[.*?\]/, ""))
+    pathname.includes(item.href)
   );
 
   const {
@@ -56,7 +57,7 @@ export default function Breadcrumb({
       </>
     ),
     "/admin/project-management": (
-      <Button content="New Project" icon="cil:plus" />
+      <Button content="New Project" icon="cil:plus" href="/admin/create-project" />
     ),
     "/admin/user-management": (
       <>

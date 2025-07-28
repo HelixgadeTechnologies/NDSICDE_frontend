@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { topNavigations, bottomNavigations } from "@/lib/config/sidebar";
+import { topNavigations, bottomNavigations } from "@/lib/routes/admin";
 import Logo from "@/ui/logo-component";
 import { useSidebar } from "@/context/SidebarContext";
 import { Icon } from "@iconify/react";

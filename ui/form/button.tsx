@@ -25,8 +25,10 @@ export default function Button({
   if (href) {
     return (
       <Link href={href}>
-        {icon && (<Icon icon={icon} width={20} height={20} />)}
-        <button className={classes}>{content}</button>
+        <button className={classes}>
+          {icon && (<Icon icon={icon} width={20} height={20} />)}
+          {content}
+          </button>
       </Link>
     );
   }

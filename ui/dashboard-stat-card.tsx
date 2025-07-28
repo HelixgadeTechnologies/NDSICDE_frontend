@@ -5,7 +5,7 @@ interface StatType {
     icon?: string;
     value: number | string;
     percentage?: number;
-    percentInfo: string;
+    percentInfo?: string;
 }
 
 type StatProps = {
