@@ -10,7 +10,7 @@ import {
   KPIProgressTracking,
 } from "@/lib/config/charts";
 import PieChartComponent from "../../ui/pie-chart";
-import BarChartGrouped from "../../ui/bar-chart-grouped";
+import BarChartComponent from "../../ui/bar-chart";
 import Percentage from "@/ui/percentage-component";
 import { usePerformanceAnalyticsReportsState } from "@/store/performance-analytics";
 
@@ -65,7 +65,11 @@ export default function ProjectResultPerformance() {
               </div>
             </div>
             <div className="h-[460px]">
-              <BarChartGrouped data={KPIActualTarget} bars={bars} xKey="name" />
+              <BarChartComponent
+                data={KPIActualTarget}
+                bars={bars}
+                xKey="name"
+              />
             </div>
           </CardComponent>
         </div>

@@ -1,7 +1,7 @@
 import DashboardStat from "@/ui/dashboard-stat-card";
 import RecentActivityTab from "@/components/dashboard/recent-activity-tab";
 import PendingActivityCards from "@/components/dashboard/pending-activity-cards";
-import DashboardGraph from "@/components/dashboard/dashboard-graph";
+import OrganizationalProjectPerformance from "@/components/dashboard/organizational-project-performance";
 
 export const metadata = {
   title: "Dashboard - NDSICDE",
@@ -66,7 +66,7 @@ export default function DashboardPage() {
           <RecentActivityTab />
         </div>
       </div>
-      <DashboardGraph/>
+      <OrganizationalProjectPerformance/>
       <PendingActivityCards/>
     </section>
   );

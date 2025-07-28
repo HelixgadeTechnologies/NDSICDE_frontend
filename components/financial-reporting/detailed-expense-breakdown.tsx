@@ -4,7 +4,7 @@ import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
 import TabComponent from "@/ui/tab-component";
 import Table from "@/ui/table";
-import BarChartGrouped from "@/ui/bar-chart-grouped";
+import BarChartComponent from "@/ui/bar-chart";
 import Button from "@/ui/form/button";
 import { Icon } from "@iconify/react";
 
@@ -94,7 +94,7 @@ export default function DetailedExpenseBreakdown() {
               } else {
                 return (
                   <div className="h-[330px]">
-                    <BarChartGrouped
+                    <BarChartComponent
                       data={barData}
                       xKey="name"
                       bars={bars}

@@ -5,9 +5,8 @@ import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
 import DropDown from "@/ui/form/select-dropdown";
 import { motion, AnimatePresence } from "framer-motion";
-import BarChartGrouped from "@/ui/bar-chart-grouped";
+import BarChartComponent from "@/ui/bar-chart";
 
-const bars = [{ key: "value", label: "Performance", color: "#EF4444" }];
 
 const data = [
   { name: "Project 1", value: 80 },
@@ -20,10 +19,19 @@ const data = [
   { name: "Project 8", value: 50 },
 ];
 
+const colorsSpi = ["#0047AB", "#F44336", "#FBC02D"];
+  const colorsCpi = ["#F44336", "#FBC02D", "#0047AB", "#22C55E",];
+
 function CPI() {
   return (
     <div className="h-[300px] mt-5">
-      <BarChartGrouped legend={false} xKey="name" data={data} bars={bars} />
+      <BarChartComponent
+        data={data}
+        isSingleBar={true}
+        colors={colorsCpi}
+        xKey="name"
+        labels={["Under Budget",  "As Planned", "No Spending", "Over Budget"]}
+        />
     </div>
   );
 }
@@ -31,7 +39,13 @@ function CPI() {
 function SPI() {
   return (
     <div className="h-[300px] mt-5">
-      <BarChartGrouped legend={false} xKey="name" data={data} bars={bars} />
+      <BarChartComponent
+        data={data}
+        isSingleBar={true}
+        colors={colorsSpi}
+        xKey="name"
+        labels={["Behind Schedule", "Ahead of Schedule", "On Schedule"]}
+        />
     </div>
   );
 }
