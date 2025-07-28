@@ -3,7 +3,7 @@ import CardComponent from "@/ui/card-wrapper";
 import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
 import ActivitySummaryCard from "./activity-summary";
-import { pendingActivityFundRequest } from "@/lib/config/charts";
+import { pendingActivityFundRequest, pendingReportApproval } from "@/lib/config/charts";
 
 export default function PendingActivityCards() {
   return (
@@ -44,7 +44,7 @@ export default function PendingActivityCards() {
           </div>
         ) : (
           <div className="space-y-4 my-3">
-            {pendingActivityFundRequest.slice(0, 4).map((request) => (
+            {pendingReportApproval.slice(0, 4).map((request) => (
               <ActivitySummaryCard 
               key={request.id}
               title={request.title}

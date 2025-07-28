@@ -55,7 +55,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <section className="space-y-10">
+    <section className="space-y-7">
       <div className="flex justify-center items-start gap-4">
         <div className="w-3/5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
