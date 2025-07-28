@@ -55,7 +55,7 @@ export default function PendingActivityCards() {
             ))}
           </div>
         )}
-        <Button content="View All Approval" />
+        <Button content="View All Approval" href="/admin/dashboard/pending-approvals" />
       </CardComponent>
     </section>
   );

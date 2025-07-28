@@ -242,14 +242,14 @@ export const pendingReportApproval = [
     type: "Team",
   },
   {
-    id: 1,
+    id: 3,
     title: "Outcome",
     project: "Water Sanitation",
     status: "Normal",
     type: "Project",
   },
   {
-    id: 1,
+    id: 4,
     title: "Impact",
     project: "Food Security",
     status: "Urgent",
