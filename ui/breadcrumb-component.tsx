@@ -7,6 +7,8 @@ import { useTeamMemberModal } from "@/utils/team-member-utility";
 import AddTeamMember from "@/components/user-management/add-team-member";
 import DateRangePicker from "./form/date-range";
 import DropDown from "./form/select-dropdown";
+import { useStrategicObjectivesAndKPIsModal } from "@/utils/strategic-objective-kpi-utility";
+import AddStrategicObjectiveModal from "@/components/strategic-objectives-kpi/add-strategic-objective";
 
 type Props = {
   fallbackTitle?: string;
@@ -28,12 +30,30 @@ export default function Breadcrumb({
     handleAddUser,
   } = useTeamMemberModal();
 
+  const {
+    setAddStrategicObjective,
+    addStrategicObjective,
+    handleAddSO,
+  } = useStrategicObjectivesAndKPIsModal();
+
   const actionComponents: Record<string, React.ReactNode> = {
     "/admin/dashboard": (
       <Button content="New Project" icon="cil:plus" />
     ),
     "/admin/strategic-objectives": (
-      <Button content="Add Strategic Objective" icon="cil:plus" />
+      <>
+        <Button
+          onClick={handleAddSO}
+          content="Add New Member"
+          icon="cil:plus"
+        />
+        {addStrategicObjective && (
+          <AddStrategicObjectiveModal
+            isOpen={addStrategicObjective}
+            onClose={() => setAddStrategicObjective(false)}
+          />
+        )}
+      </>
     ),
     "/admin/project-management": (
       <Button content="New Project" icon="cil:plus" />

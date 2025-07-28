@@ -1,5 +1,10 @@
+import StrategicObjectivesAndKPIToggle from "@/components/strategic-objectives-kpi/so-kpi-parent"
+
+export const metadata = {
+    title: "Strategic Objectives & KPI - NDSICDE",
+    description: "View your strategic objectives and KPI details.",
+}
+
 export default function StrategicObjectivesAndKPI() {
-    return (
-        <>StrategicObjectivesAndKPI</>
-    )
+    return <StrategicObjectivesAndKPIToggle/>
 }

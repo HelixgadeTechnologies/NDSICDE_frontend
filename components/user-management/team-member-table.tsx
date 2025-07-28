@@ -3,7 +3,7 @@
 import { Icon } from "@iconify/react";
 import { head, data } from "@/types/team-members";
 import { useTeamMemberModal } from "@/utils/team-member-utility";
-import { useUserManagementState } from "@/store/user-management";
+import { useUserManagementState } from "@/store/user-management-store";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Table from "@/ui/table";
@@ -122,22 +122,43 @@ export default function TeamMembersTable() {
                           className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                         >
                           <ul className="text-sm">
-                            <li 
-                              onClick={() => handleViewUser(row, setActiveRowId)} 
+                            <li
+                              onClick={() =>
+                                handleViewUser(row, setActiveRowId)
+                              }
                               className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center"
                             >
-                              <Icon icon={"hugeicons:view"} height={20} width={20} />
+                              <Icon
+                                icon={"hugeicons:view"}
+                                height={20}
+                                width={20}
+                              />
                               View Profile
                             </li>
-                            <li 
-                              onClick={() => handleEditUser(row, setActiveRowId)} 
+                            <li
+                              onClick={() =>
+                                handleEditUser(row, setActiveRowId)
+                              }
                               className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center"
                             >
-                              <Icon icon={"cil:pencil"} height={20} width={20} />
+                              <Icon
+                                icon={"cil:pencil"}
+                                height={20}
+                                width={20}
+                              />
                               Edit
                             </li>
-                            <li onClick={() => handleDeleteUser(row, setActiveRowId)} className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
-                              <Icon icon={"pixelarticons:trash"} height={20} width={20} />
+                            <li
+                              onClick={() =>
+                                handleDeleteUser(row, setActiveRowId)
+                              }
+                              className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center"
+                            >
+                              <Icon
+                                icon={"pixelarticons:trash"}
+                                height={20}
+                                width={20}
+                              />
                               Remove
                             </li>
                           </ul>
@@ -159,15 +180,15 @@ export default function TeamMembersTable() {
 
       {/* Pass the selected user to the modals */}
       {viewTeamMember && selectedUser && (
-        <ViewTeamMember 
-          isOpen={viewTeamMember} 
-          onClose={() => setViewTeamMember(false)} 
-          user={selectedUser} 
+        <ViewTeamMember
+          isOpen={viewTeamMember}
+          onClose={() => setViewTeamMember(false)}
+          user={selectedUser}
         />
       )}
-      
+
       {editTeamMember && selectedUser && (
-        <EditTeamMember 
+        <EditTeamMember
           isOpen={editTeamMember}
           onClose={() => setEditTeamMember(false)}
           user={selectedUser}
@@ -176,9 +197,9 @@ export default function TeamMembersTable() {
 
       {deleteTeamMember && selectedUser && (
         <DeleteTeamMember
-        isOpen={deleteTeamMember}
-        onClose={() => setDeleteTeamMember(false)}
-        user={selectedUser}
+          isOpen={deleteTeamMember}
+          onClose={() => setDeleteTeamMember(false)}
+          user={selectedUser}
         />
       )}
     </section>

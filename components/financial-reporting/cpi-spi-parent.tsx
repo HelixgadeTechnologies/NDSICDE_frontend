@@ -94,7 +94,7 @@ export default function FinancialPerformance() {
                   {isActive && (
                     <motion.div
                       layoutId="tab"
-                      className="absolute inset-0 z-0 bg-white rounded-lg"
+                      className="absolute inset-0 z-0 bg-white rounded-lg text-[#242424]"
                       transition={{
                         type: "spring",
                         stiffness: 300,

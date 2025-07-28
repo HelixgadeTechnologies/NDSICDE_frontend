@@ -7,7 +7,7 @@ import Button from "@/ui/form/button";
 import CardComponent from "@/ui/card-wrapper";
 import DateRangePicker from "@/ui/form/date-range";
 import PDF from "@/ui/pdf-download-btn";
-import { usePerformanceAnalyticsReportsState } from "@/store/performance-analytics";
+import { usePerformanceAnalyticsReportsState } from "@/store/performance-analytics-store";
 
 export default function CustomReports() {
   const { reportType, reportConfigurationProjects, metricsAndKPIs, setField } =
@@ -86,25 +86,25 @@ export default function CustomReports() {
       </div>
       <div className="w-full md:w-[70%]">
         <CardComponent height="540px">
-            <Table
+          <Table
             tableHead={head}
             tableData={data}
             renderRow={(row) => {
-                return (
-                    <>
-                        <td className="px-6">{row.reportName}</td>
-                        <td className="px-6">{row.type}</td>
-                        <td className="px-6">{row.dateCreated}</td>
-                        <td>
-                            <div className="flex gap-1">
-                                <PDF title="PDF"/>
-                                <PDF title="Excel" />
-                            </div>
-                        </td>
-                    </>
-                )
+              return (
+                <>
+                  <td className="px-6">{row.reportName}</td>
+                  <td className="px-6">{row.type}</td>
+                  <td className="px-6">{row.dateCreated}</td>
+                  <td>
+                    <div className="flex gap-1">
+                      <PDF title="PDF" />
+                      <PDF title="Excel" />
+                    </div>
+                  </td>
+                </>
+              );
             }}
-            />
+          />
         </CardComponent>
       </div>
     </section>
