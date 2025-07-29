@@ -52,7 +52,8 @@ export default function FormParent() {
         <CardComponent height="100%">
           <div className="space-y-6">
             {tabs.map((tab) => {
-              const isActive = activeTab === tab.id;
+              // Show both tabs as active when on form two (activeTab === 2)
+              const isActive = activeTab === tab.id || (activeTab === 2 && tab.id <= 2);
               return (
                 <div key={tab.id} className="flex gap-4 items-center">
                   <div
@@ -87,7 +88,7 @@ export default function FormParent() {
         <p className="text-sm text-center text-gray-500">
           Project successfully created
         </p>
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-6">
           <Button
             href="/admin/project-management"
             content="Close"

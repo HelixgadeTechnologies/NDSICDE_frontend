@@ -57,7 +57,7 @@ export default function Breadcrumb({
       </>
     ),
     "/admin/project-management": (
-      <Button content="New Project" icon="cil:plus" href="/admin/create-project" />
+      <Button content="New Project" icon="cil:plus" href="/admin/project-management/create-project" />
     ),
     "/admin/user-management": (
       <>
@@ -105,8 +105,12 @@ export default function Breadcrumb({
     ),
   };
 
+  const hiddenRoutes = [
+    "/admin/project-management/create-project",
+  ];
+
   return (
-    <section>
+    <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""}`}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-base md:text-[22px] text-[#242424]">
           {matched?.header || fallbackTitle}

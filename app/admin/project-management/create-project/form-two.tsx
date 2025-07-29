@@ -6,17 +6,17 @@ import TagInput from "@/ui/form/tag-input";
 
 type FormTwoProps = {
   onClick: () => void;
-  onNext: () => void; // New prop for opening modal
+  onNext: () => void;
 };
 
 export default function FormTwo({ onClick, onNext }: FormTwoProps) {
   const [stateTags, setStateTags] = useState(["Rivers", "Delta"]);
-  const [lgaTags, setLgaTags] = useState([""]);
-  const [communityTags, setCommunityTags] = useState([""]);
-  const [thematicTags, setThematicTags] = useState([""]);
-  const [managerTags, setManagerTags] = useState([""]);
-  const [objectiveTags, setObjectiveTags] = useState([""]);
-  const [statusTags, setStatusTags] = useState([""]);
+  const [lgaTags, setLgaTags] = useState<string[]>([]);
+  const [communityTags, setCommunityTags] = useState<string[]>([]);
+  const [thematicTags, setThematicTags] = useState<string[]>([]);
+  const [managerTags, setManagerTags] = useState<string[]>([]);
+  const [objectiveTags, setObjectiveTags] = useState<string[]>([]);
+  const [statusTags, setStatusTags] = useState<string[]>([]);
 
   const nigerianStates = [
     "Rivers",
@@ -35,9 +35,21 @@ export default function FormTwo({ onClick, onNext }: FormTwoProps) {
     "Ekiti",
   ];
 
+  const handleBack = () => {
+    onClick();
+  };
+
+  const handleNext = () => {
+    onNext();
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent form submission
+  };
+
   return (
     <section>
-      <form action="" className="space-y-6 w-full">
+      <form className="space-y-6 w-full" onSubmit={handleFormSubmit}>
         <TagInput
           label="Target States"
           tags={stateTags}
@@ -83,10 +95,19 @@ export default function FormTwo({ onClick, onNext }: FormTwoProps) {
         />
         <div className="flex gap-6 items-center mt-4">
           <div className="w-2/5">
-            <Button isSecondary content="Back" onClick={onClick} />
+            <Button 
+              isSecondary 
+              content="Back" 
+              onClick={handleBack}
+              // type="button"
+            />
           </div>
           <div className="w-3/5">
-            <Button content="Next" onClick={onNext} />
+            <Button 
+              content="Next" 
+              onClick={handleNext}
+              // type="button"
+            />
           </div>
         </div>
       </form>

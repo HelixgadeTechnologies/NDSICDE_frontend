@@ -10,9 +10,17 @@ type FormOneProps = {
 }
 
 export default function FormOne({ onClick }: FormOneProps) {
+    const handleNext = () => {
+        onClick();
+    };
+
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault(); // Prevent form submission
+    };
+
     return (
         <section>
-            <form action="" className="space-y-6">
+            <form className="space-y-6" onSubmit={handleFormSubmit}>
                 <TextInput
                 value=""
                 label="Name of Project"
@@ -65,7 +73,8 @@ export default function FormOne({ onClick }: FormOneProps) {
                     <div className="w-3/5">
                         <Button
                         content="Next"
-                        onClick={onClick}
+                        onClick={handleNext}
+                        // type="button"
                         />
                     </div>
                 </div>

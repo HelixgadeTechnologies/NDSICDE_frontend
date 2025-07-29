@@ -7,7 +7,7 @@ import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
-import MultiSelectDropdown from "@/ui/form/multi-select-dropdown";
+import TagInput from "@/ui/form/tag-input";
 
 type AddProps = {
   isOpen: boolean;
@@ -22,15 +22,15 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     phoneNumber,
     role,
     status,
-    assignedProjects,
+    // assignedProjects,
     setField,
   } = useUserManagementState();
 
   const options = [
-    { label: "Healthcare Initiative", value: "healthcare" },
-    { label: "Education Program", value: "education" },
-    { label: "Clean Water Project", value: "water" },
-    { label: "Clean Water One", value: "one" },
+    "Healthcare Initiative",
+    "Education Program",
+    "Clean Water Project",
+    "Clean Water One", 
   ];
 
   return (
@@ -87,11 +87,11 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             onChange={(value: string) => setField("status", value)}
           />
           <div className="col-span-2">
-            <MultiSelectDropdown
+            <TagInput
               label="Assigned Projects"
               options={options}
-              selected={assignedProjects}
-              onChange={(selected) => setField("assignedProjects", selected)}
+              tags={[]}
+              onChange={() => setField("assignedProjects", [])}
             />
           </div>
         </div>
