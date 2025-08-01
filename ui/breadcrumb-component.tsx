@@ -4,20 +4,18 @@ import { usePathname } from "next/navigation";
 import { breadcrumbs } from "@/lib/config/breadcrumbs";
 import Button from "@/ui/form/button";
 import { useTeamMemberModal } from "@/utils/team-member-utility";
-import AddTeamMember from "@/components/user-management/add-team-member";
+import AddTeamMember from "@/components/admin-components/user-management/add-team-member";
 import DateRangePicker from "./form/date-range";
 import DropDown from "./form/select-dropdown";
 import { useStrategicObjectivesAndKPIsModal } from "@/utils/strategic-objective-kpi-utility";
-import AddStrategicObjectiveModal from "@/components/strategic-objectives-kpi/add-strategic-objective";
+import AddStrategicObjectiveModal from "@/components/admin-components/strategic-objectives-kpi/add-strategic-objective";
 
 type Props = {
   fallbackTitle?: string;
   fallbackSubtitle?: string;
 };
 
-export default function Breadcrumb({
-  fallbackTitle = "",
-}: Props) {
+export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const pathname = usePathname();
 
   const matched = breadcrumbs.find((item) =>
@@ -25,22 +23,14 @@ export default function Breadcrumb({
     pathname.includes(item.href)
   );
 
-  const {
-    setAddTeamMember,
-    addTeamMember,
-    handleAddUser,
-  } = useTeamMemberModal();
+  const { setAddTeamMember, addTeamMember, handleAddUser } =
+    useTeamMemberModal();
 
-  const {
-    setAddStrategicObjective,
-    addStrategicObjective,
-    handleAddSO,
-  } = useStrategicObjectivesAndKPIsModal();
+  const { setAddStrategicObjective, addStrategicObjective, handleAddSO } =
+    useStrategicObjectivesAndKPIsModal();
 
   const actionComponents: Record<string, React.ReactNode> = {
-    "/admin/dashboard": (
-      <Button content="New Project" icon="cil:plus" />
-    ),
+    "/admin/dashboard": <Button content="New Project" icon="cil:plus" />,
     "/admin/strategic-objectives": (
       <>
         <Button
@@ -57,7 +47,11 @@ export default function Breadcrumb({
       </>
     ),
     "/admin/project-management": (
-      <Button content="New Project" icon="cil:plus" href="/admin/project-management/create-project" />
+      <Button
+        content="New Project"
+        icon="cil:plus"
+        href="/admin/project-management/create-project"
+      />
     ),
     "/admin/user-management": (
       <>
@@ -105,9 +99,7 @@ export default function Breadcrumb({
     ),
   };
 
-  const hiddenRoutes = [
-    "/admin/project-management/create-project",
-  ];
+  const hiddenRoutes = ["/admin/project-management/create-project"];
 
   return (
     <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""}`}>

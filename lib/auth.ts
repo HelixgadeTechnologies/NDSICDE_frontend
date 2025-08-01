@@ -1,0 +1,51 @@
+import { UserRole } from "@/store/role-store";
+
+export interface RoutePermission {
+  path: string;
+  allowedRoles: UserRole[];
+  exact?: boolean;
+}
+
+export const ROUTE_PERMISSIONS: RoutePermission[] = [
+  // Admin routes
+  { path: "/admin", allowedRoles: ["admin"] },
+  { path: "/admin/dashboard", allowedRoles: ["admin"] },
+  { path: "/admin/user-management", allowedRoles: ["admin"] },
+  { path: "/admin/performance-analytics", allowedRoles: ["admin"] },
+  { path: "/admin/settings", allowedRoles: ["admin"] },
+
+  // Partner routes
+  { path: "/partners", allowedRoles: ["partners"] },
+  { path: "/partners/dashboard", allowedRoles: ["partners"] },
+  { path: "/partners/objectives", allowedRoles: ["partners"] },
+  { path: "/partners/settings", allowedRoles: ["partners"] },
+
+  //   // Manager routes
+  //   { path: '/manager', allowedRoles: ['manager'] },
+  //   { path: '/manager/dashboard', allowedRoles: ['manager'] },
+  //   { path: '/manager/team-management', allowedRoles: ['manager'] },
+  //   { path: '/manager/settings', allowedRoles: ['manager'] },
+];
+
+export function canUserAccessRoute(
+  userRole: UserRole | null,
+  pathname: string
+): boolean {
+  if (!userRole) return false;
+
+  const permission = ROUTE_PERMISSIONS.find((p) =>
+    p.exact ? p.path === pathname : pathname.startsWith(p.path)
+  );
+
+  if (!permission) return true; // Allow access to routes not explicitly protected
+
+  return permission.allowedRoles.includes(userRole);
+}
+
+export function getDefaultRouteForRole(role: UserRole): string {
+  return `/${role}/dashboard`;
+}
+
+export function redirectToRoleBasedRoute(role: UserRole): string {
+  return getDefaultRouteForRole(role);
+}

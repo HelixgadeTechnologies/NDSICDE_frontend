@@ -6,8 +6,16 @@ import EmailInput from "@/ui/form/email-input";
 import PasswordInput from "@/ui/form/password-input";
 import Checkbox from "@/ui/form/checkbox";
 import Button from "@/ui/form/button";
+import { MOCK_USERS, useRoleStore, UserRole } from "@/store/role-store";
+import { useRouter } from "next/navigation";
+import { getDefaultRouteForRole } from "@/lib/auth";
 
 export default function Login() {
+
+  const [selectedRole, setSelectedRole] = useState<UserRole>("admin");
+  const router = useRouter();
+  const { login } = useRoleStore();
+
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -30,6 +38,19 @@ export default function Login() {
     }));
   };
 
+  
+  const handleLogin = (e?: React.FormEvent) => {
+    // Prevent form submission
+    if (e) {
+      e.preventDefault();
+    }
+    const user = MOCK_USERS[selectedRole];
+    login(user);
+    
+    const redirectPath = getDefaultRouteForRole(selectedRole);
+    router.push(redirectPath);
+  };
+
   return (
     <div className="rounded-[10px] md:border border-[#D0D5DD] bg-white py-8 px-7 w-[450px] h-[480px]">
       <h4 className="font-semibold text-2xl md:text-[28px] text-gray-900 text-center mb-2">
@@ -39,7 +60,8 @@ export default function Login() {
         Enter your credentials to access your account
       </p>
 
-      <form action="" className="mt-8 space-y-6">
+      {/* space-y-6 */}
+      <form action="" className="mt-8 space-y-4">
         <EmailInput
           value={userData.email}
           onChange={handleInputChange}
@@ -68,8 +90,28 @@ export default function Login() {
             Forgot Password?
           </Link>
         </div>
+
+        {/* to test roles */}
+         <div className="flex items-center gap-2">
+              {Object.entries(MOCK_USERS).map(([role, user]) => (
+                <label key={role} className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    name="role"
+                    value={role}
+                    checked={selectedRole === role}
+                    onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+                    className="h-4 w-4 accent-red-600 border-gray-300 focus:ring-red-500"
+                  />
+                  <div className="text-sm font-medium text-gray-900">
+                    {user.name}
+                  </div>
+                </label>
+              ))}
+            </div>
+
         <div className="mt-4">
-          <Button content="Log into Account" href="/admin/dashboard" />
+          <Button content="Log into Account" onClick={handleLogin} />
         </div>
         <Link
           href={"/reset-password"}

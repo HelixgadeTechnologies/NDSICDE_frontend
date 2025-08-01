@@ -2,7 +2,7 @@
 
 import CardComponent from "@/ui/card-wrapper";
 import Heading from "@/ui/text-heading";
-import PieChartComponent from "../../ui/pie-chart";
+import PieChartComponent from "../../../ui/pie-chart";
 import { ECBColors, expenseCategoriesBreakdown } from "@/lib/config/charts";
 import LineChartComponent from "@/ui/line-chart";
 

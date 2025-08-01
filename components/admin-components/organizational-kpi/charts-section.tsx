@@ -5,7 +5,7 @@ import DateRangePicker from "@/ui/form/date-range";
 import { useOrgKPIFormState } from "@/store/organizational-kpi-store";
 import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
-import BarChartComponent from "../../ui/bar-chart";
+import BarChartComponent from "../../../ui/bar-chart";
 import { kPIOverview } from "@/lib/config/charts";
 
 export default function ChartsComponent() {

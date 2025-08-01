@@ -9,8 +9,8 @@ import {
   PDSColors,
   KPIProgressTracking,
 } from "@/lib/config/charts";
-import PieChartComponent from "../../ui/pie-chart";
-import BarChartComponent from "../../ui/bar-chart";
+import PieChartComponent from "../../../ui/pie-chart";
+import BarChartComponent from "../../../ui/bar-chart";
 import Percentage from "@/ui/percentage-component";
 import { usePerformanceAnalyticsReportsState } from "@/store/performance-analytics-store";
 

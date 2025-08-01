@@ -1,4 +1,4 @@
-import ProjectsTable from "@/components/project-management/projects-table";
+import ProjectsTable from "@/components/admin-components/project-management/projects-table";
 import DashboardStat from "@/ui/dashboard-stat-card"
 
 export const metadata = {

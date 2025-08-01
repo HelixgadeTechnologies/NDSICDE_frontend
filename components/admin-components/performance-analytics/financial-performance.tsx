@@ -7,8 +7,8 @@ import {
   budgetVSActualSpending,
   ECBColors,
 } from "@/lib/config/charts";
-import PieChartComponent from "../../ui/pie-chart";
-import BarChartComponent from "../../ui/bar-chart";
+import PieChartComponent from "../../../ui/pie-chart";
+import BarChartComponent from "../../../ui/bar-chart";
 import Table from "@/ui/table";
 import { typeChecker } from "@/utils/ui-utility";
 

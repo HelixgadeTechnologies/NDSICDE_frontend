@@ -1,5 +1,5 @@
 import DashboardStat from "@/ui/dashboard-stat-card"
-import DataValidationTable from "@/components/data-validation/data-validation-table";
+import DataValidationTable from "@/components/admin-components/data-validation/data-validation-table";
 
 export const metadata = {
     title: "Data Validation - NDSICDE",

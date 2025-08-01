@@ -1,7 +1,7 @@
 import DashboardStat from "@/ui/dashboard-stat-card";
-import RecentActivityTab from "@/components/dashboard/recent-activity-summary";
-import PendingActivityCards from "@/components/dashboard/pending-activity-cards";
-import OrganizationalProjectPerformance from "@/components/dashboard/organizational-project-performance";
+import RecentActivityTab from "@/components/admin-components/dashboard/recent-activity-summary";
+import PendingActivityCards from "@/components/admin-components/dashboard/pending-activity-cards";
+import OrganizationalProjectPerformance from "@/components/admin-components/dashboard/organizational-project-performance";
 
 export const metadata = {
   title: "Dashboard - NDSICDE",

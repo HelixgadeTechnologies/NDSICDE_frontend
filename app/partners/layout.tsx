@@ -23,15 +23,15 @@ export default function AdminLayout({
       return
     }
 
-    // redirect if not an admin
-    if (user?.role !== "admin") {
+    // redirect if not an partners
+    if (user?.role !== "partners") {
       router.push(`/${user?.role}/dashboard`)
       return
     }
   }, [isAuthenticated, user, router])
 
     // show loading or redirect
-    if (!isAuthenticated || user?.role !== 'admin') {
+    if (!isAuthenticated || user?.role !== 'partners') {
       return (
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>

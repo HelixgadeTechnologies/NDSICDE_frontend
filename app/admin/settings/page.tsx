@@ -1,4 +1,4 @@
-import SettingsComponent from "@/components/settings/settings-component";
+import SettingsComponent from "@/components/admin-components/settings/settings-component";
 
 export const metadata = {
   title: "System Settings & Access Control - NDSICDE",
@@ -6,6 +6,5 @@ export const metadata = {
 };
 
 export default function SettingsPage() {
-
-  return <SettingsComponent/>
+  return <SettingsComponent />;
 }

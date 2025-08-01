@@ -47,9 +47,4 @@ export const bottomNavigations = [
     href: "/admin/settings",
     icon: "bi:gear",
   },
-  {
-    name: "Logout",
-    href: "/login",
-    icon: "heroicons-solid:logout",
-  },
 ];
