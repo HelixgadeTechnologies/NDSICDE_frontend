@@ -1,5 +1,5 @@
-export default function DashboardPage() {
+export default function PartnersDashboardPage() {
     return (
-        <>dashboard</>
+        <>partners dashboard</>
     )
 }

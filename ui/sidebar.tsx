@@ -2,16 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { bottomNavigations } from "@/lib/routes/admin";
 import Logo from "@/ui/logo-component";
 import { useSidebar } from "@/context/SidebarContext";
 import { Icon } from "@iconify/react";
 import { useRoleStore } from "@/store/role-store";
 import { getSidebarConfig, SidebarItem } from "@/lib/config/sidebarConfig";
-// import { getSidebarLinksForRole } from "@/lib/roles";
 
 interface BaseSidebarProps {
-  className?: string
+  className?: string;
 }
 
 export default function Sidebar({ className }: BaseSidebarProps) {
@@ -22,11 +20,14 @@ export default function Sidebar({ className }: BaseSidebarProps) {
   if (!user) return null;
   const sidebarConfig = getSidebarConfig(user.role);
 
-   const handleItemClick = (item: SidebarItem) => {
+  const handleItemClick = (item: SidebarItem) => {
     // Add any click handling logic here
     closeMobile();
-    console.log(`Navigating to ${item.href}`)
-  }
+    console.log(`Navigating to ${item.href}`);
+  };
+
+  // for active on settings
+  const isActive = pathname.startsWith(`/${user.role}/settings`);
 
   return (
     <>
@@ -76,32 +77,25 @@ export default function Sidebar({ className }: BaseSidebarProps) {
           </div>
 
           <div className="space-y-1">
-            {bottomNavigations.map((nav, index) => {
-              const isActive = pathname.startsWith(nav.href);
-
-              return (
-                <Link
-                  key={index}
-                  href={nav.href}
-                  className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 ${
-                    isActive
-                      ? "bg-[#FFECE5] text-[#D2091E]"
-                      : "hover:bg-gray-50 text-gray-600"
-                  }`}
-                >
-                  <Icon
-                    icon={nav.icon}
-                    width={20}
-                    height={20}
-                    color={isActive ? "#D2091E" : "#737373"}
-                  />
-                  <span className="text-xs">{nav.name}</span>
-                </Link>
-              );
-            })}
+            <Link
+              href={`/${user.role}/settings`}
+              className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 ${
+                isActive
+                  ? "bg-[#FFECE5] text-[#D2091E]"
+                  : "hover:bg-gray-50 text-gray-600"
+              }`}
+            >
+              <Icon
+                icon={"bi:gear"}
+                width={20}
+                height={20}
+                color={isActive ? "#D2091E" : "#737373"}
+              />
+              <span className="text-xs">Settings</span>
+            </Link>
             <div
               onClick={logout}
-              className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 hover:bg-[#FFECE5] hover:text-[#D2091E] text-gray-600`}
+              className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 hover:bg-[#FFECE5] hover:text-[#D2091E] text-gray-600 cursor-pointer`}
             >
               <Icon
                 icon={"heroicons-solid:logout"}

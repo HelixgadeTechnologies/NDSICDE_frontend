@@ -72,17 +72,41 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
     role: "partners",
     items: [
       {
-        id: "/partners/dashboard",
+        id: "dashboard",
         name: "Dashboard",
         href: "/partners/dashboard",
         icon: "lucide:home",
     },
     {
-        id: "/partners/kpi-reporting",
+        id: "kpi-reporting",
         name: "KPI Reporting",
         href: "/partners/kpi-reporting",
         icon: "fluent-mdl2:c-r-m-report",
     },
+    ],
+  },
+
+  management: {
+    role: 'management',
+    items: [
+      {
+        id: "dashboard",
+        name: "Dashboard",
+        href: "/management-and-staff/dasboard",
+        icon: "lucide:home",
+      },
+      {
+        id: "reports-and-comments",
+        name: "View Reports & Comments",
+        href: "/management-and-staff/reports-and-comments",
+        icon: "fluent-mdl2:c-r-m-report",
+      },
+      {
+        id: "organizational-kpi",
+        name: "Organizational KPI",
+        href: "/management-and-staff/organizational-kpi",
+        icon: "carbon:result-new",
+      },
     ],
   },
 };

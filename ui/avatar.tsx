@@ -4,7 +4,7 @@ import Link from "next/link";
 
 type AvatarProps = {
   src?: string;
-  name: string;
+  name?: string;
   href?: string;
 };
 

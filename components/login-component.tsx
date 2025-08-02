@@ -101,10 +101,10 @@ export default function Login() {
                     value={role}
                     checked={selectedRole === role}
                     onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-                    className="h-4 w-4 accent-red-600 border-gray-300 focus:ring-red-500"
+                    className="h-4 w-4 accent-red-600 border-gray-300 focus:ring-red-500 cursor-pointer"
                   />
-                  <div className="text-sm font-medium text-gray-900">
-                    {user.name}
+                  <div className="text-sm font-medium text-gray-900 capitalize">
+                    {user.role}
                   </div>
                 </label>
               ))}

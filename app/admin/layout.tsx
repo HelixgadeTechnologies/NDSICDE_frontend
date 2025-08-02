@@ -6,6 +6,7 @@ import Breadcrumb from "@/ui/breadcrumb-component";
 import { useRouter } from "next/navigation";
 import { useRoleStore } from "@/store/role-store";
 import { useEffect } from "react";
+import Loading from "../loading";
 
 export default function AdminLayout({
   children,
@@ -32,11 +33,7 @@ export default function AdminLayout({
 
     // show loading or redirect
     if (!isAuthenticated || user?.role !== 'admin') {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-        </div>
-      )
+      return <Loading />
     }
 
   return (

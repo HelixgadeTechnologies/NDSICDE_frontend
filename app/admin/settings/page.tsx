@@ -5,6 +5,6 @@ export const metadata = {
   description: "Control your profile settings and integration",
 };
 
-export default function SettingsPage() {
+export default function AdminSettingsPage() {
   return <SettingsComponent />;
 }

@@ -1,3 +1,5 @@
+// ask claude why this file is necessary
+
 import { UserRole } from "@/store/role-store";
 
 export interface RoutePermission {
@@ -8,8 +10,11 @@ export interface RoutePermission {
 
 export const ROUTE_PERMISSIONS: RoutePermission[] = [
   // Admin routes
-  { path: "/admin", allowedRoles: ["admin"] },
   { path: "/admin/dashboard", allowedRoles: ["admin"] },
+  { path: "/admin/strategic-objectives", allowedRoles: ["admin"] },
+  { path: "/admin/project-management", allowedRoles: ["admin"] },
+  { path: "/admin/user-management", allowedRoles: ["admin"] },
+  { path: "/admin/data-validation", allowedRoles: ["admin"] },
   { path: "/admin/user-management", allowedRoles: ["admin"] },
   { path: "/admin/performance-analytics", allowedRoles: ["admin"] },
   { path: "/admin/settings", allowedRoles: ["admin"] },
@@ -17,7 +22,7 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   // Partner routes
   { path: "/partners", allowedRoles: ["partners"] },
   { path: "/partners/dashboard", allowedRoles: ["partners"] },
-  { path: "/partners/objectives", allowedRoles: ["partners"] },
+  { path: "/partners/kpi-reporting", allowedRoles: ["partners"] },
   { path: "/partners/settings", allowedRoles: ["partners"] },
 
   //   // Manager routes

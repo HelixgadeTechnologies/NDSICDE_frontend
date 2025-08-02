@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type UserRole = 'admin' | 'partners'
+export type UserRole = 'admin' | 'partners' | 'management'
 
 export interface User {
   id: string
@@ -30,10 +30,17 @@ export const MOCK_USERS: Record<UserRole, User> = {
   },
   partners: {
     id: '2',
-    name: 'Partner',
+    name: 'Partners',
     email: 'partner@company.com',
     role: 'partners',
     avatar: '/avatars/partner.jpg'
+  },
+  management: {
+    id: '3',
+    name: "Management and Staff",
+    email: "managementandstaff.com",
+    role: 'management',
+    avatar: '/management-staff.jpg',
   },
 }
 
@@ -70,6 +77,7 @@ export const getRoleDisplayName = (role: UserRole): string => {
   const names = {
     admin: 'Administrator',
     partners: 'Partners',
+    management: "Management and Staff"
   }
   return names[role]
 }

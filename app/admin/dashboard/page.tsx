@@ -8,7 +8,7 @@ export const metadata = {
   description: "View your dashboard in detail",
 };
 
-export default function DashboardPage() {
+export default function AdminDashboardPage() {
   const dashboardData = [
     {
       title: "Total Projects",
