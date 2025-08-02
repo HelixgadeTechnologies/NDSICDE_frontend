@@ -5,17 +5,17 @@ interface StatType {
     icon?: string;
     value: number | string;
     percentage?: number;
-    percentInfo?: string;
-}
+    percentInfo?: string;}
 
 type StatProps = {
     data: Array<StatType>
     icon?: string;
+    bigger?: boolean;
 }
 
-export default function DashboardStat({ data, icon }: StatProps) {
+export default function DashboardStat({ data, icon, bigger }: StatProps) {
     return data.map((d, index) => (
-        <div key={index} className="h-[126px] w-full rounded-lg border border-[#E5E5E5] p-2 md:p-4 space-y-2.5">
+        <div key={index} className={`${bigger ? 'h-[158px]' : 'h-[126px]'} w-full rounded-lg border border-[#E5E5E5] p-2 md:p-4 space-y-2.5`}>
             <div className="flex justify-between items-center">
               <p className="text-xs md:text-[13px] font-medium leading-5 text-[#242424] whitespace-nowrap capitalize">
                 {d.title}

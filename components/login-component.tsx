@@ -75,6 +75,8 @@ export default function Login() {
           name="password"
           label="password"
           placeholder="Enter Password"
+          uppercase
+          isBigger
         />
         <div className="flex justify-between items-center">
           <Checkbox
