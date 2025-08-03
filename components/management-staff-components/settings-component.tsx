@@ -6,9 +6,10 @@ import PasswordInput from "@/ui/form/password-input";
 import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
 import { Icon } from "@iconify/react";
-import { usePartnerSettingsState } from "@/store/partners-store/settings-store";
+import { useManagementSettingsState } from "@/store/management-and-staff-store/settings-store";
 
-export default function PartnersSettingsComponents() {
+
+export default function ManagementStaffSettingsComponents() {
   const {
     name,
     email,
@@ -18,7 +19,7 @@ export default function PartnersSettingsComponents() {
     newPassword,
     confirmPassword,
     setField,
-  } = usePartnerSettingsState();
+  } = useManagementSettingsState();
   return (
     <div className="space-y-4">
       <CardComponent>
@@ -51,7 +52,7 @@ export default function PartnersSettingsComponents() {
             name="email"
             value={email}
             label="Email Address"
-            placeholder="partner@sdn.org"
+            placeholder="management@sdn.org"
             onChange={(e) => setField("email", e.target.value)}
             />
             <TextInput

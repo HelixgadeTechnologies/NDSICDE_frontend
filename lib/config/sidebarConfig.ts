@@ -92,19 +92,19 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
       {
         id: "dashboard",
         name: "Dashboard",
-        href: "/management-and-staff/dasboard",
+        href: "/management/dashboard",
         icon: "lucide:home",
       },
       {
         id: "reports-and-comments",
         name: "View Reports & Comments",
-        href: "/management-and-staff/reports-and-comments",
+        href: "/management/reports-and-comments",
         icon: "fluent-mdl2:c-r-m-report",
       },
       {
         id: "organizational-kpi",
         name: "Organizational KPI",
-        href: "/management-and-staff/organizational-kpi",
+        href: "/management/organizational-kpi",
         icon: "carbon:result-new",
       },
     ],

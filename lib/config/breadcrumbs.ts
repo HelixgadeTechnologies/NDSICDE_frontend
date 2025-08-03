@@ -54,4 +54,20 @@ export const breadcrumbs = [
     href: "/partners/settings",
     header: "Account Settings",
   },
+  {
+    href: "/management/dashboard",
+    header: "Project Dashboard"
+  },
+  {
+    href: "/management/reports-and-comments",
+    header: "View Reports & Comments"
+  },
+  {
+    href: "/management/organizational-kpi",
+    header: "Organizational KPI"
+  },
+  {
+    href: "/management/settings",
+    header: "Account Settings"
+  },
 ];

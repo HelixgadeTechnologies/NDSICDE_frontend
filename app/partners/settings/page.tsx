@@ -1,4 +1,4 @@
-import SettingsComponents from "@/components/partners-components/settings-component"
+import PartnersSettingsComponents from "@/components/partners-components/settings-component"
 
 export const metadata = {
     title: "Account Settings - NDSICDE",
@@ -6,5 +6,5 @@ export const metadata = {
 }
 
 export default function PartnersSettingsPage() {
-    return <SettingsComponents/>
+    return <PartnersSettingsComponents/>
 }

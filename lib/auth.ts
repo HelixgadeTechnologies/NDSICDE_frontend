@@ -1,5 +1,3 @@
-// ask claude why this file is necessary
-
 import { UserRole } from "@/store/role-store";
 
 export interface RoutePermission {
@@ -25,11 +23,11 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
   { path: "/partners/kpi-reporting", allowedRoles: ["partners"] },
   { path: "/partners/settings", allowedRoles: ["partners"] },
 
-  //   // Manager routes
-  //   { path: '/manager', allowedRoles: ['manager'] },
-  //   { path: '/manager/dashboard', allowedRoles: ['manager'] },
-  //   { path: '/manager/team-management', allowedRoles: ['manager'] },
-  //   { path: '/manager/settings', allowedRoles: ['manager'] },
+   // Manager routes
+  { path: '/management/dashboard', allowedRoles: ['management'] },
+  { path: '/management/organizational-kpi', allowedRoles: ['management'] },
+  { path: '/management/view-reports', allowedRoles: ['management'] },
+  { path: '/management/settings', allowedRoles: ['management'] },
 ];
 
 export function canUserAccessRoute(
