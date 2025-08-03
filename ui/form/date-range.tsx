@@ -71,7 +71,7 @@ export default function DateRangePicker({ onChange, label }: DatePickerProps) {
       </button>
 
       {isDateRangePickerOpen && (
-        <div className="absolute z-50 mt-2 shadow-lg rounded-md">
+        <div className="absolute right-0 z-50 mt-2 shadow-lg rounded-md">
           <DateRange
             editableDateInputs={true}
             onChange={handleChange}

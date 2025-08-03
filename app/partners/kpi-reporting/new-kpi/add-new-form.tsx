@@ -7,61 +7,71 @@ import TextInput from "@/ui/form/text-input";
 import TextareaInput from "@/ui/form/textarea";
 import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
+import { useKPIReportState } from "@/store/partners-store/kpi-report-store";
 
 export default function AddNewKPIForm() {
+  const {
+    strategicObjective,
+    kpiName,
+    kpiType,
+    baseline,
+    target,
+    narrative,
+    setField,
+  } = useKPIReportState();
   return (
     <CardComponent>
       <form className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <DropDown
-            value=""
-            name=""
+            value={strategicObjective}
+            name="strategicObjective"
             label="Strategic Objective"
             placeholder="Select Strategic Objective"
-            onChange={() => {}}
+            onChange={(value: string) => setField("strategicObjective", value)}
             options={[]}
             isBigger
           />
           <TextInput
-            value=""
-            name=""
+            value={kpiName}
+            name="kpiName"
             label="KPI Name"
             placeholder="Enter KPI Name"
-            onChange={() => {}}
+            onChange={(e) => setField("kpiName", e.target.value)}
             isBigger
           />
           <DropDown
-            value=""
-            name=""
+            value={kpiType}
+            name="kpiType"
             label="KPI Type"
             placeholder="Select KPI Type"
-            onChange={() => {}}
+            onChange={(value: string) => setField("kpiType", value)}
             options={[]}
             isBigger
           />
           <TextInput
-            value=""
-            name=""
+            value={baseline}
+            name="baseline"
             label="Baseline"
             placeholder="Enter Baseline"
-            onChange={() => {}}
+            onChange={(e) => setField("baseline", e.target.value)}
             isBigger
           />
           <TextInput
-            value=""
-            name=""
+            value={target}
+            name="target"
             label="Target"
             placeholder="Enter Target"
-            onChange={() => {}}
+            onChange={(e) => setField("target", e.target.value)}
             isBigger
           />
         </div>
         <TextareaInput
           label="Narrative/Observations"
-          value=""
-          name=""
+          value={narrative}
+          name="narrative"
           placeholder="Provide context or explanations for the KPI values"
-          onChange={() => {}}
+          onChange={(e) => setField("narrative", e.target.value)}
         />
         <Heading heading="Supporting Evidence" subtitle="Attach files to support your activity report" />
         <FileUploader/>

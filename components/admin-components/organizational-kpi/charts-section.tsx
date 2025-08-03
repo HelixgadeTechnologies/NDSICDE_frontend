@@ -2,7 +2,7 @@
 
 import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
-import { useOrgKPIFormState } from "@/store/organizational-kpi-store";
+import { useOrgKPIFormState } from "@/store/admin-store/organizational-kpi-store";
 import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
 import BarChartComponent from "../../../ui/bar-chart";

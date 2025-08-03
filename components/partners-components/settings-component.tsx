@@ -6,8 +6,19 @@ import PasswordInput from "@/ui/form/password-input";
 import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
 import { Icon } from "@iconify/react";
+import { usePartnerSettingsState } from "@/store/partners-store/settings-store";
 
 export default function SettingsComponents() {
+  const {
+    name,
+    email,
+    phoneNumber,
+    rolesAndPermissions,
+    currentPassword,
+    newPassword,
+    confirmPassword,
+    setField,
+  } = usePartnerSettingsState();
   return (
     <div className="space-y-4">
       <CardComponent>
@@ -31,31 +42,31 @@ export default function SettingsComponents() {
           <div className="grid grid-cols-2 gap-4 justify-between items-center w-full">
             <TextInput
             name="name"
-            value=""
+            value={name}
             label="Name"
             placeholder="John Doe"
-            onChange={() => {}}
+            onChange={(e) => setField("name", e.target.value)}
             />
             <TextInput
             name="email"
-            value=""
+            value={email}
             label="Email Address"
             placeholder="partner@sdn.org"
-            onChange={() => {}}
+            onChange={(e) => setField("email", e.target.value)}
             />
             <TextInput
             name="phoneNumber"
-            value=""
+            value={phoneNumber}
             label="Phone Number"
             placeholder="0901 234 5678"
-            onChange={() => {}}
+            onChange={(e) => setField("phoneNumber", e.target.value)}
             />
             <TextInput
             name="rolesandPermission"
-            value=""
+            value={rolesAndPermissions}
             label="Roles and Permissison"
             placeholder="Project Manager"
-            onChange={() => {}}
+            onChange={(e) => setField("rolesAndPermissions", e.target.value)}
             />
           </div>
         </div>
@@ -65,22 +76,22 @@ export default function SettingsComponents() {
         <Heading heading="Change Password" />
         <div className="grid grid-cols-2 gap-y-3 gap-x-8 mt-6">
           <PasswordInput
-            value=""
-            onChange={() => {}}
+            value={currentPassword}
+            onChange={(e) => setField("currentPassword", e.target.value)}
             label="Current Password"
             name="currentPassword"
             placeholder="Enter Current Password"
           />
           <PasswordInput
-            value=""
-            onChange={() => {}}
+            value={newPassword}
+            onChange={(e) => setField("newPassword", e.target.value)}
             label="New Password"
             name="newPassword"
             placeholder="Enter New Password"
           />
           <PasswordInput
-            value=""
-            onChange={() => {}}
+            value={confirmPassword}
+            onChange={(e) => setField("confirmPassword", e.target.value)}
             label="Confirm New Password"
             name="confirmPassword"
             placeholder="Re-enter New Password"

@@ -6,7 +6,7 @@ import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
-import { useUserManagementState } from "@/store/user-management-store";
+import { useUserManagementState } from "@/store/admin-store/user-management-store";
 import { ChangeEvent } from "react";
 import TagInput from "@/ui/form/tag-input";
 
@@ -32,7 +32,7 @@ export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
     "Healthcare Initiative",
     "Education Program",
     "Clean Water Project",
-    "Clean Water One", 
+    "Clean Water One",
   ];
 
   return (

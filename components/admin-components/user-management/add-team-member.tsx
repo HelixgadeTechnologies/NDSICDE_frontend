@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserManagementState } from "@/store/user-management-store";
+import { useUserManagementState } from "@/store/admin-store/user-management-store";
 import { ChangeEvent } from "react";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
@@ -30,7 +30,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     "Healthcare Initiative",
     "Education Program",
     "Clean Water Project",
-    "Clean Water One", 
+    "Clean Water One",
   ];
 
   return (

@@ -3,7 +3,7 @@
 import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
 import TextInput from "@/ui/form/text-input";
-import { useSettingsFormState } from "@/store/settings-store";
+import { useSettingsFormState } from "@/store/admin-store/settings-store";
 import RadioComponent from "@/ui/form/switch-component";
 import Button from "@/ui/form/button";
 import DropDown from "@/ui/form/select-dropdown";
@@ -92,7 +92,9 @@ export default function GeneralSettings() {
           <DropDown
             label="Data Rentention Policy"
             value={dataRententionPolicy}
-            onChange={(value: string) => setField("dataRententionPolicy", value)}
+            onChange={(value: string) =>
+              setField("dataRententionPolicy", value)
+            }
             name="dataRententionPolicy"
             placeholder="1 Year"
             options={[]}

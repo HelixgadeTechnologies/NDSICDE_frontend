@@ -3,7 +3,7 @@
 import { Icon } from "@iconify/react";
 import { head, data } from "@/types/team-members";
 import { useTeamMemberModal } from "@/utils/team-member-utility";
-import { useUserManagementState } from "@/store/user-management-store";
+import { useUserManagementState } from "@/store/admin-store/user-management-store";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Table from "@/ui/table";

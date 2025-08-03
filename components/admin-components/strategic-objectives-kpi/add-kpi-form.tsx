@@ -5,7 +5,7 @@ import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Checkbox from "@/ui/form/checkbox";
-import { useStrategicObjectivesAndKPIsState } from "@/store/strategic-objectives-kpi-store";
+import { useStrategicObjectivesAndKPIsState } from "@/store/admin-store/strategic-objectives-kpi-store";
 import Button from "@/ui/form/button";
 
 type AddKPIFormProps = {

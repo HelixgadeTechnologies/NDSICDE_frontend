@@ -12,7 +12,7 @@ import {
 import PieChartComponent from "../../../ui/pie-chart";
 import BarChartComponent from "../../../ui/bar-chart";
 import Percentage from "@/ui/percentage-component";
-import { usePerformanceAnalyticsReportsState } from "@/store/performance-analytics-store";
+import { usePerformanceAnalyticsReportsState } from "@/store/admin-store/performance-analytics-store";
 
 export default function ProjectResultPerformance() {
   const { KPIName, result, projects, PSDFilter, setField } =

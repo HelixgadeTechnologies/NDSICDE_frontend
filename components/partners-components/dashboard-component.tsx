@@ -47,7 +47,7 @@ const lines = [
   ];
 
   const chartData = [
-    { name: "Jan", target: 0, actual: 0 },
+    { name: "Jan", target: 20, actual: 40 },
     { name: "Feb", target: 70, actual: 60 },
     { name: "Mar", target: 38, actual: 45 },
     { name: "Apr", target: 75, actual: 60 },
