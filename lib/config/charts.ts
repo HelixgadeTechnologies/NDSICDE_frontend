@@ -1,4 +1,4 @@
-// all chart data
+// all fake data
 
 // KPI VS actual target
 export const KPIActualTarget = [
@@ -266,4 +266,21 @@ export const progressTracking = [
   { name: "Outputs", value: 53 },
   { name: "Outcomes", value: 37 },
   { name: "Impact", value: 20 },
+];
+
+export const comments = [
+  {
+    id: 1,
+    name: "John Doe",
+    date: "Mar 15, 2025",
+    time: "10:20 PM",
+    comment: "The marketing campaign exceeded our expectations in terms of reach, but we need to improve conversion rates in the next quarter.",
+  },
+  {
+    id: 2,
+    name: "John Doe",
+    date: "Mar 15, 2025",
+    time: "10:20 PM",
+    comment: "The marketing campaign exceeded our expectations in terms of reach, but we need to improve conversion rates in the next quarter.",
+  },
 ];

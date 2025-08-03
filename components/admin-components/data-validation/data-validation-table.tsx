@@ -12,6 +12,7 @@ import TitleAndContent from "./title-content-component";
 import Button from "@/ui/form/button";
 import FileDisplay from "@/ui/file-display";
 import TextareaInput from "@/ui/form/textarea";
+import CommentsTab from "@/ui/comments-tab";
 
 export default function DataValidationTable() {
   const head = [
@@ -138,16 +139,13 @@ export default function DataValidationTable() {
                 <div className="space-y-2">
                     {Array.isArray(details?.comments) && details.comments.length > 0 ? (
                     details.comments.map((c, i) => (
-                        <div key={i} className="h-[84px] w-full bg-[#F2F2F2] p-4 space-y-1.5">
-                        <div className="flex justify-between items-center">
-                            <p className="font-semibold text-black">{c.commentedBy}</p>
-                            <p className="space-x-1 text-[#475367] text-sm">
-                            <span>{c.date}.</span>
-                            <span>{c.time}</span>
-                            </p>
-                        </div>
-                        <p className="text-[#475367] text-sm">{c.comment}</p>
-                        </div>
+                        <CommentsTab
+                        key={i}
+                        name={c.commentedBy}
+                        date={c.date}
+                        time={c.time}
+                        comment={c.comment}
+                        />
                     ))
                     ) : (
                     <div className="text-sm text-gray-600 text-center mb-5">No comments yet.</div>
