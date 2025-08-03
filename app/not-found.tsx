@@ -26,7 +26,7 @@ export default function NotFound() {
         </p>
         <Button
           content="Return"
-          onClick={() => window.history.back()}
+          // onClick={() => window.history.back()}
           isSecondary
         />
         <span className="my-10 text-sm">
