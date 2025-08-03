@@ -99,7 +99,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     ),
   };
 
-  const hiddenRoutes = ["/admin/project-management/create-project"];
+  const hiddenRoutes = ["/admin/project-management/create-project", "/partners/kpi-reporting/new-kpi"];
 
   return (
     <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""}`}>

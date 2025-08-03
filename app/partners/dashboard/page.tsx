@@ -1,3 +1,4 @@
+import PartnersDashboardComponent from "@/components/partners-components/dashboard-component"
 import DashboardStat from "@/ui/dashboard-stat-card"
 
 export const metadata = {
@@ -30,10 +31,11 @@ export default function PartnersDashboardPage() {
 ]
 
     return (
-        <section>
+        <section className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <DashboardStat data={dashboardData} />
               </div>
+              <PartnersDashboardComponent/>
         </section>
     )
 }

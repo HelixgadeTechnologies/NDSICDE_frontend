@@ -46,6 +46,11 @@ export const breadcrumbs = [
     header: "Assigned KPI",
   },
   {
+    href: "/partners/kpi-reporting/new-kpi",
+    header: "KPI Reporting",
+    subtitle: "Provide detailed information about KPI details",
+  },
+  {
     href: "/partners/settings",
     header: "Account Settings",
   },

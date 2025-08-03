@@ -256,3 +256,14 @@ export const pendingReportApproval = [
     type: "Project",
   },
 ];
+
+export const progressTrackingColors = [
+  "#22C55E",
+  "#EF4444",
+  "#003B99",
+];
+export const progressTracking = [
+  { name: "Outputs", value: 53 },
+  { name: "Outcomes", value: 37 },
+  { name: "Impact", value: 20 },
+];

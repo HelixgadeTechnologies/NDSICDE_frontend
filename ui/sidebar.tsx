@@ -101,7 +101,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                 icon={"heroicons-solid:logout"}
                 width={20}
                 height={20}
-                color={"#737373"}
+                // color={"#737373"}
               />
               <span className="text-xs">Logout</span>
             </div>

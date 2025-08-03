@@ -1,3 +1,6 @@
+"use client";
+
+
 import Button from "@/ui/form/button";
 import Link from "next/link";
 
@@ -22,8 +25,8 @@ export default function NotFound() {
           Oops! The page you&apos;re looking for does not exist.
         </p>
         <Button
-          content="Return to Homepage"
-          href="/admin/dashboard"
+          content="Return"
+          onClick={() => window.history.back()}
           isSecondary
         />
         <span className="my-10 text-sm">
