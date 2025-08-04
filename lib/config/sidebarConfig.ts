@@ -76,18 +76,18 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
         name: "Dashboard",
         href: "/partners/dashboard",
         icon: "lucide:home",
-    },
-    {
+      },
+      {
         id: "kpi-reporting",
         name: "KPI Reporting",
         href: "/partners/kpi-reporting",
         icon: "fluent-mdl2:c-r-m-report",
-    },
+      },
     ],
   },
 
   management: {
-    role: 'management',
+    role: "management",
     items: [
       {
         id: "dashboard",
@@ -105,6 +105,30 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
         id: "organizational-kpi",
         name: "Organizational KPI",
         href: "/management/organizational-kpi",
+        icon: "carbon:result-new",
+      },
+    ],
+  },
+
+  "retirement-managers": {
+    role: "retirement-managers",
+    items: [
+      {
+        id: "dashboard",
+        name: "Dashboard",
+        href: "/retirement-managers/dashboard",
+        icon: "lucide:home",
+      },
+      {
+        id: "request-and-retirement",
+        name: "Request and Retirement",
+        href: "/retirement-managers/request",
+        icon: "bi:people",
+      },
+      {
+        id: "organizational-kpi",
+        name: "Organizational KPI",
+        href: "/retirement-managers/organizational-kpi",
         icon: "carbon:result-new",
       },
     ],

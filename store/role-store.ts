@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type UserRole = 'admin' | 'partners' | 'management'
+export type UserRole = 'admin' | 'partners' | 'management' | 'retirement-managers'
 
 export interface User {
   id: string
@@ -19,7 +19,7 @@ interface RoleState {
   setUser: (user: User) => void
 }
 
-// Hardcoded users for testing
+// Updated users with kebab-case roles
 export const MOCK_USERS: Record<UserRole, User> = {
   admin: {
     id: '1',
@@ -35,13 +35,20 @@ export const MOCK_USERS: Record<UserRole, User> = {
     role: 'partners',
     avatar: '/avatars/partner.jpg'
   },
-  management: {
+  'management': {
     id: '3',
     name: "Management and Staff",
-    email: "managementandstaff.com",
+    email: "managementandstaff@company.com",
     role: 'management',
     avatar: '/management-staff.jpg',
   },
+  'retirement-managers': {
+    id: '4',
+    name: "Retirement Managers",
+    email: "retirement@company.com",
+    role: 'retirement-managers',
+    avatar: '/retirement.jpg',
+  }
 }
 
 export const useRoleStore = create<RoleState>()(
@@ -73,11 +80,13 @@ export const getRoleBasePath = (role: UserRole): string => {
   return `/${role}`
 }
 
+// for name at the top of the page
 export const getRoleDisplayName = (role: UserRole): string => {
   const names = {
-    admin: 'Administrator',
+    admin: 'Super Admin',
     partners: 'Partners',
-    management: "Management and Staff"
+    'management': 'Management & Staff',
+    'retirement-managers': 'Request & Retirement Managers'
   }
   return names[role]
 }

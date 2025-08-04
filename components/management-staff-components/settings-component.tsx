@@ -6,8 +6,7 @@ import PasswordInput from "@/ui/form/password-input";
 import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
 import { Icon } from "@iconify/react";
-import { useManagementSettingsState } from "@/store/management-and-staff-store/settings-store";
-
+import { useManagementSettingsState } from "@/store/management-staff-store/settings-store";
 
 export default function ManagementStaffSettingsComponents() {
   const {
@@ -42,32 +41,32 @@ export default function ManagementStaffSettingsComponents() {
           </div>
           <div className="grid grid-cols-2 gap-4 justify-between items-center w-full">
             <TextInput
-            name="name"
-            value={name}
-            label="Name"
-            placeholder="John Doe"
-            onChange={(e) => setField("name", e.target.value)}
+              name="name"
+              value={name}
+              label="Name"
+              placeholder="John Doe"
+              onChange={(e) => setField("name", e.target.value)}
             />
             <TextInput
-            name="email"
-            value={email}
-            label="Email Address"
-            placeholder="management@sdn.org"
-            onChange={(e) => setField("email", e.target.value)}
+              name="email"
+              value={email}
+              label="Email Address"
+              placeholder="management@sdn.org"
+              onChange={(e) => setField("email", e.target.value)}
             />
             <TextInput
-            name="phoneNumber"
-            value={phoneNumber}
-            label="Phone Number"
-            placeholder="0901 234 5678"
-            onChange={(e) => setField("phoneNumber", e.target.value)}
+              name="phoneNumber"
+              value={phoneNumber}
+              label="Phone Number"
+              placeholder="0901 234 5678"
+              onChange={(e) => setField("phoneNumber", e.target.value)}
             />
             <TextInput
-            name="rolesandPermission"
-            value={rolesAndPermissions}
-            label="Roles and Permissison"
-            placeholder="Project Manager"
-            onChange={(e) => setField("rolesAndPermissions", e.target.value)}
+              name="rolesandPermission"
+              value={rolesAndPermissions}
+              label="Roles and Permissison"
+              placeholder="Project Manager"
+              onChange={(e) => setField("rolesAndPermissions", e.target.value)}
             />
           </div>
         </div>

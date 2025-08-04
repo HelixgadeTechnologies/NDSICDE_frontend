@@ -70,4 +70,20 @@ export const breadcrumbs = [
     href: "/management/settings",
     header: "Account Settings"
   },
+  {
+    href: "/retirement-managers/dashboard",
+    header: "Dashboard",
+  },
+  {
+    href: "/retirement-managers/request",
+    header: "Request and Retirement",
+  },
+  {
+    href: "/retirement-managers/organizational-kpi",
+    header: "Organizational KPI",
+  },
+  {
+    href: "/retirement-managers/settings",
+    header: "Account Settings",
+  }
 ];

@@ -1,5 +1,6 @@
 import DashboardCharts from "@/components/management-staff-components/dashboard/dashboard-charts-parent";
 import ManagementStaffDashboardTable from "@/components/management-staff-components/dashboard/dashboard-table";
+
 import DashboardStat from "@/ui/dashboard-stat-card";
 
 export const metadata = {
@@ -41,7 +42,7 @@ export default function ManagementAndStaffDashboard() {
         <DashboardStat data={dashboardData} />
       </div>
       <DashboardCharts />
-      <ManagementStaffDashboardTable/>
+      <ManagementStaffDashboardTable />
     </section>
   );
 }
