@@ -10,7 +10,7 @@ export default function RetirementManagersChartAnalytics() {
   const barData = [
     { name: "Approved", value: 80 },
     { name: "Rejected", value: 96 },
-    { name: "Pending", value: 77 },
+    { name: "Pending", value: 67 },
   ];
 
   return (
@@ -33,14 +33,14 @@ export default function RetirementManagersChartAnalytics() {
       </div>
       <CardComponent height="100%">
         <div className="space-y-8 text-center flex flex-col justify-center items-center h-full">
-            <h3 className="text-[#737373] font-bold text-2xl leading-[33.6px]">Total Project Activity Request Approved</h3>
-            <h2 className="text-[#1D2739] font-extrabold text-5xl">₦ 10,000,000</h2>
+            <h3 className="text-[#737373] font-bold text-xl leading-[33.6px]">Total Project Activity Request Approved</h3>
+            <h2 className="text-[#1D2739] font-extrabold text-4xl">₦ 10,000,000</h2>
         </div>
       </CardComponent>
       <CardComponent height="100%">
         <div className="space-y-8 text-center flex flex-col justify-center items-center h-full">
-            <h3 className="text-[#737373] font-bold text-2xl leading-[33.6px]">Total Project Activity Amount Retired</h3>
-            <h2 className="text-[#1D2739] font-extrabold text-5xl">₦ 10,000,000</h2>
+            <h3 className="text-[#737373] font-bold text-xl leading-[33.6px]">Total Project Activity Amount Retired</h3>
+            <h2 className="text-[#1D2739] font-extrabold text-4xl">₦ 10,000,000</h2>
             <p className="text-[#22C55E] font-medium text-base">Percent Amount Retired: 10%</p>
         </div>
       </CardComponent>

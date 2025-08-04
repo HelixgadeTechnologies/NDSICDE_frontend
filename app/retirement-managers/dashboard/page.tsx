@@ -1,4 +1,5 @@
 import RetirementManagersChartAnalytics from "@/components/retirement-managers-components/dashboard/chart-analytics";
+import RetirementManagersDashboardTable from "@/components/retirement-managers-components/dashboard/table-parent";
 import DashboardStat from "@/ui/dashboard-stat-card";
 
 export const metadata = {
@@ -31,11 +32,12 @@ export default function RetirementManagersDashboard() {
     },
   ];
   return (
-    <section>
+    <section className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-5">
-        <DashboardStat data={dashboardData} icon="basil:plus-solid" />
+        <DashboardStat data={dashboardData} />
       </div>
       <RetirementManagersChartAnalytics />
+      <RetirementManagersDashboardTable />
     </section>
   );
 }
