@@ -38,7 +38,11 @@ export default function FinancialRequestAndRetirementModal({
         data={tabs} 
         renderContent={(tabId => {
             if (tabId === 1) {
-                return 'first'
+                return (
+                    <>
+                    {request.status}
+                    </>
+                )
             } else {
                 return <CommentsAndNotes/>
             }
