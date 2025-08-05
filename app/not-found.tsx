@@ -1,6 +1,4 @@
-"use client";
-
-import { useRoleStore } from "@/store/role-store";
+// import { useRoleStore } from "@/store/role-store";
 import Button from "@/ui/form/button";
 import Link from "next/link";
 
@@ -11,7 +9,7 @@ export const metadata = {
 };
 
 export default function NotFound() {
-  const { user } = useRoleStore();
+  // const { user } = useRoleStore();
   return (
     <div
       className="h-screen w-screen flex items-center justify-center"
@@ -28,7 +26,7 @@ export default function NotFound() {
         <Button
           content="Return"
           // onClick={() => window.history.back()}
-          href={`/${user?.role}/dashboard`}
+          // href={`/${user?.role}/dashboard`}
           isSecondary
         />
         <span className="my-10 text-sm">
