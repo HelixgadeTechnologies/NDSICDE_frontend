@@ -1,4 +1,4 @@
-import RequestAndRetirementTable from "@/components/retirement-managers-components/request-and-retirement-table"
+import RequestAndRetirementTable from "@/components/retirement-managers-components/retirement-request-table"
 
 export const metadata = {
     title: "Request and Retirement - NDSICDE",
