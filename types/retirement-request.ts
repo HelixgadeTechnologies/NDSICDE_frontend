@@ -23,7 +23,7 @@ export const RetirementRequestHead = [
 export const RetirementRequestData: RetirementRequest[] = [
     {
       id: 1,
-      activityLineDesc: "Accomodation",
+      activityLineDesc: "Community Health Initiative",
       quantity: 2,
       frequency: 3,
       unitCost: "30,000",
