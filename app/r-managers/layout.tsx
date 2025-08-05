@@ -25,14 +25,14 @@ export default function RetirementManagerLayout({
     }
 
     // redirect if not an partners
-    if (user?.role !== "retirement-managers") {
+    if (user?.role !== "r-managers") {
       router.push(`/${user?.role}/dashboard`)
       return
     }
   }, [isAuthenticated, user, router])
 
     // show loading or redirect
-    if (!isAuthenticated || user?.role !== 'retirement-managers') {
+    if (!isAuthenticated || user?.role !== 'r-managers') {
       return <Loading/>
     }
 

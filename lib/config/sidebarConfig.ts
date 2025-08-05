@@ -110,25 +110,25 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
     ],
   },
 
-  "retirement-managers": {
-    role: "retirement-managers",
+  "r-managers": {
+    role: "r-managers",
     items: [
       {
         id: "dashboard",
         name: "Dashboard",
-        href: "/retirement-managers/dashboard",
+        href: "/r-managers/dashboard",
         icon: "lucide:home",
       },
       {
         id: "request-and-retirement",
         name: "Request and Retirement",
-        href: "/retirement-managers/request",
+        href: "/r-managers/request-and-retirement",
         icon: "bi:people",
       },
       {
         id: "organizational-kpi",
         name: "Organizational KPI",
-        href: "/retirement-managers/organizational-kpi",
+        href: "/r-managers/organizational-kpi",
         icon: "carbon:result-new",
       },
     ],

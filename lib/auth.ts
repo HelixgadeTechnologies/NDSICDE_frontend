@@ -25,12 +25,14 @@ export const ROUTE_PERMISSIONS: RoutePermission[] = [
 
   // Manager routes
   { path: "/management/dashboard", allowedRoles: ["management"] },
-  {
-    path: "/management/organizational-kpi",
-    allowedRoles: ["management"],
-  },
+  { path: "/management/organizational-kpi", allowedRoles: ["management"] },
   { path: "/management/view-reports", allowedRoles: ["management"] },
   { path: "/management/settings", allowedRoles: ["management"] },
+
+  { path: "/r-managers/dashboard", allowedRoles: ["r-managers"] },
+  { path: "/r-managers/organizational-kpi", allowedRoles: ["r-managers"] },
+  { path: "/r-managers/request-and-retirement", allowedRoles: ["r-managers"] },
+  { path: "/r-managers/settings", allowedRoles: ["r-managers"] },
 ];
 
 export function canUserAccessRoute(

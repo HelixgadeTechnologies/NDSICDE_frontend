@@ -56,34 +56,34 @@ export const breadcrumbs = [
   },
   {
     href: "/management/dashboard",
-    header: "Project Dashboard"
+    header: "Project Dashboard",
   },
   {
     href: "/management/reports-and-comments",
-    header: "View Reports & Comments"
+    header: "View Reports & Comments",
   },
   {
     href: "/management/organizational-kpi",
-    header: "Organizational KPI"
-  },
-  {
-    href: "/management/settings",
-    header: "Account Settings"
-  },
-  {
-    href: "/retirement-managers/dashboard",
-    header: "Dashboard",
-  },
-  {
-    href: "/retirement-managers/request",
-    header: "Request and Retirement",
-  },
-  {
-    href: "/retirement-managers/organizational-kpi",
     header: "Organizational KPI",
   },
   {
-    href: "/retirement-managers/settings",
+    href: "/management/settings",
     header: "Account Settings",
-  }
+  },
+  {
+    href: "/r-managers/dashboard",
+    header: "Dashboard",
+  },
+  {
+    href: "/r-managers/request-and-retirement",
+    header: "Request and Retirement",
+  },
+  {
+    href: "/r-managers/organizational-kpi",
+    header: "Organizational KPI",
+  },
+  {
+    href: "/r-managers/settings",
+    header: "Account Settings",
+  },
 ];
