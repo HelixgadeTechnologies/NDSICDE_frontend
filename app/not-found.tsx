@@ -1,3 +1,5 @@
+"use client";
+
 import { useRoleStore } from "@/store/role-store";
 import Button from "@/ui/form/button";
 import Link from "next/link";
