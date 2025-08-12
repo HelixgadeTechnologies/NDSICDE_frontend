@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useActionState } from "react";
 import Link from "next/link";
 import EmailInput from "@/ui/form/email-input";
 import PasswordInput from "@/ui/form/password-input";
@@ -38,17 +38,20 @@ export default function Login() {
     }));
   };
 
+  const [state, loginAction] = useActionState()
   
   const handleLogin = (e?: React.FormEvent) => {
     // Prevent form submission
-    if (e) {
-      e.preventDefault();
-    }
-    const user = MOCK_USERS[selectedRole];
-    login(user);
+    // if (e) {
+    //   e.preventDefault();
+    // }
+    // const user = MOCK_USERS[selectedRole];
+    // login(user);
     
-    const redirectPath = getDefaultRouteForRole(selectedRole);
-    router.push(redirectPath);
+    // const redirectPath = getDefaultRouteForRole(selectedRole);
+    // router.push(redirectPath);
+
+
   };
 
   return (
@@ -94,7 +97,7 @@ export default function Login() {
         </div>
 
         {/* to test roles */}
-         <div className="flex items-center gap-2">
+         {/* <div className="flex items-center gap-2">
               {Object.entries(MOCK_USERS).map(([role, user]) => (
                 <label key={role} className="flex items-center gap-1">
                   <input
@@ -110,7 +113,7 @@ export default function Login() {
                   </div>
                 </label>
               ))}
-            </div>
+            </div> */}
 
         <div className="mt-4">
           <Button content="Log into Account" onClick={handleLogin} />
