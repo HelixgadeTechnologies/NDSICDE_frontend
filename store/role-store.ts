@@ -23,31 +23,38 @@ export interface User {
 
 interface RoleState {
   user: User | null
+  token: string | null
   isAuthenticated: boolean
-  login: (user: User) => void
+  login: (user: User, token: string) => void
   logout: () => void
   setUser: (user: User) => void
+  setToken: (token: string) => void
 }
 
 export const useRoleStore = create<RoleState>()(
   persist(
     (set) => ({
       user: null,
+      token: null,
       isAuthenticated: false,
       
-      login: (user: User) => {
-        set({ user, isAuthenticated: true })
+      login: (user: User, token: string) => {
+        set({ user, token, isAuthenticated: true })
       },
       
       logout: () => {
         // Clear stored tokens
         localStorage.removeItem('authToken');
         sessionStorage.removeItem('authToken');
-        set({ user: null, isAuthenticated: false })
+        set({ user: null, token: null, isAuthenticated: false })
       },
       
       setUser: (user: User) => {
         set({ user })
+      },
+      
+      setToken: (token: string) => {
+        set({ token })
       }
     }),
     {

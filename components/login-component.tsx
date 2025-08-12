@@ -9,7 +9,7 @@ import Button from "@/ui/form/button";
 import { useRoleStore, UserRole } from "@/store/role-store";
 import { useRouter } from "next/navigation";
 import { getDefaultRouteForRole, apiLogin, decodeJWT, storeToken } from "@/lib/auth";
-
+import { toast } from "react-toastify";
 
 // Map role names from API to your UserRole type
 function mapRoleNameToUserRole(roleName: string): UserRole {
@@ -110,16 +110,17 @@ export default function Login() {
       // Store token
       storeToken(token, userData.isChecked);
 
-      // Login the user
-      login(user);
+      // Login the user with both user object and token
+      login(user, token);
       
       // Redirect to appropriate dashboard
       const redirectPath = getDefaultRouteForRole(mappedRole);
       router.push(redirectPath);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Login error:', error);
-      setError(error.message || 'Login failed. Please check your credentials and try again.');
+      toast.error(`Error: ${error.message}`);
+      setError(error?.message || 'Login failed. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -134,7 +135,7 @@ export default function Login() {
         Enter your credentials to access your account
       </p>
 
-      <form onSubmit={handleLogin} className="mt-8 space-y-4">
+      <form onSubmit={handleLogin} className="mt-8 space-y-6">
         <EmailInput
           value={userData.email}
           onChange={handleInputChange}
@@ -175,9 +176,10 @@ export default function Login() {
 
         <div className="mt-4">
           <Button 
-            content={isLoading ? "Logging in..." : "Log into Account"} 
+            content={"Log into Account"} 
             onClick={handleLogin}
             isDisabled={isLoading}
+            isLoading={isLoading}
           />
         </div>
         
