@@ -9,6 +9,16 @@ export interface User {
   email: string
   role: UserRole
   avatar?: string
+  // Additional fields from your JWT token
+  phoneNumber?: string
+  address?: string
+  department?: string | null
+  community?: string | null
+  state?: string | null
+  localGovernmentArea?: string | null
+  status?: string
+  assignedProjectId?: string | null
+  roleId?: string
 }
 
 interface RoleState {
@@ -17,38 +27,6 @@ interface RoleState {
   login: (user: User) => void
   logout: () => void
   setUser: (user: User) => void
-}
-
-// Updated users with kebab-case roles
-export const MOCK_USERS: Record<UserRole, User> = {
-  admin: {
-    id: '1',
-    name: 'Super Admin',
-    email: 'admin@dsn.org',
-    role: 'admin',
-    avatar: '/avatars/admin.jpg'
-  },
-  partners: {
-    id: '2',
-    name: 'Partners',
-    email: 'partner@company.com',
-    role: 'partners',
-    avatar: '/avatars/partner.jpg'
-  },
-  'management': {
-    id: '3',
-    name: "Management and Staff",
-    email: "managementandstaff@company.com",
-    role: 'management',
-    avatar: '/management-staff.jpg',
-  },
-  'r-managers': {
-    id: '4',
-    name: "Retirement Managers",
-    email: "retirement@company.com",
-    role: 'r-managers',
-    avatar: '/retirement.jpg',
-  }
 }
 
 export const useRoleStore = create<RoleState>()(
@@ -62,6 +40,9 @@ export const useRoleStore = create<RoleState>()(
       },
       
       logout: () => {
+        // Clear stored tokens
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
         set({ user: null, isAuthenticated: false })
       },
       
@@ -89,4 +70,32 @@ export const getRoleDisplayName = (role: UserRole): string => {
     'r-managers': 'Request & Retirement Managers'
   }
   return names[role]
+}
+
+// Utility function to get stored token
+export const getStoredToken = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+}
+
+// Utility function to check if token is expired
+export const isTokenExpired = (token: string): boolean => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+    const decoded = JSON.parse(jsonPayload);
+    const currentTime = Date.now() / 1000;
+    return decoded.exp < currentTime;
+  } catch (error) {
+    console.log(error)
+    return true; // Consider expired if we can't decode
+  }
 }

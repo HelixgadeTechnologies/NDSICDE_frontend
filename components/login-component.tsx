@@ -1,20 +1,39 @@
 "use client";
 
-import { useState, ChangeEvent, useActionState } from "react";
+import { useState, ChangeEvent } from "react";
 import Link from "next/link";
 import EmailInput from "@/ui/form/email-input";
 import PasswordInput from "@/ui/form/password-input";
 import Checkbox from "@/ui/form/checkbox";
 import Button from "@/ui/form/button";
-import { MOCK_USERS, useRoleStore, UserRole } from "@/store/role-store";
+import { useRoleStore, UserRole } from "@/store/role-store";
 import { useRouter } from "next/navigation";
-import { getDefaultRouteForRole } from "@/lib/auth";
+import { getDefaultRouteForRole, apiLogin, decodeJWT, storeToken } from "@/lib/auth";
+
+
+// Map role names from API to your UserRole type
+function mapRoleNameToUserRole(roleName: string): UserRole {
+  const roleMap: Record<string, UserRole> = {
+    'SUPER ADMIN': 'admin',
+    'ADMIN': 'admin',
+    'PARTNERS': 'partners',
+    'PARTNER': 'partners',
+    'MANAGEMENT': 'management',
+    'MANAGEMENT AND STAFF': 'management',
+    'RETIREMENT MANAGERS': 'r-managers',
+    'R-MANAGERS': 'r-managers',
+    'REQUEST AND RETIREMENT MANAGERS': 'r-managers'
+  };
+  
+  const normalizedRole = roleName.toUpperCase();
+  return roleMap[normalizedRole] || 'admin';
+}
 
 export default function Login() {
-
-  const [selectedRole, setSelectedRole] = useState<UserRole>("admin");
   const router = useRouter();
   const { login } = useRoleStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const [userData, setUserData] = useState({
     email: "",
@@ -24,34 +43,86 @@ export default function Login() {
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setUserData((prev) => ({ ...prev, [name]: value }));
+    if (error) setError("");
   };
 
-  // for checkbox
   const handleCheckboxChange = (checked: boolean) => {
-    setUserData((prev) => ({
-      ...prev,
-      isChecked: checked,
-    }));
+    setUserData((prev) => ({ ...prev, isChecked: checked }));
   };
 
-  const [state, loginAction] = useActionState()
-  
-  const handleLogin = (e?: React.FormEvent) => {
-    // Prevent form submission
-    // if (e) {
-    //   e.preventDefault();
-    // }
-    // const user = MOCK_USERS[selectedRole];
-    // login(user);
-    
-    // const redirectPath = getDefaultRouteForRole(selectedRole);
-    // router.push(redirectPath);
+  const handleLogin = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
 
+    // Validation
+    if (!userData.email || !userData.password) {
+      setError("Please fill in all fields");
+      return;
+    }
 
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Make API call
+      const response = await apiLogin({
+        email: userData.email,
+        password: userData.password,
+      });
+
+      console.log('Login API response:', response);
+
+      // Extract token from response - the data field contains the JWT token directly
+      const token = response.data;
+      
+      if (!token || typeof token !== 'string') {
+        console.error('Token not found in response:', response);
+        throw new Error('No authentication token found in server response');
+      }
+
+      // Decode the JWT token
+      const decodedToken = decodeJWT(token);
+      
+      if (!decodedToken) {
+        throw new Error('Failed to decode authentication token');
+      }
+
+      // Map the role and create user object
+      const mappedRole = mapRoleNameToUserRole(decodedToken.roleName);
+      
+      const user = {
+        id: decodedToken.userId,
+        name: decodedToken.fullName,
+        email: decodedToken.email,
+        role: mappedRole,
+        avatar: decodedToken.profilePic || undefined,
+        phoneNumber: decodedToken.phoneNumber,
+        address: decodedToken.address,
+        department: decodedToken.department,
+        community: decodedToken.community,
+        state: decodedToken.state,
+        localGovernmentArea: decodedToken.localGovernmentArea,
+        status: decodedToken.status,
+        assignedProjectId: decodedToken.assignedProjectId,
+        roleId: decodedToken.roleId,
+      };
+
+      // Store token
+      storeToken(token, userData.isChecked);
+
+      // Login the user
+      login(user);
+      
+      // Redirect to appropriate dashboard
+      const redirectPath = getDefaultRouteForRole(mappedRole);
+      router.push(redirectPath);
+
+    } catch (error: any) {
+      console.error('Login error:', error);
+      setError(error.message || 'Login failed. Please check your credentials and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -63,8 +134,7 @@ export default function Login() {
         Enter your credentials to access your account
       </p>
 
-      {/* space-y-6 */}
-      <form action="" className="mt-8 space-y-4">
+      <form onSubmit={handleLogin} className="mt-8 space-y-4">
         <EmailInput
           value={userData.email}
           onChange={handleInputChange}
@@ -81,6 +151,13 @@ export default function Login() {
           uppercase
           isBigger
         />
+        
+        {error && (
+          <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
+            {error}
+          </div>
+        )}
+        
         <div className="flex justify-between items-center">
           <Checkbox
             name="terms"
@@ -96,28 +173,14 @@ export default function Login() {
           </Link>
         </div>
 
-        {/* to test roles */}
-         {/* <div className="flex items-center gap-2">
-              {Object.entries(MOCK_USERS).map(([role, user]) => (
-                <label key={role} className="flex items-center gap-1">
-                  <input
-                    type="radio"
-                    name="role"
-                    value={role}
-                    checked={selectedRole === role}
-                    onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-                    className="h-4 w-4 accent-red-600 border-gray-300 focus:ring-red-500 cursor-pointer"
-                  />
-                  <div className="text-sm font-medium text-gray-900 capitalize">
-                    {user.role}
-                  </div>
-                </label>
-              ))}
-            </div> */}
-
         <div className="mt-4">
-          <Button content="Log into Account" onClick={handleLogin} />
+          <Button 
+            content={isLoading ? "Logging in..." : "Log into Account"} 
+            onClick={handleLogin}
+            isDisabled={isLoading}
+          />
         </div>
+        
         <Link
           href={"/reset-password"}
           className="primary block md:hidden text-xs font-medium hover:underline whitespace-nowrap text-center"
