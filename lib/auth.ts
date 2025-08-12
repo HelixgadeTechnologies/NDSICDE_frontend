@@ -1,59 +1,117 @@
 import { UserRole } from "@/store/role-store";
 
-export interface RoutePermission {
-  path: string;
-  allowedRoles: UserRole[];
-  exact?: boolean;
+// lib/auth-utils.ts
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
 }
 
-export const ROUTE_PERMISSIONS: RoutePermission[] = [
-  // Admin routes
-  { path: "/admin/dashboard", allowedRoles: ["admin"] },
-  { path: "/admin/strategic-objectives", allowedRoles: ["admin"] },
-  { path: "/admin/project-management", allowedRoles: ["admin"] },
-  { path: "/admin/user-management", allowedRoles: ["admin"] },
-  { path: "/admin/data-validation", allowedRoles: ["admin"] },
-  { path: "/admin/user-management", allowedRoles: ["admin"] },
-  { path: "/admin/performance-analytics", allowedRoles: ["admin"] },
-  { path: "/admin/settings", allowedRoles: ["admin"] },
-
-  // Partner routes
-  { path: "/partners", allowedRoles: ["partners"] },
-  { path: "/partners/dashboard", allowedRoles: ["partners"] },
-  { path: "/partners/kpi-reporting", allowedRoles: ["partners"] },
-  { path: "/partners/settings", allowedRoles: ["partners"] },
-
-  // Manager routes
-  { path: "/management/dashboard", allowedRoles: ["management"] },
-  { path: "/management/organizational-kpi", allowedRoles: ["management"] },
-  { path: "/management/view-reports", allowedRoles: ["management"] },
-  { path: "/management/settings", allowedRoles: ["management"] },
-
-  { path: "/r-managers/dashboard", allowedRoles: ["r-managers"] },
-  { path: "/r-managers/organizational-kpi", allowedRoles: ["r-managers"] },
-  { path: "/r-managers/request-and-retirement", allowedRoles: ["r-managers"] },
-  { path: "/r-managers/settings", allowedRoles: ["r-managers"] },
-];
-
-export function canUserAccessRoute(
-  userRole: UserRole | null,
-  pathname: string
-): boolean {
-  if (!userRole) return false;
-
-  const permission = ROUTE_PERMISSIONS.find((p) =>
-    p.exact ? p.path === pathname : pathname.startsWith(p.path)
-  );
-
-  if (!permission) return true; // Allow access to routes not explicitly protected
-
-  return permission.allowedRoles.includes(userRole);
+export interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: string; // The JWT token is directly in the data field as a string
 }
 
+export interface DecodedToken {
+  userId: string;
+  fullName: string;
+  email: string;
+  address?: string;
+  phoneNumber?: string;
+  roleId: string;
+  roleName: string;
+  status: string;
+  assignedProjectId?: string | null;
+  department?: string | null;
+  community?: string | null;
+  state?: string | null;
+  localGovernmentArea?: string | null;
+  profilePic?: string | null;
+  profilePicMimeType?: string | null;
+  loginLast: string;
+  createAt: string;
+  updateAt: string;
+  password: string;
+  iat: number;
+  exp: number;
+}
+
+// JWT decode function
+export function decodeJWT(token: string): DecodedToken | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    return null;
+  }
+}
+
+// API login function
+export async function apiLogin(credentials: LoginCredentials): Promise<LoginResponse> {
+  const response = await fetch('https://ndsicde-backend.onrender.com/api/auth/signIn', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || `Login failed with status ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+// Check if token is expired
+export function isTokenExpired(token: string): boolean {
+  try {
+    const decoded = decodeJWT(token);
+    if (!decoded) return true;
+    
+    const currentTime = Date.now() / 1000;
+    return decoded.exp < currentTime;
+  } catch (error) {
+    console.log(error)
+    return true;
+  }
+}
+
+// Get token from storage
+export function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+}
+
+// Remove token from storage
+export function removeStoredToken(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('authToken');
+  sessionStorage.removeItem('authToken');
+}
+
+// Store token
+export function storeToken(token: string, remember: boolean): void {
+  if (typeof window === 'undefined') return;
+  
+  if (remember) {
+    localStorage.setItem('authToken', token);
+  } else {
+    sessionStorage.setItem('authToken', token);
+  }
+}
 export function getDefaultRouteForRole(role: UserRole): string {
   return `/${role}/dashboard`;
-}
-
-export function redirectToRoleBasedRoute(role: UserRole): string {
-  return getDefaultRouteForRole(role);
 }
