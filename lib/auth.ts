@@ -59,7 +59,7 @@ export function decodeJWT(token: string): DecodedToken | null {
 
 // API login function
 export async function apiLogin(credentials: LoginCredentials): Promise<LoginResponse> {
-  const response = await fetch('https://ndsicde-backend.onrender.com/api/auth/signIn', {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/signIn`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
