@@ -70,7 +70,7 @@ export default function Login() {
         password: userData.password,
       });
 
-      console.log('Login API response:', response);
+      // console.log('Login API response:', response);
 
       // Extract token from response - the data field contains the JWT token directly
       const token = response.data;

@@ -13,6 +13,16 @@ export interface LoginResponse {
   data: string; // The JWT token is directly in the data field as a string
 }
 
+export interface ResetPasswordCredentials {
+  email: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+  data: null;
+}
+
 export interface DecodedToken {
   userId: string;
   fullName: string;
@@ -70,6 +80,23 @@ export async function apiLogin(credentials: LoginCredentials): Promise<LoginResp
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || `Login failed with status ${response.status}`);
+  }
+
+  return await response.json();
+};
+
+export async function apiResetPassword(credentials: ResetPasswordCredentials): Promise<ResetPasswordResponse> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(credentials),
+  });
+
+    if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || `Reset password failed with status ${response.status}`);
   }
 
   return await response.json();
