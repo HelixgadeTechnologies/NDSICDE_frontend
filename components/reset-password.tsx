@@ -6,7 +6,7 @@ import EmailInput from "@/ui/form/email-input";
 import Button from "@/ui/form/button";
 import Modal from "@/ui/popup-modal";
 import { Icon } from "@iconify/react";
-import { apiResetPassword } from "@/lib/auth";
+import { apiResetPassword } from "@/lib/api/auth";
 
 export default function ResetPassword() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function ResetPassword() {
   };
 
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -47,18 +47,18 @@ export default function ResetPassword() {
         email: userData.email,
       });
 
-      console.log('Reset password response:', response);
-      
+      // console.log('Reset password response:', response);
+
       // Check if reset was successful
       if (response.success) {
         setIsOpen(true);
       } else {
-        setError(response.message || 'Password reset failed');
+        setError(response.message || "Password reset failed");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Reset password error:', error);
-      setError(error.message || 'Failed to reset password. Please try again.');
+      console.error("Reset password error:", error);
+      setError(error.message || "Failed to reset password. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -91,16 +91,16 @@ export default function ResetPassword() {
             label="Email address"
             placeholder="Enter Email"
           />
-          
+
           {error && (
             <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
               {error}
             </div>
           )}
-          
+
           <div className="mt-6">
-            <Button 
-              content={"Reset Password"} 
+            <Button
+              content={"Reset Password"}
               isDisabled={isLoading}
               isLoading={isLoading}
             />
@@ -120,13 +120,13 @@ export default function ResetPassword() {
             Your password has been reset successfully.
           </p>
           <p className="text-sm text-center text-gray-700 font-medium">
-            Your new password is: <span className="bg-red-100 px-2 py-1 rounded font-mono">12345</span>
+            Your new password is:{" "}
+            <span className="bg-red-100 px-2 py-1 rounded font-mono">
+              12345
+            </span>
           </p>
           <div className="mt-4 flex justify-end gap-2">
-            <Button
-              onClick={handleProceedToLogin}
-              content="Proceed to Login"
-            />
+            <Button onClick={handleProceedToLogin} content="Proceed to Login" />
           </div>
         </Modal>
       )}

@@ -8,25 +8,31 @@ import Checkbox from "@/ui/form/checkbox";
 import Button from "@/ui/form/button";
 import { useRoleStore, UserRole } from "@/store/role-store";
 import { useRouter } from "next/navigation";
-import { getDefaultRouteForRole, apiLogin, decodeJWT, storeToken } from "@/lib/auth";
+import {
+  getDefaultRouteForRole,
+  apiLogin,
+  decodeJWT,
+  storeToken,
+} from "@/lib/api/auth";
 import { toast } from "react-toastify";
 
 // Map role names from API to your UserRole type
 function mapRoleNameToUserRole(roleName: string): UserRole {
   const roleMap: Record<string, UserRole> = {
-    'SUPER ADMIN': 'admin',
-    'ADMIN': 'admin',
-    'PARTNERS': 'partners',
-    'PARTNER': 'partners',
-    'MANAGEMENT': 'management',
-    'MANAGEMENT AND STAFF': 'management',
-    'RETIREMENT MANAGERS': 'r-managers',
-    'R-MANAGERS': 'r-managers',
-    'REQUEST AND RETIREMENT MANAGERS': 'r-managers'
+    "SUPER ADMIN": "admin",
+    "ADMIN": "admin",
+    "PARTNERS": "partners",
+    "PARTNER": "partners",
+    "MANAGEMENT": "management",
+    "MANAGEMENT AND STAFF": "management",
+    "TEAM MEMBER": "management", //for test because davis created a user that there is no screen for
+    "RETIREMENT MANAGERS": "r-managers",
+    "R-MANAGERS": "r-managers",
+    "REQUEST AND RETIREMENT MANAGERS": "r-managers",
   };
-  
+
   const normalizedRole = roleName.toUpperCase();
-  return roleMap[normalizedRole] || 'admin';
+  return roleMap[normalizedRole] || "admin";
 }
 
 export default function Login() {
@@ -74,22 +80,22 @@ export default function Login() {
 
       // Extract token from response - the data field contains the JWT token directly
       const token = response.data;
-      
-      if (!token || typeof token !== 'string') {
-        console.error('Token not found in response:', response);
-        throw new Error('No authentication token found in server response');
+
+      if (!token || typeof token !== "string") {
+        console.error("Token not found in response:", response);
+        throw new Error("No authentication token found in server response");
       }
 
       // Decode the JWT token
       const decodedToken = decodeJWT(token);
-      
+
       if (!decodedToken) {
-        throw new Error('Failed to decode authentication token');
+        throw new Error("Failed to decode authentication token");
       }
 
       // Map the role and create user object
       const mappedRole = mapRoleNameToUserRole(decodedToken.roleName);
-      
+
       const user = {
         id: decodedToken.userId,
         name: decodedToken.fullName,
@@ -112,22 +118,25 @@ export default function Login() {
 
       // Login the user with both user object and token
       login(user, token);
-      
+
       // Redirect to appropriate dashboard
       const redirectPath = getDefaultRouteForRole(mappedRole);
       router.push(redirectPath);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(`Error: ${error.message}`);
-      setError(error?.message || 'Login failed. Please check your credentials and try again.');
+      setError(
+        error?.message ||
+          "Login failed. Please check your credentials and try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="rounded-[10px] md:border border-[#D0D5DD] bg-white py-8 px-7 w-[450px] h-[480px]">
+    <div className="rounded-[10px] md:border border-[#D0D5DD] bg-white pb-4 pt-8 px-7 w-[450px] h-fit">
       <h4 className="font-semibold text-2xl md:text-[28px] text-gray-900 text-center mb-2">
         Log In
       </h4>
@@ -152,13 +161,13 @@ export default function Login() {
           uppercase
           isBigger
         />
-        
+
         {error && (
           <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
             {error}
           </div>
         )}
-        
+
         <div className="flex justify-between items-center">
           <Checkbox
             name="terms"
@@ -175,14 +184,14 @@ export default function Login() {
         </div>
 
         <div className="mt-4">
-          <Button 
-            content={"Log into Account"} 
+          <Button
+            content={"Log into Account"}
             onClick={handleLogin}
             isDisabled={isLoading}
             isLoading={isLoading}
           />
         </div>
-        
+
         <Link
           href={"/reset-password"}
           className="primary block md:hidden text-xs font-medium hover:underline whitespace-nowrap text-center"
