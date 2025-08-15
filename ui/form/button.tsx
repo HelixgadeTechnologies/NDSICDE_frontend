@@ -38,7 +38,7 @@ export default function Button({
         <button className={classes}>
           {isLoading ? (
             <div className="flex justify-center items-center">
-              <div className="dots">
+              <div className="dots-white">
                 <div></div>
                 <div></div>
                 <div></div>
@@ -59,7 +59,7 @@ export default function Button({
     <button onClick={onClick} className={classes}>
       {isLoading ? (
         <div className="flex justify-center items-center">
-          <div className="dots">
+          <div className="dots-white">
             <div></div>
             <div></div>
             <div></div>

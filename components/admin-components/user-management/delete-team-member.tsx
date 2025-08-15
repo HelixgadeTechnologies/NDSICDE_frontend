@@ -43,10 +43,10 @@ export default function DeleteTeamMember({
               {user.fullName}
             </h3>
             <p className="text-sm text-[#7A7A7A] leading-5">
-              {user.emailAddress}
+              {user.email}
             </p>
             <p className="text-sm text-[#7A7A7A] leading-5">
-              Role: {user.role}
+              Role: {user.roleId}
             </p>
           </div>
         </div>

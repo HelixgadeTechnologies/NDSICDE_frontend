@@ -6,9 +6,12 @@ import EmailInput from "@/ui/form/email-input";
 import Button from "@/ui/form/button";
 import Modal from "@/ui/popup-modal";
 import { Icon } from "@iconify/react";
+import { apiResetPassword } from "@/lib/api/auth";
 
 export default function ResetPassword() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const [userData, setUserData] = useState({
     email: "",
@@ -20,19 +23,59 @@ export default function ResetPassword() {
       ...prev,
       [name]: value,
     }));
+    // Clear error when user starts typing
+    if (error) setError("");
   };
 
   const [isOpen, setIsOpen] = useState(false);
-  const handleSubmit = (e: FormEvent) => {
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setIsOpen(true);
+
+    // Validation
+    if (!userData.email) {
+      setError("Please enter your email address");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Make API call
+      const response = await apiResetPassword({
+        email: userData.email,
+      });
+
+      // console.log('Reset password response:', response);
+
+      // Check if reset was successful
+      if (response.success) {
+        setIsOpen(true);
+      } else {
+        setError(response.message || "Password reset failed");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Reset password error:", error);
+      setError(error.message || "Failed to reset password. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleModalClose = () => setIsOpen(false);
+  const handleModalClose = () => {
+    setIsOpen(false);
+  };
+
+  const handleProceedToLogin = () => {
+    setIsOpen(false);
+    router.push("/login");
+  };
 
   return (
     <>
-      <div className="rounded-[10px] md:border border-[#D0D5DD] bg-white py-8 px-7 w-[450px] h-[320px]">
+      <div className="rounded-[10px] md:border border-[#D0D5DD] bg-white py-8 px-7 w-[450px] h-fit">
         <h4 className="font-semibold text-2xl md:text-[28px] text-gray-900 text-center mb-2">
           Forgot Password
         </h4>
@@ -48,8 +91,19 @@ export default function ResetPassword() {
             label="Email address"
             placeholder="Enter Email"
           />
-          <div className="mt-4">
-            <Button content="Log into Account" />
+
+          {error && (
+            <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
+              {error}
+            </div>
+          )}
+
+          <div className="mt-6">
+            <Button
+              content={"Reset Password"}
+              isDisabled={isLoading}
+              isLoading={isLoading}
+            />
           </div>
         </form>
       </div>
@@ -60,16 +114,19 @@ export default function ResetPassword() {
             <Icon icon={"simple-line-icons:check"} width={96} height={96} />
           </div>
           <h2 className="text-[28px] font-semibold mb-2 text-center text-gray-900">
-            Congratulations!
+            Password Reset Successful!
           </h2>
-          <p className="text-sm text-center text-gray-500">
-            Your Password Reset was Successful
+          <p className="text-sm text-center text-gray-500 mb-2">
+            Your password has been reset successfully.
           </p>
-          <div className="mt-6 flex justify-end gap-2">
-            <Button
-              onClick={() => router.push("/login")}
-              content="Proceed to Login"
-            />
+          <p className="text-sm text-center text-gray-700 font-medium">
+            Your new password is:{" "}
+            <span className="bg-red-100 px-2 py-1 rounded font-mono">
+              12345
+            </span>
+          </p>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button onClick={handleProceedToLogin} content="Proceed to Login" />
           </div>
         </Modal>
       )}

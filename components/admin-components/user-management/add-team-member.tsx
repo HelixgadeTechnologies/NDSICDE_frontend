@@ -20,7 +20,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     emailAddress,
     department,
     phoneNumber,
-    role,
+    roleId,
     status,
     // assignedProjects,
     setField,
@@ -60,9 +60,9 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
           <DropDown
             label="Role"
             options={[]}
-            name="role"
-            value={role}
-            onChange={(value: string) => setField("role", value)}
+            name="roleId"
+            value={roleId}
+            onChange={(value: string) => setField("roleId", value)}
           />
           <DropDown
             label="Department"

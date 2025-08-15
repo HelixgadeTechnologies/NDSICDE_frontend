@@ -1,39 +1,52 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
-interface AP {
-  label: string;
-  value: string;
+interface UserManagementState {
+  fullName: string;
+  emailAddress: string;
+  department: string;
+  phoneNumber: string;
+  roleId: string;
+  status: string;
+  assignedProjects: string[];
+  
+  // Actions
+  setField: <K extends keyof UserManagementState>(
+    field: K, 
+    value: UserManagementState[K]
+  ) => void;
+  resetForm: () => void;
 }
 
-type UserManagementState = {
-    role: string;
-    status: string;
-    fullName: string;
-    emailAddress: string;
-    department: string;
-    phoneNumber: string;
-    assignedProjects: Array<AP>;
-
-    setField: <K extends keyof UserManagementState>(key: K, value: UserManagementState[K]) => void;
-    resetForm: () => void;
+const initialState = {
+  fullName: '',
+  emailAddress: '',
+  department: '',
+  phoneNumber: '',
+  roleId: '',
+  status: 'Active',
+  assignedProjects: [],
 };
 
-const defaultFormState: Omit<UserManagementState, "setField" | "resetForm"> = {
-    role: "",
-    status: "",
-    fullName: "",
-    emailAddress: "",
-    department: "",
-    phoneNumber: "",
-    assignedProjects: [],
-}
-
 export const useUserManagementState = create<UserManagementState>((set) => ({
-    ...defaultFormState,
-    setField: <K extends keyof UserManagementState>(key: K, value: UserManagementState[K]) =>
-    set((state) => ({
-      ...state,
-      [key]: value,
-    })),
-  resetForm: () => set({ ...defaultFormState }),
-}))
+  ...initialState,
+  
+  setField: (field, value) => {
+    set((state) => {
+      // Only update if the value is actually different
+      if (state[field] === value) {
+        return state; // Return the same state reference to prevent re-renders
+      }
+      
+      return {
+        ...state,
+        [field]: value,
+      };
+    });
+  },
+  
+  resetForm: () => {
+    set(() => ({
+      ...initialState,
+    }));
+  },
+}));
