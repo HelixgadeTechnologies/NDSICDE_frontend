@@ -1,10 +1,10 @@
 "use client";
 
 import { Icon } from "@iconify/react";
-import { head, data } from "@/types/team-members";
+import { head, UserDetails } from "@/types/team-members";
 import { useTeamMemberModal } from "@/utils/team-member-utility";
 import { useUserManagementState } from "@/store/admin-store/user-management-store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Table from "@/ui/table";
 import CardComponent from "@/ui/card-wrapper";
@@ -13,9 +13,12 @@ import SearchInput from "@/ui/form/search";
 import ViewTeamMember from "./view-team-member";
 import EditTeamMember from "./edit-team-member";
 import DeleteTeamMember from "./delete-team-member";
+import { getUsers } from "@/lib/api/user-management";
+import { useRoleStore } from "@/store/role-store";
+import { UserManagementCredentials } from "@/lib/api/user-management";
 
 export default function TeamMembersTable() {
-  const { role, status, setField } = useUserManagementState();
+  const { roleId, status, setField } = useUserManagementState();
 
   const {
     editTeamMember,
@@ -30,17 +33,65 @@ export default function TeamMembersTable() {
     handleDeleteUser,
   } = useTeamMemberModal();
 
-  // Search functions
+  const [isFetching, setIsFetching] = useState(false);
+  const [users, setUsers] = useState<UserDetails[]>([]);
+  const { token } = useRoleStore();
+
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!token) return;
+      setIsFetching(true);
+
+      try {
+        const response = await getUsers(token);
+
+        if (response.success && Array.isArray(response.data)) {
+          const mappedUsers: UserDetails[] = response.data.map(
+            (user: UserManagementCredentials) => ({
+              userId: user.userId,
+              fullName: user.fullName,
+              email: user.email,
+              address: user.address,
+              phoneNumber: user.phoneNumber,
+              roleId: user.roleId,
+              roleName: user.roleName,
+              status: user.status,
+              assignedProjectId: user.assignedProjectId,
+              department: user.department,
+              community: user.community,
+              state: user.state,
+              localGovernmentArea: user.localGovernmentArea,
+              profilePic: user.profilePic,
+              profilePicMimeType: user.profilePicMimeType,
+              loginLast: user.loginLast,
+              createAt: user.createAt,
+              updateAt: user.updateAt,
+              password: user.password,
+            })
+          );
+
+          setUsers(mappedUsers);
+        }
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchUsers();
+  }, [token]);
+
   const [query, setQuery] = useState("");
 
-  // Search logic (case insensitive)
-  const filteredData = data.filter((item) =>
-    `${item.fullName} ${item.emailAddress} ${item.role} ${item.assignedProjects}`
+  const filteredData = users.filter((item) =>
+    `${item.fullName} ${item.email} ${item.roleName} ${item.assignedProjectId}`
       .toLowerCase()
-      .includes(query.toLowerCase())
+      .includes(query.trim().toLowerCase())
   );
 
-  const [activeRowId, setActiveRowId] = useState<number | null>(null);
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
 
   return (
     <section className="mt-10">
@@ -57,11 +108,11 @@ export default function TeamMembersTable() {
             </div>
             <div className="w-2/5 flex gap-4">
               <DropDown
-                value={role}
+                value={roleId}
                 label="Role"
                 placeholder="All Role"
                 name="role"
-                onChange={(value: string) => setField("role", value)}
+                onChange={(value: string) => setField("roleId", value)}
                 options={[]}
               />
               <DropDown
@@ -74,28 +125,37 @@ export default function TeamMembersTable() {
               />
             </div>
           </div>
-          {filteredData.length > 0 ? (
+
+          {isFetching ? (
+            <section className="flex justify-center items-center h-[300px]">
+                <div className="dots">
+                    <div className=""></div>
+                    <div className=""></div>
+                    <div className=""></div>
+                </div>
+            </section>
+          ) : filteredData.length > 0 ? (
             <Table
               checkbox
-              idKey="id"
+              idKey="userId"
               tableHead={head}
               tableData={filteredData}
               renderRow={(row) => (
                 <>
                   <td className="px-6">{row.fullName}</td>
-                  <td className="px-6">{row.emailAddress}</td>
-                  <td className="px-6">{row.role}</td>
+                  <td className="px-6">{row.email}</td>
+                  <td className="px-6">{row.roleName}</td>
                   <td
                     className={`px-6 ${
-                      row.status === "Active"
+                      row.status == "Active"
                         ? "text-green-500"
                         : "text-red-500"
                     }`}
                   >
                     {row.status}
                   </td>
-                  <td className="px-6">{row.lastActive}</td>
-                  <td className="px-6">{row.assignedProjects}</td>
+                  <td className="px-6">{row.loginLast}</td>
+                  <td className="px-6">{row.department}</td>
                   <td className="px-6 relative">
                     <div className="flex justify-center items-center">
                       <Icon
@@ -106,13 +166,13 @@ export default function TeamMembersTable() {
                         color="#909CAD"
                         onClick={() =>
                           setActiveRowId((prev) =>
-                            prev === row.id ? null : row.id
+                            prev === row.userId ? null : row.userId
                           )
                         }
                       />
                     </div>
 
-                    {activeRowId === row.id && (
+                    {activeRowId === row.userId && (
                       <AnimatePresence>
                         <motion.div
                           initial={{ y: -10, opacity: 0 }}
@@ -178,7 +238,7 @@ export default function TeamMembersTable() {
         </div>
       </CardComponent>
 
-      {/* Pass the selected user to the modals */}
+      {/* Modals */}
       {viewTeamMember && selectedUser && (
         <ViewTeamMember
           isOpen={viewTeamMember}
@@ -186,7 +246,6 @@ export default function TeamMembersTable() {
           user={selectedUser}
         />
       )}
-
       {editTeamMember && selectedUser && (
         <EditTeamMember
           isOpen={editTeamMember}
@@ -194,7 +253,6 @@ export default function TeamMembersTable() {
           user={selectedUser}
         />
       )}
-
       {deleteTeamMember && selectedUser && (
         <DeleteTeamMember
           isOpen={deleteTeamMember}

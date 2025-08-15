@@ -19,7 +19,7 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
     items: [
       {
         id: "dashboard",
-        name: "Dashboard",
+        name: "Project Management Dashboard",
         icon: "lucide:home",
         href: "/admin/dashboard",
       },
@@ -29,12 +29,12 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
         href: "/admin/strategic-objectives",
         icon: "fluent:arrow-growth-24-regular",
       },
-      {
-        id: "project-management",
-        name: "Project Management",
-        href: "/admin/project-management",
-        icon: "iconoir:folder",
-      },
+      // {
+      //   id: "project-management",
+      //   name: "Project Management",
+      //   href: "/admin/project-management",
+      //   icon: "iconoir:folder",
+      // },
       {
         id: "user-management",
         name: "User Management",
@@ -43,7 +43,7 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
       },
       {
         id: "data-validation",
-        name: "Data Validation",
+        name: "Request and Retirement Manager",
         href: "/admin/data-validation",
         icon: "fluent:radar-checkmark-20-regular",
       },
@@ -55,13 +55,13 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
       },
       {
         id: "performance-analytics",
-        name: "Performance Analytics & Reports",
+        name: "Project Performance Dashboard",
         href: "/admin/performance-analytics",
         icon: "bi:gear",
       },
       {
         id: "organizational-kpi",
-        name: "Organizational KPI",
+        name: "Org KPI Dashboard",
         href: "/admin/organizational-kpi",
         icon: "carbon:result-new",
       },

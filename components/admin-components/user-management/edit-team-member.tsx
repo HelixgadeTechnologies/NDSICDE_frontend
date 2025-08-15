@@ -22,7 +22,7 @@ export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
     emailAddress,
     department,
     phoneNumber,
-    role,
+    roleId,
     status,
     // assignedProjects,
     setField,
@@ -63,8 +63,8 @@ export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
             label="Role"
             options={[]}
             name="role"
-            value={role}
-            onChange={(value: string) => setField("role", value)}
+            value={roleId}
+            onChange={(value: string) => setField("roleId", value)}
           />
           <DropDown
             label="Department"

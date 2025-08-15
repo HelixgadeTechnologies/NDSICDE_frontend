@@ -30,7 +30,13 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     useStrategicObjectivesAndKPIsModal();
 
   const actionComponents: Record<string, React.ReactNode> = {
-    "/admin/dashboard": <Button content="New Project" icon="cil:plus" />,
+    "/admin/dashboard": (
+      <Button
+        content="New Project"
+        icon="cil:plus"
+        href="/admin/dashboard/create-project"
+      />
+    ),
     "/admin/strategic-objectives": (
       <>
         <Button
@@ -46,13 +52,13 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         )}
       </>
     ),
-    "/admin/project-management": (
-      <Button
-        content="New Project"
-        icon="cil:plus"
-        href="/admin/project-management/create-project"
-      />
-    ),
+    // "/admin/project-management": (
+    //   <Button
+    //     content="New Project"
+    //     icon="cil:plus"
+    //     href="/admin/project-management/create-project"
+    //   />
+    // ),
     "/admin/user-management": (
       <>
         <Button

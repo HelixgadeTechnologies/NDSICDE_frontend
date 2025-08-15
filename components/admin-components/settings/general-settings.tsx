@@ -13,6 +13,7 @@ import { FormEvent, useState, useEffect } from "react";
 import { apiAdminSettings, apiGetGeneralSettings } from "@/lib/api/settings";
 import { useRoleStore } from "@/store/role-store";
 import { Icon } from "@iconify/react";
+import Modal from "@/ui/popup-modal";
 
 export default function GeneralSettings() {
   const {
@@ -161,13 +162,13 @@ export default function GeneralSettings() {
     }
   };
 
-  const handleReset = () => {
-    if (confirm("Are you sure you want to reset all settings to default values? This action cannot be undone.")) {
-      resetForm();
-      setError("");
-      setSuccessMessage("Settings reset to default values");
-      setIsEditMode(false);
-    }
+  const [openConfirmReset, setOpenConfirmReset] = useState(false);
+  const handleReset = (e: FormEvent) => {
+    e.preventDefault();
+    resetForm();
+    setError("");
+    setSuccessMessage("Settings reset to default values");
+    setIsEditMode(false);
   };
 
   // Show loading spinner while fetching initial data
@@ -176,7 +177,6 @@ export default function GeneralSettings() {
       <section className="flex items-center justify-center min-h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading settings...</p>
         </div>
       </section>
     );
@@ -196,7 +196,7 @@ export default function GeneralSettings() {
         {successMessage && (
           <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md relative text-sm">
             {successMessage}
-            <Icon icon="formkit:close" width={22} height={22} onClick={() => setSuccessMessage("")} className="absolute right-5 cursor-pointer" />
+            <Icon icon="formkit:close" width={22} height={22} onClick={() => setSuccessMessage("")} className="absolute right-3 top-3 cursor-pointer" />
           </div>
         )}
         
@@ -329,7 +329,7 @@ export default function GeneralSettings() {
             <Button 
               isSecondary 
               content="Reset to Default" 
-              onClick={handleReset}
+              onClick={() => setOpenConfirmReset(true)}
               // isDisabled={isLoading}
             />
             <Button 
@@ -340,6 +340,16 @@ export default function GeneralSettings() {
           </div>
         </CardComponent>
       </form>
+
+      <Modal isOpen={openConfirmReset} onClose={() => setOpenConfirmReset(false)}>
+        <div className="space-y-3">
+          <Heading heading="Reset Settings" subtitle="Are you sure you want to reset all settings to default values? This action cannot be undone." className="text-center" />
+          <div className="flex items-center gap-4">
+            <Button content="Cancel" isSecondary onClick={() => setOpenConfirmReset(false)}/>
+          <Button content="Reset" onClick={() => handleReset}/>
+          </div>
+        </div>
+      </Modal>
     </section>
   );
 }
