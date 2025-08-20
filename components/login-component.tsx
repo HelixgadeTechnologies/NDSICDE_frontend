@@ -12,7 +12,6 @@ import {
   getDefaultRouteForRole,
   apiLogin,
   decodeJWT,
-  storeToken,
 } from "@/lib/api/auth";
 import { toast } from "react-toastify";
 
@@ -76,8 +75,6 @@ export default function Login() {
         password: userData.password,
       });
 
-      // console.log('Login API response:', response);
-
       // Extract token from response - the data field contains the JWT token directly
       const token = response.data;
 
@@ -113,17 +110,18 @@ export default function Login() {
         roleId: decodedToken.roleId,
       };
 
-      // Store token
-      storeToken(token, userData.isChecked);
-
       // Login the user with both user object and token
+      // The Zustand store will handle all persistence automatically
       login(user, token);
+
+      // Show success message
+      toast.success(`Welcome back, ${user.name}!`);
 
       // Redirect to appropriate dashboard
       const redirectPath = getDefaultRouteForRole(mappedRole);
       router.push(redirectPath);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(`Error: ${error.message}`);
       setError(
