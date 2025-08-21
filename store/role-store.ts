@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type UserRole = 'admin' | 'partners' | 'management' | 'r-managers'
+export type UserRole = 'admin' | 'partners' | 'management' | 'r-managers' | 'team-member'
 
 export interface User {
   id: string
@@ -59,6 +59,7 @@ export const useRoleStore = create<RoleState>()(
         const { token } = get()
         if (token && !isTokenExpired(token)) {
           set({ isAuthenticated: true })
+          sessionStorage.setItem("isAuthenticated",JSON.stringify(true))
         } else {
           set({ user: null, token: null, isAuthenticated: false })
         }
@@ -81,7 +82,8 @@ export const getRoleDisplayName = (role: UserRole): string => {
     admin: 'Super Admin',
     partners: 'Partners',
     'management': 'Management & Staff',
-    'r-managers': 'Request & Retirement Managers'
+    'r-managers': 'Request & Retirement Managers',
+    'team-member': 'Team Members'
   }
   return names[role]
 }

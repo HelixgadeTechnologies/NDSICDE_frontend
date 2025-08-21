@@ -3,9 +3,9 @@
 import Sidebar from "@/ui/sidebar";
 import Navigation from "@/ui/navigation";
 import Breadcrumb from "@/ui/breadcrumb-component";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useRoleStore } from "@/store/role-store";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import Loading from "../loading";
 
 export default function PartnersLayout({
@@ -14,22 +14,28 @@ export default function PartnersLayout({
   children: React.ReactNode;
 }>) {
 
-  const router = useRouter();
+  // const router = useRouter();
   const { user, isAuthenticated } = useRoleStore();
+  // const setIsAuth = useRoleStore.setState; // direct access to set
 
-  useEffect(() => {
-    // redirect if not authenticated
-    if (!isAuthenticated) {
-      router.push("/login");
-      return
-    }
+  // useEffect(() => {
 
-    // redirect if not an partners
-    if (user?.role !== "partners") {
-      router.push(`/${user?.role}/dashboard`)
-      return
-    }
-  }, [isAuthenticated, user, router])
+  //         // get back the isAuthentication value from the sessional storage and set back in the store
+  //   const parseIsAuthenticated:boolean = JSON.parse(sessionStorage.getItem("isAuthenticated") as string)
+  //   setIsAuth({isAuthenticated:parseIsAuthenticated})
+    
+  //   // redirect if not authenticated
+  //   if (!isAuthenticated) {
+  //     router.push("/login");
+  //     return
+  //   }
+
+  //   // redirect if not an partners
+  //   if (user?.role !== "partners") {
+  //     router.push(`/${user?.role}/dashboard`)
+  //     return
+  //   }
+  // }, [isAuthenticated, user, router, setIsAuth])
 
     // show loading or redirect
     if (!isAuthenticated || user?.role !== 'partners') {

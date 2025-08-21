@@ -8,39 +8,39 @@ import { useRoleStore } from "@/store/role-store";
 // import { useEffect } from "react";
 import Loading from "../loading";
 
-export default function RetirementManagerLayout({
+export default function TeamMemberLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   // const router = useRouter();
   const { user, isAuthenticated } = useRoleStore();
-    // const setIsAuth = useRoleStore.setState; // direct access to set
+  // const setIsAuth = useRoleStore.setState; // direct access to set
 
   // useEffect(() => {
-
-  //         // get back the isAuthentication value from the sessional storage and set back in the store
-  //   const parseIsAuthenticated:boolean = JSON.parse(sessionStorage.getItem("isAuthenticated") as string)
-  //   setIsAuth({isAuthenticated:parseIsAuthenticated})
+  //   // get back the isAuthentication value from the sessional storage and set back in the store
+  //   const parseIsAuthenticated: boolean = JSON.parse(
+  //     sessionStorage.getItem("isAuthenticated") as string
+  //   );
+  //   setIsAuth({ isAuthenticated: parseIsAuthenticated });
 
   //   // redirect if not authenticated
   //   if (!isAuthenticated) {
   //     router.push("/login");
-  //     return
+  //     return;
   //   }
 
-  //   // redirect if not an partners
-  //   if (user?.role !== "r-managers") {
-  //     router.push(`/${user?.role}/dashboard`)
-  //     return
+  //   // redirect if not an team-member
+  //   if (user?.role !== "team-member") {
+  //     router.push(`/${user?.role}/dashboard`);
+  //     return;
   //   }
-  // }, [isAuthenticated, user, router, setIsAuth])
+  // }, [isAuthenticated, user, router, setIsAuth]);
 
-    // show loading or redirect
-    if (!isAuthenticated || user?.role !== 'r-managers') {
-      return <Loading/>
-    }
+  // show loading or redirect
+  if (!isAuthenticated || user?.role !== "team-member") {
+    return <Loading />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">

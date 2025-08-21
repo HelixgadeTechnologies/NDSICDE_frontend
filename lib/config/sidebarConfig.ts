@@ -133,6 +133,48 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
       },
     ],
   },
+
+  "team-member": {
+    role:  "team-member",
+    items: [
+      {
+        id: "dashboard",
+        name: "Dashboard",
+        href: "/team-member/dashboard",
+        icon: "lucide:home",
+      },
+      {
+        id: "project-management",
+        name: "Project Management",
+        href: "/team-member/project-management",
+        icon: "iconoir:component",
+      },
+      {
+        id: "request-approvals",
+        name: "Request Approvals",
+        href: "/team-member/request-approvals",
+        icon: "mdi:approval",
+      },
+      {
+        id: "result-dashboard",
+        name: "Result Dashboard",
+        href: "/team-member/result-dashboard",
+        icon: "carbon:result-old",
+      },
+      {
+        id: "organizational-kpi",
+        name: "Organizational KPI",
+        href: "/team-member/organizational-kpi",
+        icon: "carbon:result-new",
+      },
+      {
+        id: "financial-dashboard",
+        name: "Financial Dashboard",
+        href: "/team-member/financial-dashboard",
+        icon: "carbon:financial-assets",
+      },
+    ],
+  }
 };
 
 export const getSidebarConfig = (role: UserRole): SidebarConfig => {
