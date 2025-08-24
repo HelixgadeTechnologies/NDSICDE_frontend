@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import Logo from "@/ui/logo-component";
 import { useSidebar } from "@/context/SidebarContext";
 import { Icon } from "@iconify/react";
@@ -28,6 +28,13 @@ export default function Sidebar({ className }: BaseSidebarProps) {
 
   // for active on settings
   const isActive = pathname.startsWith(`/${user.role}/settings`);
+
+  const handleLogout = () => {
+    logout();
+    closeMobile();
+    console.log("User logged out");
+    redirect("/login");
+  }
 
   return (
     <>
@@ -94,7 +101,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
               <span className="text-xs">Settings</span>
             </Link>
             <div
-              onClick={logout}
+              onClick={handleLogout}
               className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 hover:bg-[#FFECE5] hover:text-[#D2091E] text-gray-600 cursor-pointer`}
             >
               <Icon
