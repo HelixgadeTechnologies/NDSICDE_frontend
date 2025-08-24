@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type UserRole = 'admin' | 'partners' | 'management' | 'r-managers'
+export type UserRole = 'admin' | 'partners' | 'management' | 'r-managers' | 'team-member'
 
 export interface User {
   id: string
@@ -9,7 +9,6 @@ export interface User {
   email: string
   role: UserRole
   avatar?: string
-  // Additional fields from your JWT token
   phoneNumber?: string
   address?: string
   department?: string | null
@@ -29,11 +28,12 @@ interface RoleState {
   logout: () => void
   setUser: (user: User) => void
   setToken: (token: string) => void
+  initializeAuth: () => void
 }
 
 export const useRoleStore = create<RoleState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -43,9 +43,6 @@ export const useRoleStore = create<RoleState>()(
       },
       
       logout: () => {
-        // Clear stored tokens
-        localStorage.removeItem('authToken');
-        sessionStorage.removeItem('authToken');
         set({ user: null, token: null, isAuthenticated: false })
       },
       
@@ -55,6 +52,17 @@ export const useRoleStore = create<RoleState>()(
       
       setToken: (token: string) => {
         set({ token })
+      },
+
+      // Initialize auth state on app startup
+      initializeAuth: () => {
+        const { token } = get()
+        if (token && !isTokenExpired(token)) {
+          set({ isAuthenticated: true })
+          sessionStorage.setItem("isAuthenticated",JSON.stringify(true))
+        } else {
+          set({ user: null, token: null, isAuthenticated: false })
+        }
       }
     }),
     {
@@ -74,15 +82,15 @@ export const getRoleDisplayName = (role: UserRole): string => {
     admin: 'Super Admin',
     partners: 'Partners',
     'management': 'Management & Staff',
-    'r-managers': 'Request & Retirement Managers'
+    'r-managers': 'Request & Retirement Managers',
+    'team-member': 'Team Members'
   }
   return names[role]
 }
 
-// Utility function to get stored token
+// Utility function to get stored token (now from Zustand store)
 export const getStoredToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+  return useRoleStore.getState().token
 }
 
 // Utility function to check if token is expired
@@ -103,6 +111,6 @@ export const isTokenExpired = (token: string): boolean => {
     return decoded.exp < currentTime;
   } catch (error) {
     console.log(error)
-    return true; // Consider expired if we can't decode
+    return true; 
   }
 }

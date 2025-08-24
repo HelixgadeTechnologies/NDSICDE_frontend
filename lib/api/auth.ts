@@ -116,21 +116,24 @@ export function isTokenExpired(token: string): boolean {
   }
 }
 
-// Get token from storage
+// DEPRECATED: Use Zustand store instead
+// These functions are kept for backward compatibility but should not be used
+// if you're using the updated role store without manual storage
 export function getStoredToken(): string | null {
+  console.warn('getStoredToken is deprecated. Use useRoleStore.getState().token instead');
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
 }
 
-// Remove token from storage
 export function removeStoredToken(): void {
+  console.warn('removeStoredToken is deprecated. Use useRoleStore logout method instead');
   if (typeof window === 'undefined') return;
   localStorage.removeItem('authToken');
   sessionStorage.removeItem('authToken');
 }
 
-// Store token
 export function storeToken(token: string, remember: boolean): void {
+  console.warn('storeToken is deprecated. Use useRoleStore login method instead');
   if (typeof window === 'undefined') return;
   
   if (remember) {
@@ -139,6 +142,55 @@ export function storeToken(token: string, remember: boolean): void {
     sessionStorage.setItem('authToken', token);
   }
 }
+
+// Helper function to convert DecodedToken to User object for the store
+export function createUserFromToken(decoded: DecodedToken): {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
+  phoneNumber?: string;
+  address?: string;
+  department?: string | null;
+  community?: string | null;
+  state?: string | null;
+  localGovernmentArea?: string | null;
+  status?: string;
+  assignedProjectId?: string | null;
+  roleId?: string;
+} {
+  // Map roleName to UserRole
+  const roleMap: Record<string, UserRole> = {
+    'admin': 'admin',
+    'super admin': 'admin', // Handle variations
+    'partners': 'partners',
+    'management': 'management',
+    'management & staff': 'management',
+    'r-managers': 'r-managers',
+    'request & retirement managers': 'r-managers'
+  };
+
+  const role = roleMap[decoded.roleName.toLowerCase()] || 'partners'; // Default fallback
+
+  return {
+    id: decoded.userId,
+    name: decoded.fullName,
+    email: decoded.email,
+    role,
+    avatar: decoded.profilePic || undefined,
+    phoneNumber: decoded.phoneNumber,
+    address: decoded.address,
+    department: decoded.department,
+    community: decoded.community,
+    state: decoded.state,
+    localGovernmentArea: decoded.localGovernmentArea,
+    status: decoded.status,
+    assignedProjectId: decoded.assignedProjectId,
+    roleId: decoded.roleId
+  };
+}
+
 export function getDefaultRouteForRole(role: UserRole): string {
   return `/${role}/dashboard`;
 }

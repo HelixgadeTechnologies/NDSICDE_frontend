@@ -6,18 +6,17 @@ import Breadcrumb from "@/ui/breadcrumb-component";
 import { useRoleStore } from "@/store/role-store";
 import Loading from "../loading";
 
-export default function PartnersLayout({
+export default function TeamMemberLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const { user, isAuthenticated } = useRoleStore();
 
-    // show loading or redirect
-    if (!isAuthenticated || user?.role !== 'partners') {
-      return <Loading/>
-    }
+  // show loading or redirect
+  if (!isAuthenticated || user?.role !== "team-member") {
+    return <Loading />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">

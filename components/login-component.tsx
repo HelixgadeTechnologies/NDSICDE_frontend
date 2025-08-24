@@ -8,12 +8,7 @@ import Checkbox from "@/ui/form/checkbox";
 import Button from "@/ui/form/button";
 import { useRoleStore, UserRole } from "@/store/role-store";
 import { useRouter } from "next/navigation";
-import {
-  getDefaultRouteForRole,
-  apiLogin,
-  decodeJWT,
-  storeToken,
-} from "@/lib/api/auth";
+import { getDefaultRouteForRole, apiLogin, decodeJWT } from "@/lib/api/auth";
 import { toast } from "react-toastify";
 
 // Map role names from API to your UserRole type
@@ -25,10 +20,11 @@ function mapRoleNameToUserRole(roleName: string): UserRole {
     "PARTNER": "partners",
     "MANAGEMENT": "management",
     "MANAGEMENT AND STAFF": "management",
-    "TEAM MEMBER": "management", //for test because davis created a user that there is no screen for
     "RETIREMENT MANAGERS": "r-managers",
     "R-MANAGERS": "r-managers",
     "REQUEST AND RETIREMENT MANAGERS": "r-managers",
+    "TEAM MEMBER": "team-member",
+    "TEAM MEMBERS": "team-member",
   };
 
   const normalizedRole = roleName.toUpperCase();
@@ -76,8 +72,6 @@ export default function Login() {
         password: userData.password,
       });
 
-      // console.log('Login API response:', response);
-
       // Extract token from response - the data field contains the JWT token directly
       const token = response.data;
 
@@ -113,11 +107,15 @@ export default function Login() {
         roleId: decodedToken.roleId,
       };
 
-      // Store token
-      storeToken(token, userData.isChecked);
-
       // Login the user with both user object and token
       login(user, token);
+      
+      sessionStorage.setItem("isAuthenticated", JSON.stringify(true));
+      sessionStorage.setItem("user", JSON.stringify(user));
+      sessionStorage.setItem("token", token);
+      
+      // Show success message
+      // toast.success(`Welcome back, ${user.name}!`);
 
       // Redirect to appropriate dashboard
       const redirectPath = getDefaultRouteForRole(mappedRole);

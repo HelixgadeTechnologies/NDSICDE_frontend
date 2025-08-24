@@ -3,9 +3,7 @@
 import Sidebar from "@/ui/sidebar";
 import Navigation from "@/ui/navigation";
 import Breadcrumb from "@/ui/breadcrumb-component";
-import { useRouter } from "next/navigation";
 import { useRoleStore } from "@/store/role-store";
-import { useEffect } from "react";
 import Loading from "../loading";
 
 export default function RetirementManagerLayout({
@@ -14,23 +12,7 @@ export default function RetirementManagerLayout({
   children: React.ReactNode;
 }>) {
 
-  const router = useRouter();
   const { user, isAuthenticated } = useRoleStore();
-
-  useEffect(() => {
-    // redirect if not authenticated
-    if (!isAuthenticated) {
-      router.push("/login");
-      return
-    }
-
-    // redirect if not an partners
-    if (user?.role !== "r-managers") {
-      router.push(`/${user?.role}/dashboard`)
-      return
-    }
-  }, [isAuthenticated, user, router])
-
     // show loading or redirect
     if (!isAuthenticated || user?.role !== 'r-managers') {
       return <Loading/>
