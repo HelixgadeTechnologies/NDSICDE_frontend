@@ -1,3 +1,5 @@
+// settings for every other user except admin
+
 "use client";
 
 import CardComponent from "@/ui/card-wrapper";
@@ -6,9 +8,9 @@ import PasswordInput from "@/ui/form/password-input";
 import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
 import { Icon } from "@iconify/react";
-import { useRetirementManagersSettingsState } from "@/store/retirement-managers-store/settings-store";
+import { useManagementSettingsState } from "@/store/management-staff-store/settings-store";
 
-export default function RetirementManagersSettingsComponent() {
+export default function GeneralSettings() {
   const {
     name,
     email,
@@ -18,7 +20,7 @@ export default function RetirementManagersSettingsComponent() {
     newPassword,
     confirmPassword,
     setField,
-  } = useRetirementManagersSettingsState();
+  } = useManagementSettingsState();
   return (
     <div className="space-y-4">
       <CardComponent>
@@ -51,7 +53,7 @@ export default function RetirementManagersSettingsComponent() {
               name="email"
               value={email}
               label="Email Address"
-              placeholder="request.manager@sdn.org"
+              placeholder="management@sdn.org"
               onChange={(e) => setField("email", e.target.value)}
             />
             <TextInput

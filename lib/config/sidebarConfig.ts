@@ -146,19 +146,19 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
       {
         id: "project-management",
         name: "Project Management",
-        href: "/team-member/project-management",
+        href: "/team-member/project-management/team",
         icon: "iconoir:component",
         children: [
           {
             id: "project-team",
             name: "Project Team",
-            href: "/team-member/project-management/project-team",
+            href: "/team-member/project-management/team",
             icon: "",
           },
           {
             id: "partner",
             name: "Partner",
-            href: "/team-member/project-management/partner",
+            href: "/team-member/project-management/partners",
             icon: "",
           },
           {

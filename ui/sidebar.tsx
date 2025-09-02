@@ -28,11 +28,11 @@ export default function Sidebar({ className }: BaseSidebarProps) {
     index: number,
     e: React.MouseEvent
   ) => {
-    // If item has children, prevent navigation and toggle dropdown
+    // If item has children, redirect to first child route and toggle dropdown
     if (item.children && item.children.length > 0) {
       e.preventDefault();
       e.stopPropagation();
-
+      
       setOpenDropdowns((prev) => {
         const newSet = new Set(prev);
         if (newSet.has(index)) {
@@ -42,7 +42,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
         }
         return newSet;
       });
-      return;
+      redirect(item.children[0].href); // can change later on
     }
 
     // Regular navigation for items without children
@@ -50,13 +50,13 @@ export default function Sidebar({ className }: BaseSidebarProps) {
     // console.log(`Navigating to ${item.href}`);
   };
 
-  const handleChildClick = () => {
+  const handleChildClick = (child: SidebarItem) => {
     closeMobile();
-    // console.log(`Navigating to ${child.href}`);
+    console.log(`Navigating to ${child.href}`);
   };
 
   // for active on settings
-  const isSettingsActive = pathname.startsWith(`/${user.role}/settings`);
+  const isSettingsActive = pathname.startsWith(`/settings`);
 
   const handleLogout = () => {
     logout();
@@ -115,7 +115,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                         icon={
                           isDropdownOpen
                             ? "solar:alt-arrow-down-linear"
-                            : "solar:alt-arrow-right-linear"
+                            : "solar:alt-arrow-up-linear"
                         }
                         height={16}
                         width={16}
@@ -163,7 +163,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                               onClick={() => handleChildClick(child)}
                               className={`h-9 w-full px-3 py-1.5 rounded-[4px] flex items-center gap-2 text-xs ${
                                 isChildActive
-                                  ? "bg-[#FFECE5] text-[#D2091E]"
+                                  ? "text-[#D2091E]"
                                   : "hover:bg-gray-50 text-gray-500"
                               }`}
                             >
@@ -189,7 +189,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
 
           <div className="space-y-1">
             <Link
-              href={`/${user.role}/settings`}
+              href={`/settings`}
               className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 ${
                 isSettingsActive
                   ? "bg-[#FFECE5] text-[#D2091E]"
