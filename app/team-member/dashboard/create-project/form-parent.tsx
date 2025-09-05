@@ -90,7 +90,7 @@ export default function FormParent() {
         </p>
         <div className="mt-6">
           <Button
-            href="/admin/dashboard"
+            href="/team-member/dashboard"
             content="Close"
           />
         </div>

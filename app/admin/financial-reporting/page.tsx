@@ -22,16 +22,16 @@ export default function FinancialReporting() {
       percentage: 70,
       percentInfo: "of total budget",
     },
-    {
-      title: "Pending Financial Requests",
-      value: 13,
-      percentInfo: "Awaiting approval",
-    },
-    {
-      title: "Approved Retirements",
-      value: 45,
-      percentInfo: "Completed this period",
-    },
+    // {
+    //   title: "Pending Financial Requests",
+    //   value: 13,
+    //   percentInfo: "Awaiting approval",
+    // },
+    // {
+    //   title: "Approved Retirements",
+    //   value: 45,
+    //   percentInfo: "Completed this period",
+    // },
     {
       title: "Budget Variance",
       value: "-7.5%",
