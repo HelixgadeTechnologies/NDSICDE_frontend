@@ -1,7 +1,7 @@
 "use client";
 
 import { useSidebar } from "@/context/SidebarContext";
-import NotificationTab from "@/ui/notification-tab";
+// import NotificationTab from "@/ui/notification-tab";
 import Avatar from "@/ui/avatar";
 import { Icon } from "@iconify/react";
 import { useRoleStore, getRoleDisplayName, User } from "@/store/role-store";
@@ -43,7 +43,7 @@ export default function Navigation() {
         {user?.role ? getRoleDisplayName(user.role) : "Dashboard"}
       </h2>
       <div className="flex justify-end items-center gap-1.5 md:gap-3">
-        <NotificationTab />
+        {/* <NotificationTab /> */}
         <div className="hidden md:flex justify-center items-center gap-3">
           <Avatar name={user?.name} />
           <div>

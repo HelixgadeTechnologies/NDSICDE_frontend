@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 function mapRoleNameToUserRole(roleName: string): UserRole {
   const roleMap: Record<string, UserRole> = {
     "SUPER ADMIN": "admin",
-    "ADMIN": "admin",
+    "ADMIN": "admin", // change to other admin
     "PARTNERS": "partners",
     "PARTNER": "partners",
     "MANAGEMENT": "management",

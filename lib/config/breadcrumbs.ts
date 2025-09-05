@@ -34,10 +34,6 @@ export const breadcrumbs = [
     header: "Organizational KPI",
   },
   {
-    href: "/admin/settings",
-    header: "System Settings & Access Control",
-  },
-  {
     href: "/partners/dashboard",
     header: "Dashboard",
   },
@@ -49,10 +45,6 @@ export const breadcrumbs = [
     href: "/partners/kpi-reporting/new-kpi",
     header: "KPI Reporting",
     subtitle: "Provide detailed information about KPI details",
-  },
-  {
-    href: "/partners/settings",
-    header: "Account Settings",
   },
   {
     href: "/management/dashboard",
@@ -67,10 +59,6 @@ export const breadcrumbs = [
     header: "Organizational KPI",
   },
   {
-    href: "/management/settings",
-    header: "Account Settings",
-  },
-  {
     href: "/r-managers/dashboard",
     header: "Dashboard",
   },
@@ -83,7 +71,55 @@ export const breadcrumbs = [
     header: "Organizational KPI",
   },
   {
-    href: "/r-managers/settings",
+    href: "/settings",
     header: "Account Settings",
+  },
+  {
+    href: "/team-member/dashboard",
+    header: "Project Management",
+  },
+  {
+    href: "/team-member/project-management/team",
+    header: "Project Team",
+  },
+  {
+    href: "/team-member/project-management/partners",
+    header: "Project Partners",
+  },
+  {
+    href: "/team-member/project-management/impact",
+    header: "Project Impact",
+  },
+  {
+    href: "/team-member/project-management/outcome",
+    header: "Project Outcome",
+  },
+  {
+    href: "/team-member/project-management/output",
+    header: "Project Output",
+  },
+  {
+    href: "/team-member/project-management/activity",
+    header: "Activity",
+  },
+  {
+    href: "/team-member/project-management/logical-framework",
+    header: "Logical Framework",
+  },
+  {
+    href: "/team-member/project-management/request",
+    header: "Activity Request",
+  },
+  {
+    href: "/team-member/result-dashboard",
+    header: "Result Dashboard: Indicator Calculation and Analysis",
+  },
+  {
+    href: "/team-member/organizational-kpi",
+    header: "Organizational KPI",
+  },
+  {
+    href: "/team-member/financial-dashboard",
+    header: "Project Activity/Finance Dashboard",
   },
 ];

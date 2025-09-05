@@ -146,15 +146,65 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
       {
         id: "project-management",
         name: "Project Management",
-        href: "/team-member/project-management",
+        href: "/team-member/project-management/team",
         icon: "iconoir:component",
+        children: [
+          {
+            id: "project-team",
+            name: "Project Team",
+            href: "/team-member/project-management/team",
+            icon: "",
+          },
+          {
+            id: "partner",
+            name: "Partner",
+            href: "/team-member/project-management/partners",
+            icon: "",
+          },
+          {
+            id: "impact",
+            name: "Impact",
+            href: "/team-member/project-management/impact",
+            icon: "",
+          },
+          {
+            id: "outcome",
+            name: "Outcome",
+            href: "/team-member/project-management/outcome",
+            icon: "",
+          },
+          {
+            id: "output",
+            name: "Output",
+            href: "/team-member/project-management/output",
+            icon: "",
+          },
+          {
+            id: "activity",
+            name: "Activity",
+            href: "/team-member/project-management/activity",
+            icon: "",
+          },
+          {
+            id: "logical-framework",
+            name: "Logical Framework",
+            href: "/team-member/project-management/logical-framework",
+            icon: "",
+          },
+          {
+            id: "request",
+            name: "Request",
+            href: "/team-member/project-management/request",
+            icon: "",
+          },
+        ],
       },
-      {
-        id: "request-approvals",
-        name: "Request Approvals",
-        href: "/team-member/request-approvals",
-        icon: "mdi:approval",
-      },
+      // {
+      //   id: "request-approvals",
+      //   name: "Request Approvals",
+      //   href: "/team-member/request-approvals",
+      //   icon: "mdi:approval",
+      // },
       {
         id: "result-dashboard",
         name: "Result Dashboard",
