@@ -103,6 +103,9 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         />
       </div>
     ),
+      "/team-member/dashboard": (
+      <Button content="New Project" icon="cil:plus" href="/team-member/dashboard/create-project" />
+    ),
   };
 
   const hiddenRoutes = ["/admin/project-management/create-project", "/partners/kpi-reporting/new-kpi"];
