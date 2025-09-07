@@ -36,11 +36,21 @@ export default function DataValidation() {
             percentInfo: "rejection rate",
             icon: "marketeq:rejected-file-2",
         },
+          {
+          title: "Pending Financial Requests",
+          value: 13,
+          percentInfo: "Awaiting approval",
+        },
+        {
+          title: "Approved Retirements",
+          value: 45,
+          percentInfo: "Completed this period",
+        },
     ];
 
     return (
         <section className="space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 my-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
                 <DashboardStat data={dashboardData} />
             </div>
             <DataValidationTable />
