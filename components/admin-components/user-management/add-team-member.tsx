@@ -70,7 +70,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     }
   }, [token, isOpen]);
 
-  console.log(roles)
+  // console.log(roles)
 
   const addUser = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -32,7 +32,6 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   //for handle add team member
   const handleTeamMemberClose = () => {
     setAddTeamMember(false);
-    window.dispatchEvent(new CustomEvent("teamMemberUpdated"));
   };
 
   const actionComponents: Record<string, React.ReactNode> = {
