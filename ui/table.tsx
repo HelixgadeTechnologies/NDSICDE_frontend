@@ -9,6 +9,7 @@ type TableProps<T> = {
   checkbox?: boolean;
   idKey?: keyof T;
   onSelectionChange?: (selected: T[]) => void;
+  isStraight?: boolean
 };
 
 export default function Table<T>({
@@ -17,6 +18,7 @@ export default function Table<T>({
   renderRow,
   checkbox = false,
   idKey,
+  isStraight = false,
   onSelectionChange,
 }: TableProps<T>) {
   const [selectedIds, setSelectedIds] = useState<Array<T[keyof T]>>([]);
@@ -64,7 +66,7 @@ export default function Table<T>({
               </th>
             )}
             {tableHead.map((head, index) => (
-              <th key={index} className="px-6 py-3 whitespace-nowrap">
+              <th key={index} className={`px-6 py-3 ${isStraight && 'whitespace-nowrap'}`}>
                 {head}
               </th>
             ))}

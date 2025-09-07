@@ -58,10 +58,10 @@ export default function TeamMembersTable() {
       refetch();
     };
 
-    window.addEventListener('teamMemberUpdated', handleTeamMemberUpdate);
-    
+    window.addEventListener("teamMemberUpdated", handleTeamMemberUpdate);
+
     return () => {
-      window.removeEventListener('teamMemberUpdated', handleTeamMemberUpdate);
+      window.removeEventListener("teamMemberUpdated", handleTeamMemberUpdate);
     };
   }, [refetch]);
 

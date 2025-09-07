@@ -41,7 +41,7 @@ export default function FinancialReporting() {
 
   return (
     <section className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 my-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
         <DashboardStat data={dashboardData} />
       </div>
       <BudgetVSExpenditureTrends />
