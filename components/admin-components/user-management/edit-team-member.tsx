@@ -14,12 +14,13 @@ type EditProps = {
   isOpen: boolean;
   onClose: () => void;
   user: UserDetails;
+  onEdit: () => void;
 };
 
-export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
+export default function EditTeamMember({ isOpen, onClose, user, onEdit }: EditProps) {
   const {
     fullName,
-    emailAddress,
+    email,
     department,
     phoneNumber,
     roleId,
@@ -52,11 +53,11 @@ export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
             }
           />
           <TextInput
-            value={emailAddress}
+            value={email}
             label="Email Address"
-            name="emailAddress"
+            name="email"
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setField("emailAddress", e.target.value)
+              setField("email", e.target.value)
             }
           />
           <DropDown

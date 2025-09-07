@@ -7,25 +7,57 @@ import { UserDetails } from "@/types/team-members";
 import Checkbox from "@/ui/form/checkbox";
 import { useState } from "react";
 import Button from "@/ui/form/button";
+import { deleteUser } from "@/lib/api/user-management";
+import { useRoleStore } from "@/store/role-store";
 
 type DeleteProps = {
   isOpen: boolean;
   onClose: () => void;
   user: UserDetails;
+  onDelete: () => void;
 };
 
 export default function DeleteTeamMember({
   isOpen,
-  onClose,
   user,
+  onClose,
+  onDelete,
 }: DeleteProps) {
   const [checked, setChecked] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChecked = () => {
     setChecked(!checked);
     setIsDisabled(!isDisabled);
-  }
+  };
+
+  const { token } = useRoleStore();
+
+    const handleDelete = async () => {
+      setIsLoading(true);
+      setError(null); // Clear any previous errors
+
+      if (!token) {
+        setError("Authentication token not available");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await deleteUser(user.userId, token);
+        console.log("User deleted successfully:", response.message);
+        onClose();
+        onDelete();
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to delete user";
+        setError(errorMessage);
+        console.error("Error deleting user:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
@@ -42,11 +74,9 @@ export default function DeleteTeamMember({
             <h3 className="font-bold text-black text-base leading-8">
               {user.fullName}
             </h3>
+            <p className="text-sm text-[#7A7A7A] leading-5">{user.email}</p>
             <p className="text-sm text-[#7A7A7A] leading-5">
-              {user.email}
-            </p>
-            <p className="text-sm text-[#7A7A7A] leading-5">
-              Role: {user.roleId}
+              Role: {user.roleName}
             </p>
           </div>
         </div>
@@ -71,7 +101,13 @@ export default function DeleteTeamMember({
           isChecked={checked}
           onChange={handleChecked}
         />
-        <Button content="Remove Member" isDisabled={isDisabled} />
+        <p className="text-sm text-red-500">{error}</p>
+        <Button
+          content="Remove Member"
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+          onClick={handleDelete}
+        />
       </div>
     </Modal>
   );

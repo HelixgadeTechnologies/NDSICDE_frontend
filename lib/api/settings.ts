@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export interface AdminSettingsCredentials {
   generalSettingsId: string;
   organizationName: string;
@@ -19,13 +21,29 @@ export interface AdminSettingsResponse {
   message: string;
   data: string;
 }
-
 // get
 export interface GeneralSettingsResponse {
   success: boolean;
   message: string;
   data: AdminSettingsCredentials;
 }
+
+interface Role {
+  roleId: string;
+  roleName: string;
+  description: string | null;
+  permission: string;
+  createAt: string;
+  updateAt: string;
+  users: number;
+}
+
+// Dropdown option interface
+export interface RoleOption {
+  value: string;
+  label: string;
+}
+
 
 export async function apiAdminSettings(
   credentials: AdminSettingsCredentials,
@@ -34,7 +52,7 @@ export async function apiAdminSettings(
 ): Promise<AdminSettingsResponse> {
   const requestBody = {
     isCreate,
-    data: credentials
+    data: credentials,
   };
 
   const response = await fetch(
@@ -43,7 +61,7 @@ export async function apiAdminSettings(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(requestBody),
     }
@@ -51,11 +69,13 @@ export async function apiAdminSettings(
 
   if (!response.ok) {
     const errorData = await response.json();
-    console.error('API Error Response:', errorData);
-    
+    console.error("API Error Response:", errorData);
+
     throw new Error(
       errorData.message ||
-        `Settings ${isCreate ? 'creation' : 'update'} failed with status ${response.status}`
+        `Settings ${isCreate ? "creation" : "update"} failed with status ${
+          response.status
+        }`
     );
   }
 
@@ -73,7 +93,7 @@ export async function apiGetGeneralSettings(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     }
   );
@@ -87,4 +107,37 @@ export async function apiGetGeneralSettings(
   }
 
   return await response.json();
+}
+
+export async function getAllRoles(token: string): Promise<Role[]> {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/settings/roles`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data.data;
+  } catch (error) {
+    throw new Error('Failed to fetch roles');
+    console.error(error)
+  }
+}
+
+export async function getRoleOptions(token: string): Promise<RoleOption[]> {
+  try {
+    const roles = await getAllRoles(token);
+    
+    return roles.map(role => ({
+      value: role.roleId,
+      label: role.roleName
+    }));
+  } catch (error) {
+    console.error('Error fetching role options:', error);
+    return [];
+  }
 }

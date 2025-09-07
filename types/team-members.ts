@@ -26,7 +26,7 @@ export const head = [
     "Role",
     "Status",
     "Last Active",
-    "Assigned Projects",
+    "Department",
     "Actions",
   ];
 

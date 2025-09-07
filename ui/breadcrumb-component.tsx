@@ -29,6 +29,12 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const { setAddStrategicObjective, addStrategicObjective, handleAddSO } =
     useStrategicObjectivesAndKPIsModal();
 
+  //for handle add team member
+  const handleTeamMemberClose = () => {
+    setAddTeamMember(false);
+    window.dispatchEvent(new CustomEvent("teamMemberUpdated"));
+  };
+
   const actionComponents: Record<string, React.ReactNode> = {
     "/admin/dashboard": (
       <Button
@@ -69,7 +75,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         {addTeamMember && (
           <AddTeamMember
             isOpen={addTeamMember}
-            onClose={() => setAddTeamMember(false)}
+            onClose={handleTeamMemberClose}
           />
         )}
       </>
@@ -103,12 +109,19 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         />
       </div>
     ),
-      "/team-member/dashboard": (
-      <Button content="New Project" icon="cil:plus" href="/team-member/dashboard/create-project" />
+    "/team-member/dashboard": (
+      <Button
+        content="New Project"
+        icon="cil:plus"
+        href="/team-member/dashboard/create-project"
+      />
     ),
   };
 
-  const hiddenRoutes = ["/admin/project-management/create-project", "/partners/kpi-reporting/new-kpi"];
+  const hiddenRoutes = [
+    "/admin/project-management/create-project",
+    "/partners/kpi-reporting/new-kpi",
+  ];
 
   return (
     <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""}`}>
