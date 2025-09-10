@@ -35,11 +35,11 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   };
 
   const actionComponents: Record<string, React.ReactNode> = {
-    "/admin/dashboard": (
+    "/dashboard": (
       <Button
         content="New Project"
         icon="cil:plus"
-        href="/admin/dashboard/create-project"
+        href="/dashboard/create-project"
       />
     ),
     "/strategic-objectives": (
@@ -107,13 +107,6 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
           onChange={() => {}}
         />
       </div>
-    ),
-    "/team-member/dashboard": (
-      <Button
-        content="New Project"
-        icon="cil:plus"
-        href="/team-member/dashboard/create-project"
-      />
     ),
     "/project-management/team": (
       <Button

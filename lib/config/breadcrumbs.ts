@@ -38,8 +38,8 @@ export const breadcrumbs = [
     header: "Performance Analytics & Reports",
   },
   {
-    href: "/partners/dashboard",
-    header: "Dashboard",
+    href: "/dashboard",
+    header: "Project Dashboard",
   },
   {
     href: "/kpi-reporting",
@@ -51,24 +51,12 @@ export const breadcrumbs = [
     subtitle: "Provide detailed information about KPI details",
   },
   {
-    href: "/management/dashboard",
-    header: "Project Dashboard",
-  },
-  {
     href: "/reports-and-comments",
     header: "View Reports & Comments",
   },
   {
-    href: "/r-managers/dashboard",
-    header: "Dashboard",
-  },
-  {
     href: "/request-and-retirement",
     header: "Request and Retirement",
-  },
-  {
-    href: "/team-member/dashboard",
-    header: "Project Management",
   },
   {
     href: "/project-management/team",

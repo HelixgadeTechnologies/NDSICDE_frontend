@@ -36,6 +36,10 @@ export default function EditTeamMember({ isOpen, onClose, user, onEdit }: EditPr
     "Clean Water One",
   ];
 
+  const handleEdit = () => {
+    onEdit();
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
       <Heading
@@ -98,7 +102,7 @@ export default function EditTeamMember({ isOpen, onClose, user, onEdit }: EditPr
             />
           </div>
         </div>
-        <Button content="Save Changes" />
+        <Button content="Save Changes" onClick={handleEdit} />
       </form>
     </Modal>
   );
