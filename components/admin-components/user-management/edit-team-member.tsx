@@ -14,12 +14,13 @@ type EditProps = {
   isOpen: boolean;
   onClose: () => void;
   user: UserDetails;
+  onEdit: () => void;
 };
 
-export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
+export default function EditTeamMember({ isOpen, onClose, user, onEdit }: EditProps) {
   const {
     fullName,
-    emailAddress,
+    email,
     department,
     phoneNumber,
     roleId,
@@ -34,6 +35,10 @@ export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
     "Clean Water Project",
     "Clean Water One",
   ];
+
+  const handleEdit = () => {
+    onEdit();
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
@@ -52,11 +57,11 @@ export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
             }
           />
           <TextInput
-            value={emailAddress}
+            value={email}
             label="Email Address"
-            name="emailAddress"
+            name="email"
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setField("emailAddress", e.target.value)
+              setField("email", e.target.value)
             }
           />
           <DropDown
@@ -97,7 +102,7 @@ export default function EditTeamMember({ isOpen, onClose, user }: EditProps) {
             />
           </div>
         </div>
-        <Button content="Save Changes" />
+        <Button content="Save Changes" onClick={handleEdit} />
       </form>
     </Modal>
   );

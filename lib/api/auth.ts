@@ -191,6 +191,8 @@ export function createUserFromToken(decoded: DecodedToken): {
   };
 }
 
-export function getDefaultRouteForRole(role: UserRole): string {
-  return `/${role}/dashboard`;
-}
+// export function getDefaultRouteForRole(
+//   // role: UserRole
+// ): string {
+//   return `/dashboard`;
+// }

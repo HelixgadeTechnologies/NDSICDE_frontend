@@ -29,15 +29,20 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const { setAddStrategicObjective, addStrategicObjective, handleAddSO } =
     useStrategicObjectivesAndKPIsModal();
 
+  //for handle add team member
+  const handleTeamMemberClose = () => {
+    setAddTeamMember(false);
+  };
+
   const actionComponents: Record<string, React.ReactNode> = {
-    "/admin/dashboard": (
+    "/dashboard": (
       <Button
         content="New Project"
         icon="cil:plus"
-        href="/admin/dashboard/create-project"
+        href="/dashboard/create-project"
       />
     ),
-    "/admin/strategic-objectives": (
+    "/strategic-objectives": (
       <>
         <Button
           onClick={handleAddSO}
@@ -59,7 +64,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     //     href="/admin/project-management/create-project"
     //   />
     // ),
-    "/admin/user-management": (
+    "/user-management": (
       <>
         <Button
           onClick={handleAddUser}
@@ -69,15 +74,15 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         {addTeamMember && (
           <AddTeamMember
             isOpen={addTeamMember}
-            onClose={() => setAddTeamMember(false)}
+            onClose={handleTeamMemberClose}
           />
         )}
       </>
     ),
-    "/admin/data-validation": (
+    "/data-validation": (
       <Button content="Date Range" icon="stash:data-date-light" />
     ),
-    "/admin/financial-reporting": (
+    "/financial-reporting": (
       <div className="w-[430px] flex items-center gap-4">
         <DateRangePicker label="Date Range" />
         <DropDown
@@ -90,7 +95,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         />
       </div>
     ),
-    "/admin/performance-analytics": (
+    "/performance-analytics": (
       <div className="w-[430px] flex items-center gap-4">
         <DateRangePicker label="Date Range" />
         <DropDown
@@ -103,12 +108,19 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         />
       </div>
     ),
-      "/team-member/dashboard": (
-      <Button content="New Project" icon="cil:plus" href="/team-member/dashboard/create-project" />
-    ),
+    "/project-management/team": (
+      <Button
+      content="Add Team Member"
+      icon="cil:plus"
+      href="/project-management/team/create"
+      />
+    )
   };
 
-  const hiddenRoutes = ["/admin/project-management/create-project", "/partners/kpi-reporting/new-kpi"];
+  const hiddenRoutes = [
+    "/project-management/create-project",
+    "/kpi-reporting/new-kpi",
+  ];
 
   return (
     <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""}`}>

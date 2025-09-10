@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@iconify/react": "^6.0.0",
+    "axios": "^1.11.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.3",
     "jose": "^6.0.12",

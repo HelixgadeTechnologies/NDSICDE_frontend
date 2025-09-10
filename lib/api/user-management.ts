@@ -29,7 +29,7 @@ export interface CreateUserData {
   roleId: string;
   department: string;
   phoneNumber: string;
-  status: "Active" | "Inactive";
+  status: string;
   assignedProjectId: string;
 }
 
@@ -164,16 +164,17 @@ export async function updateUser(
 // Delete a user
 export async function deleteUser(
   userId: string,
-  token: string
+  token: string,
 ): Promise<DeleteUserResponse> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/userManagement/users/${userId}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/userManagement/delete`,
     {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({userId}),
     }
   );
 

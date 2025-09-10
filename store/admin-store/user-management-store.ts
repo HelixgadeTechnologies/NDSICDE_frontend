@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 interface UserManagementState {
   fullName: string;
-  emailAddress: string;
+  email: string;
   department: string;
   phoneNumber: string;
   roleId: string;
@@ -19,7 +19,7 @@ interface UserManagementState {
 
 const initialState = {
   fullName: '',
-  emailAddress: '',
+  email: '',
   department: '',
   phoneNumber: '',
   roleId: '',
