@@ -8,7 +8,7 @@ import Checkbox from "@/ui/form/checkbox";
 import Button from "@/ui/form/button";
 import { useRoleStore, UserRole } from "@/store/role-store";
 import { useRouter } from "next/navigation";
-import { getDefaultRouteForRole, apiLogin, decodeJWT } from "@/lib/api/auth";
+import { apiLogin, decodeJWT } from "@/lib/api/auth";
 import { toast } from "react-toastify";
 
 // Map role names from API to your UserRole type
@@ -113,13 +113,11 @@ export default function Login() {
       sessionStorage.setItem("isAuthenticated", JSON.stringify(true));
       sessionStorage.setItem("user", JSON.stringify(user));
       sessionStorage.setItem("token", token);
-      
-      // Show success message
-      // toast.success(`Welcome back, ${user.name}!`);
+    
 
-      // Redirect to appropriate dashboard
-      const redirectPath = getDefaultRouteForRole(mappedRole);
-      router.push(redirectPath);
+      // Redirect to dashboard
+      // const redirectPath = getDefaultRouteForRole(mappedRole);
+      router.push("/dashboard");
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

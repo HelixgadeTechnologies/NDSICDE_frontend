@@ -1,4 +1,4 @@
-import ChartsAndTableParent from "@/components/admin-components/organizational-kpi/charts-table-parent";
+import ChartsAndTableParent from "@/components/organizational-kpi/charts-table-parent";
 import DashboardStat from "@/ui/dashboard-stat-card";
 
 export const metadata = {

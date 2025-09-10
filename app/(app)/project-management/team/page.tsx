@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Icon } from "@iconify/react";
 
 export default function ProjectTeam() {
-  const [activeRowId, setActiveRowId] = useState<number | null>(1);
+  const [activeRowId, setActiveRowId] = useState<number | null>(null);
   const head = [
     "Full Name",
     "Email Address",

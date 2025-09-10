@@ -42,7 +42,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         href="/admin/dashboard/create-project"
       />
     ),
-    "/admin/strategic-objectives": (
+    "/strategic-objectives": (
       <>
         <Button
           onClick={handleAddSO}
@@ -64,7 +64,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     //     href="/admin/project-management/create-project"
     //   />
     // ),
-    "/admin/user-management": (
+    "/user-management": (
       <>
         <Button
           onClick={handleAddUser}
@@ -79,10 +79,10 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         )}
       </>
     ),
-    "/admin/data-validation": (
+    "/data-validation": (
       <Button content="Date Range" icon="stash:data-date-light" />
     ),
-    "/admin/financial-reporting": (
+    "/financial-reporting": (
       <div className="w-[430px] flex items-center gap-4">
         <DateRangePicker label="Date Range" />
         <DropDown
@@ -95,7 +95,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         />
       </div>
     ),
-    "/admin/performance-analytics": (
+    "/performance-analytics": (
       <div className="w-[430px] flex items-center gap-4">
         <DateRangePicker label="Date Range" />
         <DropDown
@@ -115,11 +115,18 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         href="/team-member/dashboard/create-project"
       />
     ),
+    "/project-management/team": (
+      <Button
+      content="Add Team Member"
+      icon="cil:plus"
+      href="/project-management/team/create"
+      />
+    )
   };
 
   const hiddenRoutes = [
-    "/admin/project-management/create-project",
-    "/partners/kpi-reporting/new-kpi",
+    "/project-management/create-project",
+    "/kpi-reporting/new-kpi",
   ];
 
   return (
