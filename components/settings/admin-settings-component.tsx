@@ -1,4 +1,4 @@
-// admin only settings
+// super-admin only settings
 
 "use client";
 
@@ -6,7 +6,7 @@ import TabComponent from "@/ui/tab-component";
 import AccessControl from "@/components/admin-components/settings/access-control";
 import GeneralSettings from "@/components/admin-components/settings/general-settings";
 
-export default function AdminSettingsComponent() {
+export default function SuperAdminSettingsComponent() {
   const tabs = [
     { tabName: "General Settings", id: 1 },
     { tabName: "Access Control", id: 2 },

@@ -14,8 +14,8 @@ export interface SidebarConfig {
 }
 
 export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
-  admin: {
-    role: "admin",
+  "super-admin": {
+    role: "super-admin",
     items: [
       {
         id: "dashboard",
@@ -199,12 +199,97 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
           },
         ],
       },
-      // {
-      //   id: "request-approvals",
-      //   name: "Request Approvals",
-      //   href: "/team-member/request-approvals",
-      //   icon: "mdi:approval",
-      // },
+      {
+        id: "result-dashboard",
+        name: "Result Dashboard",
+        href: "/result-dashboard",
+        icon: "carbon:result-old",
+      },
+      {
+        id: "organizational-kpi",
+        name: "Organizational KPI",
+        href: "/organizational-kpi",
+        icon: "carbon:result-new",
+      },
+      {
+        id: "financial-dashboard",
+        name: "Financial Dashboard",
+        href: "/financial-dashboard",
+        icon: "carbon:financial-assets",
+      },
+    ],
+  },
+  "admin": {
+    role: "admin",
+    items: [
+      {
+        id: "dashboard",
+        name: "Dashboard",
+        href: "/dashboard",
+        icon: "lucide:home",
+      },
+      {
+        id: "project-management",
+        name: "Project Management",
+        href: "/project-management/team",
+        icon: "iconoir:component",
+        children: [
+          {
+            id: "project-team",
+            name: "Project Team",
+            href: "/project-management/team",
+            icon: "",
+          },
+          {
+            id: "partner",
+            name: "Partner",
+            href: "/project-management/partners",
+            icon: "",
+          },
+          {
+            id: "impact",
+            name: "Impact",
+            href: "/project-management/impact",
+            icon: "",
+          },
+          {
+            id: "outcome",
+            name: "Outcome",
+            href: "/team-member/project-management/outcome",
+            icon: "",
+          },
+          {
+            id: "output",
+            name: "Output",
+            href: "/project-management/output",
+            icon: "",
+          },
+          {
+            id: "activity",
+            name: "Activity",
+            href: "/project-management/activity",
+            icon: "",
+          },
+          {
+            id: "logical-framework",
+            name: "Logical Framework",
+            href: "/project-management/logical-framework",
+            icon: "",
+          },
+          {
+            id: "request",
+            name: "Request",
+            href: "/project-management/request",
+            icon: "",
+          },
+        ],
+      },
+      {
+        id: "request-approvals",
+        name: "Request Approvals",
+        href: "/team-member/request-approvals",
+        icon: "mdi:approval",
+      },
       {
         id: "result-dashboard",
         name: "Result Dashboard",

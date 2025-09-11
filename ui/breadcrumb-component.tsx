@@ -118,7 +118,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   };
 
   const hiddenRoutes = [
-    "/project-management/create-project",
+    "/dashboard/create-project",
     "/kpi-reporting/new-kpi",
   ];
 

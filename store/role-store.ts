@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type UserRole = 'admin' | 'partners' | 'management' | 'r-managers' | 'team-member'
+export type UserRole = 'super-admin' | 'partners' | 'management' | 'r-managers' | 'team-member' | 'admin'
 
 export interface User {
   id: string
@@ -79,11 +79,12 @@ export const getRoleBasePath = (role: UserRole): string => {
 // for name at the top of the page
 export const getRoleDisplayName = (role: UserRole): string => {
   const names = {
-    admin: 'Super Admin',
+    'super-admin': 'Super Admin',
     partners: 'Partners',
     'management': 'Management & Staff',
     'r-managers': 'Request & Retirement Managers',
-    'team-member': 'Team Members'
+    'team-member': 'Team Members',
+    'admin': "Admin"
   }
   return names[role]
 }

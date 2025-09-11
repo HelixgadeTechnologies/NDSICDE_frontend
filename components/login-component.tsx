@@ -14,8 +14,8 @@ import { toast } from "react-toastify";
 // Map role names from API to your UserRole type
 function mapRoleNameToUserRole(roleName: string): UserRole {
   const roleMap: Record<string, UserRole> = {
-    "SUPER ADMIN": "admin",
-    "ADMIN": "admin", // change to other admin
+    "SUPER ADMIN": "super-admin",
+    "ADMIN": "admin",
     "PARTNERS": "partners",
     "PARTNER": "partners",
     "MANAGEMENT": "management",
@@ -28,7 +28,7 @@ function mapRoleNameToUserRole(roleName: string): UserRole {
   };
 
   const normalizedRole = roleName.toUpperCase();
-  return roleMap[normalizedRole] || "admin";
+  return roleMap[normalizedRole] || "super-admin";
 }
 
 export default function Login() {

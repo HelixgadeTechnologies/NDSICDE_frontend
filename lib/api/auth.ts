@@ -163,7 +163,7 @@ export function createUserFromToken(decoded: DecodedToken): {
   // Map roleName to UserRole
   const roleMap: Record<string, UserRole> = {
     'admin': 'admin',
-    'super admin': 'admin', // Handle variations
+    'super admin': 'super-admin',
     'partners': 'partners',
     'management': 'management',
     'management & staff': 'management',

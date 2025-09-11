@@ -29,7 +29,7 @@ export default function RecentActivityTab() {
                 </div>
             ))}
         </div>
-        <Button content="View All Activities" href="/admin/dashboard/recent-activities" />
+        <Button content="View All Activities" href="/dashboard/recent-activities" />
     </CardComponent>
   );
 }

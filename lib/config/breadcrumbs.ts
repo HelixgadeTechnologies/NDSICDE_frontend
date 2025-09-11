@@ -10,10 +10,6 @@ export const breadcrumbs = [
     header: "Account Settings",
   },
   {
-    href: "/admin/dashboard",
-    header: "Super Admin Overview",
-  },
-  {
     href: "/strategic-objectives",
     header: "Strategic Objectives and KPIs",
   },
@@ -39,7 +35,7 @@ export const breadcrumbs = [
   },
   {
     href: "/dashboard",
-    header: "Project Dashboard",
+    header: "Project Dashboard Overview",
   },
   {
     href: "/kpi-reporting",

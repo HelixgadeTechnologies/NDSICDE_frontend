@@ -67,7 +67,7 @@ export default function FormOne({ onClick }: FormOneProps) {
                         <Button
                         isSecondary
                         content="Cancel"
-                        href="/admin/dashboard"
+                        href="/dashboard"
                         />
                     </div>
                     <div className="w-3/5">
