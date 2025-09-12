@@ -94,4 +94,8 @@ export const breadcrumbs = [
     href: "/financial-dashboard",
     header: "Project Activity/Finance Dashboard",
   },
+  {
+    href: "/request-approvals",
+    header: "Request Approvals"
+  },
 ];

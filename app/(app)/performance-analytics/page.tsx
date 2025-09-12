@@ -1,5 +1,5 @@
 import DashboardStat from "@/ui/dashboard-stat-card";
-import RestOfPage from "@/components/admin-components/performance-analytics/tab-switching-parent";
+import RestOfPage from "@/components/super-admin-components/performance-analytics/tab-switching-parent";
 
 export const metadata = {
   title: "Performance Analytics & Reports - NDSICDE",

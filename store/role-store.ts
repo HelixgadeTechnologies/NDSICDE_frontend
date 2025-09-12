@@ -80,11 +80,11 @@ export const getRoleBasePath = (role: UserRole): string => {
 export const getRoleDisplayName = (role: UserRole): string => {
   const names = {
     'super-admin': 'Super Admin',
-    partners: 'Partners',
+    'partners': 'Partners',
     'management': 'Management & Staff',
     'r-managers': 'Request & Retirement Managers',
     'team-member': 'Team Members',
-    'admin': "Admin"
+    'admin': "Admin - Monitoring and Evaluation System"
   }
   return names[role]
 }

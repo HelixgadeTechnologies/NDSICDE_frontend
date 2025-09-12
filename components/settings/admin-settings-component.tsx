@@ -3,8 +3,8 @@
 "use client";
 
 import TabComponent from "@/ui/tab-component";
-import AccessControl from "@/components/admin-components/settings/access-control";
-import GeneralSettings from "@/components/admin-components/settings/general-settings";
+import AccessControl from "@/components/super-admin-components/settings/access-control";
+import GeneralSettings from "@/components/super-admin-components/settings/general-settings";
 
 export default function SuperAdminSettingsComponent() {
   const tabs = [

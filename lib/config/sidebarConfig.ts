@@ -255,7 +255,7 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
           {
             id: "outcome",
             name: "Outcome",
-            href: "/team-member/project-management/outcome",
+            href: "/project-management/outcome",
             icon: "",
           },
           {
@@ -287,7 +287,7 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
       {
         id: "request-approvals",
         name: "Request Approvals",
-        href: "/team-member/request-approvals",
+        href: "/request-approvals",
         icon: "mdi:approval",
       },
       {
