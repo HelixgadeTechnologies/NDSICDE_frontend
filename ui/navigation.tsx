@@ -52,7 +52,7 @@ export default function Navigation() {
             </h3>
             <p className="text-[#737373] text-[11px]">{user?.email}</p>
           </div>
-          <Icon icon={"formkit:down"} height={18} width={18} />
+          {/* <Icon icon={"formkit:down"} height={18} width={18} /> */}
         </div>
         <Icon
           icon={"famicons:menu"}

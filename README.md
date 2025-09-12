@@ -18,7 +18,7 @@ Contains all page components and routing logic for the platform. The folder stru
 - `reset-password` - Password recovery
 
 **Role-Based Routes:**
-- `admin` - Super administrator dashboard and controls
+- `super-admin` - Super administrator dashboard and controls
 - `management` - Management and staff interfaces
 - `partners` - Partner organization access
 - `r-managers` - Request and retirement managers workspace
@@ -29,7 +29,7 @@ Additional files include loading states, 404 error handling, and the root `page.
 #### `/components` - Role-Specific Components
 Houses custom components organized by user role, ensuring clean separation of concerns and role-specific functionality.
 
-- `admin-components` - Administrative interface components
+- `super-admin-components` - Administrative interface components
 - `management-components` - Management dashboard elements
 - `partners-components` - Partner-specific UI components
 - Additional role-based component directories

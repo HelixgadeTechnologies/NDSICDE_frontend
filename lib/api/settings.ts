@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export interface AdminSettingsCredentials {
+export interface SuperAdminSettingsCredentials {
   generalSettingsId: string;
   organizationName: string;
   contactEmail: string;
@@ -16,7 +16,7 @@ export interface AdminSettingsCredentials {
 }
 
 // create and update
-export interface AdminSettingsResponse {
+export interface SuperAdminSettingsResponse {
   success: boolean;
   message: string;
   data: string;
@@ -25,7 +25,7 @@ export interface AdminSettingsResponse {
 export interface GeneralSettingsResponse {
   success: boolean;
   message: string;
-  data: AdminSettingsCredentials;
+  data: SuperAdminSettingsCredentials;
 }
 
 interface Role {
@@ -46,10 +46,10 @@ export interface RoleOption {
 
 
 export async function apiAdminSettings(
-  credentials: AdminSettingsCredentials,
+  credentials: SuperAdminSettingsCredentials,
   token: string,
   isCreate: boolean = true
-): Promise<AdminSettingsResponse> {
+): Promise<SuperAdminSettingsResponse> {
   const requestBody = {
     isCreate,
     data: credentials,

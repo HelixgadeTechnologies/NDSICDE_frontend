@@ -1,8 +1,8 @@
 import DashboardStat from "@/ui/dashboard-stat-card";
-import BudgetVSExpenditureTrends from "@/components/admin-components/financial-reporting/budget-expenditure-trends";
-import FinancialPerformance from "@/components/admin-components/financial-reporting/cpi-spi-parent";
-import BudgetVSActuals from "@/components/admin-components/financial-reporting/budget-vs-actuals-table";
-import DetailedExpenseBreakdown from "@/components/admin-components/financial-reporting/detailed-expense-breakdown";
+import BudgetVSExpenditureTrends from "@/components/super-admin-components/financial-reporting/budget-expenditure-trends";
+import FinancialPerformance from "@/components/super-admin-components/financial-reporting/cpi-spi-parent";
+import BudgetVSActuals from "@/components/super-admin-components/financial-reporting/budget-vs-actuals-table";
+import DetailedExpenseBreakdown from "@/components/super-admin-components/financial-reporting/detailed-expense-breakdown";
 
 export const metadata = {
   title: "Financial Reporting - NDSICDE",

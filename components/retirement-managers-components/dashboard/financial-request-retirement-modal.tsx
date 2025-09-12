@@ -6,7 +6,7 @@ import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import TabComponent from "@/ui/tab-component";
 import CommentsAndNotes from "./comments-and-notes";
-import TitleAndContent from "@/components/admin-components/data-validation/title-content-component";
+import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 import FileDisplay from "@/ui/file-display";
 import Button from "@/ui/form/button";
 
@@ -87,9 +87,9 @@ function RequestOverview({ request }: OverviewProps) {
             <span className="text-black font-semibold">Port Harcourt</span>
           </p>
           <TitleAndContent
-          base
-          title="Activity Purpose/Description"
-          content="Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
+            base
+            title="Activity Purpose/Description"
+            content="Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
           />
           <p className="spacey-x-1">
             <span>Activity Start Date: </span>
@@ -100,9 +100,9 @@ function RequestOverview({ request }: OverviewProps) {
             <span className="text-black font-semibold">12/04/2025</span>
           </p>
           <TitleAndContent
-          base
-          title="Activity Line Description"
-          content="Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
+            base
+            title="Activity Line Description"
+            content="Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
           />
           <p className="spacey-x-1">
             <span>Quantity: </span>
@@ -121,7 +121,7 @@ function RequestOverview({ request }: OverviewProps) {
             <span className="text-black font-semibold">000000</span>
           </p>
           <p className="spacey-x-1">
-            <span>Total (₦):  </span>
+            <span>Total (₦): </span>
             <span className="text-black font-semibold">200</span>
           </p>
         </div>
@@ -131,7 +131,7 @@ function RequestOverview({ request }: OverviewProps) {
         subtitle={`${request.activityLineDesc} - Submitted on May 15, 2023 at 10:30`}
       /> */}
 
-      <div className="my-4 text-[#475367] font-normal text-base space-y-4">
+        <div className="my-4 text-[#475367] font-normal text-base space-y-4">
           <p className="spacey-x-1">
             <span>Mode of Transport: </span>
             <span className="text-black font-semibold">Road</span>
@@ -157,26 +157,23 @@ function RequestOverview({ request }: OverviewProps) {
             <span className="text-black font-semibold">Red</span>
           </p>
           <p className="spacey-x-1">
-            <span>Recipient&apos;s Phone Number:  </span>
+            <span>Recipient&apos;s Phone Number: </span>
             <span className="text-black font-semibold">09039776534</span>
           </p>
         </div>
 
         <div className="my-4 space-y-3">
-            <Heading heading="Supporting Document" sm /> 
-            <FileDisplay
-            filename="progress_photos.zip"
-            filesize="15.2 MB"
-            />
+          <Heading heading="Supporting Document" sm />
+          <FileDisplay filename="progress_photos.zip" filesize="15.2 MB" />
         </div>
       </div>
 
       <div className="flex gap-6 items-center my-6">
         <div className="w-2/5">
-            <Button content="Reject" isSecondary />
+          <Button content="Reject" isSecondary />
         </div>
         <div className="w-3/5">
-            <Button content="Approve"/>
+          <Button content="Approve" />
         </div>
       </div>
     </div>

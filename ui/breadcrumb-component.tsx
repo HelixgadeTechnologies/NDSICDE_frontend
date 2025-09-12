@@ -4,11 +4,11 @@ import { usePathname } from "next/navigation";
 import { breadcrumbs } from "@/lib/config/breadcrumbs";
 import Button from "@/ui/form/button";
 import { useTeamMemberModal } from "@/utils/team-member-utility";
-import AddTeamMember from "@/components/admin-components/user-management/add-team-member";
+import AddTeamMember from "@/components/super-admin-components/user-management/add-team-member";
 import DateRangePicker from "./form/date-range";
 import DropDown from "./form/select-dropdown";
 import { useStrategicObjectivesAndKPIsModal } from "@/utils/strategic-objective-kpi-utility";
-import AddStrategicObjectiveModal from "@/components/admin-components/strategic-objectives-kpi/add-strategic-objective";
+import AddStrategicObjectiveModal from "@/components/super-admin-components/strategic-objectives-kpi/add-strategic-objective";
 
 type Props = {
   fallbackTitle?: string;
@@ -110,17 +110,14 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     ),
     "/project-management/team": (
       <Button
-      content="Add Team Member"
-      icon="cil:plus"
-      href="/project-management/team/create"
+        content="Add Team Member"
+        icon="cil:plus"
+        href="/project-management/team/create"
       />
-    )
+    ),
   };
 
-  const hiddenRoutes = [
-    "/project-management/create-project",
-    "/kpi-reporting/new-kpi",
-  ];
+  const hiddenRoutes = ["/dashboard/create-project", "/kpi-reporting/new-kpi"];
 
   return (
     <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""}`}>

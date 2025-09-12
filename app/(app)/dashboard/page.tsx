@@ -11,7 +11,7 @@ export default function Dashboard() {
   const { user } = useRoleStore();
 
   switch (user?.role) {
-    case "admin": {
+    case "super-admin": {
       return <AdminDashboardPage />;
     }
 
@@ -28,6 +28,10 @@ export default function Dashboard() {
     }
 
     case "team-member": {
+      return <TeamMemberDashboard />;
+    }
+
+    case "admin": {
       return <TeamMemberDashboard />;
     }
 

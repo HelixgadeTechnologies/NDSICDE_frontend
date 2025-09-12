@@ -1,4 +1,4 @@
-import TeamMembersTable from "@/components/admin-components/user-management/team-member-table";
+import TeamMembersTable from "@/components/super-admin-components/user-management/team-member-table";
 
 export const metadata = {
   title: "User Management and Team Members - NDSICDE",

@@ -1,15 +1,15 @@
 import DashboardStat from "@/ui/dashboard-stat-card";
-import RecentActivityTab from "@/components/admin-components/dashboard/recent-activity-summary";
-import PendingActivityCards from "@/components/admin-components/dashboard/pending-activity-cards";
+import RecentActivityTab from "@/components/super-admin-components/dashboard/recent-activity-summary";
+import PendingActivityCards from "@/components/super-admin-components/dashboard/pending-activity-cards";
 // import OrganizationalProjectPerformance from "@/components/admin-components/dashboard/organizational-project-performance";
-import ProjectsTable from "@/components/admin-components/project-management/projects-table";
+import ProjectsTable from "@/components/super-admin-components/project-management/projects-table";
 
 export const metadata = {
   title: "Dashboard - NDSICDE",
   description: "View your dashboard in detail",
 };
 
-export default function AdminDashboardPage() {
+export default function SuperAdminDashboardPage() {
   const dashboardData = [
     {
       title: "Total Projects",
@@ -67,8 +67,8 @@ export default function AdminDashboardPage() {
           <RecentActivityTab />
         </div>
       </div>
-      <ProjectsTable/>
-      <PendingActivityCards/>
+      <ProjectsTable />
+      <PendingActivityCards />
     </section>
   );
 }

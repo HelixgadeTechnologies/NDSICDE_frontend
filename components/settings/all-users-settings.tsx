@@ -1,4 +1,4 @@
-// settings for every other user except admin
+// settings for every other user except super admin
 
 "use client";
 

@@ -155,7 +155,7 @@ export default function GeneralSettings() {
       }
 
     } catch (error: any) {
-      console.error('Admin settings error:', error);
+      console.error('Super admin settings error:', error);
       setError(error.message || 'Failed to save settings. Please try again.');
     } finally {
       setIsLoading(false);
@@ -226,7 +226,7 @@ export default function GeneralSettings() {
               value={contactEmail}
               onChange={(e) => setField("contactEmail", e.target.value)}
               name="contactEmail"
-              placeholder="admin@sdn.org"
+              placeholder="super.admin@sdn.org"
             />
             <TextInput
               label="Contact Phone"

@@ -1,4 +1,4 @@
-import StrategicObjectivesAndKPIToggle from "@/components/admin-components/strategic-objectives-kpi/so-kpi-parent";
+import StrategicObjectivesAndKPIToggle from "@/components/super-admin-components/strategic-objectives-kpi/so-kpi-parent";
 
 export const metadata = {
   title: "Strategic Objectives & KPI - NDSICDE",
