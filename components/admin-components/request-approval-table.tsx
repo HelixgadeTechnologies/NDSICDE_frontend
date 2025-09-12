@@ -7,6 +7,7 @@ import Table from "@/ui/table";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
+import FinancialRequestModal from "./financial-request-modal";
 
 export default function RequestApprovalsTable() {
   const [activeTab, setActiveTab] = useState(1);
@@ -70,7 +71,7 @@ export default function RequestApprovalsTable() {
             <td className="px-6">{row.responsiblePersons}</td>
             <td className="px-6">{row.startDate}</td>
             <td className="px-6">{row.endDate}</td>
-            <td className="px-6">{row.status}</td>
+            <td className={`px-6 ${row.status === "Pending" ? 'text-yellow-500' : row.status === "Approved" ? 'text-green-500' : 'text-red-500'}`}>{row.status}</td>
             <td className="px-6">
               <Icon
                 icon={"fluent-mdl2:view"}
@@ -134,13 +135,12 @@ export default function RequestApprovalsTable() {
             <td className="px-6">{row.unitCost}</td>
             <td className="px-6">{row.totalBudget}</td>
             <td className="px-6">{row.actualCost}</td>
-            <td className="px-6">{row.status}</td>
+            <td className={`px-6 ${row.status === "Pending" ? 'text-yellow-500' : row.status === "Approved" ? 'text-green-500' : 'text-red-500'}`}>{row.status}</td>
             <td className="px-6">
               <Icon
                 icon={"fluent-mdl2:view"}
                 width={16}
                 height={16}
-                onClick={() => handleModalOpen()}
               />
             </td>
           </>
@@ -220,7 +220,10 @@ export default function RequestApprovalsTable() {
         </AnimatePresence>
       </CardComponent>
 
-      {openView && <>this is mean to be the modal</>}
+    <FinancialRequestModal 
+    isOpen={openView}
+    onClose={() => setOpenView(false)}
+    />
     </>
   );
 }
