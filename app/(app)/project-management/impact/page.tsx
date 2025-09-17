@@ -1,3 +1,3 @@
-export default function ProjectTeam() {
-    return <>project team</>
+export default function ProjectImpact() {
+    return <>pimpact</>
 }

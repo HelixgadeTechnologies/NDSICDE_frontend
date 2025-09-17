@@ -27,7 +27,7 @@ export default function GeneralSettings() {
         <p className="text-sm">
           Update your account information and manage your profile
         </p>
-        <div className="flex items-center mt-6 gap-6">
+        <div className="flex flex-col md:flex-row items-center mt-6 gap-6">
           <div className="flex flex-col justify-center items-center gap-2">
             <div className="h-[110px] w-[110px] rounded-full bg-[#EAEAEA] p-2 flex justify-center items-center">
               <Icon
@@ -41,7 +41,7 @@ export default function GeneralSettings() {
               Update Profile Picture
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-4 justify-between items-center w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between items-center w-full">
             <TextInput
               name="name"
               value={name}
@@ -76,7 +76,7 @@ export default function GeneralSettings() {
 
       <CardComponent>
         <Heading heading="Change Password" />
-        <div className="grid grid-cols-2 gap-y-3 gap-x-8 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 mt-6">
           <PasswordInput
             value={currentPassword}
             onChange={(e) => setField("currentPassword", e.target.value)}
@@ -100,7 +100,7 @@ export default function GeneralSettings() {
           />
         </div>
       </CardComponent>
-      <div className="w-[360px]">
+      <div className="w-full md:w-[360px]">
         <Button content="Save Changes" isDisabled />
       </div>
     </div>

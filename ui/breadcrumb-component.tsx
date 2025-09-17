@@ -9,6 +9,7 @@ import DateRangePicker from "./form/date-range";
 import DropDown from "./form/select-dropdown";
 import { useStrategicObjectivesAndKPIsModal } from "@/utils/strategic-objective-kpi-utility";
 import AddStrategicObjectiveModal from "@/components/super-admin-components/strategic-objectives-kpi/add-strategic-objective";
+import { useRoleStore } from "@/store/role-store";
 
 type Props = {
   fallbackTitle?: string;
@@ -17,11 +18,12 @@ type Props = {
 
 export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const pathname = usePathname();
+  const { user } = useRoleStore();
 
   const matched = breadcrumbs.find((item) =>
-    // pathname.startsWith(item.href.replace(/\[.*?\]/, ""))
     pathname.includes(item.href)
   );
+  console.log(pathname);
 
   const { setAddTeamMember, addTeamMember, handleAddUser } =
     useTeamMemberModal();
@@ -34,8 +36,14 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     setAddTeamMember(false);
   };
 
+  if (!user) {
+    return null;
+  }
+
+  const higherLevels = ['super-admin', 'admin'];
+
   const actionComponents: Record<string, React.ReactNode> = {
-    "/dashboard": (
+    "/dashboard": higherLevels.includes(user.role) && (
       <Button
         content="New Project"
         icon="cil:plus"
@@ -107,13 +115,6 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
           onChange={() => {}}
         />
       </div>
-    ),
-    "/project-management/team": (
-      <Button
-        content="Add Team Member"
-        icon="cil:plus"
-        href="/project-management/team/create"
-      />
     ),
   };
 
