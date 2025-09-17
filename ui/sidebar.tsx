@@ -42,7 +42,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
         }
         return newSet;
       });
-      redirect(item.children[0].href); // can change later on
+      // redirect(item.children[0].href); // can change later on
     }
 
     // Regular navigation for items without children
