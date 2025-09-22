@@ -100,3 +100,24 @@ body {
 .custom-scrollbar::-webkit-scrollbar { width: 4px; } 
 .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 2px; } 
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 2px; }
+
+.sidebar {
+  overflow-y: auto;
+  max-height: 120px; /* example */
+}
+
+/* Webkit browsers */
+.sidebar::-webkit-scrollbar {
+  width: 8px; /* scrollbar thickness */
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #C9D1DA;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  margin: 30px;
+}
