@@ -43,7 +43,7 @@ export default function AssignedKPITable() {
         <Button
           content="New KPI"
           icon="si:add-fill"
-          href="/partners/kpi-reporting/new-kpi"
+          href="/kpi-reporting/new-kpi"
         />
       </div>
       <Table

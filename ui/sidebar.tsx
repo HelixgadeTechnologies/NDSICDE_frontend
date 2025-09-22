@@ -42,7 +42,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
         }
         return newSet;
       });
-      redirect(item.children[0].href); // can change later on
+      // redirect(item.children[0].href); // can change later on
     }
 
     // Regular navigation for items without children
@@ -153,7 +153,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                       animate={{ y: 0, opacity: 1 }}  
                       exit={{ y: -10, opacity: 0 }}  
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="ml-6 mt-1 space-y-1">
+                      className="ml-6 mt-1 space-y-1 overflow-y-scroll sidebar">
                         {nav.children!.map((child, childIndex) => {
                           const isChildActive = pathname.startsWith(child.href);
                           return (

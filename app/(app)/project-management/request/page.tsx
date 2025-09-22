@@ -1,78 +1,51 @@
 "use client";
 
-import { useState } from "react";
 import CardComponent from "@/ui/card-wrapper";
-import SearchInput from "@/ui/form/search";
-import DropDown from "@/ui/form/select-dropdown";
-import Table from "@/ui/table";
-import { motion, AnimatePresence } from "framer-motion";
-import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
+import Table from "@/ui/table";
+import { useState } from "react";
+import { Icon } from "@iconify/react";
+import { AnimatePresence, motion } from "framer-motion";
 
-
-export default function ProjectPartner() {
+export default function ProjectRequest() {
   const [activeRowId, setActiveRowId] = useState<number | null>(null);
   const head = [
-    "Partner Organization Name",
-    "Email Address",
-    "Role",
-    "Last Active",
+    "Activity Description",
+    "Total Budget (₦)",
+    "Activity Location",
+    "Responsible Person(s)",
+    "Start Date",
+    "End Date",
     "Actions",
   ];
+
   const data = [
     {
       userId: 1,
-      name: "Seplat",
-      email: "john.doe@mail.com",
-      role: "Super Admin",
-      lastActive: "May 15, 2023 10:30",
+      activityDescription: "Meeting with stakeholders in Akwa Ibom",
+      totalBudget: "500,000",
+      activityLocation: "Bayelsa",
+      responsiblePersons: "Ifeoma",
+      startDate: "12/03/2024",
+      endDate: "12/03/2024",
     },
     {
       userId: 2,
-      name: "Seplat",
-      email: "john.doe@mail.com",
-      role: "Team Member",
-      lastActive: "May 15, 2023 10:30",
-    },
-    {
-      userId: 3,
-      name: "Seplat",
-      email: "john.doe@mail.com",
-      role: "Admin",
-      lastActive: "May 15, 2023 10:30",
+      activityDescription: "Meeting with stakeholders in Akwa Ibom",
+      totalBudget: "500,000",
+      activityLocation: "Bayelsa",
+      responsiblePersons: "Ifeoma",
+      startDate: "12/03/2024",
+      endDate: "12/03/2024",
     },
   ];
-
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
-        <Button
-          content="Add Project Partners"
-          icon="cil:plus"
-          href="/project-management/partner/add"
-        />
+        <Button content="Add Activity Request" icon="cil:plus" />
       </div>
-      <CardComponent>
-        <div className="flex items-end justify-between gap-4 mb-5">
-          <div className="w-4/5">
-            <SearchInput
-              name="search"
-              value=""
-              placeholder="Search Projects"
-              onChange={() => {}}
-            />
-          </div>
-          <div className="w-1/5 flex items-end gap-4">
-            <DropDown
-              value=""
-              name="role"
-              placeholder="All Role"
-              onChange={() => {}}
-              options={[]}
-            />
-          </div>
-        </div>
 
+      <CardComponent>
         <Table
           tableHead={head}
           tableData={data}
@@ -80,10 +53,12 @@ export default function ProjectPartner() {
           idKey={"userId"}
           renderRow={(row) => (
             <>
-              <td className="px-6">{row.name}</td>
-              <td className="px-6">{row.email}</td>
-              <td className="px-6">{row.role}</td>
-              <td className="px-6">{row.lastActive}</td>
+              <td className="px-6">{row.activityDescription}</td>
+              <td className="px-6">{row.totalBudget}</td>
+              <td className="px-6">{row.activityLocation}</td>
+              <td className="px-6">{row.responsiblePersons}</td>
+              <td className="px-6">{row.startDate}</td>
+              <td className="px-6">{row.endDate}</td>
               <td className="px-6 relative">
                 <div className="flex justify-center items-center">
                   <Icon
@@ -110,17 +85,21 @@ export default function ProjectPartner() {
                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                     >
                       <ul className="text-sm">
-                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
+                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon icon={"cil:pencil"} height={20} width={20} />
                           Edit
                         </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
-                          <Icon
-                            icon={"pixelarticons:trash"}
-                            height={20}
-                            width={20}
-                          />
+                        <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
+                          <Icon icon={"pixelarticons:trash"} height={20} width={20} />
                           Remove
+                        </li>
+                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
+                          <Icon icon={"si:add-fill"} height={20} width={20} />
+                          Retire
+                        </li>
+                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                          <Icon icon={"hugeicons:view"} height={20} width={20} />
+                          View Activity
                         </li>
                       </ul>
                     </motion.div>
