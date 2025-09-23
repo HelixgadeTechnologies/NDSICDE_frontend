@@ -60,8 +60,20 @@ export default function KPITable() {
           <td className="px-6">{row.type}</td>
           <td className="px-6">{row.baseline}</td>
           <td className="px-6">{row.target}</td>
-          <td className={`px-6 ${row.assigned === "Yes" ? "text-[#22C55E]" : "text-[#EAB308]"}`}>{row.assigned}</td>
-          <td className={`px-6 ${row.status === "Active" ? "text-[#22C55E]" : "text-[#EAB308]"}`}>{row.status}</td>
+          <td
+            className={`px-6 ${
+              row.assigned === "Yes" ? "text-[#22C55E]" : "text-[#EAB308]"
+            }`}
+          >
+            {row.assigned}
+          </td>
+          <td
+            className={`px-6 ${
+              row.status === "Active" ? "text-[#22C55E]" : "text-[#EAB308]"
+            }`}
+          >
+            {row.status}
+          </td>
           <td className="px-6 relative">
             <div className="flex justify-center items-center">
               <Icon
@@ -86,7 +98,11 @@ export default function KPITable() {
                 >
                   <ul className="text-sm">
                     <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
-                      <Icon icon={"cil:pencil"} height={20} width={20} />
+                      <Icon
+                        icon={"ph:pencil-simple-line"}
+                        height={20}
+                        width={20}
+                      />
                       Edit
                     </li>
                     <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">

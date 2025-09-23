@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
 
-
 export default function ProjectPartner() {
   const [activeRowId, setActiveRowId] = useState<number | null>(null);
   const head = [
@@ -48,7 +47,7 @@ export default function ProjectPartner() {
       <div className="absolute right-0 -top-[75px]">
         <Button
           content="Add Project Partners"
-          icon="cil:plus"
+          icon="si:add-fill"
           href="/project-management/partner/add"
         />
       </div>
@@ -111,7 +110,11 @@ export default function ProjectPartner() {
                     >
                       <ul className="text-sm">
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
-                          <Icon icon={"cil:pencil"} height={20} width={20} />
+                          <Icon
+                            icon={"ph:pencil-simple-line"}
+                            height={20}
+                            width={20}
+                          />
                           Edit
                         </li>
                         <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">

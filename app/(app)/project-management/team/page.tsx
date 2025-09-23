@@ -50,7 +50,7 @@ export default function ProjectTeam() {
       <div className="absolute right-0 -top-[75px]">
         <Button
           content="Add Team Member"
-          icon="cil:plus"
+          icon="si:add-fill"
           href="/project-management/team/create"
         />
       </div>
@@ -121,11 +121,19 @@ export default function ProjectTeam() {
                     >
                       <ul className="text-sm">
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                          <Icon icon={"hugeicons:view"} height={20} width={20} />
+                          <Icon
+                            icon={"hugeicons:view"}
+                            height={20}
+                            width={20}
+                          />
                           View Profile
                         </li>
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center">
-                          <Icon icon={"cil:pencil"} height={20} width={20} />
+                          <Icon
+                            icon={"ph:pencil-simple-line"}
+                            height={20}
+                            width={20}
+                          />
                           Edit
                         </li>
                         <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">

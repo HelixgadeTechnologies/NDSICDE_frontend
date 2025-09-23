@@ -33,11 +33,8 @@ export default function SOTable() {
 
   const [activeRowId, setActiveRowId] = useState<number | null>(null);
 
-  const { 
-    addKPI, 
-    setAddKPI, 
-    handleAddKPI 
-} = useStrategicObjectivesAndKPIsModal();
+  const { addKPI, setAddKPI, handleAddKPI } =
+    useStrategicObjectivesAndKPIsModal();
 
   return (
     <section>
@@ -86,7 +83,11 @@ export default function SOTable() {
                         Add Organizational KPI
                       </li>
                       <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center">
-                        <Icon icon={"cil:pencil"} height={20} width={20} />
+                        <Icon
+                          icon={"ph:pencil-simple-line"}
+                          height={20}
+                          width={20}
+                        />
                         Edit
                       </li>
                       <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
@@ -107,10 +108,7 @@ export default function SOTable() {
       />
 
       {addKPI && (
-        <AddKPIModal
-        isOpen={addKPI}
-        onClose={() => setAddKPI(false)}
-        />
+        <AddKPIModal isOpen={addKPI} onClose={() => setAddKPI(false)} />
       )}
     </section>
   );

@@ -41,7 +41,7 @@ export default function AccessControl() {
           <div className="w-[228px]">
             <Button
               content="Add New Role"
-              icon="cil:plus"
+              icon="si:add-fill"
               onClick={openAddModal}
             />
           </div>
