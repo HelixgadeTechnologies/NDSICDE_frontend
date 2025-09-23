@@ -42,7 +42,7 @@ export default function ProjectRequest() {
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
-        <Button content="Add Activity Request" icon="cil:plus" />
+        <Button content="Add Activity Request" icon="si:add-fill" />
       </div>
 
       <CardComponent>
@@ -86,11 +86,19 @@ export default function ProjectRequest() {
                     >
                       <ul className="text-sm">
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                          <Icon icon={"cil:pencil"} height={20} width={20} />
+                          <Icon
+                            icon={"ph:pencil-simple-line"}
+                            height={20}
+                            width={20}
+                          />
                           Edit
                         </li>
                         <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
-                          <Icon icon={"pixelarticons:trash"} height={20} width={20} />
+                          <Icon
+                            icon={"pixelarticons:trash"}
+                            height={20}
+                            width={20}
+                          />
                           Remove
                         </li>
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
@@ -98,7 +106,11 @@ export default function ProjectRequest() {
                           Retire
                         </li>
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                          <Icon icon={"hugeicons:view"} height={20} width={20} />
+                          <Icon
+                            icon={"hugeicons:view"}
+                            height={20}
+                            width={20}
+                          />
                           View Activity
                         </li>
                       </ul>

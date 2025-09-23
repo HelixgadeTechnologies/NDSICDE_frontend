@@ -160,7 +160,11 @@ export default function TeamMembersTable() {
                         onClick={() => handleEditUser(row, setActiveRowId)}
                         className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center"
                       >
-                        <Icon icon={"cil:pencil"} height={20} width={20} />
+                        <Icon
+                          icon={"ph:pencil-simple-line"}
+                          height={20}
+                          width={20}
+                        />
                         Edit
                       </li>
                       <li

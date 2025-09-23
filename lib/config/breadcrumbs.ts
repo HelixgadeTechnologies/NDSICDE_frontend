@@ -14,10 +14,6 @@ export const breadcrumbs = [
     header: "Strategic Objectives and KPIs",
   },
   {
-    href: "/project-management",
-    header: "Project Management",
-  },
-  {
     href: "/user-management",
     header: "Team Member",
   },
@@ -59,7 +55,7 @@ export const breadcrumbs = [
     header: "Project Team",
   },
   {
-    href: "/project-management/partners",
+    href: "/project-management/partner",
     header: "Project Partners",
   },
   {

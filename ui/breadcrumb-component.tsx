@@ -20,9 +20,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const pathname = usePathname();
   const { user } = useRoleStore();
 
-  const matched = breadcrumbs.find((item) =>
-    pathname.includes(item.href)
-  );
+  const matched = breadcrumbs.find((item) => pathname.includes(item.href));
   console.log(pathname);
 
   const { setAddTeamMember, addTeamMember, handleAddUser } =
@@ -40,13 +38,13 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     return null;
   }
 
-  const higherLevels = ['super-admin', 'admin'];
+  const higherLevels = ["super-admin", "admin"];
 
   const actionComponents: Record<string, React.ReactNode> = {
     "/dashboard": higherLevels.includes(user.role) && (
       <Button
         content="New Project"
-        icon="cil:plus"
+        icon="si:add-fill"
         href="/dashboard/create-project"
       />
     ),
@@ -55,7 +53,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         <Button
           onClick={handleAddSO}
           content="Add New Member"
-          icon="cil:plus"
+          icon="si:add-fill"
         />
         {addStrategicObjective && (
           <AddStrategicObjectiveModal
@@ -68,7 +66,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     // "/admin/project-management": (
     //   <Button
     //     content="New Project"
-    //     icon="cil:plus"
+    //     icon="si:add-fill"
     //     href="/admin/project-management/create-project"
     //   />
     // ),
@@ -77,7 +75,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         <Button
           onClick={handleAddUser}
           content="Add New Member"
-          icon="cil:plus"
+          icon="si:add-fill"
         />
         {addTeamMember && (
           <AddTeamMember

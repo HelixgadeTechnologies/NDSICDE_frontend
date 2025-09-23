@@ -170,7 +170,7 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
           {
             id: "outcome",
             name: "Outcome",
-            href: "/team-member/project-management/outcome",
+            href: "/project-management/outcome",
             icon: "",
           },
           {

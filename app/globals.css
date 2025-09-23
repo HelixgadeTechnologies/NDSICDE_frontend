@@ -103,7 +103,7 @@ body {
 
 .sidebar {
   overflow-y: auto;
-  max-height: 120px; /* example */
+  max-height: 160px; /* example */
 }
 
 /* Webkit browsers */
