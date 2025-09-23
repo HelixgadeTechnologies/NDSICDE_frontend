@@ -102,37 +102,6 @@ export function useTeamMemberModal(): TeamMemberModalStates & TeamMemberModalAct
     setSelectedUser(null);
   }, [closeAllModals]);
 
-  // Enhanced setter functions with automatic modal management
-  const setEditTeamMemberEnhanced = useCallback((value: boolean) => {
-    setEditTeamMember(value);
-    if (!value) {
-      // When closing edit modal, clear loading state
-      setIsLoading(false);
-    }
-  }, []);
-
-  const setViewTeamMemberEnhanced = useCallback((value: boolean) => {
-    setViewTeamMember(value);
-    if (!value) {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const setDeleteTeamMemberEnhanced = useCallback((value: boolean) => {
-    setDeleteTeamMember(value);
-    if (!value) {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const setAddTeamMemberEnhanced = useCallback((value: boolean) => {
-    setAddTeamMember(value);
-    if (!value) {
-      setIsLoading(false);
-      // Clear selected user when closing add modal
-      setSelectedUser(null);
-    }
-  }, []);
 
   return {
     // States
@@ -144,10 +113,10 @@ export function useTeamMemberModal(): TeamMemberModalStates & TeamMemberModalAct
     isLoading,
     
     // Enhanced state setters
-    setEditTeamMember: setEditTeamMemberEnhanced,
-    setViewTeamMember: setViewTeamMemberEnhanced,
-    setDeleteTeamMember: setDeleteTeamMemberEnhanced,
-    setAddTeamMember: setAddTeamMemberEnhanced,
+    setEditTeamMember,
+    setViewTeamMember,
+    setDeleteTeamMember,
+    setAddTeamMember,
     setSelectedUser,
     setIsLoading,
     

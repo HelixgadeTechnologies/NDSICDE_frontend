@@ -29,12 +29,6 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
         href: "/strategic-objectives",
         icon: "fluent:arrow-growth-24-regular",
       },
-      // {
-      //   id: "project-management",
-      //   name: "Project Management",
-      //   href: "/admin/project-management",
-      //   icon: "iconoir:folder",
-      // },
       {
         id: "user-management",
         name: "User Management",
