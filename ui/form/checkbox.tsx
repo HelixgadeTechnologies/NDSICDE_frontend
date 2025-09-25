@@ -19,7 +19,7 @@ export default function Checkbox({ label, isChecked, name, onChange }: CheckboxP
         className="w-4 h-4 border border-gray-300 accent-[var(--primary)]"
       />
       {label && (
-        <label htmlFor={id} className="text-xs md:text-sm cursor-pointer whitespace-nowrap font-medium text-gray-900">
+        <label htmlFor={id} className="text-sm md:text-sm cursor-pointer whitespace-nowrap font-medium text-gray-900">
           {label}
         </label>
       )}

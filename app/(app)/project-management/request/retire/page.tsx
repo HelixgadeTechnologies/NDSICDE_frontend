@@ -3,36 +3,55 @@
 import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
 import Table from "@/ui/table";
-import { useState } from "react";
-import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
-import Modal from "@/ui/popup-modal";
-import Heading from "@/ui/text-heading";
-import FileUploader from "@/ui/form/file-uploader";
+import { Icon } from "@iconify/react";
+import { useState } from "react";
+import AddProjectRequestRetirement from "@/components/project-management-components/add-project-request-retirement";
 
-export default function ProjectLogicalFramework() {
-  const [activeRowId, setActiveRowId] = useState<number | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const head = ["Document Name", "Upload Date", "Actions"];
+export default function ProjectRequestRetirementPage() {
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [openAddRetirement, setOpenAddRetirement] = useState(false);
+
+  const head = [
+    "Activity Line Description",
+    "Quantity",
+    "Frequency",
+    "Unit Cost (₦)",
+    "Total Budget (₦)",
+    "Actual Cost (₦)",
+    "Variance",
+    "Actions",
+  ];
+
   const data = [
     {
-      userId: 1,
-      documentName: "Logical Framework 1",
-      uploadDate: "May 15, 2025 10:30",
+      userId: "1",
+      description: "Accomodation",
+      quantity: 2,
+      frequency: 3,
+      unit_cost: 300,
+      total_budget: 180,
+      actual_cost: 240,
+      variance: 600,
     },
     {
-      userId: 2,
-      documentName: "Logical Framework 2",
-      uploadDate: "May 20, 2025 10:30",
+      userId: "2",
+      description: "Accomodation",
+      quantity: 2,
+      frequency: 3,
+      unit_cost: 300,
+      total_budget: 180,
+      actual_cost: 240,
+      variance: 600,
     },
   ];
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
         <Button
-          content="Upload Framework"
+          content="Add Project Impact"
           icon="si:add-fill"
-          onClick={() => setIsOpen(true)}
+          onClick={() => setOpenAddRetirement(true)}
         />
       </div>
 
@@ -44,8 +63,13 @@ export default function ProjectLogicalFramework() {
           idKey={"userId"}
           renderRow={(row) => (
             <>
-              <td className="px-6">{row.documentName}</td>
-              <td className="px-6">{row.uploadDate}</td>
+              <td className="px-6">{row.description}</td>
+              <td className="px-6">{row.quantity}</td>
+              <td className="px-6">{row.frequency}</td>
+              <td className="px-6">{row.unit_cost}</td>
+              <td className="px-6">{row.total_budget}</td>
+              <td className="px-6">{row.actual_cost}</td>
+              <td className="px-6">{row.variance}</td>
               <td className="px-6 relative">
                 <Icon
                   icon={"uiw:more"}
@@ -70,15 +94,15 @@ export default function ProjectLogicalFramework() {
                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                     >
                       <ul className="text-sm">
-                        <li className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon
-                            icon={"hugeicons:view"}
+                            icon={"ph:pencil-simple-line"}
                             height={20}
                             width={20}
                           />
-                          View Framework
+                          Edit
                         </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
+                        <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"pixelarticons:trash"}
                             height={20}
@@ -96,23 +120,10 @@ export default function ProjectLogicalFramework() {
         />
       </CardComponent>
 
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} maxWidth="600px">
-        <div className="space-y-8">
-          <Heading
-            heading="Upload Logical Framework Document"
-            className="text-center"
-          />
-          <FileUploader />
-          <div className="flex items-center gap-4">
-            <Button
-              content="Cancel"
-              onClick={() => setIsOpen(false)}
-              isSecondary
-            />
-            <Button content="Next" />
-          </div>
-        </div>
-      </Modal>
+      <AddProjectRequestRetirement
+        isOpen={openAddRetirement}
+        onClose={() => setOpenAddRetirement(false)}
+      />
     </div>
   );
 }

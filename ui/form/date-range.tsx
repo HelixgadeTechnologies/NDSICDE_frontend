@@ -61,7 +61,7 @@ export default function DateRangePicker({ onChange, label }: DatePickerProps) {
 
   return (
     <div className="relative w-full sm:max-w-sm flex-1" ref={ref}>
-      <label className="text-xs font-medium text-gray-900 block mb-2">{label}</label>
+      <label className="text-sm font-medium text-gray-900 block mb-2">{label}</label>
       <button
         onClick={toggleDateRangePicker}
         className="border border-[#B6D8FF] rounded-md px-3 py-[6px] flex items-center gap-2 text-sm text-[#667185] bg-[#F8F8F8] focus:outline-none min-w-[180px] w-full h-10"

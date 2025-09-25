@@ -63,6 +63,10 @@ export const breadcrumbs = [
     header: "Project Impact",
   },
   {
+    href: "/project-management/impact/indicator",
+    header: "Impact Indicator",
+  },
+  {
     href: "/project-management/outcome",
     header: "Project Outcome",
   },
@@ -81,6 +85,10 @@ export const breadcrumbs = [
   {
     href: "/project-management/request",
     header: "Activity Request",
+  },
+  {
+    href: "/project-management/request/retire",
+    header: "Retirement",
   },
   {
     href: "/result-dashboard",

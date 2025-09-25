@@ -66,7 +66,7 @@ export default function DropDown({
   return (
     <div className="space-y-2 relative flex-1" ref={dropdownRef}>
       {label && (
-        <label htmlFor={id} className="text-xs font-medium text-[#242424] block">
+        <label htmlFor={id} className="text-sm font-medium text-[#242424] block">
           {label}
         </label>
       )}

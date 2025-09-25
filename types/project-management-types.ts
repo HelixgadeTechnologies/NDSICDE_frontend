@@ -4,6 +4,32 @@ export type ProjectTeamDetails = {
   name: string;
   email: string;
   role: string;
-  status: "Active" | "Inactive",
+  status: "Active" | "Inactive";
   lastActive: string;
+};
+
+export type ProjectPartnerTypes = {
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  lastActive: string;
+};
+
+export type ProjectImpactTypes = {
+  userId: string;
+  impactStatement: string;
+  thematicAreas: string;
+  responsiblePerson: string;
+};
+
+
+export type ProjectRequestTypes = {
+  userId: string;
+  activityDescription: string;
+  totalBudget: string;
+  activityLocation: string;
+  responsiblePersons: string;
+  startDate: string;
+  endDate: string;
 }
