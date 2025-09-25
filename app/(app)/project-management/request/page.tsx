@@ -6,9 +6,14 @@ import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ProjectRequestTypes } from "@/types/project-management-types";
+import { useEntityModal } from "@/utils/project-management-utility";
+import DeleteModal from "@/ui/generic-delete-modal";
+import Link from "next/link";
+import EditActivityRequest from "@/components/project-management-components/edit-activity-request";
 
 export default function ProjectRequest() {
-  const [activeRowId, setActiveRowId] = useState<number | null>(null);
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const head = [
     "Activity Description",
     "Total Budget (₦)",
@@ -19,9 +24,9 @@ export default function ProjectRequest() {
     "Actions",
   ];
 
-  const data = [
+  const data: ProjectRequestTypes[] = [
     {
-      userId: 1,
+      userId: "1",
       activityDescription: "Meeting with stakeholders in Akwa Ibom",
       totalBudget: "500,000",
       activityLocation: "Bayelsa",
@@ -30,7 +35,7 @@ export default function ProjectRequest() {
       endDate: "12/03/2024",
     },
     {
-      userId: 2,
+      userId: "2",
       activityDescription: "Meeting with stakeholders in Akwa Ibom",
       totalBudget: "500,000",
       activityLocation: "Bayelsa",
@@ -39,6 +44,18 @@ export default function ProjectRequest() {
       endDate: "12/03/2024",
     },
   ];
+
+  // state for modals - edit and remove
+  const {
+    editEntity: editRequest,
+    setEditEntity: setEditRequest,
+    handleEditEntity: handleEditRequest,
+    removeEntity: removeRequest,
+    setRemoveEntity: setRemoveRequest,
+    handleRemoveEntity: handleRemoveRequest,
+    selectedEntity: selectedRequest,
+  } = useEntityModal<ProjectRequestTypes>();
+
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
@@ -85,7 +102,10 @@ export default function ProjectRequest() {
                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                     >
                       <ul className="text-sm">
-                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                        <li
+                          onClick={() => handleEditRequest(row, setActiveRowId)}
+                          className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center"
+                        >
                           <Icon
                             icon={"ph:pencil-simple-line"}
                             height={20}
@@ -93,7 +113,12 @@ export default function ProjectRequest() {
                           />
                           Edit
                         </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
+                        <li
+                          onClick={() =>
+                            handleRemoveRequest(row, setActiveRowId)
+                          }
+                          className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center"
+                        >
                           <Icon
                             icon={"pixelarticons:trash"}
                             height={20}
@@ -101,10 +126,13 @@ export default function ProjectRequest() {
                           />
                           Remove
                         </li>
-                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
+                        <Link
+                          href={"/project-management/request/retire"}
+                          className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center"
+                        >
                           <Icon icon={"si:add-fill"} height={20} width={20} />
                           Retire
-                        </li>
+                        </Link>
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"hugeicons:view"}
@@ -122,6 +150,21 @@ export default function ProjectRequest() {
           )}
         />
       </CardComponent>
+
+      {selectedRequest && (
+        <EditActivityRequest
+          isOpen={editRequest}
+          onClose={() => setEditRequest(false)}
+        />
+      )}
+
+      {selectedRequest && (
+        <DeleteModal
+          isOpen={removeRequest}
+          onClose={() => setRemoveRequest(false)}
+          heading="Do you want to remove this  Project Activities?"
+        />
+      )}
     </div>
   );
 }

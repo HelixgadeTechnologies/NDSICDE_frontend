@@ -22,3 +22,14 @@ export type ProjectImpactTypes = {
   thematicAreas: string;
   responsiblePerson: string;
 };
+
+
+export type ProjectRequestTypes = {
+  userId: string;
+  activityDescription: string;
+  totalBudget: string;
+  activityLocation: string;
+  responsiblePersons: string;
+  startDate: string;
+  endDate: string;
+}
