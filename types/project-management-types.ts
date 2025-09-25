@@ -7,3 +7,11 @@ export type ProjectTeamDetails = {
   status: "Active" | "Inactive",
   lastActive: string;
 }
+
+export type ProjectPartnerTypes = {
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  lastActive: string;
+}

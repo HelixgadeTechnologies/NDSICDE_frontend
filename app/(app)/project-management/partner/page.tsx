@@ -8,9 +8,14 @@ import Table from "@/ui/table";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
+import { ProjectPartnerTypes } from "@/types/project-management-types";
+import { useEntityModal } from "@/utils/project-management-utility";
+import AddProjectPartnerModal from "@/components/project-management-components/add-project-partner";
+import EditProjectPartnerModal from "@/components/project-management-components/edit-project-partner";
+import DeleteProjectPartnerModal from "@/components/project-management-components/remove-project-partner";
 
 export default function ProjectPartner() {
-  const [activeRowId, setActiveRowId] = useState<number | null>(null);
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const head = [
     "Partner Organization Name",
     "Email Address",
@@ -18,23 +23,23 @@ export default function ProjectPartner() {
     "Last Active",
     "Actions",
   ];
-  const data = [
+  const data: ProjectPartnerTypes[] = [
     {
-      userId: 1,
+      userId: "1",
       name: "Seplat",
       email: "john.doe@mail.com",
       role: "Super Admin",
       lastActive: "May 15, 2023 10:30",
     },
     {
-      userId: 2,
+      userId: "2",
       name: "Seplat",
       email: "john.doe@mail.com",
       role: "Team Member",
       lastActive: "May 15, 2023 10:30",
     },
     {
-      userId: 3,
+      userId: "3",
       name: "Seplat",
       email: "john.doe@mail.com",
       role: "Admin",
@@ -42,13 +47,27 @@ export default function ProjectPartner() {
     },
   ];
 
+  // states for modals
+  const {
+    editEntity: editPartner,
+    addEntity: addPartner,
+    removeEntity: removePartner,
+    setAddEntity: setAddPartner,
+    setEditEntity: setEditPartner,
+    setRemoveEntity: setRemovePartner,
+    selectedEntity: selectedPartner,
+    handleEditEntity: handleEditPartner,
+    handleAddEntity: handleAddPartner,
+    handleRemoveEntity: handleRemovePartner,
+  } = useEntityModal<ProjectPartnerTypes>();
+
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
         <Button
           content="Add Project Partners"
           icon="si:add-fill"
-          href="/project-management/partner/add"
+          onClick={handleAddPartner}
         />
       </div>
       <CardComponent>
@@ -109,7 +128,10 @@ export default function ProjectPartner() {
                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                     >
                       <ul className="text-sm">
-                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
+                        <li
+                          onClick={() => handleEditPartner(row, setActiveRowId)}
+                          className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center"
+                        >
                           <Icon
                             icon={"ph:pencil-simple-line"}
                             height={20}
@@ -117,7 +139,12 @@ export default function ProjectPartner() {
                           />
                           Edit
                         </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
+                        <li
+                          onClick={() =>
+                            handleRemovePartner(row, setActiveRowId)
+                          }
+                          className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center"
+                        >
                           <Icon
                             icon={"pixelarticons:trash"}
                             height={20}
@@ -134,6 +161,26 @@ export default function ProjectPartner() {
           )}
         />
       </CardComponent>
+
+      {/* modals */}
+      <AddProjectPartnerModal
+        isOpen={addPartner}
+        onClose={() => setAddPartner(false)}
+      />
+
+      {selectedPartner && (
+        <EditProjectPartnerModal
+          isOpen={editPartner}
+          onClose={() => setEditPartner(false)}
+        />
+      )}
+
+      {selectedPartner && (
+        <DeleteProjectPartnerModal
+        isOpen={removePartner}
+        onClose={() => setRemovePartner(false)}
+        />
+      )}
     </div>
   );
 }
