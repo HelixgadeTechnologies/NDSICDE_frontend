@@ -8,11 +8,18 @@ import { Icon } from "@iconify/react";
 type DeleteProps = {
   isOpen: boolean;
   onClose: () => void;
+  heading: string;
+  subtitle?: string;
+  onDelete?: () => void;
 };
 
-export default function DeleteProjectPartnerModal({
+// inlcude function prop to delete
+export default function DeleteModal({
   isOpen,
   onClose,
+  heading,
+  subtitle,
+  onDelete,
 }: DeleteProps) {
   return (
     <>
@@ -21,12 +28,13 @@ export default function DeleteProjectPartnerModal({
           <Icon icon={"si:warning-line"} width={96} height={96} />
         </div>
         <Heading
-          heading="Do you want to remove this  Project Partner?"
+          heading={heading}
+          subtitle={subtitle}
           className="text-center"
         />
 
         <div className="mt-4 flex justify-center mx-auto gap-2 w-[180px]">
-          <Button content="Yes" isSecondary />
+          <Button content="Yes" isSecondary onClick={onDelete} />
           <Button content="No" onClick={onClose} />
         </div>
       </Modal>

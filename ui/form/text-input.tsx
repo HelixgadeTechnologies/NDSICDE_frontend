@@ -25,7 +25,7 @@ export default function TextInput ({
 
     return (
         <div className="space-y-2 relative">
-            <label className={`text-xs font-medium text-gray-900 block ${isUppercase && 'uppercase'}`}>{label}</label>
+            <label className={`text-sm font-medium text-gray-900 block ${isUppercase && 'uppercase'}`}>{label}</label>
             <input 
             type="text"
             value={value}

@@ -7,49 +7,44 @@ import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
+import TagInput from "@/ui/form/tag-input";
 
 type AddProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
-export default function AddProjectPartnerModal({ isOpen, onClose }: AddProps) {
+export default function AddProjectImpactModal({ isOpen, onClose }: AddProps) {
   const [successModal, setSuccessModal] = useState(false);
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
-        <Heading heading="Add Project Partner" className="text-center" />
+        <Heading heading="Add Project Impact" className="text-center" />
         <div className="space-y-6 mt-6">
           <TextInput
-            name="partnerOrganizationName"
+            name="projectImpactstatement"
             value=""
             onChange={() => {}}
             placeholder="---"
-            label="Partner Organization Name"
+            label="Project Impact Statement"
             isBigger
           />
            <DropDown
-            name="contactEmail"
-            label="Contact Person Email Address"
-            placeholder="user@gmail.com"
+            name="thematicAreas"
+            label="Thematic Areas"
+            placeholder="Environment"
             options={[]}
             value=""
             onChange={() => {}}
             isBigger
           />
-          <DropDown
-            name="role"
-            label="Role"
-            placeholder="Enter Role"
-            options={[]}
-            value=""
-            onChange={() => {}}
-            isBigger
+          <TagInput
+          label="Responsible Person(s)"
           />
           <div className="flex items-center gap-6">
             <Button content="Cancel" isSecondary onClick={onClose} />
             <Button
-              content="Add Project Partners"
+              content="Add Project Impact"
               onClick={() => {onClose(); setSuccessModal(true)}}
             />
           </div>
@@ -62,7 +57,7 @@ export default function AddProjectPartnerModal({ isOpen, onClose }: AddProps) {
         </div>
         <Heading
           heading="Congratulations!"
-          subtitle="Partner added successfully"
+          subtitle="Project Impact added successfully"
           className="text-center"
         />
 

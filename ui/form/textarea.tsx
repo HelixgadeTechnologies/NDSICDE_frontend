@@ -15,7 +15,7 @@ export default function TextareaInput({
 }: TextareaProps) {
   return (
     <div className="space-y-2 relative">
-      <label className="text-xs capitalize font-medium text-gray-900 block">{label}</label>
+      <label className="text-sm capitalize font-medium text-gray-900 block">{label}</label>
       <textarea
         value={value}
         onChange={onChange}

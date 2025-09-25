@@ -4,9 +4,9 @@ export type ProjectTeamDetails = {
   name: string;
   email: string;
   role: string;
-  status: "Active" | "Inactive",
+  status: "Active" | "Inactive";
   lastActive: string;
-}
+};
 
 export type ProjectPartnerTypes = {
   userId: string;
@@ -14,4 +14,11 @@ export type ProjectPartnerTypes = {
   email: string;
   role: string;
   lastActive: string;
-}
+};
+
+export type ProjectImpactTypes = {
+  userId: string;
+  impactStatement: string;
+  thematicAreas: string;
+  responsiblePerson: string;
+};

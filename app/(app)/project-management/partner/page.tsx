@@ -12,7 +12,7 @@ import { ProjectPartnerTypes } from "@/types/project-management-types";
 import { useEntityModal } from "@/utils/project-management-utility";
 import AddProjectPartnerModal from "@/components/project-management-components/add-project-partner";
 import EditProjectPartnerModal from "@/components/project-management-components/edit-project-partner";
-import DeleteProjectPartnerModal from "@/components/project-management-components/remove-project-partner";
+import DeleteModal from "@/ui/generic-delete-modal";
 
 export default function ProjectPartner() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -176,9 +176,10 @@ export default function ProjectPartner() {
       )}
 
       {selectedPartner && (
-        <DeleteProjectPartnerModal
-        isOpen={removePartner}
-        onClose={() => setRemovePartner(false)}
+        <DeleteModal
+          isOpen={removePartner}
+          onClose={() => setRemovePartner(false)}
+          heading="Do you want to remove this  Project Partner?"
         />
       )}
     </div>

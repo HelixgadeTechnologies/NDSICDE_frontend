@@ -17,7 +17,7 @@ export default function EmailInput({
 }: EmailProps) {
     return (
         <div className="space-y-2 relative">
-            <label className="text-xs uppercase font-medium text-gray-900 block">{label}</label>
+            <label className="text-sm uppercase font-medium text-gray-900 block">{label}</label>
             <input 
             type="email" 
             value={value}

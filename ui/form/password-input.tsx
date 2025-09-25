@@ -31,7 +31,7 @@ export default function PasswordInput ({
 
     return (
         <div className="space-y-2 relative">
-            <label className={`text-xs ${uppercase ? 'uppercase' : 'capitalize'} font-medium text-gray-900 block`}>{label}</label>
+            <label className={`text-sm ${uppercase ? 'uppercase' : 'capitalize'} font-medium text-gray-900 block`}>{label}</label>
             <input 
             type={isHidden ? "password" : "text"} 
             value={value}

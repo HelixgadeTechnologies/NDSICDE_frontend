@@ -109,7 +109,7 @@ const DateInput: React.FC<DateInputProps> = ({
 
   return (
     <div className={`relative w-full ${className}`}>
-    <label className="text-xs capitalize font-medium text-gray-900 block mb-2">{label}</label>
+    <label className="text-sm capitalize font-medium text-gray-900 block mb-2">{label}</label>
       <div 
         ref={inputRef}
         className="relative flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 h-10 cursor-pointer hover:border-gray-400 transition-colors"
