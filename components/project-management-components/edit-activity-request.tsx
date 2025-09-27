@@ -27,7 +27,7 @@ type EditProps = {
 
 // Step 1: financial request and retirement
 
-const Step1BasicInfo = () => (
+const FinancialRequest = () => (
   <div className="space-y-6">
     <Heading heading="Financial Request and Retirement" />
     <TextInput label="Staff" name="staff" value="" onChange={() => {}} />
@@ -206,7 +206,7 @@ export default function EditActivityRequest({ isOpen, onClose }: EditProps) {
   const renderStepContent = () => {
     switch (activeStep) {
       case 1:
-        return <Step1BasicInfo />;
+        return <FinancialRequest />;
       case 2:
         return <JourneyManagement />;
       case 3:
@@ -220,7 +220,7 @@ export default function EditActivityRequest({ isOpen, onClose }: EditProps) {
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
       <div className="space-y-6">
         {/* Form Content */}
-        <div className="h-[550px] custom-scrollbar overflow-y-auto pr-2">
+        <div className="h-[500px] custom-scrollbar overflow-y-auto pr-2">
           {renderStepContent()}
         </div>
 
