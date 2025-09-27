@@ -49,7 +49,7 @@ export default function ProjectRequestRetirementPage() {
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
         <Button
-          content="Add Project Impact"
+          content="Add Retirement"
           icon="si:add-fill"
           onClick={() => setOpenAddRetirement(true)}
         />
@@ -118,6 +118,11 @@ export default function ProjectRequestRetirementPage() {
             </>
           )}
         />
+        <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
+          <p>Total  Activity Cost (N): 100,00</p>
+          <p>Amount to reimburse to NDSICDE (N): 200,000</p>
+          <p>Amount to reimburse to Staff (N): 200,000</p>
+        </div>
       </CardComponent>
 
       <AddProjectRequestRetirement
