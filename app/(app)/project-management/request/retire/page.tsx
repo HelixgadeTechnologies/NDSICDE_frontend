@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 import AddProjectRequestRetirement from "@/components/project-management-components/add-project-request-retirement";
+import BackButton from "@/ui/back-button";
 
 export default function ProjectRequestRetirementPage() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -47,6 +48,7 @@ export default function ProjectRequestRetirementPage() {
   ];
   return (
     <div className="relative mt-12">
+      <BackButton/>
       <div className="absolute right-0 -top-[75px]">
         <Button
           content="Add Retirement"
