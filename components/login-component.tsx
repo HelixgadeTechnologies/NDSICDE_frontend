@@ -25,6 +25,7 @@ function mapRoleNameToUserRole(roleName: string): UserRole {
     "REQUEST AND RETIREMENT MANAGER": "r-managers",
     "TEAM MEMBER": "team-member",
     "TEAM MEMBERS": "team-member",
+    "PROJECT TEAM": "team-member",
   };
 
   const normalizedRole = roleName.toUpperCase();

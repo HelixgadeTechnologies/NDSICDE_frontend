@@ -33,3 +33,13 @@ export type ProjectRequestTypes = {
   startDate: string;
   endDate: string;
 }
+
+export type ProjectActivityTypes = {
+  userId: string;
+  activityStatement: string;
+  output: string;
+  budget: string;
+  startDate: string;
+  endDate: string;
+  responsiblePersons: string;
+}

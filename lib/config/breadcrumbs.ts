@@ -79,6 +79,10 @@ export const breadcrumbs = [
     header: "Activity",
   },
   {
+    href: "/project-management/activity/report-actual-value",
+    header: "Activity Reporting Format and Attributes",
+  },
+  {
     href: "/project-management/logical-framework",
     header: "Logical Framework",
   },

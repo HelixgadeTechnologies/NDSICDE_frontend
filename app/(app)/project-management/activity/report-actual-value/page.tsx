@@ -1,64 +1,66 @@
 "use client";
 
+import BackButton from "@/ui/back-button";
 import CardComponent from "@/ui/card-wrapper";
+import Button from "@/ui/form/button";
 import Table from "@/ui/table";
-import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
-import BackButton from "@/ui/back-button";
+import { useState } from "react";
 
-export default function ImpactIndicator() {
+export default function ReportActualValue() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-
   const head = [
-    "Indicator Statement",
-    "Baseline Value",
-    "Target Value",
-    "Actual Value",
-    "Disaggregation",
+    "Activity Statement",
+    "Liinked to Output",
+    "Total Budget",
     "Responsible Person(s)",
+    "Start Date",
+    "End Date",
     "Actions",
   ];
 
   const data = [
     {
-      user_id: "1",
-      indicator_statement:
-        "Number of stakeholders  trained on leadership skill",
-      baseline_value: 0,
-      target_value: 200,
-      actual_value: "-",
-      disaggregation: "Sex",
-      responsible_persons: "Ifeoma",
+      userId: "1",
+      activityStatement: "Activity Statement",
+      linkedToOutput: "Output 1",
+      budget: "200, 000",
+      responsiblePerson: "Ifeoma",
+      startDate: "12/03/2025",
+      endDate: "12/03/2025",
     },
     {
-      user_id: "2",
-      indicator_statement:
-        "Number of stakeholders  trained on leadership skill",
-      baseline_value: 0,
-      target_value: 145,
-      actual_value: "-",
-      disaggregation: "Sex",
-      responsible_persons: "Patrick",
+      userId: "2",
+      activityStatement: "Activity Statement",
+      linkedToOutput: "Output 1",
+      budget: "200, 000",
+      responsiblePerson: "Ifeoma",
+      startDate: "12/03/2025",
+      endDate: "12/03/2025",
     },
   ];
   return (
-    <>
-      <BackButton />
+    <div className="relative mt-12">
+        <BackButton/>
+      <div className="absolute right-0 -top-[75px]">
+        <Button content="Add Indicator Reporting Formats" icon="si:add-fill" />
+      </div>
+
       <CardComponent>
         <Table
           tableHead={head}
           tableData={data}
           checkbox
-          idKey={"user_id"}
+          idKey={"userId"}
           renderRow={(row) => (
             <>
-              <td className="px-6">{row.indicator_statement}</td>
-              <td className="px-6">{row.baseline_value}</td>
-              <td className="px-6">{row.target_value}</td>
-              <td className="px-6">{row.actual_value}</td>
-              <td className="px-6">{row.disaggregation}</td>
-              <td className="px-6">{row.responsible_persons}</td>
+              <td className="px-6">{row.activityStatement}</td>
+              <td className="px-6">{row.linkedToOutput}</td>
+              <td className="px-6">{row.budget}</td>
+              <td className="px-6">{row.responsiblePerson}</td>
+              <td className="px-6">{row.startDate}</td>
+              <td className="px-6">{row.endDate}</td>
               <td className="px-6 relative">
                 <Icon
                   icon={"uiw:more"}
@@ -68,11 +70,12 @@ export default function ImpactIndicator() {
                   color="#909CAD"
                   onClick={() =>
                     setActiveRowId((prev) =>
-                      prev === row.user_id ? null : row.user_id
+                      prev === row.userId ? null : row.userId
                     )
                   }
                 />
-                {activeRowId === row.user_id && (
+
+                {activeRowId === row.userId && (
                   <AnimatePresence>
                     <motion.div
                       initial={{ y: -10, opacity: 0 }}
@@ -98,10 +101,6 @@ export default function ImpactIndicator() {
                           />
                           Remove
                         </li>
-                        <li className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
-                          <Icon icon={"si:add-fill"} height={20} width={20} />
-                          Report Actual Value
-                        </li>
                       </ul>
                     </motion.div>
                   </AnimatePresence>
@@ -111,6 +110,6 @@ export default function ImpactIndicator() {
           )}
         />
       </CardComponent>
-    </>
+    </div>
   );
 }

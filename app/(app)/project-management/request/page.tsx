@@ -162,7 +162,7 @@ export default function ProjectRequest() {
         <DeleteModal
           isOpen={removeRequest}
           onClose={() => setRemoveRequest(false)}
-          heading="Do you want to remove this  Project Activities?"
+          heading="Do you want to remove this Project Request?"
         />
       )}
     </div>
