@@ -24,7 +24,7 @@ export default function AddImpactIndicator() {
     <>
       <BackButton/>
     <div className="border border-[#E4E7EC] pt-8 px-6 pb-6 rounded-[10px] bg-white w-[624px]">
-      <Heading heading="Add Impact Indicator" className="text-center" />
+      <Heading heading="Add Outcome Indicator" className="text-center" />
       <form className="space-y-6 my-8">
         {/* indicator source */}
         <div className="space-y-1">

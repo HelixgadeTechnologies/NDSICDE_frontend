@@ -42,7 +42,7 @@ export default function ViewActualValue() {
         <Button
           content="Add Indicator Reporting Formats"
           icon="si:add-fill"
-          href="/project-management/actual-value/report"
+          href="/project-management/impact/indicator/actual-value/report"
         />
       </div>
 

@@ -6,9 +6,15 @@ import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEntityModal } from "@/utils/project-management-utility";
+import AddProjectOutcomeModal from "@/components/project-management-components/add-project-outcome";
+import EditProjectOutcomeModal from "@/components/project-management-components/edit-project-outcome";
+import DeleteModal from "@/ui/generic-delete-modal";
+import { ProjectOutcomeTypes } from "@/types/project-management-types";
+import Link from "next/link";
 
 export default function ProjectOutcome() {
-  const [activeRowId, setActiveRowId] = useState<number | null>(null);
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const head = [
     "Project Outcome Objective",
     "Outcome Type",
@@ -19,7 +25,7 @@ export default function ProjectOutcome() {
   ];
   const data = [
     {
-      userId: 1,
+      userId: "1",
       projectOutcome: "Seplat",
       outcomeType: "Development",
       impact: "Development Outcome",
@@ -27,7 +33,7 @@ export default function ProjectOutcome() {
       responsiblePerson: "Person 2",
     },
     {
-      userId: 2,
+      userId: "2",
       projectOutcome: "Seplat",
       outcomeType: "Development",
       impact: "Development Outcome",
@@ -35,10 +41,28 @@ export default function ProjectOutcome() {
       responsiblePerson: "Person 2",
     },
   ];
+
+  // states for modals
+  const {
+    editEntity: editProjectOutcome,
+    addEntity: addProjectOutcome,
+    removeEntity: removeProjectOutcome,
+    setAddEntity: setAddProjectOutcome,
+    setEditEntity: setEditProjectOutcome,
+    setRemoveEntity: setRemoveProjectOutcome,
+    selectedEntity: selectedProjectOutcome,
+    handleEditEntity: handleEditProjectOutcome,
+    handleAddEntity: handleAddProjectOutcome,
+    handleRemoveEntity: handleRemoveProjectOutcome,
+  } = useEntityModal<ProjectOutcomeTypes>();
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
-        <Button content="Add Project Outcome" icon="si:add-fill" />
+        <Button
+          content="Add Project Outcome"
+          icon="si:add-fill"
+          onClick={handleAddProjectOutcome}
+        />
       </div>
 
       <CardComponent>
@@ -77,23 +101,45 @@ export default function ProjectOutcome() {
                       transition={{ duration: 0.2, ease: "easeOut" }}
                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                     >
-                     <ul className="text-sm">
-                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                          <Icon icon={"ph:pencil-simple-line"} height={20} width={20} />
+                      <ul className="text-sm">
+                        <li
+                          onClick={() =>
+                            handleEditProjectOutcome(row, setActiveRowId)
+                          }
+                          className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center"
+                        >
+                          <Icon
+                            icon={"ph:pencil-simple-line"}
+                            height={20}
+                            width={20}
+                          />
                           Edit
                         </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
-                          <Icon icon={"pixelarticons:trash"} height={20} width={20} />
+                        <li
+                          onClick={() =>
+                            handleRemoveProjectOutcome(row, setActiveRowId)
+                          }
+                          className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center"
+                        >
+                          <Icon
+                            icon={"pixelarticons:trash"}
+                            height={20}
+                            width={20}
+                          />
                           Remove
                         </li>
-                        <li className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                        <Link href={"/project-management/outcome/indicator/add"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                           <Icon icon={"si:add-fill"} height={20} width={20} />
                           Add Indicator
-                        </li>
-                        <li className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
-                          <Icon icon={"hugeicons:view"} height={20} width={20} />
+                        </Link>
+                        <Link href={"/project-management/outcome/indicator"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                          <Icon
+                            icon={"hugeicons:view"}
+                            height={20}
+                            width={20}
+                          />
                           View Indicator
-                        </li>
+                        </Link>
                       </ul>
                     </motion.div>
                   </AnimatePresence>
@@ -103,6 +149,27 @@ export default function ProjectOutcome() {
           )}
         />
       </CardComponent>
+
+      {/* modals */}
+      <AddProjectOutcomeModal
+        isOpen={addProjectOutcome}
+        onClose={() => setAddProjectOutcome(false)}
+      />
+
+      {selectedProjectOutcome && (
+        <EditProjectOutcomeModal
+          isOpen={editProjectOutcome}
+          onClose={() => setEditProjectOutcome(false)}
+        />
+      )}
+
+      {selectedProjectOutcome && (
+        <DeleteModal
+          isOpen={removeProjectOutcome}
+          onClose={() => setRemoveProjectOutcome(false)}
+          heading="Do you want to remove this  Project Outcome?"
+        />
+      )}
     </div>
   );
 }

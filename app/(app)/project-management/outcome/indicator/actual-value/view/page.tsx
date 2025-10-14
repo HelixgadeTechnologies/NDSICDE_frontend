@@ -1,79 +1,81 @@
 "use client";
 
 import CardComponent from "@/ui/card-wrapper";
+import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import BackButton from "@/ui/back-button";
-import Link from "next/link";
 
-export default function ImpactIndicator() {
+export default function ViewActualValue() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-
   const head = [
+    "Indicator Source",
+    "Thematic Areas",
     "Indicator Statement",
-    "Baseline Value",
-    "Target Value",
-    "Actual Value",
-    "Disaggregation",
     "Responsible Person(s)",
+    "Result Narrative",
     "Actions",
   ];
-
   const data = [
     {
-      user_id: "1",
-      indicator_statement:
-        "Number of stakeholders  trained on leadership skill",
-      baseline_value: 0,
-      target_value: 200,
-      actual_value: "-",
-      disaggregation: "Sex",
-      responsible_persons: "Ifeoma",
+      id: "1",
+      indicator_source: "Source One",
+      thematic_areas: "Development Outcome",
+      indicator_statement: "Statement",
+      responsible_person: "Person 1",
+      result_narrative: "Narrative 1",
     },
     {
-      user_id: "2",
-      indicator_statement:
-        "Number of stakeholders  trained on leadership skill",
-      baseline_value: 0,
-      target_value: 145,
-      actual_value: "-",
-      disaggregation: "Sex",
-      responsible_persons: "Patrick",
+      id: "2",
+      indicator_source: "Source One",
+      thematic_areas: "Development Outcome",
+      indicator_statement: "Statement",
+      responsible_person: "Person 1",
+      result_narrative: "Narrative 1",
     },
   ];
   return (
-    <>
-      <BackButton />
+    <section className="relative mt-12">
+      <div className="absolute right-0 -top-[75px]">
+        <Button
+          content="Add Indicator Reporting Formats"
+          icon="si:add-fill"
+          href="/project-management/outcome/indicator/actual-value/report"
+        />
+      </div>
+
+      <BackButton/>
       <CardComponent>
         <Table
           tableHead={head}
           tableData={data}
           checkbox
-          idKey={"user_id"}
+          idKey={"id"}
           renderRow={(row) => (
             <>
+              <td className="px-6">{row.indicator_source}</td>
+              <td className="px-6">{row.thematic_areas}</td>
               <td className="px-6">{row.indicator_statement}</td>
-              <td className="px-6">{row.baseline_value}</td>
-              <td className="px-6">{row.target_value}</td>
-              <td className="px-6">{row.actual_value}</td>
-              <td className="px-6">{row.disaggregation}</td>
-              <td className="px-6">{row.responsible_persons}</td>
+              <td className="px-6">{row.responsible_person}</td>
+              <td className="px-6">{row.result_narrative}</td>
               <td className="px-6 relative">
-                <Icon
-                  icon={"uiw:more"}
-                  width={22}
-                  height={22}
-                  className="cursor-pointer"
-                  color="#909CAD"
-                  onClick={() =>
-                    setActiveRowId((prev) =>
-                      prev === row.user_id ? null : row.user_id
-                    )
-                  }
-                />
-                {activeRowId === row.user_id && (
+                <div className="flex justify-center items-center">
+                  <Icon
+                    icon={"uiw:more"}
+                    width={22}
+                    height={22}
+                    className="cursor-pointer"
+                    color="#909CAD"
+                    onClick={() =>
+                      setActiveRowId((prev) =>
+                        prev === row.id ? null : row.id
+                      )
+                    }
+                  />
+                </div>
+                {activeRowId === row.id && (
                   <AnimatePresence>
                     <motion.div
                       initial={{ y: -10, opacity: 0 }}
@@ -91,7 +93,7 @@ export default function ImpactIndicator() {
                           />
                           Edit
                         </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
+                        <li className="cursor-pointer hover:text-[var(--primary-light)] border-t border-gray-300 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"pixelarticons:trash"}
                             height={20}
@@ -99,10 +101,6 @@ export default function ImpactIndicator() {
                           />
                           Remove
                         </li>
-                        <Link href={"/project-management/impact/indicator/actual-value/report"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
-                          <Icon icon={"si:add-fill"} height={20} width={20} />
-                          Report Actual Value
-                        </Link>
                       </ul>
                     </motion.div>
                   </AnimatePresence>
@@ -112,6 +110,6 @@ export default function ImpactIndicator() {
           )}
         />
       </CardComponent>
-    </>
+    </section>
   );
 }

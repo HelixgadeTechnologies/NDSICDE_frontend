@@ -48,7 +48,7 @@ export default function ReportActualValue() {
             <div className="w-full">
                 <Button
                 content="Add"
-                href="/project-management/actual-value/view"
+                href="/project-management/outcome/indicator/actual-value/view"
                 />
             </div>
           </div>

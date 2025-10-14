@@ -43,3 +43,12 @@ export type ProjectActivityTypes = {
   endDate: string;
   responsiblePersons: string;
 }
+
+export type ProjectOutcomeTypes = {
+  userId: string;
+  projectOutcome: string;
+  outcomeType: string;
+  impact: string;
+  thematicAreas: string;
+  responsiblePerson: string;
+}
