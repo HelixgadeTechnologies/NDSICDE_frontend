@@ -23,7 +23,6 @@ export type ProjectImpactTypes = {
   responsiblePerson: string;
 };
 
-
 export type ProjectRequestTypes = {
   userId: string;
   activityDescription: string;
@@ -32,7 +31,7 @@ export type ProjectRequestTypes = {
   responsiblePersons: string;
   startDate: string;
   endDate: string;
-}
+};
 
 export type ProjectActivityTypes = {
   userId: string;
@@ -42,7 +41,7 @@ export type ProjectActivityTypes = {
   startDate: string;
   endDate: string;
   responsiblePersons: string;
-}
+};
 
 export type ProjectOutcomeTypes = {
   userId: string;
@@ -51,4 +50,12 @@ export type ProjectOutcomeTypes = {
   impact: string;
   thematicAreas: string;
   responsiblePerson: string;
-}
+};
+
+export type ProjectOutputTypes = {
+  userId: string;
+  impactStatement: string;
+  outcome: string;
+  thematicAreas: string;
+  responsiblePerson: string;
+};
