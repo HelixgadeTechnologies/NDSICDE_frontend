@@ -6,9 +6,14 @@ import DropDown from "@/ui/form/select-dropdown";
 import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useRoleStore } from "@/store/role-store";
+import { year_options } from "@/lib/config/general-config";
 
 export default function ProjectsTable() {
   const [query, setQuery] = useState("");
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const { user } = useRoleStore();
 
   const head = [
     "Project Code",
@@ -23,17 +28,17 @@ export default function ProjectsTable() {
 
   const data = [
     {
-      id: 1,
+      id: "1",
       projectCode: "PRJ001",
       projectName: "Community Health Initiative",
       strategicObjective: "Improve Healthcare Access",
       status: "Active",
       startDate: "Jan 15, 2023",
       endDate: "Jan 30, 2024",
-      team: "Health Team",
+      team: "Health Teams",
     },
     {
-      id: 2,
+      id: "2",
       projectCode: "PRJ001",
       projectName: "Community Health Initiative",
       strategicObjective: "Improve Healthcare Access",
@@ -43,7 +48,7 @@ export default function ProjectsTable() {
       team: "Health Team",
     },
     {
-      id: 3,
+      id: "3",
       projectCode: "PRJ001",
       projectName: "Community Health Initiative",
       strategicObjective: "Improve Healthcare Access",
@@ -83,12 +88,11 @@ export default function ProjectsTable() {
             label="Strategic Objectives"
           />
           <DropDown
-            name="teams"
+            name="year"
             value=""
-            placeholder="All Teams"
             onChange={() => {}}
-            options={[]}
-            label="Teams"
+            options={year_options}
+            label="Year"
           />
         </div>
       </div>
@@ -106,7 +110,7 @@ export default function ProjectsTable() {
             <td className="px-4">{row.startDate}</td>
             <td className="px-4">{row.endDate}</td>
             <td className="px-4">{row.team}</td>
-            <td className="px-4">
+            <td className="px-4 relative">
               <div className="flex justify-center items-center">
                 <Icon
                   icon={"uiw:more"}
@@ -114,11 +118,45 @@ export default function ProjectsTable() {
                   height={22}
                   className="cursor-pointer"
                   color="#909CAD"
-                //   onClick={() =>
-                //     setActiveRowId((prev) => (prev === row.id ? null : row.id))
-                //   }
+                  onClick={() =>
+                    setActiveRowId((prev) => (prev === row.id ? null : row.id))
+                  }
                 />
               </div>
+              {activeRowId === row.id && (
+                <AnimatePresence>
+                  <motion.div
+                    initial={{ y: -10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -10, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
+                  >
+                    <ul className="text-sm">
+                      <li className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                        <Icon icon={"hugeicons:view"} height={20} width={20} />
+                        View
+                      </li>
+                      <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                        <Icon
+                          icon={"ph:pencil-simple-line"}
+                          height={20}
+                          width={20}
+                        />
+                        Edit
+                      </li>
+                      {user?.role === "super-admin" && <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
+                        <Icon
+                          icon={"pixelarticons:trash"}
+                          height={20}
+                          width={20}
+                        />
+                        Remove
+                      </li>}
+                    </ul>
+                  </motion.div>
+                </AnimatePresence>
+              )}
             </td>
           </>
         )}

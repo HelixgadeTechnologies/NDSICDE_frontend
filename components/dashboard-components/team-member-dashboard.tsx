@@ -1,5 +1,5 @@
-import DashboardTable from "@/components/team-member-components/dashboard-table";
 import DashboardStat from "@/ui/dashboard-stat-card";
+import ProjectsTable from "../super-admin-components/project-management/projects-table";
 
 export const metadata = {
   title: "Dashboard - NDSICDE",
@@ -39,7 +39,7 @@ export default function TeamMemberDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <DashboardStat data={dashboardData} icon="basil:plus-solid" />
       </div>
-      <DashboardTable/>
+      <ProjectsTable/>
     </section>
   );
 }

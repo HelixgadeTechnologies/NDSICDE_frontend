@@ -35,7 +35,7 @@ export default function ProjectOutput() {
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
-        <Button content="Add Project Partners" icon="si:add-fill" />
+        <Button content="Add Project Output" icon="si:add-fill" />
       </div>
 
       <CardComponent>

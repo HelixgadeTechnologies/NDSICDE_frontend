@@ -67,6 +67,10 @@ export const breadcrumbs = [
     header: "Impact Indicator",
   },
   {
+    href: "/project-management/impact/indicator/actual-value/view",
+    header: "Indicator Reporting Format and Attributes",
+  },
+  {
     href: "/project-management/outcome",
     header: "Project Outcome",
   },
