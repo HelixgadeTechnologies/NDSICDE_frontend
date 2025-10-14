@@ -16,7 +16,7 @@ export default function EditProjectOutputModal({
 }: EditProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
-      <Heading heading="Edit Project Outcome" className="text-center" />
+      <Heading heading="Edit Project Output" className="text-center" />
       <div className="space-y-6 mt-6">
         <TextInput
           label="Project Impact Statement"
