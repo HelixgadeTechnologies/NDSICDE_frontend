@@ -14,6 +14,7 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.3",
     "jose": "^6.0.12",
+    "naija-state-local-government": "^1.1.2",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-date-range": "^2.0.1",

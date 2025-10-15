@@ -1,7 +1,6 @@
 "use client";
 import DropDown from "@/ui/form/select-dropdown";
 import TextInput from "@/ui/form/text-input";
-import Checkbox from "@/ui/form/checkbox";
 import TextareaInput from "@/ui/form/textarea";
 import TagInput from "@/ui/form/tag-input";
 import Heading from "@/ui/text-heading";
@@ -9,17 +8,9 @@ import Button from "@/ui/form/button";
 import RadioInput from "@/ui/form/radio";
 import DateInput from "@/ui/form/date-input";
 import BackButton from "@/ui/back-button";
+import DisaggregationComponent from "@/ui/disaggregation-component";
 
 export default function AddImpactIndicator() {
-  const checkboxLabels = [
-    "Department",
-    "State",
-    "Product",
-    "Tenure",
-    "Gender",
-    "Age",
-    "None",
-  ];
   return (
     <>
       <BackButton/>
@@ -123,21 +114,8 @@ export default function AddImpactIndicator() {
           isBigger
         />
 
-        {/* checkboxes */}
-        <div className="space-y-4">
-          <h4 className="font-bold leading-7 text-base">Disagreggation</h4>
-          <div className="grid grid-cols-2 gap-2">
-            {checkboxLabels.map((label, index) => (
-              <Checkbox
-                key={index}
-                label={label}
-                name={label}
-                isChecked={false}
-                onChange={() => {}}
-              />
-            ))}
-          </div>
-        </div>
+        {/* disaggregation */}
+        <DisaggregationComponent />
 
         {/* baseline */}
         <div className="space-y-1">

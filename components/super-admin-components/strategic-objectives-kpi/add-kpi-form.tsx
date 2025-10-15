@@ -4,9 +4,9 @@ import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
-import Checkbox from "@/ui/form/checkbox";
 import { useStrategicObjectivesAndKPIsState } from "@/store/admin-store/strategic-objectives-kpi-store";
 import Button from "@/ui/form/button";
+import DisaggregationComponent from "@/ui/disaggregation-component";
 
 type AddKPIFormProps = {
   isOpen: boolean;
@@ -21,10 +21,6 @@ export default function AddKPIModal({ isOpen, onClose }: AddKPIFormProps) {
     specificArea,
     unitOfMeasurement,
     itemInMeasure,
-    checkboxes,
-    checkboxLabels,
-    toggleCheckbox,
-    // setAllCheckboxes,
     setField,
   } = useStrategicObjectivesAndKPIsState();
 
@@ -80,26 +76,7 @@ export default function AddKPIModal({ isOpen, onClose }: AddKPIFormProps) {
             options={[]}
           />
           {/* checkboxes */}
-          <div className="space-y-4">
-            <h4 className="font-bold leading-7 text-base">Disagreggation</h4>
-            <div className="grid grid-cols-2 gap-2">
-              {checkboxLabels.map((label, index) => (
-                <Checkbox
-                  key={index}
-                  label={label}
-                  name={label}
-                  isChecked={checkboxes[index]}
-                  onChange={() => toggleCheckbox(index)}
-                />
-              ))}
-              {/* <Checkbox
-            label="None"
-            isChecked={allChecked}
-            name="none"
-            onChange={() => setAllCheckboxes(false)}
-            /> */}
-            </div>
-          </div>
+          <DisaggregationComponent/>
 
           <TextInput
             label="Baseline"

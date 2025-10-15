@@ -14,12 +14,6 @@ type StrategicObjectivesAndKPIsState = {
     unitOfMeasurement: string;
     itemInMeasure: string;
 
-    // checkboxes
-    checkboxes: boolean[]; // 7 items
-    checkboxLabels: string[]; // optional
-    toggleCheckbox: (index: number) => void;
-    setAllCheckboxes: (value: boolean) => void;
-
     setField: <K extends keyof StrategicObjectivesAndKPIsState>(key: K, value: StrategicObjectivesAndKPIsState[K]) => void;
     resetForm: () => void;
 }
@@ -34,30 +28,10 @@ const defaultFormState: Omit<StrategicObjectivesAndKPIsState, "setField" | "rese
     specificArea: "",
     unitOfMeasurement: "",
     itemInMeasure: "",
-    checkboxes: Array(7).fill(false),
-    checkboxLabels: [
-        "Department",
-        "State",
-        "Product",
-        "Tenure",
-        "Gender",
-        "Age",
-        "None",
-    ],
 }
 
 export const useStrategicObjectivesAndKPIsState = create<StrategicObjectivesAndKPIsState>((set) => ({
     ...defaultFormState,
-    toggleCheckbox: (index: number) =>
-      set((state) => {
-        const updated = [...state.checkboxes];
-        updated[index] = !updated[index];
-        return { checkboxes: updated };
-      }),
-
-    setAllCheckboxes: (value: boolean) =>
-      set(() => ({ checkboxes: Array(7).fill(value) })),
-    
     setField: <K extends keyof StrategicObjectivesAndKPIsState>(key: K, value: StrategicObjectivesAndKPIsState[K]) => set((state) => ({
         ...state,
         [key]: value,
