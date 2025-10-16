@@ -22,6 +22,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   const [error, setError] = useState<string | null>(null);
   const [roles, setRoles] = useState<RoleOption[]>([]);
   const [isFetchingRoles, setIsFetchingRoles] = useState(false);
+  const [layerOfApproval, setLayerOfApproval] = useState<string>("");
   
   const {
     fullName,
@@ -48,6 +49,18 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     {label: "Banking", value: "Banking"},
   ];
 
+  const layerOptions = [
+    {label: "Layer 1", value: "1"},
+    {label: "Layer 2", value: "2"},
+    {label: "Layer 3", value: "3"},
+    {label: "Layer 4", value: "4"},
+    {label: "Layer 5", value: "5"},
+  ];
+
+  // Check if selected role is "RETIREMENT MANAGER"
+  const selectedRole = roles.find(role => role.value === roleId);
+  const isRetirementManager = selectedRole?.label?.toUpperCase() === "RETIREMENT MANAGER";
+
   // Fetch roles from API
   useEffect(() => {
     const fetchRoles = async () => {
@@ -70,7 +83,12 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     }
   }, [token, isOpen]);
 
-  // console.log(roles)
+  // Reset layer of approval when role changes and it's not retirement manager
+  useEffect(() => {
+    if (!isRetirementManager) {
+      setLayerOfApproval("");
+    }
+  }, [isRetirementManager]);
 
   const addUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +110,8 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         department,
         phoneNumber,
         status,
-        assignedProjectId: ''
+        assignedProjectId: '',
+        ...(isRetirementManager && layerOfApproval && { layerOfApproval })
       };
 
       const response = await createUser(userData, token);
@@ -140,6 +159,8 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             isDisabled={isFetchingRoles}
             onChange={(value: string) => setField("roleId", value)}
           />
+          
+          
           <DropDown
             label="Department"
             options={departments}
@@ -165,6 +186,19 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             value={status}
             onChange={(value: string) => setField("status", value)}
           />
+          {/* Conditional Layer of Approval dropdown */}
+          {isRetirementManager && (
+            <div className="col-span-2">
+                <DropDown
+                  label="Layer of Approval"
+                  options={layerOptions}
+                  name="layerOfApproval"
+                  value={layerOfApproval}
+                  placeholder="Select layer"
+                  onChange={(value: string) => setLayerOfApproval(value)}
+                />
+            </div>
+          )}
           <div className="col-span-2">
             <TagInput
               label="Assigned Projects"
