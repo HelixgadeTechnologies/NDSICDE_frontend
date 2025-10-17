@@ -31,7 +31,7 @@ export default function ManagementStaffDashboardTable() {
       team: "Health Team",
     },
     {
-      projectCode: "PRJ001",
+      projectCode: "PRJ002",
       projectName: "Community Health Initiative",
       strategicObjective: "Improve Healthcare Access",
       status: "Completed",
@@ -40,7 +40,7 @@ export default function ManagementStaffDashboardTable() {
       team: "Health Team",
     },
     {
-      projectCode: "PRJ001",
+      projectCode: "PRJ003",
       projectName: "Community Health Initiative",
       strategicObjective: "Improve Healthcare Access",
       status: "On Hold",

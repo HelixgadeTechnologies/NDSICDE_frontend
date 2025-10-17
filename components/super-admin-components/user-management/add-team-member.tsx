@@ -50,11 +50,11 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   ];
 
   const layerOptions = [
-    {label: "Layer 1", value: "1"},
-    {label: "Layer 2", value: "2"},
-    {label: "Layer 3", value: "3"},
-    {label: "Layer 4", value: "4"},
-    {label: "Layer 5", value: "5"},
+    {label: "Project Manager (Layer 1)", value: "project-manager"},
+    {label: "Finance Team Member (Layer 2)", value: "finance-team"},
+    {label: "Finance Manager (Layer 3)", value: "finance manager"},
+    {label: "Country Director (Layer 4)", value: "country-director"},
+    {label: "All layers", value: "all-layers"},
   ];
 
   // Check if selected role is "RETIREMENT MANAGER"

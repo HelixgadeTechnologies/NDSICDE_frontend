@@ -9,6 +9,7 @@ import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRoleStore } from "@/store/role-store";
 import { year_options } from "@/lib/config/general-config";
+import Link from "next/link";
 
 export default function ProjectsTable() {
   const [query, setQuery] = useState("");
@@ -39,7 +40,7 @@ export default function ProjectsTable() {
     },
     {
       id: "2",
-      projectCode: "PRJ001",
+      projectCode: "PRJ002",
       projectName: "Community Health Initiative",
       strategicObjective: "Improve Healthcare Access",
       status: "Completed",
@@ -49,7 +50,7 @@ export default function ProjectsTable() {
     },
     {
       id: "3",
-      projectCode: "PRJ001",
+      projectCode: "PRJ003",
       projectName: "Community Health Initiative",
       strategicObjective: "Improve Healthcare Access",
       status: "On Hold",
@@ -111,7 +112,7 @@ export default function ProjectsTable() {
             <td className="px-4">{row.endDate}</td>
             <td className="px-4">{row.team}</td>
             <td className="px-4 relative">
-              <div className="flex justify-center items-center">
+              <div className="flex justify-center items-center"> 
                 <Icon
                   icon={"uiw:more"}
                   width={22}
@@ -133,10 +134,10 @@ export default function ProjectsTable() {
                     className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                   >
                     <ul className="text-sm">
-                      <li className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                      <Link href={`/projects/${row.id}`} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                         <Icon icon={"hugeicons:view"} height={20} width={20} />
                         View
-                      </li>
+                      </Link>
                       <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                         <Icon
                           icon={"ph:pencil-simple-line"}
