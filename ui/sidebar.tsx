@@ -21,7 +21,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
   const [openDropdowns, setOpenDropdowns] = useState<Set<number>>(new Set());
 
   if (!user) return null;
-  const sidebarConfig = getSidebarConfig(user.role);
+  const sidebarConfig = getSidebarConfig(user.role, pathname);
 
   const handleItemClick = (
     item: SidebarItem,

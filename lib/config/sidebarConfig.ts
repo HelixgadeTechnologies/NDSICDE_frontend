@@ -13,6 +13,94 @@ export interface SidebarConfig {
   items: SidebarItem[];
 }
 
+// Base items that appear in both contexts
+const getBaseItems = (): SidebarItem[] => [
+  {
+    id: "dashboard",
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: "lucide:home",
+  },
+  {
+    id: "organizational-kpi",
+    name: "Organizational KPI",
+    href: "/organizational-kpi",
+    icon: "carbon:result-new",
+  },
+];
+
+// Project context items
+const getProjectContextItems = (): SidebarItem[] => [
+  {
+    id: "result-dashboard",
+    name: "Result Dashboard",
+    href: "/result-dashboard",
+    icon: "carbon:result-old",
+  },
+  {
+    id: "financial-dashboard",
+    name: "Financial Dashboard",
+    href: "/financial-dashboard",
+    icon: "carbon:financial-assets",
+  },
+  {
+    id: "project-management",
+    name: "Project Management",
+    href: "/project-management",
+    icon: "iconoir:component",
+    children: [
+      {
+        id: "project-team",
+        name: "Project Team",
+        href: "/project-management/team",
+        icon: "",
+      },
+      {
+        id: "partner",
+        name: "Partner",
+        href: "/project-management/partner",
+        icon: "",
+      },
+      {
+        id: "impact",
+        name: "Impact",
+        href: "/project-management/impact",
+        icon: "",
+      },
+      {
+        id: "outcome",
+        name: "Outcome",
+        href: "/project-management/outcome",
+        icon: "",
+      },
+      {
+        id: "output",
+        name: "Output",
+        href: "/project-management/output",
+        icon: "",
+      },
+      {
+        id: "activity",
+        name: "Activity",
+        href: "/project-management/activity",
+        icon: "",
+      },
+      {
+        id: "logical-framework",
+        name: "Logical Framework",
+        href: "/project-management/logical-framework",
+        icon: "",
+      },
+      {
+        id: "request",
+        name: "Request",
+        href: "/project-management/request",
+        icon: "",
+      },
+    ],
+  },
+];
+
 export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
   "super-admin": {
     role: "super-admin",
@@ -129,183 +217,48 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
   },
 
   "team-member": {
-    role:  "team-member",
-    items: [
-      {
-        id: "dashboard",
-        name: "Dashboard",
-        href: "/dashboard",
-        icon: "lucide:home",
-      },
-      {
-        id: "project-management",
-        name: "Project Management",
-        href: "/project-management",
-        icon: "iconoir:component",
-        children: [
-          {
-            id: "project-team",
-            name: "Project Team",
-            href: "/project-management/team",
-            icon: "",
-          },
-          {
-            id: "partner",
-            name: "Partner",
-            href: "/project-management/partner",
-            icon: "",
-          },
-          {
-            id: "impact",
-            name: "Impact",
-            href: "/project-management/impact",
-            icon: "",
-          },
-          {
-            id: "outcome",
-            name: "Outcome",
-            href: "/project-management/outcome",
-            icon: "",
-          },
-          {
-            id: "output",
-            name: "Output",
-            href: "/project-management/output",
-            icon: "",
-          },
-          {
-            id: "activity",
-            name: "Activity",
-            href: "/project-management/activity",
-            icon: "",
-          },
-          {
-            id: "logical-framework",
-            name: "Logical Framework",
-            href: "/project-management/logical-framework",
-            icon: "",
-          },
-          {
-            id: "request",
-            name: "Request",
-            href: "/project-management/request",
-            icon: "",
-          },
-        ],
-      },
-      {
-        id: "result-dashboard",
-        name: "Result Dashboard",
-        href: "/result-dashboard",
-        icon: "carbon:result-old",
-      },
-      {
-        id: "organizational-kpi",
-        name: "Organizational KPI",
-        href: "/organizational-kpi",
-        icon: "carbon:result-new",
-      },
-      {
-        id: "financial-dashboard",
-        name: "Financial Dashboard",
-        href: "/financial-dashboard",
-        icon: "carbon:financial-assets",
-      },
-    ],
+    role: "team-member",
+    items: getBaseItems(),
   },
-  "admin": {
+
+  admin: {
     role: "admin",
-    items: [
-      {
-        id: "dashboard",
-        name: "Dashboard",
-        href: "/dashboard",
-        icon: "lucide:home",
-      },
-      {
-        id: "project-management",
-        name: "Project Management",
-        href: "/project-management",
-        icon: "iconoir:component",
-        children: [
-          {
-            id: "project-team",
-            name: "Project Team",
-            href: "/project-management/team",
-            icon: "",
-          },
-          {
-            id: "partner",
-            name: "Partner",
-            href: "/project-management/partner",
-            icon: "",
-          },
-          {
-            id: "impact",
-            name: "Impact",
-            href: "/project-management/impact",
-            icon: "",
-          },
-          {
-            id: "outcome",
-            name: "Outcome",
-            href: "/project-management/outcome",
-            icon: "",
-          },
-          {
-            id: "output",
-            name: "Output",
-            href: "/project-management/output",
-            icon: "",
-          },
-          {
-            id: "activity",
-            name: "Activity",
-            href: "/project-management/activity",
-            icon: "",
-          },
-          {
-            id: "logical-framework",
-            name: "Logical Framework",
-            href: "/project-management/logical-framework",
-            icon: "",
-          },
-          {
-            id: "request",
-            name: "Request",
-            href: "/project-management/request",
-            icon: "",
-          },
-        ],
-      },
-      {
-        id: "request-approvals",
-        name: "Request Approvals",
-        href: "/request-approvals",
-        icon: "mdi:approval",
-      },
-      {
-        id: "result-dashboard",
-        name: "Result Dashboard",
-        href: "/result-dashboard",
-        icon: "carbon:result-old",
-      },
-      {
-        id: "organizational-kpi",
-        name: "Organizational KPI",
-        href: "/organizational-kpi",
-        icon: "carbon:result-new",
-      },
-      {
-        id: "financial-dashboard",
-        name: "Financial Dashboard",
-        href: "/financial-dashboard",
-        icon: "carbon:financial-assets",
-      },
-    ],
-  }
+    items: getBaseItems(),
+  },
 };
 
-export const getSidebarConfig = (role: UserRole): SidebarConfig => {
-  return SIDEBAR_CONFIGS[role];
+export const getSidebarConfig = (
+  role: UserRole,
+  currentPath: string
+): SidebarConfig => {
+  const baseConfig = SIDEBAR_CONFIGS[role];
+
+  // Check if we're in a project context
+  const isProjectContext = currentPath.includes("/projects/");
+
+  // Handle team-member and admin roles with context switching
+  if (role === "team-member" && isProjectContext) {
+    return {
+      ...baseConfig,
+      items: [...getBaseItems(), ...getProjectContextItems()],
+    };
+  }
+
+  if (role === "admin" && isProjectContext) {
+    return {
+      ...baseConfig,
+      items: [
+        ...getBaseItems(),
+        {
+          id: "request-approvals",
+          name: "Request Approvals",
+          href: "/request-approvals",
+          icon: "mdi:approval",
+        },
+        ...getProjectContextItems(),
+      ],
+    };
+  }
+
+  return baseConfig;
 };

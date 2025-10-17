@@ -27,7 +27,7 @@ export default function ProjectsTable() {
     "Actions",
   ];
 
-  const data = [
+  const projects = [
     {
       id: "1",
       projectCode: "PRJ001",
@@ -99,7 +99,7 @@ export default function ProjectsTable() {
       </div>
       <Table
         tableHead={head}
-        tableData={data}
+        tableData={projects}
         idKey={"id"}
         checkbox
         renderRow={(row) => (
@@ -134,11 +134,11 @@ export default function ProjectsTable() {
                     className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                   >
                     <ul className="text-sm">
-                      <Link href={`/projects/${row.id}`} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                      <Link href={`/dashboard/projects/${row.id}`} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                         <Icon icon={"hugeicons:view"} height={20} width={20} />
-                        View
+                        Details
                       </Link>
-                      <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                      {/* <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                         <Icon
                           icon={"ph:pencil-simple-line"}
                           height={20}
@@ -153,7 +153,7 @@ export default function ProjectsTable() {
                           width={20}
                         />
                         Remove
-                      </li>}
+                      </li>} */}
                     </ul>
                   </motion.div>
                 </AnimatePresence>

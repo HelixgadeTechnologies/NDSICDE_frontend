@@ -10,27 +10,27 @@ export default function TeamMemberDashboard() {
   const dashboardData = [
     {
       title: "Total Projects",
-      value: 24,
+      value: 3,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "Team Assigned Projects",
-      value: 24,
+      value: 0,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "Active Projects",
-      value: 5,
+      value: 1,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "Completed Projects",
-      value: 5,
+      value: 1,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "On Hold Projects",
-      value: 5,
+      value: 1,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
   ];
