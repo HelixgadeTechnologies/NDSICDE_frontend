@@ -234,7 +234,8 @@ export const getSidebarConfig = (
   const baseConfig = SIDEBAR_CONFIGS[role];
 
   // Check if we're in a project context
-  const isProjectContext = currentPath.includes("/projects/");
+  const includedLinks = ["/projects/", "/result-dashboard", "/financial-dashboard", "/project-management"];
+const isProjectContext = includedLinks.some(link => currentPath.includes(link));
 
   // Handle team-member and admin roles with context switching
   if (role === "team-member" && isProjectContext) {
