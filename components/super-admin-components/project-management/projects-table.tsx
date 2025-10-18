@@ -9,19 +9,21 @@ import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { year_options } from "@/lib/config/general-config";
 import Link from "next/link";
+import { useRoleStore } from "@/store/role-store";
 
 export default function ProjectsTable() {
   const [query, setQuery] = useState("");
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const { user } = useRoleStore();
 
   const head = [
-    "Project Code",
     "Project Name",
-    "Strategic Objective",
+    "Project Code",
+    "SO Alignment",
     "Status",
     "Start Date",
     "End Date",
-    "Team",
+    "Thematic Area",
     "Actions",
   ];
 
@@ -104,11 +106,15 @@ export default function ProjectsTable() {
           <>
             <td className="px-4">{row.projectName}</td>
             <td className="px-4">{row.projectCode}</td>
-            <td className="px-4">{row.strategicObjective}</td>
+            <td className="px-4">
+               <DropDown name="so_alignment" value="" options={[]} onChange={() => {}}/>
+            </td>
             <td className="px-4">{row.status}</td>
             <td className="px-4">{row.startDate}</td>
             <td className="px-4">{row.endDate}</td>
-            <td className="px-4">{row.team}</td>
+            <td className="px-4">
+              <DropDown name="thematic_area" value="" options={[]} onChange={() => {}}/>
+            </td>
             <td className="px-4 relative">
               <div className="flex justify-center items-center"> 
                 <Icon
@@ -134,9 +140,9 @@ export default function ProjectsTable() {
                     <ul className="text-sm">
                       <Link href={`/dashboard/projects/${row.id}`} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                         <Icon icon={"hugeicons:view"} height={20} width={20} />
-                        Details
+                        View
                       </Link>
-                      {/* <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                      <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                         <Icon
                           icon={"ph:pencil-simple-line"}
                           height={20}
@@ -151,7 +157,7 @@ export default function ProjectsTable() {
                           width={20}
                         />
                         Remove
-                      </li>} */}
+                      </li>}
                     </ul>
                   </motion.div>
                 </AnimatePresence>

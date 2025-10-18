@@ -5,7 +5,7 @@ import Link from "next/link";
 export const metadata = {
   title: "404 - NDSICDE",
   description:
-    "Seems you've naviagted to the wrong page. Please click the button tohead back to the site.",
+    "Seems you've naviagted to the wrong page. Please click the button to head back to the site.",
 };
 
 export default function NotFound() {
