@@ -6,7 +6,7 @@ import {
   // Tooltip,
 } from "recharts";
 
-interface P {
+type P = {
   name: string;
   value: number;
 }

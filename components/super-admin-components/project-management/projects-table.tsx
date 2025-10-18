@@ -7,14 +7,12 @@ import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRoleStore } from "@/store/role-store";
 import { year_options } from "@/lib/config/general-config";
 import Link from "next/link";
 
 export default function ProjectsTable() {
   const [query, setQuery] = useState("");
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-  const { user } = useRoleStore();
 
   const head = [
     "Project Code",
