@@ -8,15 +8,29 @@ import Button from "@/ui/form/button";
 import RadioInput from "@/ui/form/radio";
 import DateInput from "@/ui/form/date-input";
 import DisaggregationComponent from "@/ui/disaggregation-component";
-import IndicatorSourceSelector from "@/ui/indicator-source-selector";
+import IndicatorSourceSelector, {
+  IndicatorSourceData,
+} from "@/ui/indicator-source-selector";
+import { useState } from "react";
 
 export default function AddImpactIndicator() {
+  const [indicatorSourceData, setIndicatorSourceData] =
+    useState<IndicatorSourceData | null>(null);
+
+  const handleIndicatorSourceChange = (data: IndicatorSourceData) => {
+    setIndicatorSourceData(data);
+    console.log("Indicator Source Data:", data);
+  };
   return (
     <div className="border border-[#E4E7EC] pt-8 px-6 pb-6 rounded-[10px] bg-white w-[624px]">
       <Heading heading="Add Output Indicator" className="text-center" />
       <form className="space-y-6 my-8">
         {/* indicator source */}
-        <IndicatorSourceSelector onChange={() => {}} />
+        <IndicatorSourceSelector
+          onChange={handleIndicatorSourceChange}
+          thematicAreaOptions={[]}
+          indicatorStatementOptions={[]}
+        />
 
         {/* link to indicator sdn */}
         <DropDown
