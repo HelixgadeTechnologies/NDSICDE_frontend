@@ -7,6 +7,7 @@ import DateInput from "@/ui/form/date-input";
 import Button from "@/ui/form/button";
 import Heading from "@/ui/text-heading";
 import TextareaInput from "@/ui/form/textarea";
+import { Icon } from "@iconify/react";
 
 type BudgetLine = {
   id: number;
@@ -15,7 +16,6 @@ type BudgetLine = {
   frequency: string;
   unitCost: string;
   budgetCode: string;
-  total: string;
 };
 
 type BudgetLineComponentProps = {
@@ -23,73 +23,72 @@ type BudgetLineComponentProps = {
   index: number;
   onRemove: (id: number) => void;
   onChange: (id: number, field: keyof BudgetLine, value: string) => void;
+  showRemove: boolean;
 };
 
-function BudgetLineComponent({ budgetLine, index, onRemove, onChange }: BudgetLineComponentProps) {
-  const calculateTotal = () => {
-    const qty = parseFloat(budgetLine.quantity) || 0;
-    const frq = parseFloat(budgetLine.frequency) || 0;
-    const unit = parseFloat(budgetLine.unitCost) || 0;
-    return (qty * frq * unit).toFixed(2);
-  };
-
+function BudgetLineComponent({ budgetLine, index, onRemove, onChange, showRemove }: BudgetLineComponentProps) {
   return (
-    <div className="space-y-4 p-4 rounded-lg relative">
-      <div className="flex justify-between items-center">
-        <p className="text-sm primary font-semibold">Budget Line Item #{index + 1}</p>
-        {index > 0 && (
-          <button
-            type="button"
-            onClick={() => onRemove(budgetLine.id)}
-            className="text-red-500 text-sm hover:text-red-700"
-          >
-            Remove
-          </button>
-        )}
+    <div className="flex items-end gap-2">
+      <div className="flex-1">
+        <TextInput
+          label={index === 0 ? "Activity Description" : ""}
+          name={`activityLineDescription-${budgetLine.id}`}
+          value={budgetLine.activityLineDescription}
+          onChange={(e) => onChange(budgetLine.id, 'activityLineDescription', e.target.value)}
+          placeholder="Description"
+        />
       </div>
       
-      <TextareaInput
-        label="Activity Line Description"
-        name={`activityLineDescription-${budgetLine.id}`}
-        value={budgetLine.activityLineDescription}
-        onChange={(e) => onChange(budgetLine.id, 'activityLineDescription', e.target.value)}
-      />
+      <div className="w-24">
+        <TextInput
+          label={index === 0 ? "Quantity" : ""}
+          name={`quantity-${budgetLine.id}`}
+          value={budgetLine.quantity}
+          onChange={(e) => onChange(budgetLine.id, 'quantity', e.target.value)}
+          placeholder="Qty"
+        />
+      </div>
       
-      <TextInput
-        label="Quantity"
-        name={`quantity-${budgetLine.id}`}
-        value={budgetLine.quantity}
-        onChange={(e) => onChange(budgetLine.id, 'quantity', e.target.value)}
-      />
+      <div className="w-28">
+        <TextInput
+          label={index === 0 ? "Frequency" : ""}
+          name={`frequency-${budgetLine.id}`}
+          value={budgetLine.frequency}
+          onChange={(e) => onChange(budgetLine.id, 'frequency', e.target.value)}
+          placeholder="Freq"
+        />
+      </div>
       
-      <TextInput
-        label="Frequency"
-        name={`frequency-${budgetLine.id}`}
-        value={budgetLine.frequency}
-        onChange={(e) => onChange(budgetLine.id, 'frequency', e.target.value)}
-      />
+      <div className="w-32">
+        <TextInput
+          label={index === 0 ? "Unit Cost (₦)" : ""}
+          name={`unitCost-${budgetLine.id}`}
+          value={budgetLine.unitCost}
+          onChange={(e) => onChange(budgetLine.id, 'unitCost', e.target.value)}
+          placeholder="Unit Cost"
+        />
+      </div>
       
-      <TextInput
-        label="Unit Cost (₦)"
-        name={`unitCost-${budgetLine.id}`}
-        value={budgetLine.unitCost}
-        onChange={(e) => onChange(budgetLine.id, 'unitCost', e.target.value)}
-      />
-      
-      <TextInput
-        label="Budget Code"
-        name={`budgetCode-${budgetLine.id}`}
-        value={budgetLine.budgetCode}
-        onChange={(e) => onChange(budgetLine.id, 'budgetCode', e.target.value)}
-      />
-      
-      <TextInput
-        label="Total (₦) - Automatically calculated (Qty × Frq × Unit cost)"
-        name={`total-${budgetLine.id}`}
-        value={calculateTotal()}
-        onChange={() => {}}
-        isDisabled
-      />
+      <div className="w-32">
+        <TextInput
+          label={index === 0 ? "Budget Code" : ""}
+          name={`budgetCode-${budgetLine.id}`}
+          value={budgetLine.budgetCode}
+          onChange={(e) => onChange(budgetLine.id, 'budgetCode', e.target.value)}
+          placeholder="Code"
+        />
+      </div>
+
+      {showRemove && (
+        <button
+          type="button"
+          onClick={() => onRemove(budgetLine.id)}
+          className="mb-2 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+          title="Remove line"
+        >
+          <Icon icon={"material-symbols:close-rounded"} height={20} width={20} />
+        </button>
+      )}
     </div>
   );
 }
@@ -107,7 +106,6 @@ export default function FormOne({ onNext }: FormOneProps) {
       frequency: "",
       unitCost: "",
       budgetCode: "",
-      total: "",
     },
   ]);
 
@@ -126,7 +124,6 @@ export default function FormOne({ onNext }: FormOneProps) {
         frequency: "",
         unitCost: "",
         budgetCode: "",
-        total: "",
       },
     ]);
   };
@@ -187,7 +184,10 @@ export default function FormOne({ onNext }: FormOneProps) {
         </div>
 
         {/* Budget Line Items */}
-        <div className="space-y-4">
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Budget Line Items
+          </label>
           {budgetLines.map((budgetLine, index) => (
             <BudgetLineComponent
               key={budgetLine.id}
@@ -195,14 +195,18 @@ export default function FormOne({ onNext }: FormOneProps) {
               index={index}
               onRemove={removeBudgetLine}
               onChange={updateBudgetLine}
+              showRemove={budgetLines.length > 1}
             />
           ))}
           
-          <Button
-            isSecondary
-            content="+ Add Budget Line Item"
+          <button
+            type="button"
             onClick={addBudgetLine}
-          />
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+          >
+            <Icon icon={"ic:round-plus"} height={18} width={18} />
+            Add Budget Line Item
+          </button>
         </div>
 
         {/* buttons */}

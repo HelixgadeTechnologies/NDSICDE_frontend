@@ -6,12 +6,116 @@ export interface SidebarItem {
   href: string;
   icon: string;
   children?: SidebarItem[];
+  isHeader?: boolean; // New property to identify header items
 }
 
 export interface SidebarConfig {
   role: UserRole;
   items: SidebarItem[];
 }
+
+// Base items that appear in both contexts
+const getBaseItems = (): SidebarItem[] => [
+  {
+    id: "dashboard",
+    name: "Home",
+    href: "/dashboard",
+    icon: "lucide:home",
+  },
+  {
+    id: "organizational-kpi",
+    name: "Organizational KPI",
+    href: "/organizational-kpi",
+    icon: "carbon:result-new",
+  },
+];
+
+const extractProjectId = (path: string): string | undefined => {
+  const match = path.match(/\/projects\/(\d+)/);
+  return match ? match[1] : undefined;
+};
+
+const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
+  const pid = projectId ?? "1"; // fallback if none
+  return [
+    {
+      id: "project-details-header",
+      name: "Project Details",
+      href: "#",
+      icon: "mdi:folder-outline",
+      isHeader: true,
+    },
+    {
+      id: "result-dashboard",
+      name: "Project Result Dashboard",
+      href: `/projects/${pid}`,
+      icon: "carbon:result-old",
+    },
+    {
+      id: "financial-dashboard",
+      name: "Financial Dashboard",
+      href: `/projects/${pid}/financial-dashboard`,
+      icon: "carbon:financial-assets",
+    },
+    {
+      id: "project-management",
+      name: "Project Management",
+      href: `/projects/${pid}/project-management`,
+      icon: "iconoir:component",
+      children: [
+        {
+          id: "project-team",
+          name: "Project Team",
+          href: `/projects/${pid}/project-management/team`,
+          icon: "",
+        },
+        {
+          id: "partner",
+          name: "Partner",
+          href: `/projects/${pid}/project-management/partner`,
+          icon: "",
+        },
+        {
+          id: "impact",
+          name: "Impact",
+          href: `/projects/${pid}/project-management/impact`,
+          icon: "",
+        },
+        {
+          id: "outcome",
+          name: "Outcome",
+          href: `/projects/${pid}/project-management/outcome`,
+          icon: "",
+        },
+        {
+          id: "output",
+          name: "Output",
+          href: `/projects/${pid}/project-management/output`,
+          icon: "",
+        },
+        {
+          id: "activity",
+          name: "Activity",
+          href: `/projects/${pid}/project-management/activity`,
+          icon: "",
+        },
+        {
+          id: "logical-framework",
+          name: "Logical Framework",
+          href: `/projects/${pid}/project-management/logical-framework`,
+          icon: "",
+        },
+        {
+          id: "request",
+          name: "Request",
+          href: `/projects/${pid}/project-management/request`,
+          icon: "",
+        },
+      ],
+    },
+  ];
+};
+
 
 export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
   "super-admin": {
@@ -129,183 +233,59 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
   },
 
   "team-member": {
-    role:  "team-member",
-    items: [
-      {
-        id: "dashboard",
-        name: "Home",
-        href: "/dashboard",
-        icon: "lucide:home",
-      },
-      {
-        id: "project-management",
-        name: "Project Management",
-        href: "/project-management",
-        icon: "iconoir:component",
-        children: [
-          {
-            id: "project-team",
-            name: "Project Team",
-            href: "/project-management/team",
-            icon: "",
-          },
-          {
-            id: "partner",
-            name: "Partner",
-            href: "/project-management/partner",
-            icon: "",
-          },
-          {
-            id: "impact",
-            name: "Impact",
-            href: "/project-management/impact",
-            icon: "",
-          },
-          {
-            id: "outcome",
-            name: "Outcome",
-            href: "/project-management/outcome",
-            icon: "",
-          },
-          {
-            id: "output",
-            name: "Output",
-            href: "/project-management/output",
-            icon: "",
-          },
-          {
-            id: "activity",
-            name: "Activity",
-            href: "/project-management/activity",
-            icon: "",
-          },
-          {
-            id: "logical-framework",
-            name: "Logical Framework",
-            href: "/project-management/logical-framework",
-            icon: "",
-          },
-          {
-            id: "request",
-            name: "Request",
-            href: "/project-management/request",
-            icon: "",
-          },
-        ],
-      },
-      {
-        id: "result-dashboard",
-        name: "Result Dashboard",
-        href: "/result-dashboard",
-        icon: "carbon:result-old",
-      },
-      {
-        id: "organizational-kpi",
-        name: "Organizational KPI",
-        href: "/organizational-kpi",
-        icon: "carbon:result-new",
-      },
-      {
-        id: "financial-dashboard",
-        name: "Financial Dashboard",
-        href: "/financial-dashboard",
-        icon: "carbon:financial-assets",
-      },
-    ],
+    role: "team-member",
+    items: getBaseItems(),
   },
-  "admin": {
+
+  admin: {
     role: "admin",
-    items: [
-      {
-        id: "dashboard",
-        name: "Home",
-        href: "/dashboard",
-        icon: "lucide:home",
-      },
-      {
-        id: "project-management",
-        name: "Project Management",
-        href: "/project-management",
-        icon: "iconoir:component",
-        children: [
-          {
-            id: "project-team",
-            name: "Project Team",
-            href: "/project-management/team",
-            icon: "",
-          },
-          {
-            id: "partner",
-            name: "Partner",
-            href: "/project-management/partner",
-            icon: "",
-          },
-          {
-            id: "impact",
-            name: "Impact",
-            href: "/project-management/impact",
-            icon: "",
-          },
-          {
-            id: "outcome",
-            name: "Outcome",
-            href: "/project-management/outcome",
-            icon: "",
-          },
-          {
-            id: "output",
-            name: "Output",
-            href: "/project-management/output",
-            icon: "",
-          },
-          {
-            id: "activity",
-            name: "Activity",
-            href: "/project-management/activity",
-            icon: "",
-          },
-          {
-            id: "logical-framework",
-            name: "Logical Framework",
-            href: "/project-management/logical-framework",
-            icon: "",
-          },
-          {
-            id: "request",
-            name: "Request",
-            href: "/project-management/request",
-            icon: "",
-          },
-        ],
-      },
-      {
-        id: "request-approvals",
-        name: "Request Approvals",
-        href: "/request-approvals",
-        icon: "mdi:approval",
-      },
-      {
-        id: "result-dashboard",
-        name: "Result Dashboard",
-        href: "/result-dashboard",
-        icon: "carbon:result-old",
-      },
-      {
-        id: "organizational-kpi",
-        name: "Organizational KPI",
-        href: "/organizational-kpi",
-        icon: "carbon:result-new",
-      },
-      {
-        id: "financial-dashboard",
-        name: "Financial Dashboard",
-        href: "/financial-dashboard",
-        icon: "carbon:financial-assets",
-      },
-    ],
-  }
+    items: getBaseItems(),
+  },
 };
 
-export const getSidebarConfig = (role: UserRole): SidebarConfig => {
-  return SIDEBAR_CONFIGS[role];
+// export const getSidebarConfig = (
+//   role: UserRole,
+//   currentPath: string
+// ): SidebarConfig => {
+//   const baseConfig = SIDEBAR_CONFIGS[role];
+
+//   // Check if we're in a project context
+//   const PROJECT_CONTEXT_ROUTES = [
+//     "/projects/",
+//     "/financial-dashboard",
+//     "/project-management/"
+//   ] as const;
+
+//   const isProjectContext = PROJECT_CONTEXT_ROUTES.some(route => 
+//     currentPath.includes(route)
+//   );
+
+//   // For admin, super-admin, and team-member: show unified project details sidebar
+//   if (isProjectContext && ["admin", "super-admin", "team-member"].includes(role)) {
+//     return {
+//       ...baseConfig,
+//       items: getProjectDetailsItems(),
+//     };
+//   }
+
+//   return baseConfig;
+// };
+
+export const getSidebarConfig = (
+  role: UserRole,
+  currentPath: string
+): SidebarConfig => {
+  const baseConfig = SIDEBAR_CONFIGS[role];
+  const projectId = extractProjectId(currentPath);
+
+  const isProjectContext = currentPath.includes("/projects/");
+
+  if (isProjectContext && ["admin", "super-admin", "team-member"].includes(role)) {
+    return {
+      ...baseConfig,
+      items: getProjectDetailsItems(projectId),
+    };
+  }
+
+  return baseConfig;
 };

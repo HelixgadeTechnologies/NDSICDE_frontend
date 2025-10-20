@@ -51,67 +51,67 @@ export const breadcrumbs = [
     header: "Request and Retirement",
   },
   {
-    href: "/project-management/team",
+    href: "/projects/[id]/project-management/team",
     header: "Project Team",
   },
   {
-    href: "/project-management/partner",
+    href: "/projects/[id]/project-management/partner",
     header: "Project Partners",
   },
   {
-    href: "/project-management/impact",
+    href: "/projects/[id]/project-management/impact",
     header: "Project Impact",
   },
   {
-    href: "/project-management/impact/indicator",
+    href: "/projects/[id]/project-management/impact/indicator",
     header: "Impact Indicator",
   },
   {
-    href: "/project-management/impact/indicator/actual-value/view",
+    href: "/projects/[id]/project-management/impact/indicator/actual-value/view",
     header: "Indicator Reporting Format and Attributes",
   },
   {
-    href: "/project-management/outcome",
+    href: "/projects/[id]/project-management/outcome",
     header: "Project Outcome",
   },
   {
-    href: "/project-management/outcome/indicator",
+    href: "/projects/[id]/project-management/outcome/indicator",
     header: "Outcome Indicator"
   },
   {
-    href: "/project-management/outcome/indicator/actual-value/view",
+    href: "/projects/[id]/project-management/outcome/indicator/actual-value/view",
     header: "Indicator Reporting Format and Attributes",
   },
   {
-    href: "/project-management/output",
+    href: "/projects/[id]/project-management/output",
     header: "Project Output",
   },
   {
-    href: "/project-management/output/indicator",
+    href: "/projects/[id]/project-management/output/indicator",
     header: "Output Indicator"
   },
   {
-    href: "/project-management/output/indicator/actual-value/view",
+    href: "/projects/[id]/project-management/output/indicator/actual-value/view",
     header: "Indicator Reporting Format and Attributes",
   },
   {
-    href: "/project-management/activity",
+    href: "/projects/[id]/project-management/activity",
     header: "Activity",
   },
   {
-    href: "/project-management/activity/report-actual-value",
+    href: "/projects/[id]/project-management/activity/report-actual-value",
     header: "Activity Reporting Format and Attributes",
   },
   {
-    href: "/project-management/logical-framework",
+    href: "/projects/[id]/project-management/logical-framework",
     header: "Logical Framework",
   },
   {
-    href: "/project-management/request",
+    href: "/projects/[id]/project-management/request",
     header: "Activity Request",
   },
   {
-    href: "/project-management/request/retire",
+    href: "/projects/[id]/project-management/request/retire",
     header: "Retirement",
   },
   {
@@ -119,7 +119,7 @@ export const breadcrumbs = [
     header: "Result Dashboard: Indicator Calculation and Analysis",
   },
   {
-    href: "/financial-dashboard",
+    href: "/projects/[id]/financial-dashboard",
     header: "Project Activity/Finance Dashboard",
   },
   {

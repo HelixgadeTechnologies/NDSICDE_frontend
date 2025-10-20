@@ -23,7 +23,7 @@ export default function ProjectsTable() {
     "Status",
     "Start Date",
     "End Date",
-    "Thematic Area",
+    "Thematic Areas",
     "Actions",
   ];
 
@@ -104,17 +104,15 @@ export default function ProjectsTable() {
         checkbox
         renderRow={(row) => (
           <>
-            <td className="px-4">{row.projectName}</td>
-            <td className="px-4">{row.projectCode}</td>
             <td className="px-4">
-               <DropDown name="so_alignment" value="" options={[]} onChange={() => {}}/>
+              <Link href={`/projects/${row.id}`} className="hover:underline">{row.projectName}</Link>
             </td>
+            <td className="px-4">{row.projectCode}</td>
+            <td className="px-4">{row.strategicObjective}</td>
             <td className="px-4">{row.status}</td>
             <td className="px-4">{row.startDate}</td>
             <td className="px-4">{row.endDate}</td>
-            <td className="px-4">
-              <DropDown name="thematic_area" value="" options={[]} onChange={() => {}}/>
-            </td>
+            <td className="px-4">{row.team}</td>
             <td className="px-4 relative">
               <div className="flex justify-center items-center"> 
                 <Icon
@@ -138,10 +136,6 @@ export default function ProjectsTable() {
                     className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
                   >
                     <ul className="text-sm">
-                      <Link href={`/dashboard/projects/${row.id}`} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
-                        <Icon icon={"hugeicons:view"} height={20} width={20} />
-                        View
-                      </Link>
                       <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                         <Icon
                           icon={"ph:pencil-simple-line"}

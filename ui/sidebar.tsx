@@ -8,7 +8,7 @@ import { Icon } from "@iconify/react";
 import { useRoleStore } from "@/store/role-store";
 import { getSidebarConfig, SidebarItem } from "@/lib/config/sidebarConfig";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BaseSidebarProps {
   className?: string;
@@ -21,14 +21,20 @@ export default function Sidebar({ className }: BaseSidebarProps) {
   const [openDropdowns, setOpenDropdowns] = useState<Set<number>>(new Set());
 
   if (!user) return null;
-  const sidebarConfig = getSidebarConfig(user.role);
+  const sidebarConfig = getSidebarConfig(user.role, pathname);
 
   const handleItemClick = (
     item: SidebarItem,
     index: number,
     e: React.MouseEvent
   ) => {
-    // If item has children, redirect to first child route and toggle dropdown
+    // If item is a header, do nothing
+    if (item.isHeader) {
+      e.preventDefault();
+      return;
+    }
+
+    // If item has children, toggle dropdown
     if (item.children && item.children.length > 0) {
       e.preventDefault();
       e.stopPropagation();
@@ -42,12 +48,10 @@ export default function Sidebar({ className }: BaseSidebarProps) {
         }
         return newSet;
       });
-      // redirect(item.children[0].href); // can change later on
     }
 
     // Regular navigation for items without children
     closeMobile();
-    // console.log(`Navigating to ${item.href}`);
   };
 
   const handleChildClick = (child: SidebarItem) => {
@@ -87,9 +91,33 @@ export default function Sidebar({ className }: BaseSidebarProps) {
         <section className="flex flex-col justify-between h-full w-full mt-10">
           <div className="space-y-1 border-b border-gray-200 pb-2">
             {sidebarConfig.items.map((nav, index) => {
-              const isActive = pathname.startsWith(nav.href);
+              // Special handling for project result dashboard to match any project ID
+              const isActive =
+                pathname === nav.href ||
+                (pathname.startsWith(nav.href + "/") &&
+                  !pathname.includes("/financial-dashboard") && !pathname.includes("/project-management/"));
               const isDropdownOpen = openDropdowns.has(index);
               const hasChildren = nav.children && nav.children.length > 0;
+
+              // Render header differently
+              if (nav.isHeader) {
+                return (
+                  <div
+                    key={index}
+                    className="h-9 w-full px-4 py-2 flex items-center gap-2 mt-4 mb-2"
+                  >
+                    <Icon
+                      icon={nav.icon}
+                      width={18}
+                      height={18}
+                      color="#404040"
+                    />
+                    <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      {nav.name}
+                    </span>
+                  </div>
+                );
+              }
 
               return (
                 <div key={index}>
@@ -149,11 +177,12 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                   {hasChildren && isDropdownOpen && (
                     <AnimatePresence>
                       <motion.div
-                      initial={{ y: -10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}  
-                      exit={{ y: -10, opacity: 0 }}  
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="ml-6 mt-1 space-y-1 overflow-y-scroll sidebar">
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -10, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="ml-6 mt-1 space-y-1 overflow-y-scroll sidebar"
+                      >
                         {nav.children!.map((child, childIndex) => {
                           const isChildActive = pathname.startsWith(child.href);
                           return (

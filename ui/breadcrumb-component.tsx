@@ -20,8 +20,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const pathname = usePathname();
   const { user } = useRoleStore();
 
-  const matched = breadcrumbs.find((item) => pathname === item.href);
-  console.log(pathname);
+  const matched = breadcrumbs.find((item) => pathname.startsWith(item.href));
 
   const { setAddTeamMember, addTeamMember, handleAddUser } =
     useTeamMemberModal();

@@ -9,7 +9,7 @@ export const metadata = {
 export default function FinancialDashboard() {
   const dashboardData = [
     {
-      title: "Total Projects",
+      title: "Total Budget",
       value: 24,
       percentage: 20,
       percentInfo: "from last month",
@@ -23,7 +23,7 @@ export default function FinancialDashboard() {
       icon: "material-symbols:planner-review-rounded",
     },
     {
-      title: "On Budget",
+      title: "Burn Rate",
       value: 8,
       percentage: 33,
       percentInfo: "of total projects",
