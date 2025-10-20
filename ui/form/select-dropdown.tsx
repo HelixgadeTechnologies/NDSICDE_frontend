@@ -76,7 +76,7 @@ export default function DropDown({
         onClick={handleToggle}
         className={`${
           isBigger ? "h-12" : "h-10"
-        } min-w-full md:w-fit outline-none border border-[#B6D8FF] focus:border-[var(--primary-light)] hover:border-[var(--primary-light)] rounded-[6px] px-4 text-sm flex items-center justify-between gap-5 bg-white transition-colors duration-200 ${isDisabled ? 'cursor-not-allowed text-gray-400' : 'cursor-pointer'}`}
+        } min-w-full md:w-fit outline-none border border-[#B6D8FF] focus:border-[var(--primary-light)] rounded-[6px] px-4 text-sm flex items-center justify-between gap-5 bg-white transition-colors duration-200 ${isDisabled ? 'cursor-not-allowed text-gray-400 border-gray-200' : 'cursor-pointer hover:border-[var(--primary-light)] '}`}
       >
         <span className="text-gray-500 whitespace-nowrap">{displayValue}</span>
         <Icon
@@ -92,7 +92,7 @@ export default function DropDown({
 
       {/* Dropdown menu */}
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && !isDisabled && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}

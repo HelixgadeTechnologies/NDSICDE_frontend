@@ -1,13 +1,14 @@
 "use client";
 import DropDown from "@/ui/form/select-dropdown";
+import RadioInput from "@/ui/form/radio";
 import TextInput from "@/ui/form/text-input";
 import TextareaInput from "@/ui/form/textarea";
 import TagInput from "@/ui/form/tag-input";
 import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
-import RadioInput from "@/ui/form/radio";
 import DateInput from "@/ui/form/date-input";
 import DisaggregationComponent from "@/ui/disaggregation-component";
+import IndicatorSourceSelector from "@/ui/indicator-source-selector";
 
 export default function AddImpactIndicator() {
   return (
@@ -15,47 +16,7 @@ export default function AddImpactIndicator() {
       <Heading heading="Add Impact Indicator" className="text-center" />
       <form className="space-y-6 my-8">
         {/* indicator source */}
-        <div className="space-y-1">
-          <p className="text-[#101928] text-sm font-medium">Indicator Source</p>
-          <div className="flex items-center gap-2">
-            <RadioInput
-              label="Organization KPI"
-              value="organizational-kpi"
-              name="indicatorSource"
-              is_checked
-              onChange={() => {}}
-            />
-            <RadioInput
-              label="Custom Indicator"
-              value="custom-indicator"
-              name="indicatorSource"
-              is_checked
-              onChange={() => {}}
-            />
-          </div>
-        </div>
-
-        {/* thematic area/pillar */}
-        <DropDown
-          label="Thematic Area/Pillar"
-          value=""
-          name="thematicAreaPillar"
-          placeholder="---"
-          onChange={() => {}}
-          options={[]}
-          isBigger
-        />
-
-        {/* indicator statement */}
-        <DropDown
-          label="Indicator Statement"
-          value=""
-          name="indicatorStatement"
-          placeholder="---"
-          onChange={() => {}}
-          options={[]}
-          isBigger
-        />
+        <IndicatorSourceSelector onChange={() => {}}/>
 
         {/* link to indicator sdn */}
         <DropDown

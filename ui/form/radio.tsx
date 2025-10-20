@@ -4,13 +4,13 @@ type RadioProps = {
   value: string;
   name: string;
   is_checked: boolean;
-  onChange: () => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   label?: string;
 };
 
 export default function RadioInput({ value, name, is_checked, onChange, label }: RadioProps) {
   return (
-    <label key={value} className="flex items-center gap-1">
+    <label key={value} className="flex items-center gap-1 cursor-pointer">
       <input
         type="radio"
         name={name}

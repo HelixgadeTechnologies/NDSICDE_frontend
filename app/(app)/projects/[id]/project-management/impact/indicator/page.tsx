@@ -5,7 +5,6 @@ import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
-import BackButton from "@/ui/back-button";
 import Link from "next/link";
 
 export default function ImpactIndicator() {
