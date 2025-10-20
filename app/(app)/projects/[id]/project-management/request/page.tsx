@@ -59,7 +59,7 @@ export default function ProjectRequest() {
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
-        <Button content="Add Activity Request" icon="si:add-fill" href="/project-management/request/add" />
+        <Button content="Add Activity Request" icon="si:add-fill" href="/projects/1/project-management/request/add" />
       </div>
 
       <CardComponent>
@@ -127,7 +127,7 @@ export default function ProjectRequest() {
                           Remove
                         </li>
                         <Link
-                          href={"/project-management/request/retire"}
+                          href={"/projects/1/project-management/request/retire"}
                           className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center"
                         >
                           <Icon icon={"si:add-fill"} height={20} width={20} />

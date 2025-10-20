@@ -48,7 +48,6 @@ export default function ProjectRequestRetirementPage() {
   ];
   return (
     <div className="relative mt-12">
-      <BackButton/>
       <div className="absolute right-0 -top-[75px]">
         <Button
           content="Add Retirement"

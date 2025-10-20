@@ -16,11 +16,28 @@ type Props = {
   fallbackSubtitle?: string;
 };
 
+// Utility to extract project ID from the pathname
+const extractProjectId = (pathname: string): string | undefined => {
+  const match = pathname.match(/\/projects\/(\d+)/);
+  return match ? match[1] : undefined;
+};
+
 export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const pathname = usePathname();
   const { user } = useRoleStore();
+  const projectId = extractProjectId(pathname);
 
-  const matched = breadcrumbs.find((item) => pathname.startsWith(item.href));
+  if (!user) return null;
+
+  // Find matching breadcrumb
+  const matched = breadcrumbs.find((item) => {
+    // Convert [id] to actual project ID in regex
+    let pattern = item.href;
+    if (projectId) pattern = pattern.replace("[id]", projectId);
+    const regex = new RegExp(`^${pattern}`);
+    return regex.test(pathname);
+  });
+
 
   const { setAddTeamMember, addTeamMember, handleAddUser } =
     useTeamMemberModal();

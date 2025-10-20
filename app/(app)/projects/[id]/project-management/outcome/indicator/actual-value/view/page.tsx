@@ -42,11 +42,10 @@ export default function ViewActualValue() {
         <Button
           content="Add Indicator Reporting Formats"
           icon="si:add-fill"
-          href="/project-management/outcome/indicator/actual-value/report"
+          href="/projects/1/project-management/outcome/indicator/actual-value/report"
         />
       </div>
 
-      <BackButton/>
       <CardComponent>
         <Table
           tableHead={head}

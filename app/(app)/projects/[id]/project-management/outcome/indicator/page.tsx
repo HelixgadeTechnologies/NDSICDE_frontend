@@ -5,7 +5,6 @@ import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
-import BackButton from "@/ui/back-button";
 import Link from "next/link";
 
 export default function ImpactIndicator() {
@@ -44,8 +43,6 @@ export default function ImpactIndicator() {
     },
   ];
   return (
-    <>
-      <BackButton />
       <CardComponent>
         <Table
           tableHead={head}
@@ -99,7 +96,7 @@ export default function ImpactIndicator() {
                           />
                           Remove
                         </li>
-                        <Link href={"/project-management/outcome/indicator/actual-value/report"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                        <Link href={"/projects/1/project-management/outcome/indicator/actual-value/report"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                           <Icon icon={"si:add-fill"} height={20} width={20} />
                           Report Actual Value
                         </Link>
@@ -112,6 +109,5 @@ export default function ImpactIndicator() {
           )}
         />
       </CardComponent>
-    </>
   );
 }

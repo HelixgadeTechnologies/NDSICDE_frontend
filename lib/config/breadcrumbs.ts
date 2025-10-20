@@ -114,10 +114,10 @@ export const breadcrumbs = [
     href: "/projects/[id]/project-management/request/retire",
     header: "Retirement",
   },
-  {
-    href: "/result-dashboard",
-    header: "Result Dashboard: Indicator Calculation and Analysis",
-  },
+  // {
+  //   href: "/projects/[id]",
+  //   header: "Project Result Dashboard: Indicator Calculation and Analysis",
+  // },
   {
     href: "/projects/[id]/financial-dashboard",
     header: "Project Activity/Finance Dashboard",

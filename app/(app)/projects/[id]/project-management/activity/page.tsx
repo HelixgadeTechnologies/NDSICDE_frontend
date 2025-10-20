@@ -58,7 +58,7 @@ export default function ProjectActivity() {
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
-        <Button content="Add Activity" icon="si:add-fill" href="/project-management/activity/add" />
+        <Button content="Add Activity" icon="si:add-fill" href="/projects/1/project-management/activity/add" />
       </div>
 
       <CardComponent>
@@ -127,7 +127,7 @@ export default function ProjectActivity() {
                         </li>
                         <Link
                           href={
-                            "/project-management/activity/report-actual-value"
+                            "/projects/1/project-management/activity/report-actual-value"
                           }
                           className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center"
                         >

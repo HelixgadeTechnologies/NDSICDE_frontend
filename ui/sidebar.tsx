@@ -142,8 +142,8 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                       <Icon
                         icon={
                           isDropdownOpen
-                            ? "solar:alt-arrow-down-linear"
-                            : "solar:alt-arrow-up-linear"
+                            ? "solar:alt-arrow-up-linear"
+                            : "solar:alt-arrow-down-linear"
                         }
                         height={16}
                         width={16}

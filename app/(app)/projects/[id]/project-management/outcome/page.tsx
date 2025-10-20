@@ -128,11 +128,11 @@ export default function ProjectOutcome() {
                           />
                           Remove
                         </li>
-                        <Link href={"/project-management/outcome/indicator/add"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                        <Link href={"/projects/1/project-management/outcome/indicator/add"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                           <Icon icon={"si:add-fill"} height={20} width={20} />
                           Add Indicator
                         </Link>
-                        <Link href={"/project-management/outcome/indicator"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+                        <Link href={"/projects/1/project-management/outcome/indicator"} className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"hugeicons:view"}
                             height={20}

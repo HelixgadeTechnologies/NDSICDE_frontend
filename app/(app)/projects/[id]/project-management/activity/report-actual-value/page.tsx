@@ -1,6 +1,5 @@
 "use client";
 
-import BackButton from "@/ui/back-button";
 import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
 import Table from "@/ui/table";
@@ -42,7 +41,6 @@ export default function ReportActualValue() {
   ];
   return (
     <div className="relative mt-12">
-        <BackButton/>
       <div className="absolute right-0 -top-[75px]">
         <Button content="Add Indicator Reporting Formats" icon="si:add-fill" />
       </div>

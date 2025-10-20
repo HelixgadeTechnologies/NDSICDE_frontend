@@ -1,6 +1,5 @@
 "use client";
 
-import BackButton from "@/ui/back-button";
 import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
 import DateInput from "@/ui/form/date-input";
@@ -14,7 +13,6 @@ import Heading from "@/ui/text-heading";
 export default function AddProjectActivity() {
   return (
     <div className="w-[624px]">
-      <BackButton />
       <CardComponent>
         <Heading
           heading="Project Activities, Format and Attributes"

@@ -6,7 +6,6 @@ import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
-import BackButton from "@/ui/back-button";
 
 export default function ViewActualValue() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -42,11 +41,10 @@ export default function ViewActualValue() {
         <Button
           content="Add Indicator Reporting Formats"
           icon="si:add-fill"
-          href="/project-management/impact/indicator/actual-value/report"
+          href="/projects/1/project-management/impact/indicator/actual-value/report"
         />
       </div>
 
-      <BackButton/>
       <CardComponent>
         <Table
           tableHead={head}

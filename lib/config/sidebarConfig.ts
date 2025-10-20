@@ -239,7 +239,12 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
 
   admin: {
     role: "admin",
-    items: getBaseItems(),
+    items: [ ...getBaseItems(),  {
+        id: "request-approvals",
+        name: "Request Approvals",
+        href: "/request-approvals",
+        icon: "mdi:approval",
+      },],
   },
 };
 

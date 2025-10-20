@@ -7,14 +7,11 @@ import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
 import RadioInput from "@/ui/form/radio";
 import DateInput from "@/ui/form/date-input";
-import BackButton from "@/ui/back-button";
 import DisaggregationComponent from "@/ui/disaggregation-component";
 
 export default function AddImpactIndicator() {
 
   return (
-    <>
-      <BackButton/>
     <div className="border border-[#E4E7EC] pt-8 px-6 pb-6 rounded-[10px] bg-white w-[624px]">
       <Heading heading="Add Output Indicator" className="text-center" />
       <form className="space-y-6 my-8">
@@ -216,6 +213,5 @@ export default function AddImpactIndicator() {
         </div>
       </form>
     </div>
-    </>
   );
 }
