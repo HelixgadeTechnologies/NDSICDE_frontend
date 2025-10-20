@@ -19,7 +19,7 @@ export default function AddImpactIndicator() {
 
   const handleIndicatorSourceChange = (data: IndicatorSourceData) => {
     setIndicatorSourceData(data);
-    console.log("Indicator Source Data:", data);
+    console.log("Indicator Source Data:", data, indicatorSourceData);
   };
   return (
     <div className="border border-[#E4E7EC] pt-8 px-6 pb-6 rounded-[10px] bg-white w-[624px]">
