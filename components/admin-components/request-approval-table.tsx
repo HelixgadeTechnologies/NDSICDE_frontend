@@ -91,7 +91,7 @@ export default function RequestApprovalsTable() {
           idKey={"id"}
           renderRow={(row) => (
             <>
-              <td className="px-6">{row.description}</td>
+              <td className="px-6 cursor-pointer hover:underline" onClick={handleModalOpen}>{row.description}</td>
               <td className="px-6">{row.totalBudget}</td>
               <td className="px-6">{row.responsiblePersons}</td>
               <td className="px-6">{row.project}</td>
@@ -182,13 +182,11 @@ export default function RequestApprovalsTable() {
             onChange={() => {}}
             options={[]}
           />
-           <DropDown
+           <SearchInput
             value=""
             name="journalId"
             placeholder="All Journal IDs"
-            label="Journal ID"
             onChange={() => {}}
-            options={[]}
           />
           <DateRangePicker label="Date" />
         </div>

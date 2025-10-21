@@ -93,7 +93,7 @@ export default function SubmitAndReview({ onBack, onSubmit }: FormTwoProps) {
           </div>
 
           <Heading
-            heading="Request and Retirement"
+            heading="Journey Management"
             subtitle="Community Health Initiative - Submitted on May 15, 2023 at 10:30"
           />
 

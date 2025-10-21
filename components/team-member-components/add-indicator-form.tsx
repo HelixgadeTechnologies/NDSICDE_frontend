@@ -32,7 +32,6 @@ function TargetComponent({
   target,
   index,
   onRemove,
-  onChange,
   showRemove,
 }: TargetComponentProps) {
   return (
