@@ -38,6 +38,12 @@ const extractProjectId = (path: string): string | undefined => {
 const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
   const pid = projectId ?? "1"; // fallback if none
   return [
+     {
+    id: "dashboard",
+    name: "Home",
+    href: "/dashboard",
+    icon: "lucide:home",
+  },
     {
       id: "project-details-header",
       name: "Project Details",

@@ -104,7 +104,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                 return (
                   <div
                     key={index}
-                    className="h-9 w-full px-4 py-2 flex items-center gap-2 mt-4 mb-2"
+                    className="h-9 w-full px-4 py-2 flex items-center gap-2 mb-2"
                   >
                     <Icon
                       icon={nav.icon}
