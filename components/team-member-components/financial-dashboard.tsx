@@ -4,142 +4,15 @@ import CardComponent from "@/ui/card-wrapper";
 import DateRangePicker from "@/ui/form/date-range";
 import DropDown from "@/ui/form/select-dropdown";
 import LineChartComponent from "@/ui/line-chart";
-import TabComponent from "@/ui/tab-component";
-import Table from "@/ui/table";
 import Heading from "@/ui/text-heading";
 import { PieChart, ResponsiveContainer, Pie, Cell } from "recharts";
-import { motion, AnimatePresence } from "framer-motion"
 import { useState } from "react";
-import BarChartComponent from "@/ui/bar-chart";
+import ImplementationTimeAnalysisComponent from "./ita-component";
+import CPIComponent from "./cpi-component";
+import SPIComponnet from "./spi-component";
 
-function ITAChart() {
-  const lines = [
-    { key: "actual", label: "Actual", color: "#003B99" },
-    { key: "planned", label: "Planned", color: "#EF4444" },
-  ];
-
-  const data = [
-    { name: "Task 1", actual: 45, planned: 55 },
-    { name: "Task 2", actual: 75, planned: 60 },
-    { name: "Task 3", actual: 30, planned: 15 },
-    { name: "Task 4", actual: 50, planned: 80 },
-    { name: "Task 5", actual: 40, planned: 30 },
-    { name: "Task 6", actual: 78, planned: 60 },
-  ];
-
-  return (
-    <div className="h-[260px] mt-4 mr-4">
-      <LineChartComponent data={data} lines={lines} xKey="name" legend />
-    </div>
-  );
-}
-
-function ITATable() {
-  const head = [
-    "Activity Description",
-    "Total Activity Planned Days",
-    "Total Activity Spent Days",
-    "(Days Spent) %",
-    "Earned Value (EV)",
-    "Planned Value (EV)",
-    "Status",
-    "Cost Variance",
-  ];
-
-  const data = [
-    {
-      activityDescription: "Activity Description",
-      totalActivityPlannedDays: 65,
-      totalActivitySpentDays: 40,
-      daysSpent: 32,
-      earnedValue: 10,
-      plannedValue: 78,
-      status: "Due to Start",
-      costVariance: 20,
-    },
-    {
-      activityDescription: "Activity Description",
-      totalActivityPlannedDays: 65,
-      totalActivitySpentDays: 40,
-      daysSpent: 32,
-      earnedValue: 10,
-      plannedValue: 78,
-      status: "Due to Start",
-      costVariance: 20,
-    },
-  ];
-
-  return (
-    <div className="mt-5">
-      <Table
-        tableHead={head}
-        tableData={data}
-        renderRow={(row) => (
-          <>
-            <td className="px-6">{row.activityDescription}</td>
-            <td className="px-6">{row.totalActivityPlannedDays}</td>
-            <td className="px-6">{row.totalActivitySpentDays}</td>
-            <td className="px-6">{row.daysSpent}</td>
-            <td className="px-6">{row.earnedValue}</td>
-            <td className="px-6">{row.plannedValue}</td>
-            <td className="px-6">{row.status}</td>
-            <td className="px-6">{row.costVariance}</td>
-          </>
-        )}
-      />
-    </div>
-  );
-}
-
-const data = [
-  { name: "Project 1", value: 80 },
-  { name: "Project 2", value: 90 },
-  { name: "Project 3", value: 80 },
-  { name: "Project 4", value: 50 },
-  { name: "Project 5", value: 80 },
-  { name: "Project 6", value: 80 },
-  { name: "Project 7", value: 90 },
-  { name: "Project 8", value: 50 },
-];
-
-const colorsSpi = ["#0047AB", "#F44336", "#FBC02D"];
-  const colorsCpi = ["#F44336", "#FBC02D", "#0047AB", "#22C55E",];
-
-function CPI() {
-  return (
-    <div className="h-[300px] mt-5">
-      <BarChartComponent
-        data={data}
-        isSingleBar={true}
-        colors={colorsCpi}
-        xKey="name"
-        labels={["Under Budget",  "As Planned", "No Spending", "Over Budget"]}
-        />
-    </div>
-  );
-}
-
-function SPI() {
-  return (
-    <div className="h-[300px] mt-5">
-      <BarChartComponent
-        data={data}
-        isSingleBar={true}
-        colors={colorsSpi}
-        xKey="name"
-        labels={["Behind Schedule", "Ahead of Schedule", "On Schedule"]}
-        />
-    </div>
-  );
-}
 
 export default function ActivityOverview() {
-  const [activeTab, setActiveTab] = useState(1);
-
-  const tabs = [
-    {tabName: "CPI", id: 1},
-    {tabName: "SPI", id: 2},
-  ];
 
   const budgetUilization = [
     { name: "Due to Start", value: 23 },
@@ -203,38 +76,7 @@ export default function ActivityOverview() {
       </CardComponent>
 
       {/* implementation time analysis */}
-      <div className="space-y-4">
-        <TabComponent
-          width="240px"
-          data={[
-            { tabName: "Charts", id: 1 },
-            { tabName: "Table", id: 2 },
-          ]}
-          renderContent={(tabId) => {
-            if (tabId === 1) {
-              return (
-                <CardComponent>
-                  <Heading
-                    heading="Implementation Time Analysis"
-                    subtitle="Planned vs. actual timeline for project activities"
-                  />
-                  <ITAChart />
-                </CardComponent>
-              );
-            } else {
-              return (
-                <CardComponent>
-                  <Heading
-                    heading="Implementation Time Analysis"
-                    subtitle="Planned vs. actual timeline for project activities"
-                  />
-                  <ITATable />
-                </CardComponent>
-              );
-            }
-          }}
-        />
-      </div>
+     <ImplementationTimeAnalysisComponent/>
 
       {/* burn rate */}
       <CardComponent>
@@ -268,59 +110,9 @@ export default function ActivityOverview() {
         </div>
       </CardComponent>
 
-      {/* cpi and spi */}
-        <CardComponent>
-      <div className="flex justify-between items-center">
-        <Heading
-          heading={activeTab === 1 ? 'Cost Performance Index (CPI)' : 'Schedule Performance Index (SPI)'}
-          subtitle="Budget Performance by Project"
-        />
-          {/* Hardcoded Tabs */}
-          <div className="w-[175px] h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg">
-            {tabs.map((d) => {
-              const isActive = activeTab === d.id;
-              return (
-                <div
-                  key={d.id}
-                  onClick={() => setActiveTab(d.id)}
-                  className="relative"
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="tab"
-                      className="absolute inset-0 z-0 bg-white rounded-lg text-[#242424]"
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                  <div
-                    className={`relative z-10 px-3 md:px-6 h-10 flex items-center justify-center font-bold text-xs md:text-sm cursor-pointer whitespace-nowrap ${
-                      isActive ? "text-[#242424]" : "text-[#7A7A7A]"
-                    }`}
-                  >
-                    {d.tabName}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-      </div>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.25 }}
-        >
-          { activeTab === 1 && <CPI/> }
-          { activeTab === 2 && <SPI/> }
-        </motion.div>
-      </AnimatePresence>
-    </CardComponent>
+        <CPIComponent/>
+
+        <SPIComponnet/>
     </>
   );
 }

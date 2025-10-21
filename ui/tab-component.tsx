@@ -31,7 +31,7 @@ export default function TabComponent({
   return (
     <div className="w-full space-y-4">
       {/* Tabs */}
-      <div className={`${width ? `w-${width}`: 'w-full'} relative h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg overflow-x-auto`}>
+      <div className={`w-full relative h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg`} style={{width: width ? width : '100%' }}>
         {data.map((d) => {
           const isActive = activeTab === d.id;
           return (
