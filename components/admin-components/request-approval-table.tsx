@@ -5,17 +5,12 @@ import DropDown from "@/ui/form/select-dropdown";
 import SearchInput from "@/ui/form/search";
 import Table from "@/ui/table";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import FinancialRequestModal from "./financial-request-modal";
 import DateRangePicker from "@/ui/form/date-range";
 import TabComponent from "@/ui/tab-component";
 
 export default function RequestApprovalsTable() {
-  const [activeTab, setActiveTab] = useState(1);
-  const handleTabChange = (index: number) => {
-    setActiveTab(index);
-  };
 
   const [openView, setOpenView] = useState(false);
   const handleModalOpen = () => {
