@@ -118,7 +118,7 @@ export default function IndicatorSourceSelector({
           label="Indicator Statement"
           value={indicatorStatement}
           name="indicatorStatement"
-          placeholder={!thematicAreaPillar ? 'Select a Thematic Area/Pillar' : 'Select Option'}
+          placeholder={!thematicAreaPillar ? '---' : 'Select indicator statement'}
           onChange={handleIndicatorStatementChange}
           options={filteredIndicatorStatements}
           isBigger
