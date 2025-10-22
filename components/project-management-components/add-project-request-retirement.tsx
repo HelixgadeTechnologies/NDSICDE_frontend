@@ -27,7 +27,7 @@ type LineItemProps = {
   showRemove: boolean;
 };
 
-function LineItemDropdown({ onRemove, showRemove, lineItem, index, onChange }: LineItemProps) {
+function LineItemDropdown({ onRemove, showRemove, lineItem }: LineItemProps) {
   return (
     <div className="flex items-end gap-2">
       <DropDown
