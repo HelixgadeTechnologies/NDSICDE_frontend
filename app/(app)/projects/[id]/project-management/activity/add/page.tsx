@@ -142,16 +142,16 @@ export default function AddProjectActivity() {
                   key={subActivity.id}
                   className={`space-y-4 ${
                     activityType === "multiple" && subActivities.length > 1
-                      ? "border border-gray-200 rounded-lg relative"
+                      ? "rounded-lg relative"
                       : ""
                   }`}
                 >
                   {/* Show number badge for multiple activities */}
-                  {activityType === "multiple" && subActivities.length > 1 && (
+                  {/* {activityType === "multiple" && subActivities.length > 1 && (
                     <div className="absolute -top-3 -left-3 bg-blue-600 text-white size-7 rounded-full flex items-center justify-center text-xs font-semibold shadow-md z-10">
                       {index + 1}
                     </div>
-                  )}
+                  )} */}
 
                   {/* Remove button */}
                   {activityType === "multiple" && subActivities.length > 1 && (

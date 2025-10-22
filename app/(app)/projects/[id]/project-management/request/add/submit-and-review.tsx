@@ -3,6 +3,7 @@
 import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 import FileDisplay from "@/ui/file-display";
 import Button from "@/ui/form/button";
+import Table from "@/ui/table";
 import Heading from "@/ui/text-heading";
 
 type FormTwoProps = {
@@ -15,18 +16,37 @@ export default function SubmitAndReview({ onBack, onSubmit }: FormTwoProps) {
     e.preventDefault(); // Prevent form submission
   };
 
+  const head = ["Quantity", "Frequency", "Unit Cost", "Total (₦)"];
+
+  const data = [
+    {
+      quantity: 200,
+      frequency: 200,
+      unit_cost: 200,
+      total: 600,
+    },
+    {
+      quantity: 250,
+      frequency: 200,
+      unit_cost: 200,
+      total: 650,
+    },
+  ];
+
   return (
     <section>
       <form className="space-y-6 w-full" onSubmit={handleFormSubmit}>
-        <Heading heading="Review & Submit" className="text-center"/>
+        <Heading heading="Review & Submit" className="text-center" />
 
         {/* body */}
-        <section className="space-y-6 my-5">
-          <h3 className="text-lg font-bold text-black my-2">
-            Submission Details
-          </h3>
+        <section className="space-y-4 my-5">
+          {/* <Heading
+            heading="Financial Request"
+            subtitle="Community Health Initiative - Submitted on May 15, 2023 at 10:30"
+          /> */}
+          <Heading heading="Submission Details"/>
           {/* submission details */}
-          <div className="space-y-5 mb-5">
+          <div className="space-y-3 mb-5">
             <p className="mb-2 text-sm">
               <span className="text-[#475367]">Submitted by:</span>
               <span className="font-semibold text-gray-900"> John Doe</span>
@@ -47,15 +67,9 @@ export default function SubmitAndReview({ onBack, onSubmit }: FormTwoProps) {
               <span className="font-semibold text-gray-900"> 000000</span>
             </p>
             <p className="mb-2 text-sm">
-              <span className="text-[#475367]">Activity Location:</span>
+              <span className="text-[#475367]">Activity Locations:</span>
               <span className="font-semibold text-gray-900"> Location 1</span>
             </p>
-            <TitleAndContent
-              title={"Activity Purpose/Description"}
-              content={
-                "Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
-              }
-            />
             <p className="mb-2 text-sm">
               <span className="text-[#475367]">Activity Start Date:</span>
               <span className="font-semibold text-gray-900"> 12/04/2025</span>
@@ -65,39 +79,28 @@ export default function SubmitAndReview({ onBack, onSubmit }: FormTwoProps) {
               <span className="font-semibold text-gray-900"> 12/04/2025</span>
             </p>
             <TitleAndContent
-              title={"Activity Line Description"}
+              title={"Activity Purpose/Description"}
               content={
                 "Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
               }
             />
-            <p className="mb-2 text-sm">
-              <span className="text-[#475367]">Quantity:</span>
-              <span className="font-semibold text-gray-900"> 200</span>
-            </p>
-            <p className="mb-2 text-sm">
-              <span className="text-[#475367]">Frequency:</span>
-              <span className="font-semibold text-gray-900"> 200</span>
-            </p>
-            <p className="mb-2 text-sm">
-              <span className="text-[#475367]">Unit Cost (₦):</span>
-              <span className="font-semibold text-gray-900"> 12/04/2025</span>
-            </p>
-            <p className="mb-2 text-sm">
-              <span className="text-[#475367]">Budget Code:</span>
-              <span className="font-semibold text-gray-900"> 000000</span>
-            </p>
-            <p className="mb-2 text-sm">
-              <span className="text-[#475367]">Total (₦):</span>
-              <span className="font-semibold text-gray-900"> 200</span>
-            </p>
+            <Table
+              tableHead={head}
+              tableData={data}
+              renderRow={(row) => (
+                <>
+                  <td className="px-6">{row.quantity}</td>
+                  <td className="px-6">{row.frequency}</td>
+                  <td className="px-6">{row.unit_cost}</td>
+                  <td className="px-6">{row.total}</td>
+                </>
+              )}
+            />
           </div>
 
-          <Heading
-            heading="Journey Management"
-            subtitle="Community Health Initiative - Submitted on May 15, 2023 at 10:30"
-          />
+          <Heading heading="Journey Management" />
 
-          <div className="space-y-5">
+          <div className="space-y-3">
             <p className="mb-2 text-sm">
               <span className="text-[#475367]">Mode of Transport:</span>
               <span className="font-semibold text-gray-900"> Road</span>
