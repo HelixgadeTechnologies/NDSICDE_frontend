@@ -15,7 +15,7 @@ type BudgetLine = {
   quantity: string;
   frequency: string;
   unitCost: string;
-  budgetCode: string;
+  total: string;
 };
 
 type BudgetLineComponentProps = {
@@ -27,6 +27,12 @@ type BudgetLineComponentProps = {
 };
 
 function BudgetLineComponent({ budgetLine, index, onRemove, onChange, showRemove }: BudgetLineComponentProps) {
+ // Calculate total with proper number conversion and validation
+  const quantity = parseFloat(budgetLine.quantity) || 0;
+  const frequency = parseFloat(budgetLine.frequency) || 0;
+  const unitCost = parseFloat(budgetLine.unitCost) || 0;
+  const total = quantity * frequency * unitCost;
+
   return (
     <div className="flex items-end gap-2">
       <div className="flex-1">
@@ -71,11 +77,11 @@ function BudgetLineComponent({ budgetLine, index, onRemove, onChange, showRemove
       
       <div className="w-32">
         <TextInput
-          label={index === 0 ? "Budget Code" : ""}
-          name={`budgetCode-${budgetLine.id}`}
-          value={budgetLine.budgetCode}
-          onChange={(e) => onChange(budgetLine.id, 'budgetCode', e.target.value)}
-          placeholder="Code"
+          label={index === 0 ? "Total (Qty*Frq*Unit)" : ""}
+          name={`Total-${budgetLine.id}`}
+          value={total.toFixed(2)}
+          onChange={(e) => onChange(budgetLine.id, 'total', e.target.value)}
+          placeholder="0.00"
         />
       </div>
 
@@ -105,7 +111,7 @@ export default function FormOne({ onNext }: FormOneProps) {
       quantity: "",
       frequency: "",
       unitCost: "",
-      budgetCode: "",
+      total: "",
     },
   ]);
 
@@ -123,7 +129,7 @@ export default function FormOne({ onNext }: FormOneProps) {
         quantity: "",
         frequency: "",
         unitCost: "",
-        budgetCode: "",
+        total: "",
       },
     ]);
   };

@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 import AddProjectRequestRetirement from "@/components/project-management-components/add-project-request-retirement";
+import DashboardStat from "@/ui/dashboard-stat-card";
 
 export default function ProjectRequestRetirementPage() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -45,14 +46,47 @@ export default function ProjectRequestRetirementPage() {
       variance: 600,
     },
   ];
+
+  const dashboardData = [
+    {
+      title: "Total Requests",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+    {
+      title: "Total Approved",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+    {
+      title: "Total Rejected",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+    {
+      title: "Total Pending",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+    {
+      title: "Total Retired",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+  ];
+
   return (
-    <div className="relative mt-12">
+    <div className="relative mt-12 space-y-7">
       <div className="absolute right-0 -top-[75px]">
         <Button
           content="Add Retirement"
           icon="si:add-fill"
           onClick={() => setOpenAddRetirement(true)}
         />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <DashboardStat data={dashboardData} icon="basil:plus-solid" />
       </div>
 
       <CardComponent>
@@ -91,8 +125,7 @@ export default function ProjectRequestRetirementPage() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
-                    >
+                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]">
                       <ul className="text-sm">
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon
@@ -119,7 +152,7 @@ export default function ProjectRequestRetirementPage() {
           )}
         />
         <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-          <p>Total  Activity Cost (N): 100,00</p>
+          <p>Total Activity Cost (N): 100,00</p>
           <p>Amount to reimburse to NDSICDE (N): 200,000</p>
           <p>Amount to reimburse to Staff (N): 200,000</p>
         </div>

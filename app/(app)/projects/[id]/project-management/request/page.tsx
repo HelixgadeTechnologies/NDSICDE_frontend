@@ -11,6 +11,7 @@ import { useEntityModal } from "@/utils/project-management-utility";
 import DeleteModal from "@/ui/generic-delete-modal";
 import Link from "next/link";
 import EditActivityRequest from "@/components/project-management-components/edit-activity-request";
+import DashboardStat from "@/ui/dashboard-stat-card";
 
 export default function ProjectRequest() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -19,6 +20,8 @@ export default function ProjectRequest() {
     "Total Budget (₦)",
     "Activity Location",
     "Responsible Person(s)",
+    "Status",
+    "Retirement Status",
     "Start Date",
     "End Date",
     "Actions",
@@ -31,6 +34,8 @@ export default function ProjectRequest() {
       totalBudget: "500,000",
       activityLocation: "Bayelsa",
       responsiblePersons: "Ifeoma",
+      status: "Rejected",
+      retirementStatus: "Not Retired",
       startDate: "12/03/2024",
       endDate: "12/03/2024",
     },
@@ -40,8 +45,38 @@ export default function ProjectRequest() {
       totalBudget: "500,000",
       activityLocation: "Bayelsa",
       responsiblePersons: "Ifeoma",
+       status: "Approved",
+      retirementStatus: "Retired",
       startDate: "12/03/2024",
       endDate: "12/03/2024",
+    },
+  ];
+
+   const dashboardData = [
+    {
+      title: "Total Requests",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+    {
+      title: "Total Approved",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+    {
+      title: "Total Rejected",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+    {
+      title: "Total Pending",
+      value: 0,
+      icon: "fluent:target-24-filled",
+    },
+    {
+      title: "Total Retired",
+      value: 0,
+      icon: "fluent:target-24-filled",
     },
   ];
 
@@ -57,12 +92,16 @@ export default function ProjectRequest() {
   } = useEntityModal<ProjectRequestTypes>();
 
   return (
-    <div className="relative mt-12">
+    <div className="relative mt-12 space-y-7">
       <div className="absolute right-0 -top-[75px]">
         <Button content="Add Activity Request" icon="si:add-fill" href="/projects/1/project-management/request/add" />
       </div>
 
-      <CardComponent>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <DashboardStat data={dashboardData} icon="basil:plus-solid" />
+      </div>
+
+      <CardComponent fitWidth={true}>
         <Table
           tableHead={head}
           tableData={data}
@@ -70,10 +109,12 @@ export default function ProjectRequest() {
           idKey={"userId"}
           renderRow={(row) => (
             <>
-              <td className="px-6">{row.activityDescription}</td>
+              <td className="px-6 w-[150px]">{row.activityDescription}</td>
               <td className="px-6">{row.totalBudget}</td>
               <td className="px-6">{row.activityLocation}</td>
               <td className="px-6">{row.responsiblePersons}</td>
+              <td className={`px-6 ${row.status === "Approved" ? 'text-green-500' : 'text-red-500' }`}>{row.status}</td>
+              <td className="px-6">{row.retirementStatus}</td>
               <td className="px-6">{row.startDate}</td>
               <td className="px-6">{row.endDate}</td>
               <td className="px-6 relative">

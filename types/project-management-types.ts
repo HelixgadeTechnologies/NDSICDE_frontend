@@ -28,6 +28,8 @@ export type ProjectRequestTypes = {
   activityDescription: string;
   totalBudget: string;
   activityLocation: string;
+  status: "Rejected" | "Approved";
+  retirementStatus: "Retired" |" In Progress" | "Rejected"| "Not Retired";
   responsiblePersons: string;
   startDate: string;
   endDate: string;
