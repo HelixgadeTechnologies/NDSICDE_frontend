@@ -52,7 +52,7 @@ export default function Table<T>({
   }, [selectedIds, idKey, onSelectionChange, tableData]);
 
   return (
-    <div className="w-fit h-fit overflow-visible rounded-lg border border-[#E5E7EB]">
+    <div className="w-full h-fit overflow-visible rounded-lg border border-[#E5E7EB]">
       <table className="min-w-full text-sm text-left">
         <thead>
           <tr className="bg-[#F5F7FA] h-[52px] text-[#111928] text-sm font-medium">

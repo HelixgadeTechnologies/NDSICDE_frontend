@@ -156,6 +156,10 @@ export default function ProjectRequestRetirementPage() {
           <p>Amount to reimburse to NDSICDE (N): 200,000</p>
           <p>Amount to reimburse to Staff (N): 200,000</p>
         </div>
+
+        <div className="w-[200px] mt-6">
+          <Button content="Print" onClick={() => window.print()} />
+        </div>
       </CardComponent>
 
       <AddProjectRequestRetirement

@@ -33,9 +33,14 @@ const formatFileSize = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
-export default function FileUploader() {
+type FileUploaderProps = {
+  onFilesChange?: (files: File[]) => void;
+  maxFiles?: number;
+};
+
+export default function FileUploader({ onFilesChange, maxFiles = 5 }: FileUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,25 +49,67 @@ export default function FileUploader() {
     const isValidSize = file.size <= MAX_FILE_SIZE_MB * 1024 * 1024;
 
     if (!isValidType) {
-      setError("Unsupported file type. Please upload PDF, DOC, DOCX, XLS, XLSX, JPG, or PNG files.");
-      return false;
+      return "Unsupported file type. Please upload PDF, DOC, DOCX, XLS, XLSX, JPG, or PNG files.";
     }
 
     if (!isValidSize) {
-      setError(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit. Please choose a smaller file.`);
-      return false;
+      return `File size exceeds ${MAX_FILE_SIZE_MB}MB limit. Please choose a smaller file.`;
     }
 
+    return null;
+  };
+
+  const addFiles = (newFiles: FileList | File[]) => {
+    const filesArray = Array.from(newFiles);
+    const errors: string[] = [];
+    const validFiles: File[] = [];
+
+    // Check if adding these files would exceed maxFiles
+    if (selectedFiles.length + filesArray.length > maxFiles) {
+      setError(`You can only upload up to ${maxFiles} files.`);
+      return;
+    }
+
+    // Validate each file
+    filesArray.forEach((file) => {
+      const error = validateFile(file);
+      if (error) {
+        errors.push(`${file.name}: ${error}`);
+      } else {
+        // Check for duplicates
+        const isDuplicate = selectedFiles.some(
+          (existingFile) => existingFile.name === file.name && existingFile.size === file.size
+        );
+        if (!isDuplicate) {
+          validFiles.push(file);
+        }
+      }
+    });
+
+    if (errors.length > 0) {
+      setError(errors.join("\n"));
+      return;
+    }
+
+    const updatedFiles = [...selectedFiles, ...validFiles];
+    setSelectedFiles(updatedFiles);
     setError(null);
-    return true;
+    
+    // Callback to parent component
+    if (onFilesChange) {
+      onFilesChange(updatedFiles);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    if (validateFile(file)) {
-      setSelectedFile(file);
+    addFiles(files);
+    
+    // Reset input
+    if (inputRef.current) {
+      inputRef.current.value = "";
     }
   };
 
@@ -80,22 +127,35 @@ export default function FileUploader() {
     e.preventDefault();
     setIsDragOver(false);
     
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
 
-    if (validateFile(file)) {
-      setSelectedFile(file);
-    }
+    addFiles(files);
   };
 
-  const removeFile = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedFile(null);
+  const removeFile = (indexToRemove: number) => {
+    const updatedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
+    setSelectedFiles(updatedFiles);
     setError(null);
-    if (inputRef.current) {
-      inputRef.current.value = "";
+    
+    // Callback to parent component
+    if (onFilesChange) {
+      onFilesChange(updatedFiles);
     }
   };
+
+  // const handleSubmit = () => {
+  //   // Return files as array (even if it's just one file)
+  //   console.log("Submitting files:", selectedFiles);
+    
+  //   // You can call a parent callback here
+  //   if (onFilesChange) {
+  //     onFilesChange(selectedFiles);
+  //   }
+    
+  //   // Or return the array for form submission
+  //   return selectedFiles;
+  // };
 
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -113,17 +173,17 @@ export default function FileUploader() {
             ? "border-red-400 bg-red-50" 
             : "border-gray-300 hover:border-gray-500 hover:bg-red-25"
           }
-          ${selectedFile ? "border-green-300 bg-green-50" : ""}
+          ${selectedFiles.length > 0 ? "border-green-300 bg-green-50" : ""}
         `}
       >
         {/* Upload Icon */}
         <div className={`
           flex items-center justify-center w-16 h-16 rounded-full mb-4 transition-colors
-          ${isDragOver ? "bg-red-100" : selectedFile ? "bg-green-100" : "bg-gray-100"}
+          ${isDragOver ? "bg-red-100" : selectedFiles.length > 0 ? "bg-green-100" : "bg-gray-100"}
         `}>
           <Icon 
-            icon={selectedFile ? "heroicons:check-circle" : "heroicons:cloud-arrow-up"} 
-            className={`w-8 h-8 ${isDragOver ? "text-red-500" : selectedFile ? "text-green-500" : "text-gray-500"}`}
+            icon={selectedFiles.length > 0 ? "heroicons:check-circle" : "heroicons:cloud-arrow-up"} 
+            className={`w-8 h-8 ${isDragOver ? "text-red-500" : selectedFiles.length > 0 ? "text-green-500" : "text-gray-500"}`}
           />
         </div>
 
@@ -131,20 +191,26 @@ export default function FileUploader() {
         <div className="text-center space-y-2">
           <p className="text-base">
             <span className="font-semibold text-gray-900">
-              {selectedFile ? "File uploaded successfully" : "Click to upload"}
+              {selectedFiles.length > 0 
+                ? `${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''} uploaded` 
+                : "Click to upload"}
             </span>
-            {!selectedFile && (
+            {selectedFiles.length === 0 && (
               <span className="font-normal text-gray-600 ml-1">or drag and drop</span>
             )}
           </p>
           <p className="text-sm text-gray-500">
             Supports: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB per file)
           </p>
+          <p className="text-xs text-gray-400">
+            Upload up to {maxFiles} files ({selectedFiles.length}/{maxFiles})
+          </p>
         </div>
 
         <input
           ref={inputRef}
           type="file"
+          multiple
           accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
           className="hidden"
           onChange={handleFileChange}
@@ -156,69 +222,79 @@ export default function FileUploader() {
         <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-start">
             <Icon icon="heroicons:exclamation-triangle" className="w-5 h-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
-            <p className="text-sm text-red-700">{error}</p>
+            <p className="text-sm text-red-700 whitespace-pre-line">{error}</p>
           </div>
         </div>
       )}
 
-      {/* Selected File Preview */}
-      {selectedFile && !error && (
-        <div className="mt-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 flex-1 min-w-0">
-              {/* File Icon */}
-              <div className="flex-shrink-0">
-                <Icon 
-                  icon={getFileIcon(selectedFile.type)} 
-                  className="w-10 h-10"
-                />
+      {/* Selected Files Preview */}
+      {selectedFiles.length > 0 && !error && (
+        <div className="mt-4 space-y-2 flex items-center gap-2 overflow-x-auto custom-scrollbar">
+          {selectedFiles.map((file, index) => (
+            <div key={`${file.name}-${index}`} className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm w-[250px]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4 flex-1 min-w-0">
+                  {/* File Icon */}
+                  <div className="flex-shrink-0">
+                    <Icon 
+                      icon={getFileIcon(file.type)} 
+                      className="w-10 h-10"
+                    />
+                  </div>
+                  
+                  {/* File Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {file.name}
+                    </p>
+                    <div className="flex items-center space-x-3 mt-1">
+                      <span className="text-xs text-gray-500 whitespace-nowrap">
+                        {formatFileSize(file.size)}
+                      </span>
+                      <span className="text-xs text-gray-400">•</span>
+                      <span className="text-xs text-gray-500 capitalize truncate">
+                        {file.type.split('/')[1]?.replace('vnd.', '').replace('officedocument.', '')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Remove Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFile(index);
+                  }}
+                  className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0 ml-2"
+                  title="Remove file"
+                >
+                  <Icon icon="heroicons:x-mark" className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                </button>
               </div>
-              
-              {/* File Info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {selectedFile.name}
-                </p>
-                <div className="flex items-center space-x-3 mt-1">
-                  <span className="text-xs text-gray-500">
-                    {formatFileSize(selectedFile.size)}
-                  </span>
-                  <span className="text-xs text-gray-400">•</span>
-                  <span className="text-xs text-gray-500 capitalize">
-                    {selectedFile.type.split('/')[1]?.replace('vnd.', '').replace('officedocument.', '')}
-                  </span>
+
+              {/* Progress Bar */}
+              <div className="mt-3">
+                <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                  <span>Ready to upload</span>
+                  <span>100%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '100%' }}></div>
                 </div>
               </div>
             </div>
-
-            {/* Remove Button */}
-            <button
-              onClick={removeFile}
-              className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0 ml-2"
-              title="Remove file"
-            >
-              <Icon icon="heroicons:x-mark" className="w-5 h-5 text-gray-400 hover:text-gray-600" />
-            </button>
-          </div>
-
-          {/* Progress Bar (Optional - for future upload progress) */}
-          <div className="mt-3">
-            <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-              <span>Ready to upload</span>
-              <span>100%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-1.5">
-              <div className="bg-green-500 h-1.5 rounded-full" style={{ width: '100%' }}></div>
-            </div>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* Upload Button (Optional)
-      {selectedFile && !error && (
-        <div className="mt-4 flex justify-end">
-          <button className="px-6 py-2.5 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors">
-            Upload File
+      {/* Submit Button Example */}
+      {/* {selectedFiles.length > 0 && (
+        <div className="mt-4">
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+          >
+            Submit {selectedFiles.length} File{selectedFiles.length > 1 ? 's' : ''}
           </button>
         </div>
       )} */}

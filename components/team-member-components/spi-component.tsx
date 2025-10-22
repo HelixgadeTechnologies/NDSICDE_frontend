@@ -36,7 +36,7 @@ function SPIChart() {
 
 function SPITable() {
   const head = [
-    "Desrciption",
+    "Description",
     "Behind Schedule",
     "Ahead of Schedule",
     "On Schedule",

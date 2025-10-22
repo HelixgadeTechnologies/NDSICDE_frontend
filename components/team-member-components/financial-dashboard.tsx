@@ -9,20 +9,11 @@ import { PieChart, ResponsiveContainer, Pie, Cell } from "recharts";
 import ImplementationTimeAnalysisComponent from "./ita-component";
 import CPIComponent from "./cpi-component";
 import SPIComponnet from "./spi-component";
+import TabComponent from "@/ui/tab-component";
+import ActivityOverviewComponent from "./activity-overview-chart-table";
 
 
 export default function ActivityOverview() {
-
-  const budgetUilization = [
-    { name: "Due to Start", value: 23 },
-    { name: "In Progress(Early Start)", value: 14 },
-    { name: "In Progress(Late Start)", value: 23 },
-    { name: "Future Activity", value: 20 },
-    { name: "Completed Early", value: 10 },
-    { name: "Completed Late", value: 10 },
-  ];
-
-  const BUColors = ["#22C55E", "#EF4444", "#EAB308", "#003B99", "#98A2B3", "#000000"];
 
   const burnRate = [
     { normal: 60, name: "Target 1" },
@@ -38,40 +29,12 @@ export default function ActivityOverview() {
     <>
       {/* activity overview */}
       <CardComponent>
-        <Heading
-          heading="Activity Overview"
-          subtitle="Breakdown of activities by current activities"
-        />
-        <div className="flex items-center justify-between px-10">
-          <div className="h-[400px] w-[50%]">
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie data={budgetUilization}>
-                  {budgetUilization.map((entry, index) => (
-                    <Cell
-                      key={`cell-${entry.name}`}
-                      fill={BUColors[index % BUColors.length]}
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="space-y-4 w-[50%]">
-            {budgetUilization.map((p, i) => (
-              <div key={i} className="w-full flex justify-between items-center">
-                <div className="flex items-center gap-1">
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{ backgroundColor: BUColors[i % BUColors.length] }}
-                  ></span>
-                  <span className="text-sm text-gray-500">{p.name}</span>
-                </div>
-                <p className="font-medium text-gray-900 text-sm">{p.value}%</p>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Heading
+            heading="Activity Overview"
+            subtitle="Breakdown of activities by current activities"
+            className="mb-4"
+          />
+        <ActivityOverviewComponent/>
       </CardComponent>
 
       {/* implementation time analysis */}

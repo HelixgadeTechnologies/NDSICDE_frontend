@@ -135,7 +135,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const hiddenRoutes = ["/dashboard/create-project", "/kpi-reporting/new-kpi"];
 
   return (
-    <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""}`}>
+    <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""} no-print`}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-base md:text-[22px] text-[#242424]">
           {matched?.header || fallbackTitle}

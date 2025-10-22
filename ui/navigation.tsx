@@ -38,7 +38,7 @@ export default function Navigation() {
   }, []);
 
   return (
-    <header className="flex justify-between items-center bg-white px-2 md:pr-10 md:pl-5 py-3 border-b border-gray-200">
+    <header className="flex justify-between items-center bg-white px-2 md:pr-10 md:pl-5 py-3 border-b border-gray-200 no-print">
       <h2 className="text-lg md:text-2xl font-semibold text-[#242424]">
         {user?.role ? getRoleDisplayName(user.role) : "Dashboard"}
       </h2>

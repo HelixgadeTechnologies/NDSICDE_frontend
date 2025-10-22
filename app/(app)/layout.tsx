@@ -41,7 +41,7 @@ export default function AllUserSettingsLayout({
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <div className="w-64 flex-none transition-all duration-300 ease-in-out">
+      <div className="w-64 flex-none transition-all duration-300 ease-in-out no-print">
         <Sidebar />
       </div>
       <section className="flex-grow flex flex-col overflow-hidden">
