@@ -8,32 +8,40 @@ export const metadata = {
 
 export default function OrganizationalKPI() {
   const dashboardData = [
-   {
+    {
       title: "Governance",
-      value: "12 SOs | 45 KPIs",
-      percentage: 78,
-      percentInfo: "Overall KPI Performance",
+      lists: [
+        { title: "Total SOs", count: "5" },
+        { title: "Total KPIs", count: "7" },
+        { title: "Overall KPI Performance", count: "15" },
+      ],
       icon: "mdi:security",
     },
     {
       title: "Peace & Security",
-      value: "10 SOs | 30 KPIs",
-      percentage: 85,
-      percentInfo: "Overall KPI Performance",
+      lists: [
+        { title: "Total SOs", count: "5" },
+        { title: "Total KPIs", count: "7" },
+        { title: "Overall KPI Performance", count: "15" },
+      ],
       icon: "mdi:security",
     },
     {
       title: "Livelihood",
-      value: "8 SOs | 25 KPIs",
-      percentage: 72,
-      percentInfo: "Overall KPI Performance",
+      lists: [
+        { title: "Total SOs", count: "5" },
+        { title: "Total KPIs", count: "7" },
+        { title: "Overall KPI Performance", count: "15" },
+      ],
       icon: "mdi:briefcase",
     },
     {
       title: "Environment & Climate Change",
-      value: "14 SOs | 40 KPIs",
-      percentage: 90,
-      percentInfo: "Overall KPI Performance",
+      lists: [
+        { title: "Total SOs", count: "5" },
+        { title: "Total KPIs", count: "7" },
+        { title: "Overall KPI Performance", count: "15" },
+      ],
       icon: "mdi:leaf",
     },
   ];

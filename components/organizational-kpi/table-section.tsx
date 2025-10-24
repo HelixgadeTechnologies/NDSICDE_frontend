@@ -10,6 +10,7 @@ const head = [
   "Indicator",
   "Baseline",
   "Target",
+  "Actual",
   "Performance",
   "Status",
 ];
@@ -20,6 +21,7 @@ const data = [
     indicator: "Number of students enrolled",
     baseline: 500,
     target: 450,
+    actual: 4500,
     performance: 90,
     status: "Partially Met",
   },
@@ -28,6 +30,7 @@ const data = [
     indicator: "Percentage of students completing training",
     baseline: 85,
     target: 88,
+    actual: 4500,
     performance: 103,
     status: "Met",
   },
@@ -36,6 +39,7 @@ const data = [
     indicator: "Number of beneficiaries receiving health services",
     baseline: 5000,
     target: 3800,
+    actual: 4500,
     performance: 76,
     status: "Partially Met",
   },
@@ -117,6 +121,7 @@ export default function TableSection() {
               <td className="px-6 text-xs md:text-sm">{row.indicator}</td>
               <td className="px-6 text-xs md:text-sm">{row.baseline}</td>
               <td className="px-6 text-xs md:text-sm">{row.target}</td>
+              <td className="px-6 text-xs md:text-sm">{row.actual}</td>
               <td className="px-6 text-xs md:text-sm">{row.performance}%</td>
               <td
                 className={`${

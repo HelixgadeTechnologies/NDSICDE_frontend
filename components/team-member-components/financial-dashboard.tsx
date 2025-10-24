@@ -14,15 +14,6 @@ import BurnRateComponent from "./burn-rate-component";
 export default function ActivityOverview() {
   return (
     <>
-      {/* activity overview */}
-      <CardComponent>
-        <Heading
-          heading="Activity Overview"
-          subtitle="Breakdown of activities by current activities"
-          className="mb-4"
-        />
-        <ActivityOverviewComponent />
-      </CardComponent>
 
       {/* implementation time analysis */}
       <ImplementationTimeAnalysisComponent />

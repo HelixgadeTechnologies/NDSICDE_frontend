@@ -142,7 +142,7 @@ export default function FinancialRequestModal() {
                   renderRow={(row) => (
                     <>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                        <p className="w-[120px] truncate">{row.description}</p>
+                        <p className="w-[160px] truncate">{row.description}</p>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         {row.quantity}
