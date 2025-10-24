@@ -6,20 +6,14 @@ import SearchInput from "@/ui/form/search";
 import Table from "@/ui/table";
 import { useState } from "react";
 import { Icon } from "@iconify/react";
-import FinancialRequestModal from "./financial-request-modal";
 import DateRangePicker from "@/ui/form/date-range";
 import TabComponent from "@/ui/tab-component";
+import Link from "next/link";
 
 export default function RequestApprovalsTable() {
-
-  const [openView, setOpenView] = useState(false);
-  const handleModalOpen = () => {
-    setOpenView(true);
-  };
-
   const tabs = [
     { tabName: "Activity Financial Request", id: 1 },
-    { tabName: "Retirement Request", id: 2 },
+    { tabName: "Activity Financial Retirement", id: 2 },
   ];
 
   function ActivityFinancialRequestTable() {
@@ -91,7 +85,11 @@ export default function RequestApprovalsTable() {
           idKey={"id"}
           renderRow={(row) => (
             <>
-              <td className="px-6 cursor-pointer hover:underline" onClick={handleModalOpen}>{row.description}</td>
+              <td className="px-6 cursor-pointer hover:underline">
+                <Link href={`/request-approvals/requests/${row.id}`}>
+                  {row.description}
+                </Link>
+              </td>
               <td className="px-6">{row.totalBudget}</td>
               <td className="px-6">{row.responsiblePersons}</td>
               <td className="px-6">{row.project}</td>
@@ -108,12 +106,15 @@ export default function RequestApprovalsTable() {
                 {row.status}
               </td>
               <td className="px-6">
-                <Icon
+                {/* <Icon
                   icon={"fluent-mdl2:view"}
                   width={16}
                   height={16}
                   onClick={() => handleModalOpen()}
-                />
+                /> */}
+                <Link href={`/request-approvals/requests/${row.id}`}>
+                  <Icon icon={"fluent-mdl2:view"} width={16} height={16} />
+                </Link>
               </td>
             </>
           )}
@@ -122,7 +123,7 @@ export default function RequestApprovalsTable() {
     );
   }
 
-  function RetirementRequestTable() {
+  function ActivityFinancialRetirement() {
     const retirementRequestHead = [
       "Activity Line Description",
       "Quantity",
@@ -174,7 +175,7 @@ export default function RequestApprovalsTable() {
             onChange={() => {}}
             options={[]}
           />
-           <DropDown
+          <DropDown
             value=""
             name="project"
             placeholder="All Projects"
@@ -182,7 +183,7 @@ export default function RequestApprovalsTable() {
             onChange={() => {}}
             options={[]}
           />
-           <SearchInput
+          <SearchInput
             value=""
             name="journalId"
             placeholder="All Journal IDs"
@@ -232,16 +233,11 @@ export default function RequestApprovalsTable() {
             if (rowId === 1) {
               return <ActivityFinancialRequestTable />;
             } else {
-              return <RetirementRequestTable />;
+              return <ActivityFinancialRetirement />;
             }
           }}
         />
       </CardComponent>
-
-      <FinancialRequestModal
-        isOpen={openView}
-        onClose={() => setOpenView(false)}
-      />
     </>
   );
 }

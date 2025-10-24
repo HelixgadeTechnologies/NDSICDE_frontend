@@ -27,6 +27,19 @@ export default function ChartsComponent() {
     <section>
       {/* when api comes, add this on shared parent component if needed */}
       <div className="flex flex-grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10">
+         <DropDown
+          label="Thematic Area"
+          value={""}
+          placeholder="Thematic Area"
+          name="allThematicArea"
+          onChange={() => {}}
+          options={[
+            {label: "Governance", value: "Governance"},
+            {label: "Peace and Security", value: "Peace and Security"},
+            {label: "Livelihood", value: "Livelihood"},
+            {label: "Environment and Climate Change", value: "Environment and Climate Change"},
+          ]}
+        />
         <DropDown
           label="Strategic Objective"
           value={allStrategicObjective}

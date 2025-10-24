@@ -46,7 +46,7 @@ export default function AllUserSettingsLayout({
       </div>
       <section className="flex-grow flex flex-col overflow-hidden">
         <Navigation />
-        <div className="flex-grow overflow-y-auto p-6 bg-white">
+        <div className="flex-grow overflow-y-auto p-6 bg-white custom-scrollbar">
           <Breadcrumb />
           {children}
         </div>
