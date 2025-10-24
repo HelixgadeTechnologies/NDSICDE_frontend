@@ -94,7 +94,6 @@ export default function SPIComponnet() {
             label="Level"
             name="level"
             options={[
-                { value: "Project", label: "Project" },
                 { value: "Output", label: "Output" },
                 { value: "Activity", label: "Activity" },
             ]}

@@ -9,39 +9,47 @@ export const metadata = {
 export default function OrganizationalKPI() {
   const dashboardData = [
     {
-      title: "Total Submissions",
-      value: 24,
-      percentage: 20.1,
-      percentInfo: "from last month",
-      icon: "proicons:graph",
+      title: "Governance",
+      lists: [
+        { title: "Total SOs", count: "5" },
+        { title: "Total KPIs", count: "7" },
+        { title: "Overall KPI Performance", count: "15" },
+      ],
+      icon: "mdi:security",
     },
     {
-      title: "Pending Review",
-      value: 0,
-      percentage: 2,
-      percentInfo: "of total submissions",
-      icon: "material-symbols:planner-review-rounded",
+      title: "Peace & Security",
+      lists: [
+        { title: "Total SOs", count: "5" },
+        { title: "Total KPIs", count: "7" },
+        { title: "Overall KPI Performance", count: "15" },
+      ],
+      icon: "mdi:security",
     },
     {
-      title: "Approved",
-      value: 7,
-      percentage: 33,
-      percentInfo: "approval rate",
-      icon: "duo-icons:approved",
+      title: "Livelihood",
+      lists: [
+        { title: "Total SOs", count: "5" },
+        { title: "Total KPIs", count: "7" },
+        { title: "Overall KPI Performance", count: "15" },
+      ],
+      icon: "mdi:briefcase",
     },
     {
-      title: "Rejected",
-      value: 2,
-      percentage: 23,
-      percentInfo: "rejection rate",
-      icon: "marketeq:rejected-file-2",
+      title: "Environment & Climate Change",
+      lists: [
+        { title: "Total SOs", count: "5" },
+        { title: "Total KPIs", count: "7" },
+        { title: "Overall KPI Performance", count: "15" },
+      ],
+      icon: "mdi:leaf",
     },
   ];
 
   return (
     <section>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-5">
-        <DashboardStat data={dashboardData} icon="basil:plus-solid" />
+        <DashboardStat data={dashboardData} />
       </div>
       <ChartsAndTableParent />
     </section>

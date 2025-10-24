@@ -10,6 +10,7 @@ const head = [
   "Indicator",
   "Baseline",
   "Target",
+  "Actual",
   "Performance",
   "Status",
 ];
@@ -20,6 +21,7 @@ const data = [
     indicator: "Number of students enrolled",
     baseline: 500,
     target: 450,
+    actual: 4500,
     performance: 90,
     status: "Partially Met",
   },
@@ -28,6 +30,7 @@ const data = [
     indicator: "Percentage of students completing training",
     baseline: 85,
     target: 88,
+    actual: 4500,
     performance: 103,
     status: "Met",
   },
@@ -36,6 +39,7 @@ const data = [
     indicator: "Number of beneficiaries receiving health services",
     baseline: 5000,
     target: 3800,
+    actual: 4500,
     performance: 76,
     status: "Partially Met",
   },
@@ -60,6 +64,19 @@ export default function TableSection() {
     <section>
       {/* when api comes, add this on shared parent component if needed */}
       <div className="flex flex-col md:flex-row mb-5 gap-4 md:items-center w-full mt-10">
+        <DropDown
+          label="Thematic Area"
+          value={""}
+          placeholder="Thematic Area"
+          name="allThematicArea"
+          onChange={() => {}}
+           options={[
+            {label: "Governance", value: "Governance"},
+            {label: "Peace and Security", value: "Peace and Security"},
+            {label: "Livelihood", value: "Livelihood"},
+            {label: "Environment and Climate Change", value: "Environment and Climate Change"},
+          ]}
+        />
         <DropDown
           label="Strategic Objective"
           value={allStrategicObjective}
@@ -104,12 +121,12 @@ export default function TableSection() {
               <td className="px-6 text-xs md:text-sm">{row.indicator}</td>
               <td className="px-6 text-xs md:text-sm">{row.baseline}</td>
               <td className="px-6 text-xs md:text-sm">{row.target}</td>
+              <td className="px-6 text-xs md:text-sm">{row.actual}</td>
               <td className="px-6 text-xs md:text-sm">{row.performance}%</td>
               <td
                 className={`${
                   row.status === "Met" ? "text-[#22C55E]" : "text-[#EAB308]"
-                } px-6 text-xs md:text-sm`}
-              >
+                } px-6 text-xs md:text-sm`}>
                 {row.status}
               </td>
             </>
