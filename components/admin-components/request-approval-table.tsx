@@ -6,8 +6,11 @@ import SearchInput from "@/ui/form/search";
 import Table from "@/ui/table";
 import { Icon } from "@iconify/react";
 import DateRangePicker from "@/ui/form/date-range";
-import TabComponent from "@/ui/tab-component";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { activity_financial_request, activity_financial_retirement } from "@/lib/config/request-approvals-dashboard";
+import DashboardStat from "@/ui/dashboard-stat-card";
 
 export default function RequestApprovalsTable() {
   const tabs = [
@@ -222,21 +225,54 @@ export default function RequestApprovalsTable() {
       </div>
     );
   }
+  const [activeTab, setActiveTab] = useState(1);
 
   return (
-    <>
-      <CardComponent>
-        <TabComponent
-          data={tabs}
-          renderContent={(rowId) => {
-            if (rowId === 1) {
-              return <ActivityFinancialRequestTable />;
-            } else {
-              return <ActivityFinancialRetirement />;
-            }
-          }}
-        />
-      </CardComponent>
-    </>
+     <section>
+          <div className={`grid grid-cols-1 gap-4 my-5 ${activeTab === 1 ? ' md:grid-cols-4' : ' md:grid-cols-5'}`}>
+            <DashboardStat data={activeTab === 1 ? activity_financial_request : activity_financial_retirement} />
+          </div>
+          <CardComponent>
+            {/* hardcoded tabs */}
+            <div
+              className={`w-full relative h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg mb-4`}>
+              {tabs.map((d) => {
+                const isActive = activeTab === d.id;
+                return (
+                  <div
+                    key={d.id}
+                    onClick={() => setActiveTab(d.id)}
+                    className="relative z-10">
+                    {isActive && (
+                      <motion.div
+                        layoutId="tab"
+                        className="absolute inset-0 z-0 bg-white rounded-lg"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                    <div
+                      className={`relative z-10 px-3 md:px-6 h-10 flex items-center justify-center font-bold text-xs md:text-sm cursor-pointer whitespace-nowrap ${
+                        isActive ? "text-[#242424]" : "text-[#7A7A7A]"
+                      }`}>
+                      {d.tabName}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}>
+                {activeTab === 1 && <ActivityFinancialRequestTable />}
+                {activeTab === 2 && <ActivityFinancialRetirement />}
+              </motion.div>
+            </AnimatePresence>
+          </CardComponent>
+        </section>
   );
 }

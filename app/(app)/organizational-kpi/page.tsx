@@ -49,7 +49,7 @@ export default function OrganizationalKPI() {
   return (
     <section>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-5">
-        <DashboardStat data={dashboardData} />
+        <DashboardStat data={dashboardData} bigger />
       </div>
       <ChartsAndTableParent />
     </section>
