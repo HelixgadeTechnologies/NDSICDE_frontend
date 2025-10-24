@@ -3,12 +3,10 @@
 import CardComponent from "@/ui/card-wrapper";
 import DateRangePicker from "@/ui/form/date-range";
 import DropDown from "@/ui/form/select-dropdown";
-import LineChartComponent from "@/ui/line-chart";
 import Heading from "@/ui/text-heading";
 import ImplementationTimeAnalysisComponent from "./ita-component";
 import CPIComponent from "./cpi-component";
 import SPIComponnet from "./spi-component";
-import ActivityOverviewComponent from "./activity-overview-chart-table";
 import BurnRateComponent from "./burn-rate-component";
 
 export default function ActivityOverview() {

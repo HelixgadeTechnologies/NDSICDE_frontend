@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, useState } from "react";
+import { useState } from "react";
 import { Icon } from "@iconify/react";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
@@ -12,7 +12,6 @@ import {
   Calendar,
   MapPin,
   User,
-  Truck,
   Phone,
   FileText,
   DollarSign,

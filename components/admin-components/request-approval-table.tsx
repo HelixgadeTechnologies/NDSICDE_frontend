@@ -4,7 +4,6 @@ import CardComponent from "@/ui/card-wrapper";
 import DropDown from "@/ui/form/select-dropdown";
 import SearchInput from "@/ui/form/search";
 import Table from "@/ui/table";
-import { useState } from "react";
 import { Icon } from "@iconify/react";
 import DateRangePicker from "@/ui/form/date-range";
 import TabComponent from "@/ui/tab-component";
