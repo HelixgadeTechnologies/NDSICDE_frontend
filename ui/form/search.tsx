@@ -18,7 +18,7 @@ export default function SearchInput({
 }: SearchProps) {
     const [isFocused, setIsFocused] = useState(false);
   return (
-    <div className={`h-12 w-full outline-none border group rounded-2xl px-4 text-sm flex gap-1 items-center ${isFocused ? 'border-[var(--primary-light)]' : 'border-gray-300 '}`}>
+    <div className={`h-10 w-full outline-none border group rounded-lg px-4 text-sm flex gap-1 items-center ${isFocused ? 'border-[var(--primary-light)]' : 'border-gray-300 '}`}>
         <Icon icon={"iconamoon:search-light"} height={25} width={25} color="#98A2B3" />
         <input
         type="email"

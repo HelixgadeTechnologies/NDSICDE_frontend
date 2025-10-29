@@ -13,7 +13,7 @@ export default function OrganizationalKPI() {
       lists: [
         { title: "Total SOs", count: "5" },
         { title: "Total KPIs", count: "7" },
-        { title: "Overall KPI Performance", count: "15" },
+        { title: "Overall KPI Performance", count: "15%" },
       ],
       icon: "mdi:security",
     },
@@ -22,7 +22,7 @@ export default function OrganizationalKPI() {
       lists: [
         { title: "Total SOs", count: "5" },
         { title: "Total KPIs", count: "7" },
-        { title: "Overall KPI Performance", count: "15" },
+        { title: "Overall KPI Performance", count: "19%" },
       ],
       icon: "mdi:security",
     },
@@ -31,7 +31,7 @@ export default function OrganizationalKPI() {
       lists: [
         { title: "Total SOs", count: "5" },
         { title: "Total KPIs", count: "7" },
-        { title: "Overall KPI Performance", count: "15" },
+        { title: "Overall KPI Performance", count: "7%" },
       ],
       icon: "mdi:briefcase",
     },
@@ -40,7 +40,7 @@ export default function OrganizationalKPI() {
       lists: [
         { title: "Total SOs", count: "5" },
         { title: "Total KPIs", count: "7" },
-        { title: "Overall KPI Performance", count: "15" },
+        { title: "Overall KPI Performance", count: "65%" },
       ],
       icon: "mdi:leaf",
     },

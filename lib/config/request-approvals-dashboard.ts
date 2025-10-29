@@ -1,23 +1,26 @@
 export const activity_financial_request = [
     {
       title: "Total Request",
-      value: "0",
+      value: "5",
       icon: "mdi:chart-box-outline",
     },
     {
-      title: "Approved Requests",
-      value: "0",
+      title: "Approved Retirements",
+      value: "3",
       icon: "mdi:check-circle-outline",
+      percentage: "60",
     },
     {
-      title: "Rejected Requests",
-      value: "0",
+      title: "Rejected Retirement",
+      value: "1",
       icon: "mdi:close-circle-outline",
+      percentage: "20",
     },
     {
-      title: "Pending Requests",
-      value: "0",
+      title: "Pending Retirement",
+      value: "1",
       icon: "mdi:clock-outline",
+      percentage: "20"
     },
   ];
 
