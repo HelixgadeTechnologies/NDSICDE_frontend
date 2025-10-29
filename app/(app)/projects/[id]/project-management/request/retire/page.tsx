@@ -76,19 +76,17 @@ export default function ProjectRequestRetirementPage() {
   ];
 
   return (
-    <div className="relative mt-12 space-y-7">
-      <div className="absolute right-0 -top-[75px]">
+    <div className="mt-12 space-y-7">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <DashboardStat data={dashboardData} icon="basil:plus-solid" />
+      </div>
+      <div className="w-[200px]">
         <Button
           content="Add Retirement"
           icon="si:add-fill"
           onClick={() => setOpenAddRetirement(true)}
         />
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <DashboardStat data={dashboardData} icon="basil:plus-solid" />
-      </div>
-
       <CardComponent>
         <Table
           tableHead={head}
@@ -157,7 +155,8 @@ export default function ProjectRequestRetirementPage() {
           <p>Amount to reimburse to Staff (N): 200,000</p>
         </div>
 
-        <div className="w-[200px] mt-6">
+        <div className="w-[400px] gap-6 mt-6 flex">
+          <Button content="Submit" isSecondary />
           <Button content="Print" onClick={() => window.print()} />
         </div>
       </CardComponent>
