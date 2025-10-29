@@ -217,7 +217,9 @@ export default function RequestApprovalsTable() {
                 {row.status}
               </td>
               <td className="px-6">
-                <Icon icon={"fluent-mdl2:view"} width={16} height={16} />
+                <Link href={`/request-approvals/retirement/${row.id}`}>
+                  <Icon icon={"fluent-mdl2:view"} width={16} height={16} />
+                </Link>
               </td>
             </>
           )}

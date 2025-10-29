@@ -33,7 +33,7 @@ export default function ChartsAndTableParent() {
   return (
     <div className="space-y-5">
       {/* tabs */}
-      <CardComponent>
+      <CardComponent fitWidth>
         <TabComponent
           width="80"
           data={tabs}
