@@ -3,7 +3,6 @@
 import Button from "@/ui/form/button";
 import DropDown from "@/ui/form/select-dropdown";
 import TextInput from "@/ui/form/text-input";
-import FileUploader from "@/ui/form/file-uploader";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
@@ -86,19 +85,19 @@ export default function AddProjectRequestRetirement({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
+      <Modal isOpen={isOpen} onClose={onClose} maxWidth="700px">
         <Heading heading="Retirement" className="text-center" />
-        <div className="space-y-6 h-[550px] custom-scrollbar overflow-y-auto pr-5">
+        <div className="space-y-6 h-[400px] custom-scrollbar overflow-y-auto px-2">
           <button onClick={addLineItem} className="text-sm primary">Add Line Items</button>
           {lineItems.map((lineItem, index) => (
-            <LineItemDropdown
-            key={lineItem.id}
-            index={index}
-            lineItem={lineItem}
-            onChange={updateLineItem}
-            onRemove={removeLineItem}
-            showRemove={lineItems.length > 1}
-            />
+              <LineItemDropdown
+              key={lineItem.id}
+              index={index}
+              lineItem={lineItem}
+              onChange={updateLineItem}
+              onRemove={removeLineItem}
+              showRemove={lineItems.length > 1}
+              />
           ))}
           <TextInput
             name="actualCost"
@@ -108,13 +107,6 @@ export default function AddProjectRequestRetirement({
             label="Actual Cost of Line Item (₦)"
             isBigger
           />
-          <div className="space-y-1">
-            <p className="font-medium text-sm text-gray-900">
-              Attach vendors’ receipts (this should allow multiple attachments)
-              contract etc. (Pdf, JPEG)
-            </p>
-            <FileUploader />
-          </div>
           <TextInput
             name="name"
             value=""

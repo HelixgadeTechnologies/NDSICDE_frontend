@@ -8,10 +8,13 @@ import { Icon } from "@iconify/react";
 import { useState } from "react";
 import AddProjectRequestRetirement from "@/components/project-management-components/add-project-request-retirement";
 import DashboardStat from "@/ui/dashboard-stat-card";
+import SimpleFileInput from "@/ui/form/simple-file-input";
+import TextInput from "@/ui/form/text-input";
 
 export default function ProjectRequestRetirementPage() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [openAddRetirement, setOpenAddRetirement] = useState(false);
+  const [fileInputs, setFileInputs] = useState<string[]>(["file-1"]);
 
   const head = [
     "Activity Line Description",
@@ -74,6 +77,17 @@ export default function ProjectRequestRetirementPage() {
       icon: "fluent:target-24-filled",
     },
   ];
+
+  const handleAddFileInput = () => {
+    const newId = `file-${Date.now()}`;
+    setFileInputs([...fileInputs, newId]);
+  };
+
+  const handleRemoveFileInput = (id: string) => {
+    if (fileInputs.length > 1) {
+      setFileInputs(fileInputs.filter((inputId) => inputId !== id));
+    }
+  };
 
   return (
     <div className="mt-12 space-y-7">
@@ -154,12 +168,45 @@ export default function ProjectRequestRetirementPage() {
           <p>Amount to reimburse to NDSICDE (N): 200,000</p>
           <p>Amount to reimburse to Staff (N): 200,000</p>
         </div>
-
-        <div className="w-[400px] gap-6 mt-6 flex">
-          <Button content="Submit" isSecondary />
-          <Button content="Print" onClick={() => window.print()} />
-        </div>
       </CardComponent>
+
+      <div className="space-y-4">
+        {fileInputs.map((id) => (
+          <div key={id} className="flex items-center gap-4">
+            <div className="flex items-center flex-1 gap-5">
+              <SimpleFileInput id={id} />
+              <TextInput
+              placeholder="Enter File Name"
+              value=""
+              onChange={() => {}}
+              name="fileName"
+              />
+            </div>
+            {fileInputs.length > 1 && (
+              <button
+                type="button"
+                onClick={() => handleRemoveFileInput(id)}
+                className="text-red-500 hover:text-red-700 transition-colors"
+                aria-label="Remove file input">
+                <Icon icon="pixelarticons:trash" width={20} height={20} />
+              </button>
+            )}
+          </div>
+        ))}
+        
+        <button
+          type="button"
+          onClick={handleAddFileInput}
+          className="flex items-center gap-2 text-gray-400 text-sm hover:text-gray-500 font-medium transition-color cursor-pointers">
+          <Icon icon="si:add-fill" width={18} height={18} />
+          Add file
+        </button>
+      </div>
+
+      <div className="w-[400px] gap-6 mt-6 flex">
+        <Button content="Submit" isSecondary />
+        <Button content="Print" onClick={() => window.print()} />
+      </div>
 
       <AddProjectRequestRetirement
         isOpen={openAddRetirement}
