@@ -25,6 +25,7 @@ import CardComponent from "@/ui/card-wrapper";
 import BackButton from "@/ui/back-button";
 import DeleteModal from "@/ui/generic-delete-modal";
 import TextareaInput from "@/ui/form/textarea";
+import InfoItem from "@/ui/info-item";
 
 export default function FinancialRequestModal() {
   const [rejectRequest, setRejectRequest] = useState(false);
@@ -295,30 +296,5 @@ export default function FinancialRequestModal() {
         </div>
       </Modal>
     </>
-  );
-}
-
-// Helper Component for Info Items
-function InfoItem({
-  label,
-  value,
-  icon,
-  className,
-}: {
-  label: string;
-  value: string;
-  icon?: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`flex flex-col gap-1 ${className}`}>
-      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-        {label}
-      </span>
-      <div className="flex items-center gap-2">
-        {icon && <span className="text-[#D2091E]">{icon}</span>}
-        <span className="text-sm font-semibold text-gray-900">{value}</span>
-      </div>
-    </div>
   );
 }

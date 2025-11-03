@@ -10,6 +10,9 @@ import AddProjectRequestRetirement from "@/components/project-management-compone
 import DashboardStat from "@/ui/dashboard-stat-card";
 import SimpleFileInput from "@/ui/form/simple-file-input";
 import TextInput from "@/ui/form/text-input";
+import InfoItem from "@/ui/info-item";
+import { ActivityIcon, Calendar, FileOutput, Navigation, User } from "lucide-react";
+import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 
 export default function ProjectRequestRetirementPage() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -18,6 +21,7 @@ export default function ProjectRequestRetirementPage() {
 
   const head = [
     "Activity Line Description",
+    "Activity Line Item Description",
     "Quantity",
     "Frequency",
     "Unit Cost (₦)",
@@ -31,6 +35,7 @@ export default function ProjectRequestRetirementPage() {
     {
       userId: "1",
       description: "Accomodation",
+      lineItemDesc: "Lorem ipsum dolor sit amet",
       quantity: 2,
       frequency: 3,
       unit_cost: 300,
@@ -41,6 +46,7 @@ export default function ProjectRequestRetirementPage() {
     {
       userId: "2",
       description: "Accomodation",
+      lineItemDesc: "Lorem ipsum dolor sit amet",
       quantity: 2,
       frequency: 3,
       unit_cost: 300,
@@ -91,9 +97,13 @@ export default function ProjectRequestRetirementPage() {
 
   return (
     <div className="mt-12 space-y-7">
+      {/* stat cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <DashboardStat data={dashboardData} icon="basil:plus-solid" />
       </div>
+
+
+      {/* add retirement button */}
       <div className="w-[200px]">
         <Button
           content="Add Retirement"
@@ -101,6 +111,59 @@ export default function ProjectRequestRetirementPage() {
           onClick={() => setOpenAddRetirement(true)}
         />
       </div>
+      {/* submission details */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+          Submission Details
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <InfoItem
+            label="Submitted by"
+            value="John Doe"
+            icon={<User className="w-4 h-4" />}
+          />
+          <InfoItem
+            label="Output"
+            value="Output Name"
+            icon={<FileOutput className="w-4 h-4" />}
+          />
+          <InfoItem
+            label="Activity Title"
+            value="Activity Title"
+            icon={<ActivityIcon className="w-4 h-4" />}
+          />
+          <InfoItem
+            label="Activity Budget Code"
+            value="000000"
+            icon={<ActivityIcon className="w-4 h-4" />}
+          />
+          <InfoItem
+            label="Activity Locations"
+            value="Location 1"
+            icon={<Navigation className="w-4 h-4" />}
+          />
+          <InfoItem
+            label="Activity Start Date"
+            value="12/04/2025"
+            icon={<Calendar className="w-4 h-4" />}
+          />
+          <InfoItem
+            label="Activity End Date"
+            value="12/04/2025"
+            icon={<Calendar className="w-4 h-4" />}
+          />
+        </div>
+
+        <div className="mt-6">
+          <TitleAndContent
+            title="Activity Purpose/Description"
+            content="Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
+          />
+        </div>
+      </div>
+
+      {/* table */}
       <CardComponent>
         <Table
           tableHead={head}
@@ -110,6 +173,7 @@ export default function ProjectRequestRetirementPage() {
           renderRow={(row) => (
             <>
               <td className="px-6">{row.description}</td>
+              <td className="px-6">{row.lineItemDesc}</td>
               <td className="px-6">{row.quantity}</td>
               <td className="px-6">{row.frequency}</td>
               <td className="px-6">{row.unit_cost}</td>
@@ -176,10 +240,10 @@ export default function ProjectRequestRetirementPage() {
             <div className="flex items-center flex-1 gap-5">
               <SimpleFileInput id={id} />
               <TextInput
-              placeholder="Enter File Name"
-              value=""
-              onChange={() => {}}
-              name="fileName"
+                placeholder="Enter File Name"
+                value=""
+                onChange={() => {}}
+                name="fileName"
               />
             </div>
             {fileInputs.length > 1 && (
@@ -193,7 +257,7 @@ export default function ProjectRequestRetirementPage() {
             )}
           </div>
         ))}
-        
+
         <button
           type="button"
           onClick={handleAddFileInput}

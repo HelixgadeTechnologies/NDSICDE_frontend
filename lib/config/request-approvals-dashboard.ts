@@ -1,26 +1,26 @@
 export const activity_financial_request = [
     {
-      title: "Total Request",
+      title: "Total Requests",
       value: "5",
       icon: "mdi:chart-box-outline",
     },
     {
-      title: "Approved Retirements",
+      title: "Approved Requests",
       value: "3",
       icon: "mdi:check-circle-outline",
-      percentage: "60",
+      percentage: 87,
     },
     {
-      title: "Rejected Retirement",
+      title: "Rejected Requests",
       value: "1",
       icon: "mdi:close-circle-outline",
-      percentage: "20",
+      percentage: 60,
     },
     {
-      title: "Pending Retirement",
+      title: "Pending Requests",
       value: "1",
       icon: "mdi:clock-outline",
-      percentage: "20"
+      percentage: 17,
     },
   ];
 
@@ -29,25 +29,30 @@ export const activity_financial_request = [
       title: "Total Request",
       value: "0",
       icon: "mdi:chart-box-outline",
+     percentage: 10,
     },
     {
       title: "Total Retired",
       value: "0",
       icon: "mdi:check-circle-outline",
+     percentage: 20,
     },
     {
       title: "Total Rejected",
       value: "0",
       icon: "mdi:close-circle-outline",
+     percentage: 45,
     },
     {
       title: "Total Under Review",
       value: "0",
       icon: "mdi:clock-outline",
+     percentage: 0,
     },
      {
-      title: "Total Pending for Review",
+      title: "Yet to be Retired",
       value: "0",
       icon: "mdi:clock-outline",
+     percentage: 20,
     },
   ];
