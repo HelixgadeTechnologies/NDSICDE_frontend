@@ -247,40 +247,12 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
     role: "admin",
     items: [ ...getBaseItems(),  {
         id: "request-approvals",
-        name: "Request Approvals",
+        name: "Request and Retirement Approvals",
         href: "/request-approvals",
         icon: "mdi:approval",
       },],
   },
 };
-
-// export const getSidebarConfig = (
-//   role: UserRole,
-//   currentPath: string
-// ): SidebarConfig => {
-//   const baseConfig = SIDEBAR_CONFIGS[role];
-
-//   // Check if we're in a project context
-//   const PROJECT_CONTEXT_ROUTES = [
-//     "/projects/",
-//     "/financial-dashboard",
-//     "/project-management/"
-//   ] as const;
-
-//   const isProjectContext = PROJECT_CONTEXT_ROUTES.some(route => 
-//     currentPath.includes(route)
-//   );
-
-//   // For admin, super-admin, and team-member: show unified project details sidebar
-//   if (isProjectContext && ["admin", "super-admin", "team-member"].includes(role)) {
-//     return {
-//       ...baseConfig,
-//       items: getProjectDetailsItems(),
-//     };
-//   }
-
-//   return baseConfig;
-// };
 
 export const getSidebarConfig = (
   role: UserRole,
