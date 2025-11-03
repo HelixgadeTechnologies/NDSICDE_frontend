@@ -1,9 +1,6 @@
 "use client";
 
 import Table from "@/ui/table";
-import DropDown from "@/ui/form/select-dropdown";
-import DateRangePicker from "@/ui/form/date-range";
-import { useOrgKPIFormState } from "@/store/admin-store/organizational-kpi-store";
 
 const head = [
   "Code",
@@ -45,72 +42,10 @@ const data = [
   },
 ];
 
-const optionsData = [
-  { value: "1", label: "Option One" },
-  { value: "2", label: "Option Two" },
-  { value: "3", label: "Option Three" },
-];
-
 export default function TableSection() {
-  const {
-    allStrategicObjective,
-    indicators,
-    resultLevel,
-    disaggregation,
-    setField,
-  } = useOrgKPIFormState();
 
   return (
     <section>
-      {/* when api comes, add this on shared parent component if needed */}
-      <div className="flex flex-col md:flex-row mb-5 gap-4 md:items-center w-full mt-10">
-        <DropDown
-          label="Thematic Area"
-          value={""}
-          placeholder="Thematic Area"
-          name="allThematicArea"
-          onChange={() => {}}
-           options={[
-            {label: "Governance", value: "Governance"},
-            {label: "Peace and Security", value: "Peace and Security"},
-            {label: "Livelihood", value: "Livelihood"},
-            {label: "Environment and Climate Change", value: "Environment and Climate Change"},
-          ]}
-        />
-        <DropDown
-          label="Strategic Objective"
-          value={allStrategicObjective}
-          placeholder="Strategic Objective"
-          name="allStrategicObjective"
-          onChange={(value: string) => setField("allStrategicObjective", value)}
-          options={optionsData}
-        />
-        <DropDown
-          label="Result Level"
-          value={resultLevel}
-          placeholder="Impact"
-          name="resultLevel"
-          onChange={(value: string) => setField("resultLevel", value)}
-          options={[]}
-        />
-        <DropDown
-          label="Indicators"
-          value={indicators}
-          placeholder="All Indicators"
-          name="indicators"
-          onChange={(value: string) => setField("indicators", value)}
-          options={[]}
-        />
-        <DateRangePicker label="Date Range" />
-        <DropDown
-          label="Disaggregation"
-          value={disaggregation}
-          placeholder="Sex"
-          name="disaggregation"
-          onChange={(value: string) => setField("disaggregation", value)}
-          options={[]}
-        />
-      </div>
       <Table
         tableHead={head}
         tableData={data}

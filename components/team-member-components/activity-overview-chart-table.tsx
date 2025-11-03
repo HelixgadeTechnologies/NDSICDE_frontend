@@ -74,7 +74,7 @@ function ActivityOverviewTable() {
             activityStatement: "Statement 1", 
             targetFrequency: "Frequency 1", 
             actualFrequency: "Frequency 1",
-            performance: "Perfect",
+            performance: "10%",
             status: "Due to Start",
         },
          {
@@ -82,7 +82,7 @@ function ActivityOverviewTable() {
             activityStatement: "Statement 1", 
             targetFrequency: "Frequency 1", 
             actualFrequency: "Frequency 1",
-            performance: "Perfect",
+            performance: "50%",
             status: "In Progress",
         },
     ];
