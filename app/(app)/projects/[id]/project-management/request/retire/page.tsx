@@ -21,7 +21,6 @@ export default function ProjectRequestRetirementPage() {
 
   const head = [
     "Activity Line Description",
-    "Activity Line Item Description",
     "Quantity",
     "Frequency",
     "Unit Cost (₦)",
@@ -34,7 +33,6 @@ export default function ProjectRequestRetirementPage() {
   const data = [
     {
       userId: "1",
-      description: "Accomodation",
       lineItemDesc: "Lorem ipsum dolor sit amet",
       quantity: 2,
       frequency: 3,
@@ -45,7 +43,6 @@ export default function ProjectRequestRetirementPage() {
     },
     {
       userId: "2",
-      description: "Accomodation",
       lineItemDesc: "Lorem ipsum dolor sit amet",
       quantity: 2,
       frequency: 3,
@@ -172,7 +169,6 @@ export default function ProjectRequestRetirementPage() {
           idKey={"userId"}
           renderRow={(row) => (
             <>
-              <td className="px-6">{row.description}</td>
               <td className="px-6">{row.lineItemDesc}</td>
               <td className="px-6">{row.quantity}</td>
               <td className="px-6">{row.frequency}</td>
