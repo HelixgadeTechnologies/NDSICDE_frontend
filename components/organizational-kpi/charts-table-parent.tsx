@@ -1,17 +1,16 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import CardComponent from "@/ui/card-wrapper";
 import TabComponent from "@/ui/tab-component";
 import TableSection from "./table-section";
 import ChartsComponent from "./charts-section";
 import Heading from "@/ui/text-heading";
 import LineChartComponent from "@/ui/line-chart";
-import { useOrgKPIFormState } from "@/store/admin-store/organizational-kpi-store";
-import { useMemo } from "react";
 import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
+import { useOrgKPIFormState } from "@/store/admin-store/organizational-kpi-store";
 
-// Mock indicators list - replace with your actual data
 const indicatorOptions = [
   { label: "Project Completion Rate", value: "project_completion" },
   { label: "Budget Utilization", value: "budget_utilization" },
@@ -20,28 +19,64 @@ const indicatorOptions = [
   { label: "Community Engagement", value: "community_engagement" },
 ];
 
-// Function to generate random chart data based on indicator
-const generateChartData = (indicator: string) => {
-  const categories = ["Q1", "Q2", "Q3", "Q4"];
-  
-  return categories.map((quarter) => ({
-    name: quarter,
-    baseline: Math.floor(Math.random() * 100) + 50, // Random between 50-150
-    target: Math.floor(Math.random() * 100) + 100, // Random between 100-200
-    actual: Math.floor(Math.random() * 100) + 80, // Random between 80-180
-  }));
+const monthLabels = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
-  console.log("Generated chart data for indicator:", indicator);
-};
+function generateChartData(indicator: string, year: number) {
+  let baseMin = 80, baseMax = 120, targetMin = 110, targetMax = 160, actualMin = 90, actualMax = 150;
+
+  switch (indicator) {
+    case "project_completion":
+      baseMin = 70; baseMax = 120;
+      targetMin = 100; targetMax = 160;
+      actualMin = 80; actualMax = 150;
+      break;
+
+    case "budget_utilization":
+      baseMin = 60; baseMax = 90;
+      targetMin = 90; targetMax = 110;
+      actualMin = 70; actualMax = 100;
+      break;
+
+    case "stakeholder_satisfaction":
+      baseMin = 50; baseMax = 100;
+      targetMin = 80; targetMax = 130;
+      actualMin = 60; actualMax = 120;
+      break;
+
+    case "training_participation":
+      baseMin = 40; baseMax = 80;
+      targetMin = 70; targetMax = 130;
+      actualMin = 50; actualMax = 110;
+      break;
+
+    case "community_engagement":
+      baseMin = 30; baseMax = 100;
+      targetMin = 60; targetMax = 140;
+      actualMin = 40; actualMax = 120;
+      break;
+  }
+
+  // Generate data for each month
+  return monthLabels.map((month) => ({
+    name: month,
+    baseline: Math.floor(Math.random() * (baseMax - baseMin + 1)) + baseMin,
+    target: Math.floor(Math.random() * (targetMax - targetMin + 1)) + targetMin,
+    actual: Math.floor(Math.random() * (actualMax - actualMin + 1)) + actualMin,
+    year,
+  }));
+}
 
 export default function ChartsAndTableParent() {
-  // for switch tab
+  // Tabs
   const tabs = [
     { tabName: "Charts", id: 1 },
     { tabName: "Table", id: 2 },
   ];
 
-  // data for lower line chart
+  // Lower line chart data
   const data = [
     { code: "EDU 01", value: 70 },
     { code: "EDU 02", value: 100 },
@@ -51,51 +86,40 @@ export default function ChartsAndTableParent() {
     { code: "INFRA 02", value: 90 },
   ];
 
-  // lines for lower line chart
   const lines = [
-    {
-      key: "value",
-      label: "Performance",
-      color: "#003B99",
-    },
+    { key: "value", label: "Performance", color: "#003B99" },
   ];
 
-  // for chart child component
-    const {
-      allStrategicObjective,
-      indicators,
-      resultLevel,
-      disaggregation,
-      setField,
-    } = useOrgKPIFormState();
-  
-    // bars for bar chart
-    const bars = [
-      { key: "baseline", label: "Baseline", color: "#003B99" },
-      { key: "target", label: "Target", color: "#D2091E" },
-      { key: "actual", label: "Actual", color: "#22C55E" },
-    ];
-  
-    // Generate chart data dynamically based on selected indicator
-    const chartData = useMemo(() => {
-      if (!indicators) {
-        // Return default data if no indicator selected
-        return [
-          { name: "Q1", baseline: 100, target: 150, actual: 120 },
-          { name: "Q2", baseline: 110, target: 160, actual: 140 },
-          { name: "Q3", baseline: 120, target: 170, actual: 155 },
-          { name: "Q4", baseline: 130, target: 180, actual: 165 },
-        ];
-      }
-      
-      // Generate random data when indicator changes
-      return generateChartData(indicators);
-    }, [indicators]);
+  // Store state
+  const {
+    allStrategicObjective,
+    indicators,
+    resultLevel,
+    disaggregation,
+    setField,
+  } = useOrgKPIFormState();
 
+  // Available years
+  const availableYears = [2024, 2025];
+  const [selectedYear, setSelectedYear] = useState<number>(availableYears[0]);
+  console.log(setSelectedYear(0));
+
+  // Bars for bar chart
+  const bars = [
+    { key: "baseline", label: "Baseline", color: "#003B99" },
+    { key: "target", label: "Target", color: "#D2091E" },
+    { key: "actual", label: "Actual", color: "#22C55E" },
+  ];
+
+  // Generate chart data dynamically based on indicator and year
+  const chartData = useMemo(() => {
+    const indicatorValue = indicators || "project_completion";
+    return generateChartData(indicatorValue, selectedYear);
+  }, [indicators, selectedYear]);
 
   return (
     <div className="space-y-5">
-      {/* tabs */}
+      {/* Filter Section */}
       <CardComponent fitWidth>
         <div className="flex flex-grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10">
           <DropDown
@@ -114,16 +138,16 @@ export default function ChartsAndTableParent() {
               },
             ]}
           />
+
           <DropDown
             label="Strategic Objective"
             value={allStrategicObjective}
             placeholder="Strategic Objective"
             name="allStrategicObjective"
-            onChange={(value: string) =>
-              setField("allStrategicObjective", value)
-            }
+            onChange={(value: string) => setField("allStrategicObjective", value)}
             options={[]}
           />
+
           <DropDown
             label="Result Level"
             value={resultLevel}
@@ -132,6 +156,7 @@ export default function ChartsAndTableParent() {
             onChange={(value: string) => setField("resultLevel", value)}
             options={[]}
           />
+
           <DropDown
             label="Indicators"
             value={indicators}
@@ -140,7 +165,9 @@ export default function ChartsAndTableParent() {
             onChange={(value: string) => setField("indicators", value)}
             options={indicatorOptions}
           />
+
           <DateRangePicker label="Date Range" />
+
           <DropDown
             label="Disaggregation"
             value={disaggregation}
@@ -150,12 +177,20 @@ export default function ChartsAndTableParent() {
             options={[]}
           />
         </div>
+
+        {/* Tabs for Charts/Table */}
         <TabComponent
           width="80"
           data={tabs}
           renderContent={(tabId) => {
             if (tabId === 1) {
-              return <ChartsComponent chartData={chartData} bars={bars} />;
+              return (
+                <ChartsComponent
+                  chartData={chartData}
+                  bars={bars}
+                  availableYears={availableYears}
+                />
+              );
             } else {
               return <TableSection />;
             }
@@ -163,7 +198,7 @@ export default function ChartsAndTableParent() {
         />
       </CardComponent>
 
-      {/* card and lower chart */}
+      {/* Lower KPI Performance Section */}
       <CardComponent>
         <div className="flex justify-between items-center mb-5">
           <Heading
@@ -188,7 +223,7 @@ export default function ChartsAndTableParent() {
           </div>
         </div>
 
-        {/* line chart */}
+        {/* Line Chart */}
         <div className="h-72">
           <LineChartComponent
             data={data}

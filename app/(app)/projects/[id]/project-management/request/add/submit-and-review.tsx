@@ -16,16 +16,18 @@ export default function SubmitAndReview({ onBack, onSubmit }: FormTwoProps) {
     e.preventDefault(); // Prevent form submission
   };
 
-  const head = ["Quantity", "Frequency", "Unit Cost", "Total (₦)"];
+  const head = ["Activity Line Item Description","Quantity", "Frequency", "Unit Cost", "Total (₦)"];
 
   const data = [
     {
+      description: "Lorem ipsum dolor sit amet",
       quantity: 200,
       frequency: 200,
       unit_cost: 200,
       total: 600,
     },
     {
+      description: "Lorem ipsum dolor sit amet",
       quantity: 250,
       frequency: 200,
       unit_cost: 200,
@@ -89,6 +91,9 @@ export default function SubmitAndReview({ onBack, onSubmit }: FormTwoProps) {
               tableData={data}
               renderRow={(row) => (
                 <>
+                  <td className="px-6">
+                    <p className="w-4/5 truncate">{row.description}</p>
+                  </td>
                   <td className="px-6">{row.quantity}</td>
                   <td className="px-6">{row.frequency}</td>
                   <td className="px-6">{row.unit_cost}</td>
