@@ -102,7 +102,7 @@ export default function ChartsAndTableParent() {
   // Available years
   const availableYears = [2024, 2025];
   const [selectedYear, setSelectedYear] = useState<number>(availableYears[0]);
-  console.log(setSelectedYear(0));
+  // console.log(setSelectedYear(0));
 
   // Bars for bar chart
   const bars = [
