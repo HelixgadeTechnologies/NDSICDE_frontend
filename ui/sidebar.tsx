@@ -38,7 +38,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
     if (item.children && item.children.length > 0) {
       e.preventDefault();
       e.stopPropagation();
-      
+
       setOpenDropdowns((prev) => {
         const newSet = new Set(prev);
         if (newSet.has(index)) {
@@ -81,8 +81,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
       <aside
         className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 z-40 flex flex-col items-start p-4 no-print ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition-all duration-300 ease-in-out ${className}`}
-      >
+        } md:translate-x-0 transition-all duration-300 ease-in-out ${className}`}>
         <Link href="/dashboard" className="flex justify-start mt-2.5">
           <Logo />
         </Link>
@@ -95,7 +94,8 @@ export default function Sidebar({ className }: BaseSidebarProps) {
               const isActive =
                 pathname === nav.href ||
                 (pathname.startsWith(nav.href + "/") &&
-                  !pathname.includes("/financial-dashboard") && !pathname.includes("/project-management/"));
+                  !pathname.includes("/financial-dashboard") &&
+                  !pathname.includes("/project-management/"));
               const isDropdownOpen = openDropdowns.has(index);
               const hasChildren = nav.children && nav.children.length > 0;
 
@@ -104,8 +104,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                 return (
                   <div
                     key={index}
-                    className="h-9 w-full px-4 py-2 flex items-center gap-2 mb-2"
-                  >
+                    className="h-9 w-full px-4 py-2 flex items-center gap-2 mb-2">
                     <Icon
                       icon={nav.icon}
                       width={18}
@@ -130,8 +129,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                         isActive
                           ? "bg-[#FFECE5] text-[#D2091E]"
                           : "hover:bg-gray-50 text-gray-600"
-                      }`}
-                    >
+                      }`}>
                       <Icon
                         icon={nav.icon}
                         width={20}
@@ -161,8 +159,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                         isActive
                           ? "bg-[#FFECE5] text-[#D2091E]"
                           : "hover:bg-gray-50 text-gray-600"
-                      }`}
-                    >
+                      }`}>
                       <Icon
                         icon={nav.icon}
                         width={20}
@@ -181,8 +178,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -10, opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="ml-6 mt-1 space-y-1 overflow-y-scroll sidebar"
-                      >
+                        className="ml-6 mt-1 space-y-1 overflow-y-scroll sidebar">
                         {nav.children!.map((child, childIndex) => {
                           const isChildActive = pathname.startsWith(child.href);
                           return (
@@ -190,12 +186,11 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                               key={childIndex}
                               href={child.href}
                               onClick={() => handleChildClick(child)}
-                              className={`h-9 w-full px-3 py-1.5 rounded-[4px] flex items-center gap-2 text-xs ${
+                              className={`h-9 w-full px-3 py-1.5 rounded-[4px] flex items-center gap-2 text-xs relative ${
                                 isChildActive
                                   ? "text-[#D2091E]"
                                   : "hover:bg-gray-50 text-gray-500"
-                              }`}
-                            >
+                              }`}>
                               {child.icon && (
                                 <Icon
                                   icon={child.icon}
@@ -205,6 +200,11 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                                 />
                               )}
                               <span>{child.name}</span>
+                              {child.badge && (
+                                <span className="bg-[var(--primary)] text-white rounded-full size-4 text-[10px] flex justify-center items-center absolute right-2.5 top-2.5">
+                                  {child.badge}
+                                </span>
+                              )}
                             </Link>
                           );
                         })}
@@ -223,8 +223,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                 isSettingsActive
                   ? "bg-[#FFECE5] text-[#D2091E]"
                   : "hover:bg-gray-50 text-gray-600"
-              }`}
-            >
+              }`}>
               <Icon
                 icon={"bi:gear"}
                 width={20}
@@ -235,8 +234,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
             </Link>
             <div
               onClick={handleLogout}
-              className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 hover:bg-[#FFECE5] hover:text-[#D2091E] text-gray-600 cursor-pointer`}
-            >
+              className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 hover:bg-[#FFECE5] hover:text-[#D2091E] text-gray-600 cursor-pointer`}>
               <Icon icon={"heroicons-solid:logout"} width={20} height={20} />
               <span className="text-xs">Logout</span>
             </div>

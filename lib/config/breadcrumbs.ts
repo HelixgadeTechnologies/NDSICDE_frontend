@@ -47,8 +47,12 @@ export const breadcrumbs = [
     header: "View Reports & Comments",
   },
   {
-    href: "/request-and-retirement",
-    header: "Request and Retirement",
+    href: "/request-and-retirement/requests",
+    header: "Project Requests",
+  },
+  {
+    href: "/request-and-retirement/retirements",
+    header: "Project Retirements",
   },
   {
     href: "/projects/[id]/project-management/team",

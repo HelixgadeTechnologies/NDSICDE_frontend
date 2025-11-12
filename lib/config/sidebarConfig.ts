@@ -7,6 +7,7 @@ export interface SidebarItem {
   icon: string;
   children?: SidebarItem[];
   isHeader?: boolean; // New property to identify header items
+  badge?: string;
 }
 
 export interface SidebarConfig {
@@ -226,8 +227,23 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
       {
         id: "request-and-retirement",
         name: "Request and Retirement",
-        href: "/request-and-retirement",
+        href: "#",
         icon: "bi:people",
+        children: [
+          {
+            id: "requests",
+            name: "Requests",
+            href: "/request-and-retirement/requests",
+            icon: ""
+          },
+           {
+            id: "retirements",
+            name: "Retirements",
+            href: "/request-and-retirement/retirements",
+            icon: "",
+            badge: "2"
+          },
+        ]
       },
       {
         id: "organizational-kpi",

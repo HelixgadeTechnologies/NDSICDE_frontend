@@ -27,7 +27,6 @@ export default function RequestApprovalsTable() {
       "Start Date",
       "End Date",
       "Status",
-      "Actions",
     ];
 
     const activityFinancialRequestData = [
@@ -106,17 +105,6 @@ export default function RequestApprovalsTable() {
                     : "text-red-500"
                 }`}>
                 {row.status}
-              </td>
-              <td className="px-6">
-                {/* <Icon
-                  icon={"fluent-mdl2:view"}
-                  width={16}
-                  height={16}
-                  onClick={() => handleModalOpen()}
-                /> */}
-                <Link href={`/request-approvals/requests/${row.id}`}>
-                  <Icon icon={"fluent-mdl2:view"} width={16} height={16} />
-                </Link>
               </td>
             </>
           )}
