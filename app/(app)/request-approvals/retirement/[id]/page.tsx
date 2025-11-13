@@ -6,7 +6,6 @@ import FileDisplay from "@/ui/file-display";
 import Table from "@/ui/table";
 import {
   FileText,
-  DollarSign,
   Calendar,
   Navigation,
   ActivityIcon,
@@ -29,7 +28,7 @@ export default function FinancialRequestModal() {
     "Item Line Description",
     "Quantity",
     "Frequency",
-    "Unit Cost",
+    "Unit Cost (₦)",
     "Total (₦)",
   ];
 
@@ -60,13 +59,13 @@ export default function FinancialRequestModal() {
             <div className="flex justify-between items-start">
               <div>
                 <Heading
-                  heading="Financial Request"
+                  heading="Financial Retirement"
                   subtitle="Community Health Initiative - Submitted on May 15, 2023 at 10:30"
                 />
               </div>
               <div className="w-[200px]">
                 <Button
-                  content="Print Request"
+                  content="Print Retirement"
                   isSecondary
                   onClick={() => window.print()}
                 />
@@ -74,7 +73,8 @@ export default function FinancialRequestModal() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* grid details */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Submission Details Card */}
@@ -128,44 +128,6 @@ export default function FinancialRequestModal() {
                   />
                 </div>
               </div>
-
-              {/* Budget Breakdown Card */}
-              <CardComponent>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-[#D2091E]" />
-                  Budget Breakdown
-                </h3>
-                <Table
-                  tableHead={head}
-                  tableData={data}
-                  renderRow={(row) => (
-                    <>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                        <p className="w-[160px] truncate">{row.description}</p>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {row.quantity}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {row.frequency}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        ₦{row.unit_cost.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                        ₦{row.total.toLocaleString()}
-                      </td>
-                    </>
-                  )}
-                />
-                {/* grand total */}
-                <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
-                  <div className="text-right">
-                    <p className="text-sm text-gray-600">Grand Total</p>
-                    <p className="text-2xl font-bold text-gray-900">₦1,250</p>
-                  </div>
-                </div>
-              </CardComponent>
             </div>
 
             {/* Right Column - Supporting Documents & Actions */}
@@ -201,6 +163,39 @@ export default function FinancialRequestModal() {
               </CardComponent>
             </div>
           </div>
+
+
+          {/* table */}
+          <CardComponent>
+            <Table
+              tableHead={head}
+              tableData={data}
+              renderRow={(row) => (
+                <>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    <p className="w-[160px] truncate">{row.description}</p>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {row.quantity}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {row.frequency}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    ₦{row.unit_cost.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                    ₦{row.total.toLocaleString()}
+                  </td>
+                </>
+              )}
+            />
+            <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
+              <p>Total Activity Cost (N): 100,00</p>
+              <p>Amount to reimburse to NDSICDE (N): 200,000</p>
+              <p>Amount to reimburse to Staff (N): 200,000</p>
+            </div>
+          </CardComponent>
         </div>
       </div>
 
