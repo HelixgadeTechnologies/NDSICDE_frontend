@@ -25,27 +25,35 @@ export default function FinancialRequestModal() {
   // const [reviewRequest, setReviewRequest] = useState(false);
 
   const head = [
-    "Item Line Description",
+    "Activity Line Description",
     "Quantity",
     "Frequency",
     "Unit Cost (₦)",
-    "Total (₦)",
+    "Total Budget (₦)",
+    "Actual Cost (₦)",
+    "Variance",
   ];
 
   const data = [
     {
-      description: "Lorem ipsum dolor sit amet. lorem ipsum dolor sit amet",
-      quantity: 200,
-      frequency: 200,
-      unit_cost: 200,
-      total: 600,
+      userId: "1",
+      lineItemDesc: "Lorem ipsum dolor sit amet",
+      quantity: 2,
+      frequency: 3,
+      unit_cost: 300,
+      total_budget: 180,
+      actual_cost: 240,
+      variance: 600,
     },
     {
-      description: "Lorem ipsum dolor sit amet",
-      quantity: 250,
-      frequency: 200,
-      unit_cost: 200,
-      total: 650,
+      userId: "2",
+      lineItemDesc: "Lorem ipsum dolor sit amet",
+      quantity: 2,
+      frequency: 3,
+      unit_cost: 300,
+      total_budget: 180,
+      actual_cost: 240,
+      variance: 600,
     },
   ];
 
@@ -136,34 +144,15 @@ export default function FinancialRequestModal() {
               <CardComponent>
                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-[#D2091E]" />
-                  Supporting Document
+                  Supporting Document (s)
                 </h3>
                 <FileDisplay
                   filename="progress_photos.zip"
                   filesize="15.2 MB"
                 />
-
-                {/* Action Buttons */}
-                <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
-                  <Button
-                    content="Approve"
-                    // onClick={() => setApproveRequest(true)}
-                  />
-                  <Button
-                    content="Review"
-                    isSecondary
-                    // onClick={() => setReviewRequest(true)}
-                  />
-                  <Button
-                    content="Reject"
-                    isSecondary
-                    // onClick={() => setRejectRequest(true)}
-                  />
-                </div>
               </CardComponent>
             </div>
           </div>
-
 
           {/* table */}
           <CardComponent>
@@ -172,21 +161,13 @@ export default function FinancialRequestModal() {
               tableData={data}
               renderRow={(row) => (
                 <>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    <p className="w-[160px] truncate">{row.description}</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {row.quantity}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    {row.frequency}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    ₦{row.unit_cost.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                    ₦{row.total.toLocaleString()}
-                  </td>
+                  <td className="px-6">{row.lineItemDesc}</td>
+                  <td className="px-6">{row.quantity}</td>
+                  <td className="px-6">{row.frequency}</td>
+                  <td className="px-6">{row.unit_cost}</td>
+                  <td className="px-6">{row.total_budget}</td>
+                  <td className="px-6">{row.actual_cost}</td>
+                  <td className="px-6">{row.variance}</td>
                 </>
               )}
             />
@@ -197,6 +178,24 @@ export default function FinancialRequestModal() {
             </div>
           </CardComponent>
         </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-6 pt-6 border-t border-gray-200 flex items-center gap-3 w-[500px]">
+        <Button
+          content="Approve"
+          // onClick={() => setApproveRequest(true)}
+        />
+        <Button
+          content="Review"
+          isSecondary
+          // onClick={() => setReviewRequest(true)}
+        />
+        <Button
+          content="Reject"
+          isSecondary
+          // onClick={() => setRejectRequest(true)}
+        />
       </div>
 
       {/* Reject Modal */}

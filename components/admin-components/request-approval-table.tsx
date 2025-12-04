@@ -124,7 +124,7 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
       "Total Budget (₦)",
       "Actual Cost (₦)",
       "Variance",
-      // "Actions",
+      "Actions",
     ];
 
     const data = [
