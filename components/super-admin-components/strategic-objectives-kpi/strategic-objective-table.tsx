@@ -115,7 +115,3 @@ export default function SOTable() {
     </section>
   );
 }
-function async(arg0: any) {
-  throw new Error("Function not implemented.");
-}
-

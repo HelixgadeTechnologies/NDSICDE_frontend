@@ -139,62 +139,71 @@ export const expenseCategoriesBreakdown = [
   { name: "Other", value: 14 },
 ];
 
-export const recentActivities = [
-  {
-    id: 1,
-    activity: "submitted a new report",
-    project: "Water Sanitation",
-    time: "2 hours ago",
-    name: "John Doe",
-    role: "Project Manager",
-    status: "Success",
-  },
-  {
-    id: 2,
-    activity: "updated KPI targets",
-    project: "Food Security",
-    time: "5 hours ago",
-    name: "Alice Smith",
-    role: "Project Manager",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    activity: "approved the financial request",
-    project: "Infrastructure Development",
-    time: "5 hours ago",
-    name: "Micheal Brown",
-    role: "Project Manager",
-    status: "Success",
-  },
-  {
-    id: 4,
-    activity: "added a new team member",
-    project: "Health Outreach",
-    time: "1 day ago",
-    name: "Emily Johnson",
-    role: "Project Manager",
-    status: "Failed",
-  },
-  {
-    id: 5,
-    activity: "completed the project review",
-    project: "Community Engagement",
-    time: "2 days ago",
-    name: "David Wilson",
-    role: "Project Manager",
-    status: "Success",
-  },
-  {
-    id: 6,
-    activity: "submitted a new proposal",
-    project: "Education Initiative",
-    time: "3 days ago",
-    name: "Sarah Davis",
-    role: "Project Manager",
-    status: "Pending",
-  },
-];
+// export const recentActivities = [
+//   {
+//     id: 1,
+//     activity: "submitted a new report",
+//     project: "Water Sanitation",
+//     time: "2 hours ago",
+//     name: "John Doe",
+//     role: "Project Manager",
+//     status: "Success",
+//   },
+//   {
+//     id: 2,
+//     activity: "updated KPI targets",
+//     project: "Food Security",
+//     time: "5 hours ago",
+//     name: "Alice Smith",
+//     role: "Project Manager",
+//     status: "Pending",
+//   },
+//   {
+//     id: 3,
+//     activity: "approved the financial request",
+//     project: "Infrastructure Development",
+//     time: "5 hours ago",
+//     name: "Micheal Brown",
+//     role: "Project Manager",
+//     status: "Success",
+//   },
+//   {
+//     id: 4,
+//     activity: "added a new team member",
+//     project: "Health Outreach",
+//     time: "1 day ago",
+//     name: "Emily Johnson",
+//     role: "Project Manager",
+//     status: "Failed",
+//   },
+//   {
+//     id: 5,
+//     activity: "completed the project review",
+//     project: "Community Engagement",
+//     time: "2 days ago",
+//     name: "David Wilson",
+//     role: "Project Manager",
+//     status: "Success",
+//   },
+//   {
+//     id: 6,
+//     activity: "submitted a new proposal",
+//     project: "Education Initiative",
+//     time: "3 days ago",
+//     name: "Sarah Davis",
+//     role: "Project Manager",
+//     status: "Pending",
+//   },
+// ];
+
+export interface Activity {
+  id: string | number;
+  name: string;
+  activity: string;
+  project: string;
+  time: string;
+}
+export const recentActivities: Activity[] = [];
 
 export const pendingActivityFundRequest = [
   {
