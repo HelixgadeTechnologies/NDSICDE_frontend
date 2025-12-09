@@ -2,26 +2,26 @@
 
 import Table from "@/ui/table";
 import { useStrategicObjectivesAndKPIsModal } from "@/utils/strategic-objective-kpi-utility";
-import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "framer-motion";
+// import { Icon } from "@iconify/react";
+// import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import AddKPIModal from "./add-kpi-form";
 import axios from "axios";
-import { useStrategicObjectivesAndKPIsState } from "@/store/admin-store/strategic-objectives-kpi-store";
+// import { useStrategicObjectivesAndKPIsState } from "@/store/admin-store/strategic-objectives-kpi-store";
 
 export default function SOTable() {
   const head = ["Objective Name", "Linked KPIs", "Status", "Actions"];
-  const [data, setData] = useState<Array<any>>([]);
-  const [activeRowId, setActiveRowId] = useState<number | null>(null);
+  const [data, setData] = useState([]);
+  // const [activeRowId, setActiveRowId] = useState<number | null>(null);
 
-  const { addKPI, setAddKPI, handleAddKPI } =
+  const { addKPI, setAddKPI } =
     useStrategicObjectivesAndKPIsModal();
 
-    const {
-    strategicObjectiveStatement,
-    thematicAreas,
-    pillarLeadEmail,
-  } = useStrategicObjectivesAndKPIsState();
+  //   const {
+  //   strategicObjectiveStatement,
+  //   thematicAreas,
+  //   pillarLeadEmail,
+  // } = useStrategicObjectivesAndKPIsState();
 
     // get strategic objectives data 
     useEffect(() => {
@@ -105,7 +105,7 @@ export default function SOTable() {
           //     )}
           //   </td>
           // </>
-          <></>
+          <>{row}</>
         )}
       />
 

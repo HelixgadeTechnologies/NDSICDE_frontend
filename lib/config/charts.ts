@@ -202,6 +202,8 @@ export interface Activity {
   activity: string;
   project: string;
   time: string;
+  role?: string;
+  status?: "Success" | "Pending"
 }
 export const recentActivities: Activity[] = [];
 

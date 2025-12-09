@@ -8,7 +8,7 @@ import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
 import axios from "axios";
 import { FormEvent } from "react";
-import { token } from "@/lib/api/credentials";
+import { getToken } from "@/lib/api/credentials";
 
 type AddSOProps = {
   isOpen: boolean;
@@ -29,6 +29,7 @@ export default function AddStrategicObjectiveModal({
   const handleSO = async (e: FormEvent) => {
     e.preventDefault();
 
+    const token = getToken();
     if (!token) {
       console.error("No token found in localStorage under 'role-storage'");
       return;

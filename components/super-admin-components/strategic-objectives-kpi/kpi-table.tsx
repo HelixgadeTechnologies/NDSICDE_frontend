@@ -1,9 +1,9 @@
 "use client";
 
 import Table from "@/ui/table";
-import { Icon } from "@iconify/react";
+// import { Icon } from "@iconify/react";
+// import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios";
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function KPITable() {
@@ -18,8 +18,8 @@ export default function KPITable() {
   ];
 
 
-  const [activeRowId, setActiveRowId] = useState<number | null>(null);
-  const [data, setData] = useState<any>([]);
+  // const [activeRowId, setActiveRowId] = useState<number | null>(null);
+  const [data, setData] = useState([]);
 
     // get strategic objectives kpi 
     useEffect(() => {
@@ -105,7 +105,7 @@ export default function KPITable() {
         //     )}
         //   </td>
         // </>
-        <></>
+        <>{row}</>
       )}
     />
   );

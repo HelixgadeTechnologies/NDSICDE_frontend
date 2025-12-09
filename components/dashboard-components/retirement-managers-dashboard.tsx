@@ -1,5 +1,5 @@
 import RetirementManagersChartAnalytics from "@/components/retirement-managers-components/dashboard/chart-analytics";
-import RetirementManagersDashboardTable from "@/components/retirement-managers-components/dashboard/table-parent";
+// import RetirementManagersDashboardTable from "@/components/retirement-managers-components/dashboard/table-parent";
 import DashboardStat from "@/ui/dashboard-stat-card";
 import RequestApprovalsTable from "../admin-components/request-approval-table";
 
