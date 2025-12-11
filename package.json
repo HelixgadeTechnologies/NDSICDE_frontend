@@ -16,7 +16,7 @@
     "jose": "^6.0.12",
     "lucide-react": "^0.546.0",
     "naija-state-local-government": "^1.1.2",
-    "next": "15.3.5",
+    "next": "^16.0.8",
     "react": "^19.0.0",
     "react-date-range": "^2.0.1",
     "react-dom": "^19.0.0",
