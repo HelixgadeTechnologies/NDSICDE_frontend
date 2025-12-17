@@ -10,6 +10,7 @@ type InputProps = {
     isUppercase?: boolean;
     isBigger?: boolean;
     isDisabled?: boolean;
+    error?: string;
 }
 
 export default function TextInput ({
@@ -21,6 +22,7 @@ export default function TextInput ({
     isUppercase,
     isBigger = false,
     isDisabled,
+    error,
 }: InputProps) {
 
     return (
@@ -35,6 +37,7 @@ export default function TextInput ({
             placeholder={placeholder}
             className={`${isBigger ? 'h-12': 'h-10'} w-full outline-none border border-gray-300 focus:border-[var(--primary-light)] rounded-[6px] p-4 text-sm ${isDisabled ? 'cursor-not-allowed text-gray-400' : ''}`}
             />
+            {error && <p className="text-xs text-red-500">{error}</p>}
         </div>
     )
 }

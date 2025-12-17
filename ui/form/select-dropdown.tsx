@@ -13,6 +13,7 @@ type DropDownProps = {
   isBigger?: boolean;
   options: { value: string; label: string }[];
   isDisabled?: boolean;
+  error?: string;
 };
 
 export default function DropDown({
@@ -24,6 +25,7 @@ export default function DropDown({
   isBigger,
   options = [],
   isDisabled,
+  error,
 }: DropDownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -89,6 +91,7 @@ export default function DropDown({
           }`}
         />
       </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
 
       {/* Dropdown menu */}
       <AnimatePresence>

@@ -43,3 +43,38 @@ export const years = [
     { label: "4 Years", value: "4_year" },
     { label: "5 Years", value: "5_year" },
 ];
+
+
+// Currency options
+export const CURRENCY_OPTIONS = [
+  { label: "USD ($)", value: "USD" },
+  { label: "NGN (₦)", value: "NGN" },
+  { label: "EUR (€)", value: "EUR" },
+  { label: "GBP (£)", value: "GBP" },
+];
+
+// Country options
+export const COUNTRY_OPTIONS = [
+  { label: "Nigeria", value: "Nigeria" },
+  { label: "Ghana", value: "Ghana" },
+  { label: "Kenya", value: "Kenya" },
+  { label: "South Africa", value: "South Africa" },
+];
+
+// Strategic objective options (example - adjust based on your needs)
+export const STRATEGIC_OBJECTIVE_OPTIONS = [
+  { label: "Infrastructure Development", value: "infrastructure" },
+  { label: "Community Empowerment", value: "community" },
+  { label: "Economic Growth", value: "economic" },
+  { label: "Environmental Sustainability", value: "environmental" },
+];
+
+// Thematic areas
+export const THEMATIC_AREAS = [
+  "Environment",
+  "Economic Diversification",
+  "Governance",
+  "Peace and Security",
+  "Organizational Transformation",
+  "Strategic Partnership",
+];
