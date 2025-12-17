@@ -6,7 +6,7 @@ import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
-import { useUserManagementState } from "@/store/admin-store/user-management-store";
+import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
 import { ChangeEvent } from "react";
 import TagInput from "@/ui/form/tag-input";
 
@@ -17,7 +17,12 @@ type EditProps = {
   onEdit: () => void;
 };
 
-export default function EditTeamMember({ isOpen, onClose, user, onEdit }: EditProps) {
+export default function EditTeamMember({
+  isOpen,
+  onClose,
+  user,
+  onEdit,
+}: EditProps) {
   const {
     fullName,
     email,
@@ -38,7 +43,7 @@ export default function EditTeamMember({ isOpen, onClose, user, onEdit }: EditPr
 
   const handleEdit = () => {
     onEdit();
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">

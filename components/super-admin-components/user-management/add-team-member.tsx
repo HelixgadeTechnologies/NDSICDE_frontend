@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserManagementState } from "@/store/admin-store/user-management-store";
+import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
 import { ChangeEvent, useEffect, useState } from "react";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
@@ -23,7 +23,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   const [roles, setRoles] = useState<RoleOption[]>([]);
   const [isFetchingRoles, setIsFetchingRoles] = useState(false);
   const [layerOfApproval, setLayerOfApproval] = useState<string>("");
-  
+
   const {
     fullName,
     email,
@@ -44,35 +44,36 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   ];
 
   const departments = [
-    {label: "Finance", value: "Finance"},
-    {label: "Agriculture", value: "Agriculture"},
-    {label: "Banking", value: "Banking"},
+    { label: "Finance", value: "Finance" },
+    { label: "Agriculture", value: "Agriculture" },
+    { label: "Banking", value: "Banking" },
   ];
 
   const layerOptions = [
-    {label: "Project Manager (Layer 1)", value: "project-manager"},
-    {label: "Finance Team Member (Layer 2)", value: "finance-team"},
-    {label: "Finance Manager (Layer 3)", value: "finance manager"},
-    {label: "Country Director (Layer 4)", value: "country-director"},
-    {label: "All layers", value: "all-layers"},
+    { label: "Project Manager (Layer 1)", value: "project-manager" },
+    { label: "Finance Team Member (Layer 2)", value: "finance-team" },
+    { label: "Finance Manager (Layer 3)", value: "finance manager" },
+    { label: "Country Director (Layer 4)", value: "country-director" },
+    { label: "All layers", value: "all-layers" },
   ];
 
   // Check if selected role is "RETIREMENT MANAGER"
-  const selectedRole = roles.find(role => role.value === roleId);
-  const isRetirementManager = selectedRole?.label?.toUpperCase() === "RETIREMENT MANAGER";
+  const selectedRole = roles.find((role) => role.value === roleId);
+  const isRetirementManager =
+    selectedRole?.label?.toUpperCase() === "RETIREMENT MANAGER";
 
   // Fetch roles from API
   useEffect(() => {
     const fetchRoles = async () => {
       if (!token) return;
-      
+
       setIsFetchingRoles(true);
       try {
         const roleOptions = await getRoleOptions(token);
         setRoles(roleOptions);
       } catch (error) {
-        console.error('Failed to fetch roles:', error);
-        setError('Failed to load roles');
+        console.error("Failed to fetch roles:", error);
+        setError("Failed to load roles");
       } finally {
         setIsFetchingRoles(false);
       }
@@ -94,7 +95,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     if (!token) {
       setError("Authentication token not available");
       setIsLoading(false);
@@ -110,17 +111,17 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         department,
         phoneNumber,
         status,
-        assignedProjectId: '',
-        ...(isRetirementManager && layerOfApproval && { layerOfApproval })
+        assignedProjectId: "",
+        ...(isRetirementManager && layerOfApproval && { layerOfApproval }),
       };
 
       const response = await createUser(userData, token);
       console.log("User created successfully:", response.message);
       onClose();
-      window.dispatchEvent(new CustomEvent('teamMemberUpdated'));
+      window.dispatchEvent(new CustomEvent("teamMemberUpdated"));
     } catch (error) {
       console.error(error);
-      setError('Failed to create user');
+      setError("Failed to create user");
     } finally {
       setIsLoading(false);
     }
@@ -159,8 +160,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             isDisabled={isFetchingRoles}
             onChange={(value: string) => setField("roleId", value)}
           />
-          
-          
+
           <DropDown
             label="Department"
             options={departments}
@@ -179,8 +179,8 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
           <DropDown
             label="Status"
             options={[
-              {label: "Active", value: "Active"},
-              {label: "Inactive", value: "Inactive"},
+              { label: "Active", value: "Active" },
+              { label: "Inactive", value: "Inactive" },
             ]}
             name="status"
             value={status}
@@ -189,14 +189,14 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
           {/* Conditional Layer of Approval dropdown */}
           {isRetirementManager && (
             <div className="col-span-2">
-                <DropDown
-                  label="Layer of Approval"
-                  options={layerOptions}
-                  name="layerOfApproval"
-                  value={layerOfApproval}
-                  placeholder="Select layer"
-                  onChange={(value: string) => setLayerOfApproval(value)}
-                />
+              <DropDown
+                label="Layer of Approval"
+                options={layerOptions}
+                name="layerOfApproval"
+                value={layerOfApproval}
+                placeholder="Select layer"
+                onChange={(value: string) => setLayerOfApproval(value)}
+              />
             </div>
           )}
           <div className="col-span-2">
@@ -208,14 +208,10 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             />
           </div>
         </div>
-        {error && (
-          <div className="text-red-500 text-sm mb-4">
-            {error}
-          </div>
-        )}
-        <Button 
-          content="Save Changes" 
-          isLoading={isLoading} 
+        {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+        <Button
+          content="Save Changes"
+          isLoading={isLoading}
           isDisabled={isLoading || isFetchingRoles}
         />
       </form>

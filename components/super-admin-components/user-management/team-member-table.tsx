@@ -3,7 +3,7 @@
 import { Icon } from "@iconify/react";
 import { head } from "@/types/team-members";
 import { useTeamMemberModal } from "@/utils/team-member-utility";
-import { useUserManagementState } from "@/store/admin-store/user-management-store";
+import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Table from "@/ui/table";
@@ -117,8 +117,7 @@ export default function TeamMembersTable() {
                 row.status == "Active" || row.status == "ACTIVE"
                   ? "text-green-500"
                   : "text-red-500"
-              }`}
-            >
+              }`}>
               <span className="capitalize">{row.status}</span>
             </td>
             <td className="px-6">{formatDate(row.loginLast, "short")}</td>
@@ -146,20 +145,17 @@ export default function TeamMembersTable() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -10, opacity: 0 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
-                  >
+                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]">
                     <ul className="text-sm">
                       <li
                         onClick={() => handleViewUser(row, setActiveRowId)}
-                        className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center"
-                      >
+                        className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                         <Icon icon={"hugeicons:view"} height={20} width={20} />
                         View Profile
                       </li>
                       <li
                         onClick={() => handleEditUser(row, setActiveRowId)}
-                        className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center"
-                      >
+                        className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center">
                         <Icon
                           icon={"ph:pencil-simple-line"}
                           height={20}
@@ -169,8 +165,7 @@ export default function TeamMembersTable() {
                       </li>
                       <li
                         onClick={() => handleDeleteUser(row, setActiveRowId)}
-                        className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center"
-                      >
+                        className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
                         <Icon
                           icon={"pixelarticons:trash"}
                           height={20}

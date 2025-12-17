@@ -9,7 +9,7 @@ import Heading from "@/ui/text-heading";
 import LineChartComponent from "@/ui/line-chart";
 import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
-import { useOrgKPIFormState } from "@/store/admin-store/organizational-kpi-store";
+import { useOrgKPIFormState } from "@/store/super-admin-store/organizational-kpi-store";
 
 const indicatorOptions = [
   { label: "Project Completion Rate", value: "project_completion" },
@@ -20,42 +20,72 @@ const indicatorOptions = [
 ];
 
 const monthLabels = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 function generateChartData(indicator: string, year: number) {
-  let baseMin = 80, baseMax = 120, targetMin = 110, targetMax = 160, actualMin = 90, actualMax = 150;
+  let baseMin = 80,
+    baseMax = 120,
+    targetMin = 110,
+    targetMax = 160,
+    actualMin = 90,
+    actualMax = 150;
 
   switch (indicator) {
     case "project_completion":
-      baseMin = 70; baseMax = 120;
-      targetMin = 100; targetMax = 160;
-      actualMin = 80; actualMax = 150;
+      baseMin = 70;
+      baseMax = 120;
+      targetMin = 100;
+      targetMax = 160;
+      actualMin = 80;
+      actualMax = 150;
       break;
 
     case "budget_utilization":
-      baseMin = 60; baseMax = 90;
-      targetMin = 90; targetMax = 110;
-      actualMin = 70; actualMax = 100;
+      baseMin = 60;
+      baseMax = 90;
+      targetMin = 90;
+      targetMax = 110;
+      actualMin = 70;
+      actualMax = 100;
       break;
 
     case "stakeholder_satisfaction":
-      baseMin = 50; baseMax = 100;
-      targetMin = 80; targetMax = 130;
-      actualMin = 60; actualMax = 120;
+      baseMin = 50;
+      baseMax = 100;
+      targetMin = 80;
+      targetMax = 130;
+      actualMin = 60;
+      actualMax = 120;
       break;
 
     case "training_participation":
-      baseMin = 40; baseMax = 80;
-      targetMin = 70; targetMax = 130;
-      actualMin = 50; actualMax = 110;
+      baseMin = 40;
+      baseMax = 80;
+      targetMin = 70;
+      targetMax = 130;
+      actualMin = 50;
+      actualMax = 110;
       break;
 
     case "community_engagement":
-      baseMin = 30; baseMax = 100;
-      targetMin = 60; targetMax = 140;
-      actualMin = 40; actualMax = 120;
+      baseMin = 30;
+      baseMax = 100;
+      targetMin = 60;
+      targetMax = 140;
+      actualMin = 40;
+      actualMax = 120;
       break;
   }
 
@@ -86,9 +116,7 @@ export default function ChartsAndTableParent() {
     { code: "INFRA 02", value: 90 },
   ];
 
-  const lines = [
-    { key: "value", label: "Performance", color: "#003B99" },
-  ];
+  const lines = [{ key: "value", label: "Performance", color: "#003B99" }];
 
   // Store state
   const {
@@ -144,7 +172,9 @@ export default function ChartsAndTableParent() {
             value={allStrategicObjective}
             placeholder="Strategic Objective"
             name="allStrategicObjective"
-            onChange={(value: string) => setField("allStrategicObjective", value)}
+            onChange={(value: string) =>
+              setField("allStrategicObjective", value)
+            }
             options={[]}
           />
 

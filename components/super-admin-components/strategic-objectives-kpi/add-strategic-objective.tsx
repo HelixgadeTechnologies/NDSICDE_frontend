@@ -1,6 +1,6 @@
 "use client";
 
-import { useStrategicObjectivesAndKPIsState } from "@/store/admin-store/strategic-objectives-kpi-store";
+import { useStrategicObjectivesAndKPIsState } from "@/store/super-admin-store/strategic-objectives-kpi-store";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";

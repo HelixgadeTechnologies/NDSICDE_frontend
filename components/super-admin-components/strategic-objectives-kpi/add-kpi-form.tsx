@@ -4,7 +4,7 @@ import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
-import { useStrategicObjectivesAndKPIsState } from "@/store/admin-store/strategic-objectives-kpi-store";
+import { useStrategicObjectivesAndKPIsState } from "@/store/super-admin-store/strategic-objectives-kpi-store";
 import Button from "@/ui/form/button";
 import DisaggregationComponent from "@/ui/disaggregation-component";
 
@@ -76,7 +76,7 @@ export default function AddKPIModal({ isOpen, onClose }: AddKPIFormProps) {
             options={[]}
           />
           {/* checkboxes */}
-          <DisaggregationComponent/>
+          <DisaggregationComponent />
 
           <TextInput
             label="Baseline"
