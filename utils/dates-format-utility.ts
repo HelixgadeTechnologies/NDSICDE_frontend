@@ -135,26 +135,41 @@ export const dateUtils = {
   }
 };
 
-// Examples of usage:
-/*
-const isoDate = "2025-08-06T13:52:12.198Z";
-
-console.log(formatDate(isoDate, 'full'));      // "August 6, 2025 at 1:52 PM"
-console.log(formatDate(isoDate, 'short'));     // "Aug 6, 2025, 1:52 PM"
-console.log(formatDate(isoDate, 'relative'));  // "in 11 months" (from current date)
-console.log(formatDate(isoDate, 'date-only')); // "August 6, 2025"
-console.log(formatDate(isoDate, 'time'));      // "1:52 PM"
-
-// Using utility functions
-console.log(dateUtils.toReadable(isoDate));    // "August 6, 2025 at 1:52 PM"
-console.log(dateUtils.toCompact(isoDate));     // "Aug 6, 2025, 1:52 PM"
-console.log(dateUtils.toRelative(isoDate));    // "in 11 months"
-
-// Custom formatting
-console.log(formatDate(isoDate, 'custom', {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-})); // "Wednesday, August 6, 2025"
-*/
+export function convertDateToISO8601(dateInput: any) {
+  if (!dateInput) return '';
+  
+  // If it's already a Date object
+  if (dateInput instanceof Date) {
+    return dateInput.toISOString();
+  }
+  
+  // If it's not a string, return empty
+  if (typeof dateInput !== 'string') {
+    return '';
+  }
+  
+  const dateString = dateInput.trim();
+  
+  // If already in ISO format
+  if (dateString.includes('T') && dateString.includes('Z')) {
+    return dateString;
+  }
+  
+  // Handle MM/DD/YYYY format (like 12/04/2025)
+  const match = dateString.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (match) {
+    const [, month, day, year] = match;
+    // Create date at midnight UTC to avoid timezone issues
+    const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+    return date.toISOString();
+  }
+  
+  // Fallback: try parsing the date string directly
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    console.error('Invalid date format:', dateString);
+    return '';
+  }
+  
+  return date.toISOString();
+}

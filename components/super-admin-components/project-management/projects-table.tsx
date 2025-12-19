@@ -14,7 +14,8 @@ import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import Heading from "@/ui/text-heading";
 import { ProjectApiResponse } from "@/types/admin-types";
-
+import Modal from "@/ui/popup-modal";
+import Button from "@/ui/form/button";
 
 export default function ProjectsTable() {
   const [query, setQuery] = useState("");
@@ -23,6 +24,9 @@ export default function ProjectsTable() {
   const [filteredData, setFilteredData] = useState<ProjectApiResponse[]>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const { user } = useRoleStore();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null); // Add this
+  const { token } = useRoleStore();
 
   // Status options for dropdown
   const statusOptions = [
@@ -44,9 +48,12 @@ export default function ProjectsTable() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/projects`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/projects`
+        );
         setData(res.data.data);
         setFilteredData(res.data.data);
+        console.log(res.data.data)
       } catch (error) {
         console.error(`Error fetching projects:`, error);
         setData([]);
@@ -65,16 +72,18 @@ export default function ProjectsTable() {
     // Apply search filter
     if (query) {
       const lowerQuery = query.toLowerCase();
-      result = result.filter(item => {
+      result = result.filter((item) => {
         const projectName = item.projectName || "";
         const community = item.community || "";
         const state = item.state || "";
-        
+
         return (
           projectName.toLowerCase().includes(lowerQuery) ||
           community.toLowerCase().includes(lowerQuery) ||
           state.toLowerCase().includes(lowerQuery) ||
-          item.strategicObjectiveStatement?.toLowerCase().includes(lowerQuery) ||
+          item.strategicObjectiveStatement
+            ?.toLowerCase()
+            .includes(lowerQuery) ||
           item.thematicAreasOrPillar?.toLowerCase().includes(lowerQuery)
         );
       });
@@ -82,18 +91,18 @@ export default function ProjectsTable() {
 
     // Apply status filter
     if (filters.status) {
-      result = result.filter(item => item.status === filters.status);
+      result = result.filter((item) => item.status === filters.status);
     }
 
     setFilteredData(result);
   }, [query, filters, data]);
 
-  const handleFilterChange = (name: string, value: string) => {
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // const handleFilterChange = (name: string, value: string) => {
+  //   setFilters(prev => ({
+  //     ...prev,
+  //     [name]: value
+  //   }));
+  // };
 
   const head = [
     "Project Name",
@@ -105,6 +114,32 @@ export default function ProjectsTable() {
     "Thematic Areas",
     "Actions",
   ];
+
+  const handleDelete = async (projectId: string) => {
+    const payload = {
+      projectId: projectId,
+    };
+
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/delete`,
+        {
+          data: payload,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Deleted successfully:", response.data);
+      // Refresh the table by removing the deleted project
+    setData(prev => prev.filter(p => p.projectId !== projectId));
+    setFilteredData(prev => prev.filter(p => p.projectId !== projectId));
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    }
+  };
 
   return (
     <CardComponent>
@@ -122,7 +157,7 @@ export default function ProjectsTable() {
             name="status"
             value={filters.status}
             placeholder="All Status"
-            onChange={(value) => handleFilterChange("status", value)}
+            onChange={() => {}}
             options={statusOptions}
             label="Status"
           />
@@ -137,7 +172,7 @@ export default function ProjectsTable() {
           <DropDown
             name="year"
             value={filters.year}
-            onChange={(value) => handleFilterChange("year", value)}
+            onChange={() => {}}
             options={year_options}
             label="Year"
           />
@@ -145,16 +180,19 @@ export default function ProjectsTable() {
       </div>
 
       {loading ? (
-         <section className="flex justify-center items-center h-40">
-            <div className="dots">
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
+        <section className="flex justify-center items-center h-40">
+          <div className="dots">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
         </section>
       ) : filteredData.length === 0 ? (
         <div className="text-center py-10">
-          <Heading heading="No projects found" subtitle={query && "Try a different search term."}/>
+          <Heading
+            heading="No projects found"
+            subtitle={query && "Try a different search term."}
+          />
         </div>
       ) : (
         <Table
@@ -165,10 +203,9 @@ export default function ProjectsTable() {
           renderRow={(row) => (
             <>
               <td className="px-4 py-3">
-                <Link 
-                  href={`/projects/${row.projectId}`} 
-                  className="hover:underline font-medium"
-                >
+                <Link
+                  href={`/projects/${row.projectId}`}
+                  className="hover:underline font-medium">
                   {row.projectName}
                 </Link>
               </td>
@@ -181,31 +218,34 @@ export default function ProjectsTable() {
                 {row.strategicObjectiveStatement || "N/A"}
               </td>
               <td className="px-4 py-3">
-                <span className={`inline-flex items-center text-sm ${
-                  row.status === "Active" 
-                    ? "text-green-500" 
-                    : row.status === "Completed"
-                    ? "text-blue-500"
-                    : row.status === "On Hold"
-                    ? "text-yellow-500"
-                    : "text-gray-500"
-                }`}>
+                <span
+                  className={`inline-flex items-center text-sm ${
+                    row.status === "Active"
+                      ? "text-green-500"
+                      : row.status === "Completed"
+                      ? "text-blue-500"
+                      : row.status === "On Hold"
+                      ? "text-yellow-500"
+                      : "text-gray-500"
+                  }`}>
                   {row.status}
                 </span>
               </td>
               <td className="px-4 py-3">
-                {formatDate(row.startDate, 'date-only')}
+                {formatDate(row.startDate, "date-only")}
               </td>
               <td className="px-4 py-3">
-                {formatDate(row.endDate, 'date-only')}
+                {formatDate(row.endDate, "date-only")}
               </td>
               <td className="px-4 py-3">
-                <div className="max-w-xs truncate" title={row.thematicAreasOrPillar}>
+                <div
+                  className="max-w-xs truncate"
+                  title={row.thematicAreasOrPillar}>
                   {row.thematicAreasOrPillar || "N/A"}
                 </div>
               </td>
               <td className="px-4 py-3 relative">
-                <div className="flex justify-center items-center"> 
+                <div className="flex justify-center items-center">
                   <Icon
                     icon={"uiw:more"}
                     width={22}
@@ -213,7 +253,9 @@ export default function ProjectsTable() {
                     className="cursor-pointer hover:text-gray-700 transition-colors"
                     color="#909CAD"
                     onClick={() =>
-                      setActiveRowId((prev) => (prev === row.projectId ? null : row.projectId))
+                      setActiveRowId((prev) =>
+                        prev === row.projectId ? null : row.projectId
+                      )
                     }
                   />
                 </div>
@@ -225,8 +267,7 @@ export default function ProjectsTable() {
                       exit={{ y: -10, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
-                      onClick={(e) => e.stopPropagation()}
-                    >
+                      onClick={(e) => e.stopPropagation()}>
                       <ul className="text-sm">
                         <li className="cursor-pointer hover:bg-gray-50 hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon
@@ -237,7 +278,12 @@ export default function ProjectsTable() {
                           Edit
                         </li>
                         {user?.role === "super-admin" && (
-                          <li className="cursor-pointer hover:bg-gray-50 hover:text-red-600 border-t border-gray-200 flex gap-2 p-3 items-center">
+                          <li
+                            onClick={() => {
+                              setProjectToDelete(row.projectId); // Store the ID
+                              setConfirmDelete(true);
+                            }}
+                            className="cursor-pointer hover:bg-gray-50 hover:text-red-600 border-t border-gray-200 flex gap-2 p-3 items-center">
                             <Icon
                               icon={"pixelarticons:trash"}
                               height={20}
@@ -255,6 +301,40 @@ export default function ProjectsTable() {
           )}
         />
       )}
+      <Modal
+        isOpen={confirmDelete}
+        onClose={() => {
+          setConfirmDelete(false);
+          setProjectToDelete(null); // Clear the ID when closing
+        }}>
+        <div className="flex justify-center items-center flex-col gap-3">
+          <Heading
+            heading="Delete this project?"
+            subtitle="This action is permanent and cannot be reversed!"
+            className="text-center"
+          />
+          <div className="flex items-center gap-4">
+            <Button
+              content="Cancel"
+              isSecondary
+              onClick={() => {
+                setConfirmDelete(false);
+                setProjectToDelete(null); // Clear on cancel
+              }}
+            />
+            <Button
+              content="Delete"
+              onClick={() => {
+                if (projectToDelete) {
+                  handleDelete(projectToDelete); // Use the stored ID
+                  setConfirmDelete(false);
+                  setProjectToDelete(null);
+                }
+              }}
+            />
+          </div>
+        </div>
+      </Modal>
     </CardComponent>
   );
 }

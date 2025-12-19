@@ -61,14 +61,6 @@ export const COUNTRY_OPTIONS = [
   { label: "South Africa", value: "South Africa" },
 ];
 
-// Strategic objective options (example - adjust based on your needs)
-export const STRATEGIC_OBJECTIVE_OPTIONS = [
-  { label: "Infrastructure Development", value: "infrastructure" },
-  { label: "Community Empowerment", value: "community" },
-  { label: "Economic Growth", value: "economic" },
-  { label: "Environmental Sustainability", value: "environmental" },
-];
-
 // Thematic areas
 export const THEMATIC_AREAS = [
   "Environment",

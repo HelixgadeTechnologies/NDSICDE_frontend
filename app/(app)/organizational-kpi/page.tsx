@@ -11,36 +11,36 @@ export default function OrganizationalKPI() {
     {
       title: "Governance",
       lists: [
-        { title: "Total SOs", count: "5" },
-        { title: "Total KPIs", count: "7" },
-        { title: "Overall KPI Performance", count: "15%" },
+        { title: "Total SOs", count: "0" },
+        { title: "Total KPIs", count: "0" },
+        { title: "Overall KPI Performance", count: "0%" },
       ],
       icon: "mdi:security",
     },
     {
       title: "Peace & Security",
       lists: [
-        { title: "Total SOs", count: "5" },
-        { title: "Total KPIs", count: "7" },
-        { title: "Overall KPI Performance", count: "19%" },
+        { title: "Total SOs", count: "0" },
+        { title: "Total KPIs", count: "0" },
+        { title: "Overall KPI Performance", count: "0%" },
       ],
       icon: "mdi:security",
     },
     {
       title: "Livelihood",
       lists: [
-        { title: "Total SOs", count: "5" },
-        { title: "Total KPIs", count: "7" },
-        { title: "Overall KPI Performance", count: "7%" },
+        { title: "Total SOs", count: "0" },
+        { title: "Total KPIs", count: "0" },
+        { title: "Overall KPI Performance", count: "0%" },
       ],
       icon: "mdi:briefcase",
     },
     {
       title: "Environment & Climate Change",
       lists: [
-        { title: "Total SOs", count: "5" },
-        { title: "Total KPIs", count: "7" },
-        { title: "Overall KPI Performance", count: "65%" },
+        { title: "Total SOs", count: "0" },
+        { title: "Total KPIs", count: "0" },
+        { title: "Overall KPI Performance", count: "0%" },
       ],
       icon: "mdi:leaf",
     },
