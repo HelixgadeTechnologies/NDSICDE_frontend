@@ -9,6 +9,7 @@ interface DateInputProps {
   onChange?: (date: string) => void;
   className?: string;
   label?: string;
+  error?: string;
 }
 
 const DateInput: React.FC<DateInputProps> = ({ 
@@ -16,6 +17,7 @@ const DateInput: React.FC<DateInputProps> = ({
   value = "", 
   onChange,
   className = "",
+  error,
   label,
 }) => {
   const [selectedDate, setSelectedDate] = useState<string>(value);
@@ -127,6 +129,7 @@ const DateInput: React.FC<DateInputProps> = ({
           className="w-5 h-5 text-gray-500 ml-2 flex-shrink-0"
         />
       </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
 
       {isCalendarOpen && (
         <div 

@@ -11,6 +11,7 @@ interface TagInputProps {
   className?: string;
   maxTags?: number;
   options?: string[]; // New prop for dropdown options
+  error?: string;
 }
 
 const TagInput: React.FC<TagInputProps> = ({
@@ -20,7 +21,8 @@ const TagInput: React.FC<TagInputProps> = ({
   onChange,
   className = "",
   maxTags,
-  options = []
+  options = [],
+  error,
 }) => {
   const [tags, setTags] = useState<string[]>(initialTags);
   const [inputValue, setInputValue] = useState<string>('');
@@ -184,6 +186,7 @@ const TagInput: React.FC<TagInputProps> = ({
             </div>
           )}
         </div>
+        {error && <p className="text-xs text-red-500">{error}</p>}
 
         {/* Dropdown */}
         {isDropdownOpen && availableOptions.length > 0 && (
