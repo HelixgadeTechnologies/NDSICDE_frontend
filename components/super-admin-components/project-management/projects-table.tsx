@@ -106,7 +106,7 @@ export default function ProjectsTable() {
 
   const head = [
     "Project Name",
-    "Project ID",
+    // "Project ID",
     "SO Alignment",
     "Status",
     "Start Date",
@@ -209,11 +209,11 @@ export default function ProjectsTable() {
                   {row.projectName}
                 </Link>
               </td>
-              <td className="px-4 py-3">
+              {/* <td className="px-4 py-3">
                 <span className="font-mono text-sm text-gray-600">
                   {row.projectId.substring(0, 8)}...
                 </span>
-              </td>
+              </td> */}
               <td className="px-4 py-3">
                 {row.strategicObjectiveStatement || "N/A"}
               </td>

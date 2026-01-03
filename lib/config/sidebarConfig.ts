@@ -32,7 +32,7 @@ const getBaseItems = (): SidebarItem[] => [
 ];
 
 const extractProjectId = (path: string): string | undefined => {
-  const match = path.match(/\/projects\/(\d+)/);
+  const match = path.match(/\/projects\/([a-fA-F0-9-]+)/);
   return match ? match[1] : undefined;
 };
 
