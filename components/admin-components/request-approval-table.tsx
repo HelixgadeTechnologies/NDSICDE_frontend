@@ -13,12 +13,15 @@ import {
   activity_financial_retirement,
 } from "@/lib/config/request-approvals-dashboard";
 import DashboardStat from "@/ui/dashboard-stat-card";
+import { Icon } from "@iconify/react";
 
 export default function RequestApprovalsTable({ showStats }: { showStats?: boolean }) {
   const tabs = [
     { tabName: "Activity Financial Request", id: 1 },
     { tabName: "Activity Financial Retirement", id: 2 },
   ];
+
+  const [data, setData] = useState<any>([])
 
   function ActivityFinancialRequestTable() {
     const activityFinancialRequestHead = [
@@ -31,28 +34,6 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
       "Status",
     ];
 
-    const activityFinancialRequestData = [
-      {
-        id: 1,
-        description: "Meeting with stakeholders in Akwa Ibom",
-        totalBudget: "500, 000",
-        responsiblePersons: "Ifeoma Johnson",
-        project: "Project 1",
-        startDate: "12/03/2024",
-        endDate: "12/03/2024",
-        status: "Pending",
-      },
-      {
-        id: 2,
-        description: "Meeting with stakeholders in Akwa Ibom",
-        totalBudget: "500, 000",
-        responsiblePersons: "Ifeoma Johnson",
-        project: "Project 1",
-        startDate: "12/03/2024",
-        endDate: "12/03/2024",
-        status: "Approved",
-      },
-    ];
 
     return (
       <div className="space-y-5">
@@ -83,32 +64,33 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
         </div>
         <Table
           tableHead={activityFinancialRequestHead}
-          tableData={activityFinancialRequestData}
+          tableData={data}
           checkbox
           idKey={"id"}
           renderRow={(row) => (
-            <>
-              <td className="px-6 cursor-pointer hover:underline">
-                <Link href={`/request-approvals/requests/${row.id}`}>
-                  {row.description}
-                </Link>
-              </td>
-              <td className="px-6">{row.totalBudget}</td>
-              <td className="px-6">{row.responsiblePersons}</td>
-              <td className="px-6">{row.project}</td>
-              <td className="px-6">{row.startDate}</td>
-              <td className="px-6">{row.endDate}</td>
-              <td
-                className={`px-6 ${
-                  row.status === "Pending"
-                    ? "text-yellow-500"
-                    : row.status === "Approved"
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}>
-                {row.status}
-              </td>
-            </>
+            // <>
+            //   <td className="px-6 cursor-pointer hover:underline">
+            //     <Link href={`/request-approvals/requests/${row.id}`}>
+            //       {row.description}
+            //     </Link>
+            //   </td>
+            //   <td className="px-6">{row.totalBudget}</td>
+            //   <td className="px-6">{row.responsiblePersons}</td>
+            //   <td className="px-6">{row.project}</td>
+            //   <td className="px-6">{row.startDate}</td>
+            //   <td className="px-6">{row.endDate}</td>
+            //   <td
+            //     className={`px-6 ${
+            //       row.status === "Pending"
+            //         ? "text-yellow-500"
+            //         : row.status === "Approved"
+            //         ? "text-green-500"
+            //         : "text-red-500"
+            //     }`}>
+            //     {row.status}
+            //   </td>
+            // </>
+            <></>
           )}
         />
       </div>
@@ -127,28 +109,7 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
       "Actions",
     ];
 
-    const data = [
-      {
-      id: "1",
-      lineItemDesc: "Lorem ipsum dolor sit amet",
-      quantity: 2,
-      frequency: 3,
-      unit_cost: 300,
-      total_budget: 180,
-      actual_cost: 240,
-      variance: 600,
-    },
-    {
-      id: "2",
-      lineItemDesc: "Lorem ipsum dolor sit amet",
-      quantity: 2,
-      frequency: 3,
-      unit_cost: 300,
-      total_budget: 180,
-      actual_cost: 240,
-      variance: 600,
-    },
-    ];
+    const [data, setData] = useState<any>([])
 
     return (
       <div className="space-y-5">
@@ -189,26 +150,27 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
           checkbox
           idKey={"id"}
           renderRow={(row) => (
-            <>
-              <td className="px-6">
-                <Link href={`/request-approvals/retirement/${row.id}`} className="hover:underline">{row.lineItemDesc}</Link>
-              </td>
-              <td className="px-6">{row.quantity}</td> 
-              <td className="px-6">{row.frequency}</td>
-              <td className="px-6">{row.unit_cost}</td>
-              <td className="px-6">{row.total_budget}</td>
-              <td className="px-6">{row.actual_cost}</td>
-              <td className="px-6">{row.variance}</td>
-              {/* <td className="px-6 relative">
-                <Icon
-                  icon={"uiw:more"}
-                  width={22}
-                  height={22}
-                  className="cursor-pointer"
-                  color="#909CAD"              
-                   />
-              </td> */}
-            </>
+            // <>
+            //   <td className="px-6">
+            //     <Link href={`/request-approvals/retirement/${row.id}`} className="hover:underline">{row.lineItemDesc}</Link>
+            //   </td>
+            //   <td className="px-6">{row.quantity}</td> 
+            //   <td className="px-6">{row.frequency}</td>
+            //   <td className="px-6">{row.unit_cost}</td>
+            //   <td className="px-6">{row.total_budget}</td>
+            //   <td className="px-6">{row.actual_cost}</td>
+            //   <td className="px-6">{row.variance}</td>
+            //   <td className="px-6 relative">
+            //     <Icon
+            //       icon={"uiw:more"}
+            //       width={22}
+            //       height={22}
+            //       className="cursor-pointer"
+            //       color="#909CAD"              
+            //        />
+            //   </td>
+            // </>
+            <></>
           )}
         />
         <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">

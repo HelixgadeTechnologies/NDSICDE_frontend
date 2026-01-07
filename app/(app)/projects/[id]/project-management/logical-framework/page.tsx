@@ -3,29 +3,35 @@
 import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
 import Table from "@/ui/table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import FileUploader from "@/ui/form/file-uploader";
+import axios from "axios";
+
+// document name and upload date
 
 export default function ProjectLogicalFramework() {
   const [activeRowId, setActiveRowId] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [data, setData] = useState<any>([]);
   const head = ["Document Name", "Upload Date", "Actions"];
-  const data = [
-    {
-      userId: 1,
-      documentName: "Logical Framework 1",
-      uploadDate: "May 15, 2025 10:30",
-    },
-    {
-      userId: 2,
-      documentName: "Logical Framework 2",
-      uploadDate: "May 20, 2025 10:30",
-    },
-  ];
+
+  useEffect(() => {
+    const fetchLogicalFrameworks = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/logical_frameworks`);
+        // console.log(response.data)
+        setData(response.data.data);
+      } catch (error) {
+        console.error(`Error: ${error}`)
+      }
+    }
+
+    fetchLogicalFrameworks();
+  }, [])
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-[75px]">
@@ -43,55 +49,56 @@ export default function ProjectLogicalFramework() {
           checkbox
           idKey={"userId"}
           renderRow={(row) => (
-            <>
-              <td className="px-6">{row.documentName}</td>
-              <td className="px-6">{row.uploadDate}</td>
-              <td className="px-6 relative">
-                <Icon
-                  icon={"uiw:more"}
-                  width={22}
-                  height={22}
-                  className="cursor-pointer"
-                  color="#909CAD"
-                  onClick={() =>
-                    setActiveRowId((prev) =>
-                      prev === row.userId ? null : row.userId
-                    )
-                  }
-                />
+            // <>
+            //   <td className="px-6">{row.documentName}</td>
+            //   <td className="px-6">{row.uploadDate}</td>
+            //   <td className="px-6 relative">
+            //     <Icon
+            //       icon={"uiw:more"}
+            //       width={22}
+            //       height={22}
+            //       className="cursor-pointer"
+            //       color="#909CAD"
+            //       onClick={() =>
+            //         setActiveRowId((prev) =>
+            //           prev === row.userId ? null : row.userId
+            //         )
+            //       }
+            //     />
 
-                {activeRowId === row.userId && (
-                  <AnimatePresence>
-                    <motion.div
-                      initial={{ y: -10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -10, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
-                    >
-                      <ul className="text-sm">
-                        <li className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
-                          <Icon
-                            icon={"hugeicons:view"}
-                            height={20}
-                            width={20}
-                          />
-                          View Framework
-                        </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
-                          <Icon
-                            icon={"pixelarticons:trash"}
-                            height={20}
-                            width={20}
-                          />
-                          Remove
-                        </li>
-                      </ul>
-                    </motion.div>
-                  </AnimatePresence>
-                )}
-              </td>
-            </>
+            //     {activeRowId === row.userId && (
+            //       <AnimatePresence>
+            //         <motion.div
+            //           initial={{ y: -10, opacity: 0 }}
+            //           animate={{ y: 0, opacity: 1 }}
+            //           exit={{ y: -10, opacity: 0 }}
+            //           transition={{ duration: 0.2, ease: "easeOut" }}
+            //           className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
+            //         >
+            //           <ul className="text-sm">
+            //             <li className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
+            //               <Icon
+            //                 icon={"hugeicons:view"}
+            //                 height={20}
+            //                 width={20}
+            //               />
+            //               View Framework
+            //             </li>
+            //             <li className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
+            //               <Icon
+            //                 icon={"pixelarticons:trash"}
+            //                 height={20}
+            //                 width={20}
+            //               />
+            //               Remove
+            //             </li>
+            //           </ul>
+            //         </motion.div>
+            //       </AnimatePresence>
+            //     )}
+            //   </td>
+            // </>
+            <></>
           )}
         />
       </CardComponent>

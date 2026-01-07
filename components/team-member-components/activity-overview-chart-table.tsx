@@ -7,12 +7,12 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 // chart
 function ActivityOverviewChart() {
   const budgetUilization = [
-    { name: "Due to Start", value: 23 },
-    { name: "In Progress(Early Start)", value: 14 },
-    { name: "In Progress(Late Start)", value: 23 },
-    { name: "Future Activity", value: 20 },
-    { name: "Completed Early", value: 10 },
-    { name: "Completed Late", value: 10 },
+    { name: "Due to Start", value: 1 },
+    { name: "In Progress(Early Start)", value: 1 },
+    { name: "In Progress(Late Start)", value: 1 },
+    { name: "Future Activity", value: 1 },
+    { name: "Completed Early", value: 1 },
+    { name: "Completed Late", value: 1 },
   ];
 
   const BUColors = [
