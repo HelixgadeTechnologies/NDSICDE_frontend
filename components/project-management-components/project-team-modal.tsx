@@ -17,12 +17,23 @@ type AddProps = {
   isOpen: boolean;
   onClose: () => void;
   roles: DropdownOption[];
+  mode?: "create" | "update";
+  initialData?: {
+    id?: string;
+    email: string;
+    roleId: string;
+    teamMemberId?: string;
+  };
+  projectId?: string;
 };
 
-export default function AddProjectTeamModal({
+export default function ProjectTeamModal({
   isOpen,
   onClose,
   roles,
+  mode = "create",
+  initialData,
+  projectId: propProjectId,
 }: AddProps) {
   const [successModal, setSuccessModal] = useState(false);
   const { user } = useRoleStore();
@@ -31,33 +42,58 @@ export default function AddProjectTeamModal({
   const [team, setTeam] = useState<any[]>([]);
   const [teamOptions, setTeamOptions] = useState<DropdownOption[]>([]);
 
-  // Extract project ID from URL
+  // Extract project ID from URL or props
   const params = useParams();
   const [formData, setFormData] = useState({
+    id: "",
     teamMemberId: user?.id || "",
     email: "",
     roleId: "",
     projectId: "",
   });
 
-  // Extract project ID from URL when component mounts or params change
+  // Initialize form data based on mode
   useEffect(() => {
-    if (params?.id) {
+    if (mode === "update" && initialData) {
+      setFormData({
+        id: initialData.id || "",
+        teamMemberId: initialData.teamMemberId || user?.id || "",
+        email: initialData.email || "",
+        roleId: initialData.roleId || "",
+        projectId: propProjectId || "",
+      });
+    } else {
+      // Reset form for create mode
+      setFormData({
+        id: "",
+        teamMemberId: user?.id || "",
+        email: "",
+        roleId: "",
+        projectId: propProjectId || "",
+      });
+    }
+  }, [mode, initialData, user, propProjectId, isOpen]);
+
+  // Extract project ID from URL when component mounts or params change (only for create mode if not provided via prop)
+  useEffect(() => {
+    if (mode === "create" && !propProjectId && params?.id) {
       const projectId = params.id as string;
       setFormData((prev) => ({
         ...prev,
         projectId: projectId,
       }));
     }
-  }, [params, isOpen]);
+  }, [params, isOpen, mode, propProjectId]);
 
-  // get all team members
+  // Get all team members
   useEffect(() => {
     const getTeamMembers = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/userManagement/users`)
-        setTeam(response.data.data)
-        
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/userManagement/users`
+        );
+        setTeam(response.data.data);
+
         // Format team data for dropdown
         if (response.data.data && Array.isArray(response.data.data)) {
           const formattedOptions = response.data.data.map((member: any) => ({
@@ -67,42 +103,43 @@ export default function AddProjectTeamModal({
           setTeamOptions(formattedOptions);
         }
       } catch (error) {
-        console.error(`Error getting team members: ${error}`)
+        console.error(`Error getting team members: ${error}`);
       }
-    }
-    getTeamMembers()
-  }, [])
+    };
+    getTeamMembers();
+  }, []);
 
-  // submit form
+  // Submit form
   const handleSubmit = async () => {
     const payload = {
-      isCreate: true,
+      isCreate: mode === "create",
       data: formData,
     };
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-member`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(response.data)
+      const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-member`;
+
+      const response = await axios.post(url, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log(response.data);
       onClose();
       setSuccessModal(true);
     } catch (error) {
-      console.error(`Error submitting: ${error}`);
+      console.error(
+        `Error ${mode === "create" ? "submitting" : "updating"}: ${error}`
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // handle change for input and select
+  // Handle change for input and select
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -115,7 +152,7 @@ export default function AddProjectTeamModal({
     // Special handling for email selection
     if (name === "email" && team && Array.isArray(team)) {
       const selectedMember = team.find((member: any) => member.email === value);
-      
+
       if (selectedMember) {
         setFormData((prev) => ({
           ...prev,
@@ -125,7 +162,7 @@ export default function AddProjectTeamModal({
         return;
       }
     }
-    
+
     // Default handling for other fields
     setFormData((prev) => ({
       ...prev,
@@ -133,10 +170,21 @@ export default function AddProjectTeamModal({
     }));
   };
 
+  const modalTitle =
+    mode === "create" ? "Add Project Team Member" : "Edit Project Team Member";
+  const successMessage =
+    mode === "create"
+      ? "Member added successfully"
+      : "Member updated successfully";
+  const buttonText =
+    mode === "create"
+      ? "Add Project Team Member"
+      : "Update Project Team Member";
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
-        <Heading heading="Project Team Member" className="text-center" />
+        <Heading heading={modalTitle} className="text-center" />
         <div className="space-y-6">
           <DropDown
             name="email"
@@ -146,6 +194,7 @@ export default function AddProjectTeamModal({
             placeholder="Enter Email Address"
             label="Email Address"
             isBigger
+            // isDisabled={mode === "update"} // Optional: disable email editing in update mode
           />
           <DropDown
             name="roleId"
@@ -158,8 +207,16 @@ export default function AddProjectTeamModal({
           />
 
           <div className="flex items-center gap-6">
-            <Button content="Cancel" isSecondary onClick={onClose} />
-            <Button content="Add Project Team Member" onClick={handleSubmit} />
+            <div className="w-2/5">
+              <Button content="Cancel" isSecondary onClick={onClose} />
+            </div>
+            <div className="w-3/5">
+              <Button
+                content={buttonText}
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+              />
+            </div>
           </div>
         </div>
       </Modal>
@@ -170,12 +227,16 @@ export default function AddProjectTeamModal({
         </div>
         <Heading
           heading="Congratulations!"
-          subtitle="Member added successfully"
+          subtitle={successMessage}
           className="text-center"
         />
 
         <div className="mt-4 flex justify-end gap-2">
-          <Button content="Close" onClick={() => setSuccessModal(false)} isLoading={isSubmitting} />
+          <Button
+            content="Close"
+            onClick={() => setSuccessModal(false)}
+            isLoading={isSubmitting}
+          />
         </div>
       </Modal>
     </>

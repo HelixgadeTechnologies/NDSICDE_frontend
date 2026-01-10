@@ -9,9 +9,8 @@ import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
 import { useEntityModal } from "@/utils/project-management-utility";
-import AddProjectTeamModal from "@/components/project-management-components/add-project-team";
+import ProjectTeamModal from "@/components/project-management-components/project-team-modal";
 import ViewProjectTeamModal from "@/components/project-management-components/view-project-team";
-import EditProjectTeamModal from "@/components/project-management-components/edit-project-team";
 import DeleteProjectTeamModal from "@/components/project-management-components/remove-project-team";
 import axios from "axios";
 import Loading from "@/app/loading";
@@ -248,10 +247,11 @@ export default function ProjectTeam() {
         </CardComponent>
 
       {/* modals */}
-      <AddProjectTeamModal
+      <ProjectTeamModal
         isOpen={addMember}
         onClose={() => setAddMember(false)}
-        roles={roles} // Pass roles to modal if needed
+        roles={roles} 
+        mode="create"
       />
 
       {selectedMember && (
@@ -259,16 +259,17 @@ export default function ProjectTeam() {
           isOpen={viewMember}
           onClose={() => setViewMember(false)}
           member={selectedMember}
+          
         />
       )}
 
       {selectedMember && (
-        <EditProjectTeamModal
-          isOpen={editMember}
-          onClose={() => setEditMember(false)}
-          member={selectedMember}
-          // roles={roles} // Pass roles to edit modal
-        />
+        <ProjectTeamModal
+        isOpen={editMember}
+        onClose={() => setEditMember(false)}
+        roles={roles} 
+        mode="update"
+      />
       )}
 
       {selectedMember && (

@@ -46,7 +46,7 @@ export default function ViewProjectTeamModal({
                 Role:
               </strong>
               <span className="text-[#7A7A7A] text-sm font-normal leading-5">
-                {member.role || "N/A"}
+                {member.roleName || "N/A"}
               </span>
             </li>
             <li className="flex justify-between items-center">
@@ -57,7 +57,7 @@ export default function ViewProjectTeamModal({
                 Department Name
               </span>
             </li>
-            <li className="flex justify-between items-center">
+            {/* <li className="flex justify-between items-center">
               <strong className="font-bold text-black text-base leading-8">
                 Status:
               </strong>
@@ -68,7 +68,7 @@ export default function ViewProjectTeamModal({
               >
                 {member.status || "N/A"}
               </span>
-            </li>
+            </li> */}
             <li className="flex justify-between items-center">
               <strong className="font-bold text-black text-base leading-8">
                 Phone Number:

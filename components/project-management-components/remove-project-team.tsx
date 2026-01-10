@@ -37,7 +37,7 @@ export default function DeleteProjectTeamModal({
             </h3>
             <p className="text-sm text-[#7A7A7A] leading-5">{member.email}</p>
             <p className="text-sm text-[#7A7A7A] leading-5">
-              Role: {member.role}
+              Role: {member.roleName}
             </p>
           </div>
         </div>
