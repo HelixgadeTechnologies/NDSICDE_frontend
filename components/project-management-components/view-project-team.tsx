@@ -24,7 +24,7 @@ export default function ViewProjectTeamModal({
       />
       <div className="mt-8">
         <div className="flex flex-col justify-center items-center gap-2">
-          <div className="h-[110px] w-[110px] rounded-full bg-[#EAEAEA] p-2 flex justify-center items-center">
+          <div className="size-27.5 rounded-full bg-[#EAEAEA] p-2 flex justify-center items-center">
             <Icon
               icon={"radix-icons:avatar"}
               height={80}
