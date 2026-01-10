@@ -86,7 +86,7 @@ export default function DataValidationTable() {
         width="40%"
         maxWidth="800px"
       >
-        <div className="overflow-y-auto h-[550px] custom-scrollbar p-2.5">
+        <div className="overflow-y-auto h-137.5 custom-scrollbar p-2.5">
           <Heading heading="Report Details" />
           <p className="text-[#8C94A6] text-sm">
             {details?.project} - Submitted on {details?.date} at {details?.time}

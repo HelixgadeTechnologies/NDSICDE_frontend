@@ -191,7 +191,7 @@ export default function ProjectsTable() {
         <div className="text-center py-10">
           <Heading
             heading="No projects found"
-            subtitle={query && "Try a different search term."}
+            subtitle={query ? "Try a different search term." : "If you think this is a mistake, please refresh the page or check back later."}
           />
         </div>
       ) : (
@@ -266,7 +266,7 @@ export default function ProjectsTable() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
+                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50"
                       onClick={(e) => e.stopPropagation()}>
                       <ul className="text-sm">
                         <li className="cursor-pointer hover:bg-gray-50 hover:text-blue-600 flex gap-2 p-3 items-center">

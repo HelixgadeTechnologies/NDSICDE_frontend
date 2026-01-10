@@ -9,7 +9,7 @@ import Button from "@/ui/form/button";
 import { useRoleStore, UserRole } from "@/store/role-store";
 import { useRouter } from "next/navigation";
 import { apiLogin, decodeJWT } from "@/lib/api/auth";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 // Map role names from API to your UserRole type
 function mapRoleNameToUserRole(roleName: string): UserRole {
@@ -133,7 +133,7 @@ export default function Login() {
   };
 
   return (
-    <div className="rounded-[10px] md:border border-[#D0D5DD] bg-white pb-4 pt-8 px-7 w-[450px] h-fit">
+    <div className="rounded-[10px] md:border border-[#D0D5DD] bg-white pb-4 pt-8 px-7 w-112.5 h-fit">
       <h4 className="font-semibold text-2xl md:text-[28px] text-gray-900 text-center mb-2">
         Log In
       </h4>
