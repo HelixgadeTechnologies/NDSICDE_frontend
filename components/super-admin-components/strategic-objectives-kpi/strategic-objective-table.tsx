@@ -9,6 +9,7 @@ import AddKPIModal from "./add-kpi-form";
 import axios from "axios";
 import { getStrategicObjectives } from "@/lib/api/admin-api-calls";
 import DeleteModal from "@/ui/generic-delete-modal";
+import LinkedKPIsModal from "./linked-kpis-modal"; // Add this import
 
 type ExpectedData = {
   createAt: string;
@@ -27,6 +28,8 @@ export default function SOTable() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openLinkedKPI, setOpenLinkedKPI] = useState(false);
+  const [selectedObjectiveForKPIs, setSelectedObjectiveForKPIs] = useState<string>("");
 
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -45,8 +48,6 @@ export default function SOTable() {
     if (!itemToDelete) return;
 
     try {
-      const previousData = [...data];
-      
       // Optimistically update UI
       setData((prev) =>
         prev.filter((item) => item.strategicObjectiveId !== itemToDelete)
@@ -73,11 +74,6 @@ export default function SOTable() {
       setShowDeleteModal(false);
       setItemToDelete(null);
     } catch (error: any) {
-      // Revert on error - restore previous data
-      const previousData = data.filter(
-        item => item.strategicObjectiveId !== itemToDelete
-      );
-      
       // Refetch to ensure we have correct data
       try {
         const objectives = await getStrategicObjectives();
@@ -106,6 +102,12 @@ export default function SOTable() {
   const handleAddKPIClick = (objectiveId: string) => {
     setSelectedObjectiveId(objectiveId);
     handleAddKPI(() => setActiveRowId(null));
+  };
+
+  // Handle opening linked KPIs modal
+  const handleViewLinkedKPIs = (objectiveId: string) => {
+    setSelectedObjectiveForKPIs(objectiveId);
+    setOpenLinkedKPI(true);
   };
 
   // Get strategic objectives data
@@ -174,7 +176,9 @@ export default function SOTable() {
         renderRow={(row) => (
           <>
             <td className="px-6 py-4 capitalize">{row.statement || "N/A"}</td>
-            <td className="px-6 py-4">
+            <td 
+              onClick={() => handleViewLinkedKPIs(row.strategicObjectiveId)}
+              className="px-6 py-4 hover:cursor-pointer hover:underline hover:text-(--primary)">
               {row.linkedKpi !== undefined ? row.linkedKpi : 0}
             </td>
             <td className="px-6 py-4">
@@ -207,7 +211,7 @@ export default function SOTable() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -10, opacity: 0 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[210px]">
+                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-52.5">
                     <ul className="text-sm">
                       <li
                         onClick={() => handleAddKPIClick(row.strategicObjectiveId)}
@@ -261,6 +265,15 @@ export default function SOTable() {
         subtitle="Are you sure you want to delete this strategic objective? This action cannot be undone."
         onDelete={handleDeleteConfirm}
       />
+
+      {/* Linked KPI modal */}
+      {openLinkedKPI && (
+        <LinkedKPIsModal
+          isOpen={openLinkedKPI}
+          onClose={() => setOpenLinkedKPI(false)}
+          strategicObjectiveId={selectedObjectiveForKPIs}
+        />
+      )}
     </section>
   );
 }

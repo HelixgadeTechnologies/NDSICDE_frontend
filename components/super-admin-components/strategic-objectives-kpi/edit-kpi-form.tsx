@@ -5,19 +5,36 @@ import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-hot-toast";
 
-type AddKPIFormProps = {
+type KPI = {
+  baseLine: string;
+  createAt: string;
+  definition: string;
+  disaggregation: string;
+  itemInMeasure: string;
+  kpiId: string;
+  specificAreas: string;
+  statement: string;
+  strategicObjectiveId: string;
+  target: string;
+  type: string;
+  unitOfMeasure: string;
+  updateAt: string;
+};
+
+type EditKPIModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  strategicObjectiveId: string;
-  onSuccess?: () => void; // Add this to refresh the table
+  kpiData: KPI | null;
+  onSuccess?: () => void;
 };
 
 type KPIFormData = {
+  kpiId: string;
   statement: string;
   definition: string;
   type: string;
@@ -27,16 +44,18 @@ type KPIFormData = {
   disaggregation: string;
   baseLine: string;
   target: string;
+  strategicObjectiveId: string;
 };
 
-export default function AddKPIModal({ 
+export default function EditKPIModal({ 
   isOpen, 
   onClose, 
-  strategicObjectiveId,
+  kpiData,
   onSuccess
-}: AddKPIFormProps) {
+}: EditKPIModalProps) {
   const token = getToken();
   const [formData, setFormData] = useState<KPIFormData>({
+    kpiId: "",
     statement: "",
     definition: "",
     type: "",
@@ -46,9 +65,29 @@ export default function AddKPIModal({
     disaggregation: "",
     baseLine: "",
     target: "",
+    strategicObjectiveId: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Populate form when kpiData changes
+  useEffect(() => {
+    if (kpiData) {
+      setFormData({
+        kpiId: kpiData.kpiId,
+        statement: kpiData.statement,
+        definition: kpiData.definition,
+        type: kpiData.type,
+        specificAreas: kpiData.specificAreas,
+        unitOfMeasure: kpiData.unitOfMeasure,
+        itemInMeasure: kpiData.itemInMeasure,
+        disaggregation: kpiData.disaggregation,
+        baseLine: kpiData.baseLine,
+        target: kpiData.target,
+        strategicObjectiveId: kpiData.strategicObjectiveId,
+      });
+    }
+  }, [kpiData]);
 
   const handleInputChange = (field: keyof KPIFormData, value: string) => {
     setFormData(prev => ({
@@ -64,11 +103,8 @@ export default function AddKPIModal({
 
     try {
       const payload = {
-        isCreate: true,
-        data: { 
-          ...formData, 
-          strategicObjectiveId 
-        }
+        isCreate: false,
+        data: formData
       };
 
       console.log("Sending payload:", payload);
@@ -85,21 +121,8 @@ export default function AddKPIModal({
       );
 
       if (response.status === 200 || response.status === 201) {
-        console.log("KPI added successfully:", response.data);
-        toast.success("KPI added successfully!");
-        
-        // Reset form
-        setFormData({
-          statement: "",
-          definition: "",
-          type: "",
-          specificAreas: "",
-          unitOfMeasure: "",
-          itemInMeasure: "",
-          disaggregation: "",
-          baseLine: "",
-          target: "",
-        });
+        console.log("KPI updated successfully:", response.data);
+        toast.success("KPI updated successfully!");
         
         // Call onSuccess to refresh the table
         if (onSuccess) {
@@ -110,8 +133,8 @@ export default function AddKPIModal({
         onClose();
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || "Failed to add KPI";
-      console.error("Add KPI error:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to update KPI";
+      console.error("Update KPI error:", error);
       console.error("Error response:", error.response?.data);
       toast.error(errorMessage);
     } finally {
@@ -122,8 +145,8 @@ export default function AddKPIModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="550px">
       <Heading
-        heading="Add New KPI"
-        subtitle="Create a new key performance indicator for your organization"
+        heading="Edit KPI"
+        subtitle="Update the key performance indicator details"
       />
       <div className="overflow-y-auto h-112.5 custom-scrollbar p-2.5">
         <form onSubmit={handleSubmit} className="space-y-4 my-4">
@@ -207,7 +230,7 @@ export default function AddKPIModal({
             onChange={(e) => handleInputChange("target", e.target.value)}
           />
           <Button 
-            content={isSubmitting ? "Adding KPI..." : "Add KPI"} 
+            content={isSubmitting ? "Updating KPI..." : "Update KPI"} 
             isDisabled={isSubmitting}
           />
         </form>

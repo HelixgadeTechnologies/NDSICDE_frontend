@@ -7,6 +7,7 @@ import { useRoleStore } from "@/store/role-store";
 import Loading from "../loading";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Toaster } from "react-hot-toast";
 
 export default function AllUserSettingsLayout({
   children,
@@ -40,17 +41,20 @@ export default function AllUserSettingsLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      <div className="w-64 flex-none transition-all duration-300 ease-in-out no-print">
-        <Sidebar />
-      </div>
-      <section className="flex-grow flex flex-col overflow-hidden">
-        <Navigation />
-        <div className="flex-grow overflow-y-auto p-6 bg-white custom-scrollbar">
-          <Breadcrumb />
-          {children}
+    <>
+    <Toaster position="top-right"/>
+      <div className="flex min-h-screen flex-col md:flex-row">
+        <div className="w-64 flex-none transition-all duration-300 ease-in-out no-print">
+          <Sidebar />
         </div>
-      </section>
-    </div>
+        <section className="grow flex flex-col overflow-hidden">
+          <Navigation />
+          <div className="grow overflow-y-auto p-6 bg-white custom-scrollbar">
+            <Breadcrumb />
+            {children}
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

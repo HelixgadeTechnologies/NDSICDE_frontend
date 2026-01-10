@@ -56,7 +56,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
 
   const handleChildClick = (child: SidebarItem) => {
     closeMobile();
-    console.log(`Navigating to ${child.href}`);
+    // console.log(`Navigating to ${child.href}`);
   };
 
   // for active on settings
@@ -125,7 +125,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                     // Render as div for items with children (no navigation)
                     <div
                       onClick={(e) => handleItemClick(nav, index, e)}
-                      className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 cursor-pointer ${
+                      className={`h-11 w-full px-4 py-2 rounded-sm flex items-center gap-2 cursor-pointer ${
                         isActive
                           ? "bg-[#FFECE5] text-[#D2091E]"
                           : "hover:bg-gray-50 text-gray-600"
@@ -155,7 +155,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                       onClick={() =>
                         handleItemClick(nav, index, {} as React.MouseEvent)
                       }
-                      className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 ${
+                      className={`h-11 w-full px-4 py-2 rounded-sm flex items-center gap-2 ${
                         isActive
                           ? "bg-[#FFECE5] text-[#D2091E]"
                           : "hover:bg-gray-50 text-gray-600"
@@ -186,7 +186,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                               key={childIndex}
                               href={child.href}
                               onClick={() => handleChildClick(child)}
-                              className={`h-9 w-full px-3 py-1.5 rounded-[4px] flex items-center gap-2 text-xs relative ${
+                              className={`h-9 w-full px-3 py-1.5 rounded-sm flex items-center gap-2 text-xs relative ${
                                 isChildActive
                                   ? "text-[#D2091E]"
                                   : "hover:bg-gray-50 text-gray-500"
@@ -201,7 +201,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
                               )}
                               <span>{child.name}</span>
                               {child.badge && (
-                                <span className="bg-[var(--primary)] text-white rounded-full size-4 text-[10px] flex justify-center items-center absolute right-2.5 top-2.5">
+                                <span className="bg-(--primary) text-white rounded-full size-4 text-[10px] flex justify-center items-center absolute right-2.5 top-2.5">
                                   {child.badge}
                                 </span>
                               )}
@@ -219,7 +219,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
           <div className="space-y-1">
             <Link
               href={`/settings`}
-              className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 ${
+              className={`h-11 w-full px-4 py-2 rounded-sm flex items-center gap-2 ${
                 isSettingsActive
                   ? "bg-[#FFECE5] text-[#D2091E]"
                   : "hover:bg-gray-50 text-gray-600"
@@ -234,7 +234,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
             </Link>
             <div
               onClick={handleLogout}
-              className={`h-11 w-full px-4 py-2 rounded-[4px] flex items-center gap-2 hover:bg-[#FFECE5] hover:text-[#D2091E] text-gray-600 cursor-pointer`}>
+              className={`h-11 w-full px-4 py-2 rounded-sm flex items-center gap-2 hover:bg-[#FFECE5] hover:text-[#D2091E] text-gray-600 cursor-pointer`}>
               <Icon icon={"heroicons-solid:logout"} width={20} height={20} />
               <span className="text-xs">Logout</span>
             </div>

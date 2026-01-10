@@ -20,7 +20,7 @@ import { useTeamMembers } from "@/hooks/useTeamMembers";
 
 // Loading state component
 const LoadingState = () => (
-  <section className="flex justify-center items-center h-[300px]">
+  <section className="flex justify-center items-center h-75">
     <div className="dots">
       <div className=""></div>
       <div className=""></div>
@@ -145,7 +145,7 @@ export default function TeamMembersTable() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -10, opacity: 0 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]">
+                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
                     <ul className="text-sm">
                       <li
                         onClick={() => handleViewUser(row, setActiveRowId)}
@@ -165,7 +165,7 @@ export default function TeamMembersTable() {
                       </li>
                       <li
                         onClick={() => handleDeleteUser(row, setActiveRowId)}
-                        className="cursor-pointer hover:text-[var(--primary-light)] flex gap-2 p-3 items-center">
+                        className="cursor-pointer hover:text-(--primary-light) flex gap-2 p-3 items-center">
                         <Icon
                           icon={"pixelarticons:trash"}
                           height={20}

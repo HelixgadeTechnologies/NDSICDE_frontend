@@ -1,11 +1,11 @@
 // type for project team - add extra stuff when api comes
 export type ProjectTeamDetails = {
-  userId: string;
+  teamMemberId: string;
   name: string;
   email: string;
-  role: string;
-  status: "Active" | "Inactive";
-  lastActive: string;
+  roleName: string;
+  projectName: string;
+  updateAt: string;
 };
 
 export type ProjectPartnerTypes = {
