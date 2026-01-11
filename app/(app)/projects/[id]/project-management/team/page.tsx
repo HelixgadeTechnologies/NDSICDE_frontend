@@ -14,7 +14,7 @@ import ProjectTeamModal from "@/components/project-management-components/project
 import DeleteProjectTeamModal from "@/components/project-management-components/remove-project-team";
 import axios from "axios";
 import Loading from "@/app/loading";
-import { ProjectTeamDetails } from "@/types/project-management-types";
+import { DropdownOption, ProjectTeamDetails } from "@/types/project-management-types";
 import { formatDate } from "@/utils/dates-format-utility";
 import { getToken } from "@/lib/api/credentials";
 import toast from "react-hot-toast";
@@ -32,10 +32,6 @@ interface ApiRole {
 }
 
 // Define the type for dropdown options
-export interface DropdownOption {
-  label: string;
-  value: string;
-}
 
 export default function ProjectTeam() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);

@@ -6,11 +6,10 @@ import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
-import { DropdownOption } from "@/app/(app)/projects/[id]/project-management/team/page";
-import { useRoleStore } from "@/store/role-store";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
+import { DropdownOption } from "@/types/project-management-types";
 
 type AddProps = {
   isOpen: boolean;
@@ -37,7 +36,6 @@ export default function ProjectTeamModal({
   onSuccess,
 }: AddProps) {
   const [successModal, setSuccessModal] = useState(false);
-  const { user } = useRoleStore();
   const token = getToken();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [team, setTeam] = useState<any[]>([]);
@@ -46,8 +44,7 @@ export default function ProjectTeamModal({
   // Extract project ID from URL or props
   const params = useParams();
   const [formData, setFormData] = useState({
-    id: "",
-    teamMemberId: user?.id || "",
+    teamMemberId: "",
     email: "",
     roleId: "",
     projectId: "",
@@ -60,8 +57,7 @@ export default function ProjectTeamModal({
     if (mode === "update" && initialData) {
       const projectId = propProjectId || (params?.id as string) || "";
       setFormData({
-        id: initialData.id || "",
-        teamMemberId: initialData.teamMemberId || user?.id || "",
+        teamMemberId: initialData.teamMemberId || "",
         email: initialData.email || "",
         roleId: initialData.roleId || "",
         projectId: projectId,
@@ -70,14 +66,13 @@ export default function ProjectTeamModal({
       // Reset form for create mode
       const projectId = propProjectId || (params?.id as string) || "";
       setFormData({
-        id: "",
-        teamMemberId: user?.id || "",
+        teamMemberId: "",
         email: "",
         roleId: "",
         projectId: projectId,
       });
     }
-  }, [mode, initialData, user, propProjectId, isOpen, params]);
+  }, [mode, initialData, propProjectId, isOpen, params]);
 
   // Get all team members
   useEffect(() => {
@@ -134,13 +129,13 @@ export default function ProjectTeamModal({
   };
 
   // Handle change for input and select
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
 
   const handleSelectChange = (name: string, value: string) => {
     // Special handling for email selection
