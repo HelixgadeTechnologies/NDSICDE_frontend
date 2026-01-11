@@ -10,12 +10,14 @@ import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
 import { useEntityModal } from "@/utils/project-management-utility";
 import ProjectTeamModal from "@/components/project-management-components/project-team-modal";
-import ViewProjectTeamModal from "@/components/project-management-components/view-project-team";
+// import ViewProjectTeamModal from "@/components/project-management-components/view-project-team";
 import DeleteProjectTeamModal from "@/components/project-management-components/remove-project-team";
 import axios from "axios";
 import Loading from "@/app/loading";
 import { ProjectTeamDetails } from "@/types/project-management-types";
 import { formatDate } from "@/utils/dates-format-utility";
+import { getToken } from "@/lib/api/credentials";
+import toast from "react-hot-toast";
 
 
 // Define the type for role from API
@@ -41,26 +43,27 @@ export default function ProjectTeam() {
   const [loading, setLoading] = useState<boolean>(true);
   const [roles, setRoles] = useState<DropdownOption[]>([]);
   const [rolesLoading, setRolesLoading] = useState<boolean>(false);
+  const token  = getToken();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // api call to get project team members
+  const fetchProjectTeam = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-members`
+      );
+      // Ensure data is an array
+      const teamMembers = res.data.data || [];
+      setData(Array.isArray(teamMembers) ? teamMembers : []);
+    } catch (error) {
+      console.error(`Error fetching team members: ${error}`);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProjectTeam = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-members`
-        );
-
-        // Ensure data is an array
-        const teamMembers = res.data.data || [];
-        setData(Array.isArray(teamMembers) ? teamMembers : []);
-      } catch (error) {
-        console.error(`Error fetching team members: ${error}`);
-        setData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProjectTeam();
   }, []);
 
@@ -97,16 +100,16 @@ export default function ProjectTeam() {
 
   // states for modals
   const {
-    viewEntity: viewMember,
     editEntity: editMember,
     addEntity: addMember,
     removeEntity: removeMember,
     setAddEntity: setAddMember,
     setEditEntity: setEditMember,
     setRemoveEntity: setRemoveMember,
-    setViewEntity: setViewMember,
     selectedEntity: selectedMember,
-    handleViewEntity: handleViewMember,
+    // viewEntity: viewMember,
+    // setViewEntity: setViewMember,
+    // handleViewEntity: handleViewMember,
     handleEditEntity: handleEditMember,
     handleAddEntity: handleAddMember,
     handleRemoveEntity: handleRemoveMember,
@@ -117,6 +120,27 @@ export default function ProjectTeam() {
     { label: "Active", value: "Active" },
     { label: "Inactive", value: "Inactive" },
   ];
+
+  const handleDelete = async (id: string) => {
+    setIsDeleting(true);
+    try {
+      const res = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-member/${id}`,
+        {
+          headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      })
+      setRemoveMember(false);
+      toast.success("Project team deleted successfully!");
+      fetchProjectTeam();
+    } catch (error) {
+      console.error(`Error deleting team member: ${error}`)
+      toast.error("An error occured. Team member was not deleted.")
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   return (
     <div className="relative mt-12">
@@ -159,7 +183,11 @@ export default function ProjectTeam() {
           </div>
 
           {loading ? (
-            <Loading />
+            <div className="dots mx-auto my-20">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
           ) : (
             <Table
               tableHead={head}
@@ -168,7 +196,7 @@ export default function ProjectTeam() {
               idKey="teamMemberId"
               renderRow={(row) => (
                 <>
-                  <td className="px-6">{row.name}</td>
+                  <td className="px-6">{row.fullName}</td>
                   <td className="px-6">{row.email}</td>
                   <td className="px-6">{row.roleName}</td>
                   {/* might change this field to "status" */}
@@ -250,23 +278,25 @@ export default function ProjectTeam() {
       <ProjectTeamModal
         isOpen={addMember}
         onClose={() => setAddMember(false)}
+        onSuccess={fetchProjectTeam}
         roles={roles} 
         mode="create"
       />
 
-      {selectedMember && (
+      {/* {selectedMember && (
         <ViewProjectTeamModal
           isOpen={viewMember}
           onClose={() => setViewMember(false)}
           member={selectedMember}
           
         />
-      )}
+      )} */}
 
       {selectedMember && (
         <ProjectTeamModal
         isOpen={editMember}
         onClose={() => setEditMember(false)}
+        onSuccess={fetchProjectTeam}
         roles={roles} 
         mode="update"
       />
@@ -277,6 +307,8 @@ export default function ProjectTeam() {
           isOpen={removeMember}
           onClose={() => setRemoveMember(false)}
           member={selectedMember}
+          handleDelete={() => handleDelete(selectedMember.teamMemberId)}
+          isLoading={isDeleting}
         />
       )}
     </div>

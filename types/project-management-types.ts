@@ -1,7 +1,7 @@
 // type for project team - add extra stuff when api comes
 export type ProjectTeamDetails = {
   teamMemberId: string;
-  name: string;
+  fullName: string;
   email: string;
   roleName: string;
   projectName: string;

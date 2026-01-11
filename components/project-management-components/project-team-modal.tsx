@@ -2,7 +2,6 @@
 
 import Button from "@/ui/form/button";
 import DropDown from "@/ui/form/select-dropdown";
-import TextInput from "@/ui/form/text-input";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { useState, useEffect } from "react";
@@ -25,6 +24,7 @@ type AddProps = {
     teamMemberId?: string;
   };
   projectId?: string;
+  onSuccess?: () => void;
 };
 
 export default function ProjectTeamModal({
@@ -34,6 +34,7 @@ export default function ProjectTeamModal({
   mode = "create",
   initialData,
   projectId: propProjectId,
+  onSuccess,
 }: AddProps) {
   const [successModal, setSuccessModal] = useState(false);
   const { user } = useRoleStore();
@@ -54,36 +55,29 @@ export default function ProjectTeamModal({
 
   // Initialize form data based on mode
   useEffect(() => {
+    if (!isOpen) return; // Only run when modal is open
+    
     if (mode === "update" && initialData) {
+      const projectId = propProjectId || (params?.id as string) || "";
       setFormData({
         id: initialData.id || "",
         teamMemberId: initialData.teamMemberId || user?.id || "",
         email: initialData.email || "",
         roleId: initialData.roleId || "",
-        projectId: propProjectId || "",
+        projectId: projectId,
       });
     } else {
       // Reset form for create mode
+      const projectId = propProjectId || (params?.id as string) || "";
       setFormData({
         id: "",
         teamMemberId: user?.id || "",
         email: "",
         roleId: "",
-        projectId: propProjectId || "",
+        projectId: projectId,
       });
     }
-  }, [mode, initialData, user, propProjectId, isOpen]);
-
-  // Extract project ID from URL when component mounts or params change (only for create mode if not provided via prop)
-  useEffect(() => {
-    if (mode === "create" && !propProjectId && params?.id) {
-      const projectId = params.id as string;
-      setFormData((prev) => ({
-        ...prev,
-        projectId: projectId,
-      }));
-    }
-  }, [params, isOpen, mode, propProjectId]);
+  }, [mode, initialData, user, propProjectId, isOpen, params]);
 
   // Get all team members
   useEffect(() => {
@@ -170,6 +164,13 @@ export default function ProjectTeamModal({
     }));
   };
 
+  const handleSuccessClose = () => {
+    setSuccessModal(false);
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
+
   const modalTitle =
     mode === "create" ? "Add Project Team Member" : "Edit Project Team Member";
   const successMessage =
@@ -186,16 +187,24 @@ export default function ProjectTeamModal({
       <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
         <Heading heading={modalTitle} className="text-center" />
         <div className="space-y-6">
-          <DropDown
-            name="email"
-            value={formData.email}
-            onChange={(value) => handleSelectChange("email", value)}
-            options={teamOptions}
-            placeholder="Enter Email Address"
-            label="Email Address"
-            isBigger
-            // isDisabled={mode === "update"} // Optional: disable email editing in update mode
-          />
+          {mode === "update" ? (
+            <div>
+              <label className="block text-sm font-medium mb-2">Email Address</label>
+              <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">
+                {formData.email}
+              </div>
+            </div>
+          ) : (
+            <DropDown
+              name="email"
+              value={formData.email}
+              onChange={(value) => handleSelectChange("email", value)}
+              options={teamOptions}
+              placeholder="Enter Email Address"
+              label="Email Address"
+              isBigger
+            />
+          )}
           <DropDown
             name="roleId"
             label="Role"
@@ -221,7 +230,7 @@ export default function ProjectTeamModal({
         </div>
       </Modal>
 
-      <Modal isOpen={successModal} onClose={() => setSuccessModal(false)}>
+      <Modal isOpen={successModal} onClose={handleSuccessClose}>
         <div className="flex justify-center primary mb-4">
           <Icon icon={"simple-line-icons:check"} width={96} height={96} />
         </div>
@@ -234,7 +243,7 @@ export default function ProjectTeamModal({
         <div className="mt-4 flex justify-end gap-2">
           <Button
             content="Close"
-            onClick={() => setSuccessModal(false)}
+            onClick={handleSuccessClose}
             isLoading={isSubmitting}
           />
         </div>
