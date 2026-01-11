@@ -20,7 +20,7 @@ export default function ViewProjectTeamModal({
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
       <Heading
         heading="User Profile"
-        subtitle={`Update details, role, and project access for ${member.name}`}
+        subtitle={`Update details, role, and project access for ${member.fullName}`}
       />
       <div className="mt-8">
         <div className="flex flex-col justify-center items-center gap-2">
@@ -33,7 +33,7 @@ export default function ViewProjectTeamModal({
             />
           </div>
           <h3 className="font-bold text-black text-base leading-8">
-            {member.name || "N/A"}
+            {member.fullName || "N/A"}
           </h3>
           <p className="text-[#7A7A7A] text-sm font-normal leading-5">
             {member.email || "N/A"}

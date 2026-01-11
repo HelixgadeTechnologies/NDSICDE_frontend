@@ -1,7 +1,7 @@
 // type for project team - add extra stuff when api comes
 export type ProjectTeamDetails = {
   teamMemberId: string;
-  name: string;
+  fullName: string;
   email: string;
   roleName: string;
   projectName: string;
@@ -9,7 +9,7 @@ export type ProjectTeamDetails = {
 };
 
 export type ProjectPartnerTypes = {
-  userId: string;
+  partnerId: string;
   name: string;
   email: string;
   role: string;
@@ -61,3 +61,8 @@ export type ProjectOutputTypes = {
   thematicAreas: string;
   responsiblePerson: string;
 };
+
+export interface DropdownOption {
+  label: string;
+  value: string;
+}

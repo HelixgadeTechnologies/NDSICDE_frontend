@@ -12,20 +12,25 @@ type DeleteProps = {
   isOpen: boolean;
   onClose: () => void;
   member: ProjectTeamDetails;
+  isLoading?: boolean;
+  handleDelete: () => void;
 };
 
 export default function DeleteProjectTeamModal({
   isOpen,
   onClose,
   member,
+  isLoading,
+  handleDelete,
 }: DeleteProps) {
     const [isChecked, setISChecked] = useState(false);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
       <div className="space-y-3">
         <Heading
           heading="Remove Team Member"
-          subtitle={`Are you sure you want to remove ${member.name} from the team?`}
+          subtitle={`Are you sure you want to remove ${member.fullName} from the team?`}
         />
         <div className="h-28 w-full rounded-2xl bg-black/5 flex gap-2 items-center p-4">
           <div className="h-20 w-20 rounded-full bg-[#EAEAEA] flex justify-center items-center">
@@ -33,7 +38,7 @@ export default function DeleteProjectTeamModal({
           </div>
           <div className="space-y-1">
             <h3 className="font-bold text-black text-base leading-8">
-              {member.name}
+              {member.fullName}
             </h3>
             <p className="text-sm text-[#7A7A7A] leading-5">{member.email}</p>
             <p className="text-sm text-[#7A7A7A] leading-5">
@@ -66,8 +71,8 @@ export default function DeleteProjectTeamModal({
         <Button
           content="Remove Member"
           isDisabled={!isChecked}
-        //   isLoading={isLoading}
-        //   onClick={handleDelete}
+          isLoading={isLoading}
+          onClick={handleDelete}
         />
       </div>
     </Modal>

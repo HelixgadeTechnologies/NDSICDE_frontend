@@ -63,7 +63,7 @@ export default function Table<T>({
     <div className="w-full h-fit overflow-visible rounded-lg border border-[#E5E7EB]">
       {isEmpty ? (
         // Empty State
-        <div className="w-full min-h-[400px] flex flex-col items-center justify-center p-8 text-center">
+        <div className="w-full min-h-50 flex flex-col items-center justify-center p-8 text-center">
           {/* Icon Container */}
           <div className="w-20 h-20 mb-6 flex items-center justify-center rounded-full bg-gray-100 border border-gray-100">
             <svg
@@ -89,7 +89,7 @@ export default function Table<T>({
         // Table Content
         <table className="min-w-full text-sm text-left">
           <thead>
-            <tr className="bg-[#F5F7FA] h-[52px] text-[#111928] text-sm font-medium">
+            <tr className="bg-[#F5F7FA] h-13 text-[#111928] text-sm font-medium">
               {checkbox && (
                 <th className="px-6">
                   <Checkbox
@@ -112,7 +112,7 @@ export default function Table<T>({
                 return (
                   <tr
                     key={i}
-                    className="border-t border-[#E5E7EB] h-[60px] text-[#6B7280]"
+                    className="border-t border-[#E5E7EB] h-15 text-[#6B7280]"
                   >
                     {renderRow(row, i, false)}
                   </tr>
@@ -125,7 +125,7 @@ export default function Table<T>({
               return (
                 <tr
                   key={i}
-                  className="border-t border-[#E5E7EB] h-[60px] text-[#6B7280]"
+                  className="border-t border-[#E5E7EB] h-15 text-[#6B7280]"
                 >
                   {checkbox && idKey && (
                     <td className="px-6">
