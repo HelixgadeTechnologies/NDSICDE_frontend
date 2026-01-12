@@ -23,18 +23,26 @@ type LogicalFramework = {
   documentURL: string;
   createAt: string;
   projectName?: string;
-  updateAt?: string;
+  updateAt: string;
 };
 
 export default function ProjectLogicalFramework() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [data, setData] = useState<LogicalFramework[] | null>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoadingTable, setIsLoadingTable] = useState(false);
   const [isLoadingFramework, setIsLoadingFramework] = useState(false);
-  const [selectedFramework, setSelectedFramework] = useState<LogicalFramework | null>(null);
-  const head = ["Document Name", "Upload Date", "Actions"];
+  const [selectedFramework, setSelectedFramework] =
+    useState<LogicalFramework | null>(null);
+  const [frameworkToDelete, setFrameworkToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const head = ["Document Name", "Upload Date", "Last Updated", "Actions"];
   const token = getToken() || undefined;
   const params = useParams();
 
@@ -49,6 +57,7 @@ export default function ProjectLogicalFramework() {
 
   // Fetch logical frameworks
   const fetchLogicalFrameworks = async () => {
+    setIsLoadingTable(true);
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/logical_frameworks`,
@@ -62,6 +71,8 @@ export default function ProjectLogicalFramework() {
     } catch (error) {
       console.error(`Error fetching logical frameworks:`, error);
       toast.error("Failed to fetch logical frameworks");
+    } finally {
+      setIsLoadingTable(false);
     }
   };
 
@@ -77,14 +88,10 @@ export default function ProjectLogicalFramework() {
           },
         }
       );
-      
-      console.log("Framework details:", response.data);
       setSelectedFramework(response.data.data);
       setIsViewModalOpen(true);
       setActiveRowId(null); // Close the dropdown menu
     } catch (error) {
-      console.error("Error fetching framework details:", error);
-      
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || error.message;
         toast.error(`Failed to load framework: ${errorMessage}`);
@@ -105,6 +112,46 @@ export default function ProjectLogicalFramework() {
   useEffect(() => {
     fetchLogicalFrameworks();
   }, []);
+
+  // Handle delete click - opens confirmation modal
+  const handleDeleteClick = (frameworkId: string, documentName: string) => {
+    setFrameworkToDelete({ id: frameworkId, name: documentName });
+    setIsDeleteModalOpen(true);
+    setActiveRowId(null); // Close the dropdown menu
+  };
+
+  // Delete a framework - actual deletion after confirmation
+  const handleDeleteFramework = async () => {
+    if (!frameworkToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/logical_framework/${frameworkToDelete.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      toast.success("Framework deleted successfully!");
+      setIsDeleteModalOpen(false);
+      setFrameworkToDelete(null);
+      fetchLogicalFrameworks();
+    } catch (error) {
+      console.error(`Error deleting framework:`, error);
+
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || error.message;
+        toast.error(`Failed to delete: ${errorMessage}`);
+      } else {
+        toast.error("An error occurred. Please try again later.");
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,6 +262,12 @@ export default function ProjectLogicalFramework() {
     setSelectedFramework(null);
   };
 
+  // Close delete modal
+  const handleDeleteModalClose = () => {
+    setIsDeleteModalOpen(false);
+    setFrameworkToDelete(null);
+  };
+
   // Open document in new tab
   const handleOpenDocument = () => {
     if (selectedFramework?.documentURL) {
@@ -233,70 +286,95 @@ export default function ProjectLogicalFramework() {
       </div>
 
       <CardComponent>
-        <Table
-          tableHead={head}
-          tableData={data || []}
-          checkbox
-          idKey={"logicalFrameworkId"}
-          renderRow={(row) => (
-            <>
-              <td className="px-6">{row.documentName}</td>
-              <td className="px-6">{formatDate(row.createAt) || "N/A"}</td>
-              <td className="px-6 relative">
-                <Icon
-                  icon={"uiw:more"}
-                  width={22}
-                  height={22}
-                  className="cursor-pointer"
-                  color="#909CAD"
-                  onClick={() =>
-                    setActiveRowId((prev) =>
-                      prev === row.logicalFrameworkId
-                        ? null
-                        : row.logicalFrameworkId
-                    )
-                  }
-                />
+        {isLoadingTable ? (
+          <div className="dots mx-auto my-20">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        ) : (
+          <Table
+            tableHead={head}
+            tableData={data || []}
+            checkbox
+            idKey={"logicalFrameworkId"}
+            renderRow={(row) => (
+              <>
+                <td className="px-6">{row.documentName}</td>
+                <td className="px-6">
+                  {formatDate(row.createAt, "date-only") || "N/A"}
+                </td>
+                <td className="px-6">
+                  {formatDate(row.updateAt, "relative") || "N/A"}
+                </td>
+                <td className="px-6 relative">
+                  <Icon
+                    icon={"uiw:more"}
+                    width={22}
+                    height={22}
+                    className="cursor-pointer"
+                    color="#909CAD"
+                    onClick={() =>
+                      setActiveRowId((prev) =>
+                        prev === row.logicalFrameworkId
+                          ? null
+                          : row.logicalFrameworkId
+                      )
+                    }
+                  />
 
-                {activeRowId === row.logicalFrameworkId && (
-                  <AnimatePresence>
-                    <motion.div
-                      initial={{ y: -10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -10, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50"
-                    >
-                      <ul className="text-sm">
-                        <li
-                          className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center"
-                          onClick={() =>
-                            handleViewFramework(row.logicalFrameworkId)
-                          }
-                        >
-                          <Icon
-                            icon={"hugeicons:view"}
-                            height={20}
-                            width={20}
-                          />
-                          View Framework
-                        </li>
-                        <li className="cursor-pointer hover:text-red-600 flex gap-2 p-3 items-center">
-                          <Icon
-                            icon={"pixelarticons:trash"}
-                            height={20}
-                            width={20}
-                          />
-                          Remove
-                        </li>
-                      </ul>
-                    </motion.div>
-                  </AnimatePresence>
-                )}
-              </td>
-            </>
-          )}
-        />
+                  {activeRowId === row.logicalFrameworkId && (
+                    <AnimatePresence>
+                      <motion.div
+                        initial={{ y: -10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -10, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
+                        <ul className="text-sm">
+                          <li
+                            className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center"
+                            onClick={() =>
+                              handleViewFramework(row.logicalFrameworkId)
+                            }>
+                            <Icon
+                              icon={
+                                isLoadingFramework
+                                  ? "pixel:spinner"
+                                  : "hugeicons:view"
+                              }
+                              height={20}
+                              width={20}
+                              className={
+                                isLoadingFramework ? "animate-spin" : ""
+                              }
+                            />
+                            View Framework
+                          </li>
+                          <li
+                            className="cursor-pointer hover:text-red-600 flex gap-2 p-3 items-center"
+                            onClick={() =>
+                              handleDeleteClick(
+                                row.logicalFrameworkId,
+                                row.documentName
+                              )
+                            }>
+                            <Icon
+                              icon={"pixelarticons:trash"}
+                              height={20}
+                              width={20}
+                            />
+                            Remove
+                          </li>
+                        </ul>
+                      </motion.div>
+                    </AnimatePresence>
+                  )}
+                </td>
+              </>
+            )}
+          />
+        )}
       </CardComponent>
 
       {/* Upload Modal */}
@@ -334,9 +412,7 @@ export default function ProjectLogicalFramework() {
               content={isSubmitting ? "Uploading..." : "Submit"}
               onClick={handleSubmit}
               isDisabled={
-                isSubmitting ||
-                !formData.documentName ||
-                !formData.documentURL
+                isSubmitting || !formData.documentName || !formData.documentURL
               }
               icon={isSubmitting ? "eos-icons:loading" : undefined}
             />
@@ -348,16 +424,15 @@ export default function ProjectLogicalFramework() {
       <Modal
         isOpen={isViewModalOpen}
         onClose={handleViewModalClose}
-        maxWidth="700px"
-      >
+        maxWidth="700px">
         <div className="space-y-6">
           <Heading heading="Framework Details" className="text-center" />
 
           {isLoadingFramework ? (
             <div className="dots mx-auto my-20">
-                <div></div>
-                <div></div>
-                <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
             </div>
           ) : selectedFramework ? (
             <div className="space-y-4">
@@ -418,8 +493,7 @@ export default function ProjectLogicalFramework() {
                   </p>
                   <button
                     onClick={handleOpenDocument}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium whitespace-nowrap"
-                  >
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium whitespace-nowrap">
                     Open Document
                   </button>
                 </div>
@@ -444,6 +518,60 @@ export default function ProjectLogicalFramework() {
               No framework details available
             </div>
           )}
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={handleDeleteModalClose}
+        maxWidth="500px">
+        <div className="space-y-6">
+          {/* Warning Icon */}
+          <div className="flex justify-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+              <Icon
+                icon="heroicons:exclamation-triangle"
+                className="w-8 h-8 text-red-600"
+              />
+            </div>
+          </div>
+
+          {/* Title */}
+          <Heading
+            heading="Delete Framework?"
+            className="text-center text-gray-900"
+          />
+
+          {/* Message */}
+          <div className="text-center space-y-2">
+            <p className="text-gray-700">
+              Are you sure you want to delete{" "}
+              <strong className="text-gray-900">
+                "{frameworkToDelete?.name}"
+              </strong>
+              ?
+            </p>
+            <p className="text-sm text-red-600 font-medium">
+              This action cannot be undone.
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-4 pt-2">
+            <Button
+              content="Cancel"
+              onClick={handleDeleteModalClose}
+              isSecondary
+              // isDisabled={isDeleting}
+            />
+            <Button
+              content={isDeleting ? "Deleting..." : "Delete Framework"}
+              onClick={handleDeleteFramework}
+              isDisabled={isDeleting}
+              icon={isDeleting ? "eos-icons:loading" : "pixelarticons:trash"}
+            />
+          </div>
         </div>
       </Modal>
     </div>

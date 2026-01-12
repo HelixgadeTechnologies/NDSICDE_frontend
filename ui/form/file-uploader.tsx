@@ -386,7 +386,7 @@ export default function FileUploader({
           <p className="text-base">
             <span className={`font-semibold ${uploadSuccess ? "text-green-700" : "text-gray-900"}`}>
               {uploading
-                ? "Uploading files..."
+                ? "Uploading..."
                 : uploadSuccess
                   ? "Upload Successful!"
                   : "Click to upload"
@@ -437,7 +437,7 @@ export default function FileUploader({
         <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-start">
             <Icon icon="heroicons:exclamation-triangle" className="w-5 h-5 text-red-500 mt-0.5 mr-2 shrink-0" />
-            <p className="text-sm text-red-700 whitespace-pre-line">{error}</p>
+            <p className="text-sm text-red-700 whitespace-pre-line">{error}. Please try again.</p>
           </div>
         </div>
       )}
@@ -447,7 +447,7 @@ export default function FileUploader({
         <div className="mt-4">
           <div className="flex justify-between items-center mb-3">
             <h3 className="text-sm font-medium text-gray-900">
-              Selected Files ({selectedFiles.length})
+              Selected File(s): {selectedFiles.length}
             </h3>
             {selectedFiles.length > 0 && !uploading && (
               <button
@@ -512,8 +512,8 @@ export default function FileUploader({
       )}
 
       {/* Uploading Indicator */}
-      {uploading && (
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      {/* {uploading && (
+        <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center">
             <Icon icon="heroicons:arrow-path" className="w-5 h-5 text-blue-500 mr-2 animate-spin" />
             <p className="text-sm text-blue-700">
@@ -521,7 +521,7 @@ export default function FileUploader({
             </p>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
