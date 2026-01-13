@@ -21,6 +21,8 @@ export type ProjectImpactTypes = {
   statement: string;
   thematicArea: string;
   responsiblePerson: string;
+  projectId: string;
+  resultTypeId: string;
 };
 
 export type ProjectRequestType = {

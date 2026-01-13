@@ -13,11 +13,14 @@ import ProjectImpactModal from "@/components/project-management-components/proje
 import Link from "next/link";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { getToken } from "@/lib/api/credentials";
 
 export default function ProjectImpact() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [data, setData] = useState<ProjectImpactTypes[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const token = getToken();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const head = [
     "Project Impact Statement",
@@ -60,6 +63,29 @@ export default function ProjectImpact() {
   useEffect(() => {
     fetchImpact();
   }, []);
+
+  // delete impact
+  const deleteImpact = async (impactId: string) => {
+    setIsDeleting(true);
+    try {
+      const res = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impact/${impactId}`, 
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+      toast.success("Project impact deleted successfully!");
+      setRemoveProjectImpact(false)
+      fetchImpact();
+    } catch (error) {
+      console.error(`Error deleting impact: ${error}`);
+      toast.error("An error occurred. Please try again later.")
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   return (
     <div className="relative mt-12">
@@ -181,6 +207,7 @@ export default function ProjectImpact() {
           onClose={() => setEditProjectImpact(false)}
           mode="edit"
           onSuccess={fetchImpact}
+          initialData={selectedProjectImpact}
         />
       )}
 
@@ -189,6 +216,8 @@ export default function ProjectImpact() {
           isOpen={removeProjectImpact}
           onClose={() => setRemoveProjectImpact(false)}
           heading="Do you want to remove this  Project Impact?"
+          onDelete={() => deleteImpact(selectedProjectImpact.impactId)}
+          isDeleting={isDeleting}
         />
       )}
     </div>

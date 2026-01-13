@@ -4,7 +4,7 @@ import Button from "@/ui/form/button";
 import TextInput from "@/ui/form/text-input";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import TagInput from "@/ui/form/tag-input";
 import axios from "axios";
@@ -13,7 +13,6 @@ import { getToken } from "@/lib/api/credentials";
 import toast from "react-hot-toast";
 import {
   fetchResultTypes,
-  type ResultType,
 } from "@/lib/api/result-types";
 
 type ImpactData = {
@@ -33,7 +32,7 @@ type AddProps = {
   initialData?: ImpactData;
 };
 
-export default function ProjectImpactModal({
+export default function AddProjectImpactModal({
   isOpen,
   onClose,
   onSuccess,
@@ -45,6 +44,8 @@ export default function ProjectImpactModal({
   const [isLoadingResultTypes, setIsLoadingResultTypes] = useState(false);
   const [impactResultTypeId, setImpactResultTypeId] = useState<string>("");
   const [responsiblePersons, setResponsiblePersons] = useState<string[]>([]);
+  const [currentImpactId, setCurrentImpactId] = useState<string>("");
+  const hasInitializedRef = useRef(false);
 
   const params = useParams();
   const projectId = (params?.id as string) || "";
@@ -55,32 +56,51 @@ export default function ProjectImpactModal({
     thematicArea: "",
   });
 
-  // Initialize form with initialData when in edit mode
+  // Reset the initialization flag when modal closes
   useEffect(() => {
-    if (mode === "edit" && initialData && isOpen) {
-      // Pre-fill form with existing data
-      setFormData({
-        statement: initialData.statement || "",
-        thematicArea: initialData.thematicArea || "",
-      });
+    if (!isOpen) {
+      hasInitializedRef.current = false;
+    }
+  }, [isOpen]);
 
-      // Parse responsible persons from comma-separated string
-      if (initialData.responsiblePerson) {
-        const persons = initialData.responsiblePerson
-          .split(",")
-          .map(person => person.trim())
-          .filter(person => person.length > 0);
-        setResponsiblePersons(persons);
-      } else {
-        setResponsiblePersons([]);
+  // Initialize form with initialData when in edit mode and modal opens
+  useEffect(() => {
+    if (isOpen && !hasInitializedRef.current) {
+      if (mode === "edit" && initialData) {
+        console.log("Prefilling form with initialData:", initialData);
+        
+        // Pre-fill form with existing data
+        setFormData({
+          statement: initialData.statement || "",
+          thematicArea: initialData.thematicArea || "",
+        });
+
+        // Set the impact ID for edit mode
+        setCurrentImpactId(initialData.impactId || "");
+
+        // Parse responsible persons from comma-separated string
+        if (initialData.responsiblePerson) {
+          const persons = initialData.responsiblePerson
+            .split(",")
+            .map(person => person.trim())
+            .filter(person => person.length > 0);
+          console.log("Parsed responsible persons:", persons);
+          setResponsiblePersons(persons);
+        } else {
+          setResponsiblePersons([]);
+        }
+
+        hasInitializedRef.current = true;
+      } else if (mode === "create") {
+        // Reset form for create mode
+        console.log("Resetting form for create mode");
+        resetForm();
+        hasInitializedRef.current = true;
       }
-    } else if (mode === "create" && isOpen) {
-      // Reset form for create mode
-      resetForm();
     }
   }, [mode, initialData, isOpen]);
 
-  // Fetch result types when modal opens and find "Impact"
+  // Fetch result types when modal opens - needed for both create and edit modes
   useEffect(() => {
     if (isOpen) {
       loadImpactResultType();
@@ -94,9 +114,11 @@ export default function ProjectImpactModal({
       thematicArea: "",
     });
     setResponsiblePersons([]);
+    setCurrentImpactId("");
+    setImpactResultTypeId("");
   };
 
-  // Load result types and find the "Impact" type
+  // Load result types and find the "Impact" type (needed for both create and edit)
   const loadImpactResultType = async () => {
     setIsLoadingResultTypes(true);
     try {
@@ -112,6 +134,7 @@ export default function ProjectImpactModal({
       }
 
       setImpactResultTypeId(impactType.resultTypeId);
+      console.log("Loaded impact result type ID:", impactType.resultTypeId);
     } catch (error) {
       console.error("Error loading result types:", error);
       toast.error("Failed to load result types");
@@ -158,29 +181,34 @@ export default function ProjectImpactModal({
     }
 
     if (!impactResultTypeId) {
-      toast.error("Impact result type not loaded. Please try again.");
+      toast.error("Impact result type is required. Please try again.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Use initialData's impactId for edit mode, empty string for create
-      const impactId = mode === "edit" && initialData ? initialData.impactId : "";
+      // For edit mode, we MUST use the existing impactId from initialData
+      // For create mode, impactId should be empty string
+      const impactId = mode === "edit" ? (initialData?.impactId || currentImpactId) : "";
+
+      console.log("Mode:", mode);
+      console.log("Using impactId:", impactId);
+      console.log("Using isCreate:", mode === "create");
 
       const payload = {
-        isCreate: mode === "create",
+        isCreate: mode === "create", // true for create, false for edit
         data: {
-          impactId: impactId,
+          impactId: impactId, // Empty for create, actual ID for edit
           statement: formData.statement,
           thematicArea: formData.thematicArea,
           responsiblePerson: responsiblePersons.join(", "),
           projectId: projectId,
-          resultTypeId: impactResultTypeId,
+          resultTypeId: impactResultTypeId, // Should be same for both create and edit
         }
       };
 
-      console.log(`Submitting impact payload (${mode} mode):`, payload);
+      console.log(`Submitting impact payload (${mode} mode):`, JSON.stringify(payload, null, 2));
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impact`,
@@ -217,6 +245,7 @@ export default function ProjectImpactModal({
         toast.error(`Failed to ${mode === 'create' ? 'add' : 'update'} impact: ${errorMessage}`);
         console.error("Response data:", error.response?.data);
         console.error("Response status:", error.response?.status);
+        console.error("Request payload:", error.config?.data);
       } else {
         toast.error(`Failed to ${mode === 'create' ? 'add' : 'update'} project impact`);
       }
@@ -235,6 +264,18 @@ export default function ProjectImpactModal({
   const handleSuccessModalClose = () => {
     setSuccessModal(false);
   };
+
+  // Debug log to see current state
+  useEffect(() => {
+    console.log("Current state:", {
+      mode,
+      formData,
+      responsiblePersons,
+      currentImpactId,
+      impactResultTypeId,
+      hasInitialized: hasInitializedRef.current,
+    });
+  }, [formData, responsiblePersons, currentImpactId, impactResultTypeId, mode]);
 
   return (
     <>
