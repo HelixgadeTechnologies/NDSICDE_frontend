@@ -71,7 +71,7 @@ export default function FinancialRequestModal() {
                   subtitle="Community Health Initiative - Submitted on May 15, 2023 at 10:30"
                 />
               </div>
-              <div className="w-[200px]">
+              <div className="w-50">
                 <Button
                   content="Print Retirement"
                   isSecondary

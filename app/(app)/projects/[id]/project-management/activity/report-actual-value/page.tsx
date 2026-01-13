@@ -41,7 +41,7 @@ export default function ReportActualValue() {
   ];
   return (
     <div className="relative mt-12">
-      <div className="absolute right-0 -top-[75px]">
+      <div className="absolute right-0 -top-18.75">
         <Button content="Add Indicator Reporting Formats" icon="si:add-fill" />
       </div>
 
@@ -80,8 +80,7 @@ export default function ReportActualValue() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
-                    >
+                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
                       <ul className="text-sm">
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon
@@ -91,7 +90,7 @@ export default function ReportActualValue() {
                           />
                           Edit
                         </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
+                        <li className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"pixelarticons:trash"}
                             height={20}

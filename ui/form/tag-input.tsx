@@ -6,7 +6,8 @@ import { Icon } from '@iconify/react';
 interface TagInputProps {
   label?: string;
   placeholder?: string;
-  tags?: string[];
+  tags?: string[]; // Deprecated, use value instead
+  value?: string[]; // New prop for controlled component
   onChange?: (tags: string[]) => void;
   className?: string;
   maxTags?: number;
@@ -17,14 +18,21 @@ interface TagInputProps {
 const TagInput: React.FC<TagInputProps> = ({
   label = "Target States",
   placeholder = "Type and press Enter to add...",
-  tags: initialTags = [],
+  tags: initialTags = [], // Legacy prop, kept for backward compatibility
+  value: controlledValue,
   onChange,
   className = "",
   maxTags,
   options = [],
   error,
 }) => {
-  const [tags, setTags] = useState<string[]>(initialTags);
+  // Use controlled value if provided, otherwise use local state (uncontrolled mode)
+  const isControlled = controlledValue !== undefined;
+  const [internalTags, setInternalTags] = useState<string[]>(initialTags);
+  
+  // The actual tags to use in the component
+  const tags = isControlled ? controlledValue : internalTags;
+  
   const [inputValue, setInputValue] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
@@ -37,6 +45,14 @@ const TagInput: React.FC<TagInputProps> = ({
     !tags.includes(option) && 
     option.toLowerCase().includes(inputValue.toLowerCase())
   );
+
+  // Effect to sync with external changes when controlled
+  useEffect(() => {
+    if (isControlled) {
+      setInputValue(''); // Clear input when external tags change
+      setIsDropdownOpen(false);
+    }
+  }, [controlledValue, isControlled]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -59,9 +75,9 @@ const TagInput: React.FC<TagInputProps> = ({
     if (e.key === 'Enter') {
       e.preventDefault();
       if (highlightedIndex >= 0 && availableOptions[highlightedIndex]) {
-        addTag(availableOptions[highlightedIndex]);
+        handleAddTag(availableOptions[highlightedIndex]);
       } else if (inputValue.trim()) {
-        addTag(inputValue.trim());
+        handleAddTag(inputValue.trim());
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -79,7 +95,7 @@ const TagInput: React.FC<TagInputProps> = ({
       setIsDropdownOpen(false);
       setHighlightedIndex(-1);
     } else if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
-      removeTag(tags.length - 1);
+      handleRemoveTag(tags.length - 1);
     }
   };
 
@@ -90,10 +106,14 @@ const TagInput: React.FC<TagInputProps> = ({
     }
   };
 
-  const addTag = (tag: string): void => {
+  const handleAddTag = (tag: string): void => {
     if (!tags.includes(tag) && (!maxTags || tags.length < maxTags)) {
       const newTags = [...tags, tag];
-      setTags(newTags);
+      
+      if (!isControlled) {
+        setInternalTags(newTags);
+      }
+      
       setInputValue('');
       setIsDropdownOpen(false);
       setHighlightedIndex(-1);
@@ -107,9 +127,12 @@ const TagInput: React.FC<TagInputProps> = ({
     }
   };
 
-  const removeTag = (indexToRemove: number): void => {
+  const handleRemoveTag = (indexToRemove: number): void => {
     const newTags = tags.filter((_, index) => index !== indexToRemove);
-    setTags(newTags);
+    
+    if (!isControlled) {
+      setInternalTags(newTags);
+    }
     
     if (onChange) {
       onChange(newTags);
@@ -124,7 +147,7 @@ const TagInput: React.FC<TagInputProps> = ({
   };
 
   const handleOptionClick = (option: string): void => {
-    addTag(option);
+    handleAddTag(option);
   };
 
   return (
@@ -137,7 +160,7 @@ const TagInput: React.FC<TagInputProps> = ({
       
       <div className="relative">
         <div 
-          className="min-h-[42px] w-full border border-gray-300 rounded-md px-3 py-2 cursor-text focus-within:ring-[#D2091E] focus-within:border-[#D2091E] transition-all"
+          className="min-h-10.5 w-full border border-gray-300 rounded-md px-3 py-2 cursor-text focus-within:ring-[#D2091E] focus-within:border-[#D2091E] transition-all"
           onClick={handleContainerClick}
         >
           <div className="flex flex-wrap gap-2 items-center">
@@ -150,7 +173,7 @@ const TagInput: React.FC<TagInputProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    removeTag(index);
+                    handleRemoveTag(index);
                   }}
                   className="hover:bg-gray-300 rounded-full p-0.5 transition-colors"
                   type="button"
@@ -176,7 +199,7 @@ const TagInput: React.FC<TagInputProps> = ({
                 }
               }}
               placeholder={tags.length === 0 ? placeholder : ''}
-              className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-gray-700 placeholder-gray-400"
+              className="flex-1 min-w-30 bg-transparent outline-none text-sm text-gray-700 placeholder-gray-400"
               disabled={maxTags ? tags.length >= maxTags : false}
             />
           </div>

@@ -11,6 +11,7 @@ type DeleteProps = {
   heading: string;
   subtitle?: string;
   onDelete?: () => void;
+  isDeleting?: boolean;
 };
 
 // inlcude function prop to delete
@@ -20,6 +21,7 @@ export default function DeleteModal({
   heading,
   subtitle,
   onDelete,
+  isDeleting,
 }: DeleteProps) {
   return (
     <>
@@ -33,9 +35,9 @@ export default function DeleteModal({
           className="text-center"
         />
 
-        <div className="mt-4 flex justify-center mx-auto gap-2 w-[180px]">
-          <Button content="Yes" isSecondary onClick={onDelete} />
-          <Button content="No" onClick={onClose} />
+        <div className="mt-4 flex justify-center mx-auto gap-2 w-45">
+          <Button content="No" onClick={onClose} isSecondary />
+          <Button content="Yes" isLoading={isDeleting} onClick={onDelete} />
         </div>
       </Modal>
     </>

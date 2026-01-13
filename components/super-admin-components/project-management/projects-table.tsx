@@ -53,7 +53,6 @@ export default function ProjectsTable() {
         );
         setData(res.data.data);
         setFilteredData(res.data.data);
-        console.log(res.data.data)
       } catch (error) {
         console.error(`Error fetching projects:`, error);
         setData([]);

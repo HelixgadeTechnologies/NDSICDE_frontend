@@ -42,7 +42,7 @@ export default function Recents() {
               subtitle="Try refining your search or if you believe this is a problem, contact support."
               className="text-center"
             />
-            <div className="w-[200px]">
+            <div className="w-50">
               <Button content="Support" />
             </div>
           </div>
@@ -50,8 +50,7 @@ export default function Recents() {
           filteredData.map((f) => (
             <div
               key={f.id}
-              className="h-[94px] w-full rounded-2xl border border-gray-200 p-6 flex justify-between items-center"
-            >
+              className="h-[94px] w-full rounded-2xl border border-gray-200 p-6 flex justify-between items-center">
               <div className="flex gap-2 items-center">
                 <div className="h-14 w-14 rounded-full bg-[#D9D9D9]"></div>
                 <div className="space-y-1.5">
@@ -77,8 +76,7 @@ export default function Recents() {
                     : f.status === "Pending"
                     ? "text-[#EAB308]"
                     : "text-[#EF4444]"
-                }`}
-              >
+                }`}>
                 {f.status}
               </p>
             </div>

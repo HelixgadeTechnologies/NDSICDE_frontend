@@ -11,7 +11,13 @@ import DashboardStat from "@/ui/dashboard-stat-card";
 import SimpleFileInput from "@/ui/form/simple-file-input";
 import TextInput from "@/ui/form/text-input";
 import InfoItem from "@/ui/info-item";
-import { ActivityIcon, Calendar, FileOutput, Navigation, User } from "lucide-react";
+import {
+  ActivityIcon,
+  Calendar,
+  FileOutput,
+  Navigation,
+  User,
+} from "lucide-react";
 import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 
 export default function ProjectRequestRetirementPage() {
@@ -99,9 +105,8 @@ export default function ProjectRequestRetirementPage() {
         <DashboardStat data={dashboardData} icon="basil:plus-solid" />
       </div>
 
-
       {/* add retirement button */}
-      <div className="w-[200px]">
+      <div className="w-50">
         <Button
           content="Add Retirement"
           icon="si:add-fill"
@@ -197,7 +202,7 @@ export default function ProjectRequestRetirementPage() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]">
+                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
                       <ul className="text-sm">
                         <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon
@@ -207,7 +212,7 @@ export default function ProjectRequestRetirementPage() {
                           />
                           Edit
                         </li>
-                        <li className="cursor-pointer hover:text-[var(--primary-light)] border-y border-gray-300 flex gap-2 p-3 items-center">
+                        <li className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"pixelarticons:trash"}
                             height={20}

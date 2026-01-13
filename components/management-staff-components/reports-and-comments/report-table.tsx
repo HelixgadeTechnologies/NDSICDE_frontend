@@ -90,15 +90,13 @@ export default function ReportsTable() {
                     : row.status === "Pending"
                     ? "text-yellow-500"
                     : "text-red-500"
-                }`}
-              >
+                }`}>
                 {row.status}
               </td>
               <td
                 className={`px-6 ${
                   row.kpiStatus === "Met" ? "text-green-500" : "text-red-500"
-                }`}
-              >
+                }`}>
                 {row.kpiStatus}
               </td>
               <td className="px-6 relative">
@@ -124,13 +122,11 @@ export default function ReportsTable() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[200px]"
-                    >
+                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
                       <ul className="text-sm">
                         <li
                           onClick={() => handleAddComments(row, setActiveRowId)}
-                          className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center"
-                        >
+                          className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon icon={"si:add-fill"} height={20} width={20} />
                           Add Comments
                         </li>
@@ -138,8 +134,7 @@ export default function ReportsTable() {
                           onClick={() =>
                             handleViewAnalytics(row, setActiveRowId)
                           }
-                          className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center"
-                        >
+                          className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center">
                           <Icon icon={"heroicons:eye"} height={20} width={20} />
                           View Analytics
                         </li>
@@ -162,8 +157,8 @@ export default function ReportsTable() {
 
       {viewAnalytics && selectedReport && (
         <ViewAnalytics
-        isOpen={viewAnalytics}
-        onClose={() => setViewAnalytics(false)}
+          isOpen={viewAnalytics}
+          onClose={() => setViewAnalytics(false)}
         />
       )}
     </section>
