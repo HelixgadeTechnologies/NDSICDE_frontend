@@ -25,7 +25,6 @@ export default function TeamMemberDashboard() {
       setLoading(true);
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/project-stats`);
-        console.log(res.data.data);
         setStats(res.data.data); // Assuming API returns the stats object
       } catch (error) {
         console.error(`Error: ${error}`);

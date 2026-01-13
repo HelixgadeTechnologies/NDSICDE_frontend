@@ -17,23 +17,40 @@ export type ProjectPartnerTypes = {
 };
 
 export type ProjectImpactTypes = {
-  userId: string;
-  impactStatement: string;
-  thematicAreas: string;
+  impactId: string;
+  statement: string;
+  thematicArea: string;
   responsiblePerson: string;
 };
 
-export type ProjectRequestTypes = {
-  userId: string;
-  activityDescription: string;
-  totalBudget: string;
+export type ProjectRequestType = {
+  requestId: string;
+  staff: string;
+  outputId: string;
+  activityTitle: string;
+  activityBudgetCode: number;
   activityLocation: string;
-  status: "Rejected" | "Approved";
-  retirementStatus: "Retired" |" In Progress" | "Rejected"| "Not Retired";
-  responsiblePersons: string;
-  startDate: string;
-  endDate: string;
-};
+  activityPurposeDescription: string;
+  activityStartDate: string;
+  activityEndDate: string;
+  activityLineDescription: string;
+  quantity: number;
+  frequency: number;
+  unitCost: number;
+  budgetCode: number;
+  total: number;
+  modeOfTransport: string;
+  driverName: string;
+  driversPhoneNumber: string;
+  vehiclePlateNumber: string;
+  vehicleColor: string;
+  departureTime: string;
+  route: string;
+  recipientPhoneNumber: string;
+  documentName: string;
+  documentURL: string;
+  projectId: string;
+  status: string;};
 
 export type ProjectActivityTypes = {
   userId: string;

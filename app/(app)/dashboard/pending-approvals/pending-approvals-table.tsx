@@ -104,7 +104,14 @@ export default function PendingApprovalsTable() {
               <td className="px-6">{row.project}</td>
               <td className="px-6">{row.requestor}</td>
               <td className="px-6">{row.date}</td>
-              <td className={`px-6 ${row.priority === "Urgent" ? "text-[#EAB308]" : "text-[#003B99]"}`}>{row.priority}</td>
+              <td
+                className={`px-6 ${
+                  row.priority === "Urgent"
+                    ? "text-[#EAB308]"
+                    : "text-[#003B99]"
+                }`}>
+                {row.priority}
+              </td>
               <td className="px-6 relative">
                 <div className="flex justify-center items-center">
                   <Icon
@@ -127,23 +134,20 @@ export default function PendingApprovalsTable() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-[6px] border border-[#E5E5E5] shadow-md w-[210px]"
-                    >
+                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-[210px]">
                       <ul className="text-sm">
                         <li
                           // onClick={() => handleViewUser(row, setActiveRowId)}
-                          className="cursor-pointer hover:text-blue-600 p-3"
-                        >
-                          
+                          className="cursor-pointer hover:text-blue-600 p-3">
                           View Details
                         </li>
                         <li className="cursor-pointer hover:text-blue-600 border-y border-gray-300 p-3">
-
                           Delegate Review
                         </li>
-                        <li className="cursor-pointer text-[#22C55E] border-b border-gray-300  p-3">Approve</li>
-                        <li className="cursor-pointer text-[var(--primary-light)] p-3">
-                          
+                        <li className="cursor-pointer text-[#22C55E] border-b border-gray-300  p-3">
+                          Approve
+                        </li>
+                        <li className="cursor-pointer text-(--primary-light) p-3">
                           Reject
                         </li>
                       </ul>

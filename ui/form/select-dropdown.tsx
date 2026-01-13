@@ -68,7 +68,9 @@ export default function DropDown({
   return (
     <div className="space-y-2 relative flex-1" ref={dropdownRef}>
       {label && (
-        <label htmlFor={id} className="text-sm font-medium text-[#242424] block">
+        <label
+          htmlFor={id}
+          className="text-sm font-medium text-[#242424] block">
           {label}
         </label>
       )}
@@ -78,8 +80,11 @@ export default function DropDown({
         onClick={handleToggle}
         className={`${
           isBigger ? "h-12" : "h-10"
-        } min-w-full md:w-fit outline-none border border-[#B6D8FF] focus:border-[var(--primary-light)] rounded-[6px] px-4 text-sm flex items-center justify-between gap-5 bg-white transition-colors duration-200 ${isDisabled ? 'cursor-not-allowed text-gray-400 border-gray-100 bg-gray-400' : 'cursor-pointer hover:border-[var(--primary-light)] '}`}
-      >
+        } min-w-full md:w-fit outline-none border border-[#B6D8FF] focus:border-(--primary-light) rounded-md px-4 text-sm flex items-center justify-between gap-5 bg-white transition-colors duration-200 ${
+          isDisabled
+            ? "cursor-not-allowed text-gray-400 border-gray-100 bg-gray-400"
+            : "cursor-pointer hover:border-(--primary-light) "
+        }`}>
         <span className="text-gray-500 whitespace-nowrap">{displayValue}</span>
         <Icon
           icon="formkit:down"
@@ -100,12 +105,9 @@ export default function DropDown({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: "linear" }}
-            className="absolute top-full w-full bg-white border border-gray-300 rounded-[6px] shadow-lg z-50 max-h-60 overflow-y-auto"
-          >
+            className="absolute top-full w-full bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
             {options.length === 0 ? (
-              <div className="px-4 py-2 text-sm text-gray-500">
-                No options
-              </div>
+              <div className="px-4 py-2 text-sm text-gray-500">No options</div>
             ) : (
               options.map((option, index) => (
                 <motion.div
@@ -122,8 +124,7 @@ export default function DropDown({
                     value === option.value
                       ? "bg-[#FFECE5] text-[#D2091E]"
                       : "text-gray-500"
-                  }`}
-                >
+                  }`}>
                   {option.label}
                 </motion.div>
               ))

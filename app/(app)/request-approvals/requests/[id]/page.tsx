@@ -32,7 +32,13 @@ export default function FinancialRequestModal() {
   const [approveRequest, setApproveRequest] = useState(false);
   const [reviewRequest, setReviewRequest] = useState(false);
 
-  const head = ["Item Line Description", "Quantity", "Frequency", "Unit Cost", "Total (₦)"];
+  const head = [
+    "Item Line Description",
+    "Quantity",
+    "Frequency",
+    "Unit Cost",
+    "Total (₦)",
+  ];
 
   const data = [
     {
@@ -65,7 +71,7 @@ export default function FinancialRequestModal() {
                   subtitle="Community Health Initiative - Submitted on May 15, 2023 at 10:30"
                 />
               </div>
-              <div className="w-[200px]">
+              <div className="w-50">
                 <Button
                   content="Print Request"
                   isSecondary
@@ -141,7 +147,7 @@ export default function FinancialRequestModal() {
                   tableData={data}
                   renderRow={(row) => (
                     <>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-sm text-gray-900">
                         <p className="w-[160px] truncate">{row.description}</p>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
