@@ -114,7 +114,7 @@ export default function ProjectOutcome() {
             <>
               <td className="px-6">{row.outcomeStatement}</td>
               <td className="px-6">{row.outcomeType}</td>
-              <td className="px-6">{row.impactId}</td>
+              <td className="px-6">{row.impactStatement}</td>
               <td className="px-6">{row.thematicAreas}</td>
               <td className="px-6">{row.responsiblePerson}</td>
               <td className="px-6 relative">

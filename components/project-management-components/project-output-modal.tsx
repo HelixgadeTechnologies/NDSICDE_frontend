@@ -1,8 +1,10 @@
 "use client";
 
 import { getToken } from "@/lib/api/credentials";
-import { fetchResultTypes } from "@/lib/api/result-types";
-import { DropdownOption, ProjectOutcomeTypes } from "@/types/project-management-types";
+import {
+  DropdownOption,
+  ProjectOutputTypes,
+} from "@/types/project-management-types";
 import Button from "@/ui/form/button";
 import DropDown from "@/ui/form/select-dropdown";
 import TagInput from "@/ui/form/tag-input";
@@ -14,16 +16,15 @@ import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-
 type AddProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
   mode?: "create" | "edit";
-  initialData?: ProjectOutcomeTypes;
+  initialData?: ProjectOutputTypes;
 };
 
-export default function ProjectOutcomeModal({
+export default function ProjectOutputModal({
   isOpen,
   onClose,
   onSuccess,
@@ -31,11 +32,9 @@ export default function ProjectOutcomeModal({
   initialData,
 }: AddProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingResultTypes, setIsLoadingResultTypes] = useState(false);
-  const [isLoadingImpacts, setIsLoadingImpacts] = useState(false);
-  const [outcomeResultTypeId, setOutcomeResultTypeId] = useState<string>("");
+  const [isLoadingOutcome, setIsLoadingOutcome] = useState(false);
   const [responsiblePersons, setResponsiblePersons] = useState<string[]>([]);
-  const [impactOptions, setImpactOptions] = useState<DropdownOption[]>([]);
+  const [outcomeOptions, setOutcomeOptions] = useState<DropdownOption[]>([]);
   const hasInitializedRef = useRef(false);
 
   const params = useParams();
@@ -44,33 +43,30 @@ export default function ProjectOutcomeModal({
 
   // form data
   const [formData, setFormData] = useState({
-    outcomeStatement: "",
-    outcomeType: "",
-    impactId: "",
-    thematicAreas: "", 
+    outputStatement: "",
+    thematicAreas: "",
+    outcomeId: "",
   });
 
-  // Fetch impacts when modal opens
+  // fetch outcomes when modal opens
   useEffect(() => {
     if (isOpen) {
-      fetchImpact();
-      loadOutcomeResultType();
+      fetchOutcome();
     }
   }, [isOpen]);
 
-  // Initialize form when modal opens and mode changes
+  // initialize form when modal opens and mode changes
   useEffect(() => {
     if (isOpen && !hasInitializedRef.current) {
       if (mode === "edit" && initialData) {
-        // Pre-fill form with existing data
+        // prefill form with existing data
         setFormData({
-          outcomeStatement: initialData.outcomeStatement || "",
-          outcomeType: initialData.outcomeType || "",
-          impactId: initialData.impactId || "",
+          outputStatement: initialData.outputStatement || "",
           thematicAreas: initialData.thematicAreas || "",
+          outcomeId: initialData.outcomeId || "",
         });
 
-        // Parse responsible persons from comma-separated string
+        // parse responsible persons from comma-separated strings
         if (initialData.responsiblePerson) {
           const persons = initialData.responsiblePerson
             .split(",")
@@ -95,44 +91,19 @@ export default function ProjectOutcomeModal({
 
   const resetForm = () => {
     setFormData({
-      outcomeStatement: "",
-      outcomeType: "",
-      impactId: "",
+      outputStatement: "",
+      outcomeId: "",
       thematicAreas: "",
     });
     setResponsiblePersons([]);
-    setOutcomeResultTypeId("");
   };
 
-  // Load outcome result type
-  const loadOutcomeResultType = async () => {
-    setIsLoadingResultTypes(true);
-    try {
-      const types = await fetchResultTypes();
-      const outcomeType = types.find(
-        (type) => type.resultName.toLowerCase() === "outcome"
-      );
-
-      if (!outcomeType) {
-        toast.error("Outcome result type not found. Please contact support");
-        return;
-      }
-
-      setOutcomeResultTypeId(outcomeType.resultTypeId);
-    } catch (error) {
-      console.error("Error loading result types: ", error);
-      toast.error("Failed to load result types");
-    } finally {
-      setIsLoadingResultTypes(false);
-    }
-  };
-
-  // Fetch impacts for dropdown
-  const fetchImpact = async () => {
-    setIsLoadingImpacts(true);
+  // fetch outcomes for dropdown
+  const fetchOutcome = async () => {
+    setIsLoadingOutcome(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impacts`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outcomes`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -140,23 +111,49 @@ export default function ProjectOutcomeModal({
         }
       );
 
-      // Extract data based on API response structure
-      let impactsData = [];
+      console.log("Outcomes API response:", response.data);
+
+      // extract data based on API response structure
+      let outcomesData = [];
       if (Array.isArray(response.data)) {
-        impactsData = response.data;
+        outcomesData = response.data;
       } else if (response.data?.data && Array.isArray(response.data.data)) {
-        impactsData = response.data.data;
+        outcomesData = response.data.data;
       } else if (response.data?.data) {
-        impactsData = [response.data.data];
+        outcomesData = [response.data.data];
       }
 
-      // Transform data for dropdown
-      const transformedOptions: DropdownOption[] = impactsData.map(
-        (impact: any) => ({
-          label: impact.statement || `Impact`,
-          value: impact.impactId || "",
+      console.log("Processed outcomes data:", outcomesData);
+
+      // transform data for dropdown - adjust property names based on your actual API response
+      const transformedOptions: DropdownOption[] = outcomesData
+        .map((outcome: any) => {
+          // Try different possible property names
+          const statement = 
+            outcome.outcomeStatement || 
+            outcome.statement || 
+            outcome.outcome || 
+            `Outcome`;
+          
+          const id = 
+            outcome.outcomeId || 
+            outcome.id || 
+            outcome._id || 
+            "";
+
+          if (!id) {
+            console.warn("Skipping outcome without ID:", outcome);
+            return null;
+          }
+
+          return {
+            label: statement,
+            value: id,
+          };
         })
-      );
+        .filter((option: any): option is DropdownOption => option !== null);
+
+      console.log("Transformed options:", transformedOptions);
 
       // Filter out invalid options
       const validOptions = transformedOptions.filter(
@@ -165,16 +162,37 @@ export default function ProjectOutcomeModal({
 
       // Add a default option at the beginning
       const optionsWithDefault = [
-        { label: "Select an impact", value: "" },
+        { label: "Select an outcome", value: "" },
         ...validOptions,
       ];
 
-      setImpactOptions(optionsWithDefault);
-    } catch (error) {
-      console.error("Error fetching impacts:", error);
-      toast.error("Failed to load impacts. Please try again.");
+      setOutcomeOptions(optionsWithDefault);
+
+      // If editing and we have an initial outcomeId, ensure it's selected
+      if (mode === "edit" && initialData?.outcomeId && optionsWithDefault.length > 0) {
+        const outcomeExists = optionsWithDefault.some(
+          (option) => option.value === initialData.outcomeId
+        );
+        
+        if (!outcomeExists && initialData.outcomeId) {
+          // Add the missing outcome from initialData
+          setOutcomeOptions(prev => [
+            ...prev,
+            {
+              label: initialData.outputStatement || "Selected Outcome",
+              value: initialData.outcomeId
+            }
+          ]);
+        }
+      }
+    } catch (error: any) {
+      console.error("Error fetching outcomes:", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error.response?.data || error.message);
+      }
+      toast.error("Failed to load outcomes. Please try again.");
     } finally {
-      setIsLoadingImpacts(false);
+      setIsLoadingOutcome(false);
     }
   };
 
@@ -188,10 +206,11 @@ export default function ProjectOutcomeModal({
   };
 
   // Handle dropdown changes
-  const handleDropdownChange = (name: string, value: string) => {
+  const handleDropdownChange = (value: string) => {
+    console.log(`Dropdown changed: value="${value}"`);
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      outcomeId: value,
     }));
   };
 
@@ -200,11 +219,11 @@ export default function ProjectOutcomeModal({
     setResponsiblePersons(tags);
   };
 
-  // Handle form submission
+  // form submission
   const handleSubmit = async () => {
     // Validation
-    if (!formData.outcomeStatement.trim()) {
-      toast.error("Please enter an outcome statement");
+    if (!formData.outputStatement.trim()) {
+      toast.error("Please enter an output statement");
       return;
     }
 
@@ -218,8 +237,8 @@ export default function ProjectOutcomeModal({
       return;
     }
 
-    if (!formData.impactId) {
-      toast.error("Please select an impact");
+    if (!formData.outcomeId) {
+      toast.error("Please select an outcome");
       return;
     }
 
@@ -228,31 +247,26 @@ export default function ProjectOutcomeModal({
       return;
     }
 
-    if (!outcomeResultTypeId) {
-      toast.error("Outcome result type is required. Please try again.");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      // Prepare payload matching your example
+      // Prepare payload matching your example structure
       const payload = {
         isCreate: mode === "create",
-        data: {
-          outcomeId: mode === "edit" ? initialData?.outcomeId || "" : "",
-          outcomeStatement: formData.outcomeStatement,
-          outcomeType: formData.outcomeType,
-          impactId: formData.impactId,
-          thematicAreas: formData.thematicAreas, // Changed to match payload
+        payload: {
+          outputId: mode === "edit" ? initialData?.outputId || "" : "",
+          outputStatement: formData.outputStatement,
+          outcomeId: formData.outcomeId,
+          thematicAreas: formData.thematicAreas,
           responsiblePerson: responsiblePersons.join(", "),
           projectId: projectId,
-          resultTypeId: outcomeResultTypeId,
         },
       };
 
+      console.log("Submitting payload:", JSON.stringify(payload, null, 2));
+
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outcome`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output`,
         payload,
         {
           headers: {
@@ -262,8 +276,10 @@ export default function ProjectOutcomeModal({
         }
       );
 
+      console.log("API Response:", response.data);
+
       toast.success(
-        `Project outcome ${mode === "create" ? "added" : "updated"} successfully!`
+        `Project output ${mode === "create" ? "added" : "updated"} successfully!`
       );
 
       // Reset and close
@@ -275,7 +291,7 @@ export default function ProjectOutcomeModal({
         onSuccess();
       }
     } catch (error: any) {
-      console.error("Error submitting outcome:", error);
+      console.error("Error submitting output:", error);
 
       // Detailed error logging
       if (axios.isAxiosError(error)) {
@@ -292,7 +308,7 @@ export default function ProjectOutcomeModal({
         toast.error(`Failed to ${mode === "create" ? "add" : "update"}: ${errorMessage}`);
       } else {
         toast.error(
-          `Failed to ${mode === "create" ? "add" : "update"} project outcome`
+          `Failed to ${mode === "create" ? "add" : "update"} project output`
         );
       }
     } finally {
@@ -307,40 +323,31 @@ export default function ProjectOutcomeModal({
 
   return (
     <Modal isOpen={isOpen} onClose={handleModalClose} maxWidth="600px">
-      <Heading
-        heading={mode === "create" ? "Add Project Outcome" : "Edit Project Outcome"}
-        className="text-center"
+      <Heading 
+        heading={mode === "create" ? "Add Project Output" : "Edit Project Output"} 
+        className="text-center" 
       />
       <div className="space-y-6 mt-6">
         <TextInput
-          label="Project Outcome Statement"
-          value={formData.outcomeStatement}
-          name="outcomeStatement"
+          label="Project Output Statement"
+          value={formData.outputStatement}
+          name="outputStatement"
           onChange={handleInputChange}
-          placeholder="Enter outcome statement"
-        />
-
-        <TextInput
-          label="Outcome Type"
-          name="outcomeType"
-          onChange={handleInputChange}
-          value={formData.outcomeType}
-          placeholder="Enter outcome type"
-
+          placeholder="Enter output statement"
         />
 
         <DropDown
-          label="Linked to Impact"
-          name="impactId"
-          onChange={(value) => handleDropdownChange("impactId", value)}
-          options={impactOptions}
-          value={formData.impactId}
-          placeholder={isLoadingImpacts? "Loading..." :"Select an impact"}
+          label="Linked to Outcome"
+          name="outcomeId"
+          onChange={handleDropdownChange}
+          options={outcomeOptions}
+          value={formData.outcomeId}
+          placeholder={isLoadingOutcome ? "Loading..." : "Select an outcome"}
         />
 
         <TextInput
           label="Thematic Areas"
-          name="thematicAreas" // Changed to match payload
+          name="thematicAreas"
           onChange={handleInputChange}
           value={formData.thematicAreas}
           placeholder="Enter thematic area"
@@ -361,7 +368,7 @@ export default function ProjectOutcomeModal({
             isDisabled={isSubmitting}
           />
           <Button
-            content={mode === "create" ? "Add Outcome" : "Update Outcome"}
+            content={mode === "create" ? "Add Output" : "Update Output"}
             onClick={handleSubmit}
             isLoading={isSubmitting}
             isDisabled={isSubmitting}
