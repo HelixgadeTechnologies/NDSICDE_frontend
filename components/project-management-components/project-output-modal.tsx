@@ -131,20 +131,11 @@ export default function ProjectOutputModal({
           // Try different possible property names
           const statement = 
             outcome.outcomeStatement || 
-            outcome.statement || 
-            outcome.outcome || 
             `Outcome`;
           
           const id = 
             outcome.outcomeId || 
-            outcome.id || 
-            outcome._id || 
             "";
-
-          if (!id) {
-            console.warn("Skipping outcome without ID:", outcome);
-            return null;
-          }
 
           return {
             label: statement,
