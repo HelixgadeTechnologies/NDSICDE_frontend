@@ -9,11 +9,15 @@ export type ProjectTeamDetails = {
 };
 
 export type ProjectPartnerTypes = {
-  partnerId: string;
-  name: string;
+ partnerId: string;
+  organizationName: string;
   email: string;
-  role: string;
-  lastActive: string;
+  roleId: string;
+  projectId: string;
+  roleName?: string;
+  projectName?: string;
+  createAt?: string;
+  updateAt: string;
 };
 
 export type ProjectImpactTypes = {

@@ -1,15 +1,16 @@
 "use client";
 
-import Button from "@/ui/form/button";
-import DropDown from "@/ui/form/select-dropdown";
-import Modal from "@/ui/popup-modal";
-import Heading from "@/ui/text-heading";
 import { useState, useEffect } from "react";
-import { Icon } from "@iconify/react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import { DropdownOption } from "@/types/project-management-types";
+import Button from "@/ui/form/button";
+import DropDown from "@/ui/form/select-dropdown";
+import Modal from "@/ui/popup-modal";
+import Heading from "@/ui/text-heading";
+import { Icon } from "@iconify/react";
+import toast from "react-hot-toast";
 
 type AddProps = {
   isOpen: boolean;
@@ -54,8 +55,9 @@ export default function ProjectTeamModal({
   useEffect(() => {
     if (!isOpen) return; // Only run when modal is open
     
+    const projectId = propProjectId || (params?.id as string) || "";
+    
     if (mode === "update" && initialData) {
-      const projectId = propProjectId || (params?.id as string) || "";
       setFormData({
         teamMemberId: initialData.teamMemberId || "",
         email: initialData.email || "",
@@ -64,7 +66,6 @@ export default function ProjectTeamModal({
       });
     } else {
       // Reset form for create mode
-      const projectId = propProjectId || (params?.id as string) || "";
       setFormData({
         teamMemberId: "",
         email: "",
@@ -79,31 +80,76 @@ export default function ProjectTeamModal({
     const getTeamMembers = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/userManagement/users`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/userManagement/users`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        setTeam(response.data.data);
+        
+        console.log("Team members response:", response.data);
+        
+        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+          setTeam(response.data.data);
 
-        // Format team data for dropdown
-        if (response.data.data && Array.isArray(response.data.data)) {
-          const formattedOptions = response.data.data.map((member: any) => ({
-            label: member.email,
-            value: member.email,
-          }));
-          setTeamOptions(formattedOptions);
+          // Format team data for dropdown
+          const formattedOptions = response.data.data
+            .filter((member: any) => member.email && member.userId) // Only include members with email and userId
+            .map((member: any) => ({
+              label: member.email,
+              value: member.email,
+            }));
+          
+          // Add a default option
+          const optionsWithDefault = [
+            { label: "Select a team member", value: "" },
+            ...formattedOptions,
+          ];
+          
+          setTeamOptions(optionsWithDefault);
         }
       } catch (error) {
-        console.error(`Error getting team members: ${error}`);
+        console.error("Error getting team members:", error);
+        toast.error("Failed to load team members");
       }
     };
-    getTeamMembers();
-  }, []);
+    
+    if (isOpen && mode === "create") {
+      getTeamMembers();
+    }
+  }, [isOpen, mode, token]);
 
   // Submit form
   const handleSubmit = async () => {
+    // Validation
+    if (!formData.email) {
+      toast.error("Please select a team member");
+      return;
+    }
+
+    if (!formData.roleId) {
+      toast.error("Please select a role");
+      return;
+    }
+
+    if (!formData.projectId) {
+      toast.error("Project ID is missing");
+      return;
+    }
+
     const payload = {
       isCreate: mode === "create",
-      data: formData,
+      data: {
+        teamMemberId: formData.teamMemberId,
+        email: formData.email,
+        roleId: formData.roleId,
+        projectId: formData.projectId,
+      },
     };
+    
+    console.log("Submitting payload:", payload);
+    
     setIsSubmitting(true);
 
     try {
@@ -116,28 +162,36 @@ export default function ProjectTeamModal({
         },
       });
 
-      console.log(response.data);
+      console.log("Response:", response.data);
+      
+      toast.success(
+        `Team member ${mode === "create" ? "added" : "updated"} successfully!`
+      );
+      
       onClose();
       setSuccessModal(true);
-    } catch (error) {
-      console.error(
-        `Error ${mode === "create" ? "submitting" : "updating"}: ${error}`
-      );
+      
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error: any) {
+      console.error(`Error ${mode === "create" ? "submitting" : "updating"}:`, error);
+      
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || error.message;
+        toast.error(`Failed to ${mode === "create" ? "add" : "update"} team member: ${errorMessage}`);
+      } else {
+        toast.error(`Failed to ${mode === "create" ? "add" : "update"} team member`);
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle change for input and select
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //   }));
-  // };
-
+  // Handle dropdown changes - KEPT THE SAME
   const handleSelectChange = (name: string, value: string) => {
+    console.log(`Dropdown ${name} changed to:`, value);
+    
     // Special handling for email selection
     if (name === "email" && team && Array.isArray(team)) {
       const selectedMember = team.find((member: any) => member.email === value);
@@ -161,9 +215,10 @@ export default function ProjectTeamModal({
 
   const handleSuccessClose = () => {
     setSuccessModal(false);
-    if (onSuccess) {
-      onSuccess();
-    }
+  };
+
+  const handleModalClose = () => {
+    onClose();
   };
 
   const modalTitle =
@@ -179,7 +234,7 @@ export default function ProjectTeamModal({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
+      <Modal isOpen={isOpen} onClose={handleModalClose} maxWidth="600px">
         <Heading heading={modalTitle} className="text-center" />
         <div className="space-y-6">
           {mode === "update" ? (
@@ -195,7 +250,7 @@ export default function ProjectTeamModal({
               value={formData.email}
               onChange={(value) => handleSelectChange("email", value)}
               options={teamOptions}
-              placeholder="Enter Email Address"
+              placeholder="Select Email Address"
               label="Email Address"
               isBigger
             />
@@ -212,13 +267,14 @@ export default function ProjectTeamModal({
 
           <div className="flex items-center gap-6">
             <div className="w-2/5">
-              <Button content="Cancel" isSecondary onClick={onClose} />
+              <Button content="Cancel" isSecondary onClick={handleModalClose} />
             </div>
             <div className="w-3/5">
               <Button
                 content={buttonText}
                 onClick={handleSubmit}
                 isLoading={isSubmitting}
+                isDisabled={isSubmitting}
               />
             </div>
           </div>
@@ -239,7 +295,6 @@ export default function ProjectTeamModal({
           <Button
             content="Close"
             onClick={handleSuccessClose}
-            isLoading={isSubmitting}
           />
         </div>
       </Modal>
