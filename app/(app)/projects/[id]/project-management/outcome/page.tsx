@@ -8,7 +8,6 @@ import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEntityModal } from "@/utils/project-management-utility";
 import ProjectOutcomeModal from "@/components/project-management-components/project-outcome-modal";
-import EditProjectOutcomeModal from "@/components/project-management-components/edit-project-outcome";
 import DeleteModal from "@/ui/generic-delete-modal";
 import { ProjectOutcomeTypes } from "@/types/project-management-types";
 import Link from "next/link";

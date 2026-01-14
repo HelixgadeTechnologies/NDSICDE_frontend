@@ -9,7 +9,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEntityModal } from "@/utils/project-management-utility";
 import { ProjectOutputTypes } from "@/types/project-management-types";
 import ProjectOutputModal from "@/components/project-management-components/project-output-modal";
-import EditProjectOutputModal from "@/components/project-management-components/edit-project-output";
 import DeleteModal from "@/ui/generic-delete-modal";
 import Link from "next/link";
 import { getToken } from "@/lib/api/credentials";
