@@ -60,6 +60,7 @@ export default function ProjectImpact() {
     }
   };
 
+  // automatically fetch impacts
   useEffect(() => {
     fetchImpact();
   }, []);

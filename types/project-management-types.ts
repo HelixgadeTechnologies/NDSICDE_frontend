@@ -65,20 +65,25 @@ export type ProjectActivityTypes = {
 };
 
 export type ProjectOutcomeTypes = {
-  userId: string;
-  projectOutcome: string;
+  outcomeId: string;
+  outcomeStatement: string;
+  impactStatement?: string;
   outcomeType: string;
-  impact: string;
+  impactId: string;
   thematicAreas: string;
   responsiblePerson: string;
+  projectId: string;
+  resultTypeId: string;
 };
 
 export type ProjectOutputTypes = {
-  userId: string;
-  impactStatement: string;
-  outcome: string;
+  outputId: string;
+  outputStatement: string;
+  outcomeId: string;
+  outcomeStatement?: string;
   thematicAreas: string;
   responsiblePerson: string;
+  projectId: string;
 };
 
 export interface DropdownOption {
