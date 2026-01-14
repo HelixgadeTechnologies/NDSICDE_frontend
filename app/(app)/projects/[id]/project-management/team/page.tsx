@@ -13,7 +13,6 @@ import ProjectTeamModal from "@/components/project-management-components/project
 // import ViewProjectTeamModal from "@/components/project-management-components/view-project-team";
 import DeleteProjectTeamModal from "@/components/project-management-components/remove-project-team";
 import axios from "axios";
-import Loading from "@/app/loading";
 import { DropdownOption, ProjectTeamDetails } from "@/types/project-management-types";
 import { formatDate } from "@/utils/dates-format-utility";
 import { getToken } from "@/lib/api/credentials";
@@ -295,6 +294,11 @@ export default function ProjectTeam() {
         onSuccess={fetchProjectTeam}
         roles={roles} 
         mode="update"
+        initialData={{
+          email: selectedMember.email,
+          roleId: roles.find(role => role.label === selectedMember.roleName)?.value || "",
+          teamMemberId: selectedMember.teamMemberId,
+        }}
       />
       )}
 

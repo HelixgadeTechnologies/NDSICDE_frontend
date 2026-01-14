@@ -3,18 +3,26 @@
 import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
 import Table from "@/ui/table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEntityModal } from "@/utils/project-management-utility";
-import AddProjectOutcomeModal from "@/components/project-management-components/add-project-outcome";
+import ProjectOutcomeModal from "@/components/project-management-components/project-outcome-modal";
 import EditProjectOutcomeModal from "@/components/project-management-components/edit-project-outcome";
 import DeleteModal from "@/ui/generic-delete-modal";
 import { ProjectOutcomeTypes } from "@/types/project-management-types";
 import Link from "next/link";
+import { getToken } from "@/lib/api/credentials";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 export default function ProjectOutcome() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [data, setData] = useState<ProjectOutcomeTypes[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const token = getToken();
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const head = [
     "Project Outcome Objective",
     "Outcome Type",
@@ -22,24 +30,6 @@ export default function ProjectOutcome() {
     "Thematic Areas",
     "Responsible Person(s)",
     "Actions",
-  ];
-  const data = [
-    {
-      userId: "1",
-      projectOutcome: "Seplat",
-      outcomeType: "Development",
-      impact: "Development Outcome",
-      thematicAreas: "Environment",
-      responsiblePerson: "Person 2",
-    },
-    {
-      userId: "2",
-      projectOutcome: "Seplat",
-      outcomeType: "Development",
-      impact: "Development Outcome",
-      thematicAreas: "Environment",
-      responsiblePerson: "Person 2",
-    },
   ];
 
   // states for modals
@@ -55,6 +45,49 @@ export default function ProjectOutcome() {
     handleAddEntity: handleAddProjectOutcome,
     handleRemoveEntity: handleRemoveProjectOutcome,
   } = useEntityModal<ProjectOutcomeTypes>();
+
+  // fetch outcome
+  const fetchOutcome = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outcomes`);
+      toast.success(response.data.message);
+      setData(response.data.data);
+    } catch (error) {
+      console.error(`Error fetching outcome: ${error}`);
+      toast.error('Error retrieving outcomes. Please try again');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchOutcome();
+  }, []);
+
+  // delete outcome
+  const deleteOutcome = async (outcomeId: string) => {
+    setIsDeleting(true);
+    try {
+      const res = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outcome/${outcomeId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+      toast.success("Project outcome deleted successfully!");
+      setRemoveProjectOutcome(false);
+      fetchOutcome();
+    } catch (error) {
+      console.error(`Error deleting outcome: ${error}`);
+      toast.error("An error occured. Please try again later.")
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-18.75">
@@ -66,16 +99,22 @@ export default function ProjectOutcome() {
       </div>
 
       <CardComponent>
-        <Table
+        {isLoading ? (
+           <div className="dots my-20 mx-auto">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        ) : <Table
           tableHead={head}
           tableData={data}
           checkbox
-          idKey={"userId"}
+          idKey={"outcomeId"}
           renderRow={(row) => (
             <>
-              <td className="px-6">{row.projectOutcome}</td>
+              <td className="px-6">{row.outcomeStatement}</td>
               <td className="px-6">{row.outcomeType}</td>
-              <td className="px-6">{row.impact}</td>
+              <td className="px-6">{row.impactId}</td>
               <td className="px-6">{row.thematicAreas}</td>
               <td className="px-6">{row.responsiblePerson}</td>
               <td className="px-6 relative">
@@ -87,12 +126,12 @@ export default function ProjectOutcome() {
                   color="#909CAD"
                   onClick={() =>
                     setActiveRowId((prev) =>
-                      prev === row.userId ? null : row.userId
+                      prev === row.outcomeId ? null : row.outcomeId
                     )
                   }
                 />
 
-                {activeRowId === row.userId && (
+                {activeRowId === row.outcomeId && (
                   <AnimatePresence>
                     <motion.div
                       initial={{ y: -10, opacity: 0 }}
@@ -152,19 +191,24 @@ export default function ProjectOutcome() {
               </td>
             </>
           )}
-        />
+        />}
       </CardComponent>
 
       {/* modals */}
-      <AddProjectOutcomeModal
+      <ProjectOutcomeModal
         isOpen={addProjectOutcome}
         onClose={() => setAddProjectOutcome(false)}
+        onSuccess={fetchOutcome}
+        mode="create"
       />
 
       {selectedProjectOutcome && (
-        <EditProjectOutcomeModal
+        <ProjectOutcomeModal
           isOpen={editProjectOutcome}
           onClose={() => setEditProjectOutcome(false)}
+          mode="edit"
+          onSuccess={fetchOutcome}
+          initialData={selectedProjectOutcome}
         />
       )}
 
@@ -173,6 +217,8 @@ export default function ProjectOutcome() {
           isOpen={removeProjectOutcome}
           onClose={() => setRemoveProjectOutcome(false)}
           heading="Do you want to remove this  Project Outcome?"
+          onDelete={() => deleteOutcome(selectedProjectOutcome.outcomeId)}
+          isDeleting={isDeleting}
         />
       )}
     </div>

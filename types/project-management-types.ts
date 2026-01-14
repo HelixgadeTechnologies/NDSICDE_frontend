@@ -65,12 +65,14 @@ export type ProjectActivityTypes = {
 };
 
 export type ProjectOutcomeTypes = {
-  userId: string;
-  projectOutcome: string;
+   outcomeId: string;
+  outcomeStatement: string;
   outcomeType: string;
-  impact: string;
+  impactId: string;
   thematicAreas: string;
   responsiblePerson: string;
+  projectId: string;
+  resultTypeId: string;
 };
 
 export type ProjectOutputTypes = {

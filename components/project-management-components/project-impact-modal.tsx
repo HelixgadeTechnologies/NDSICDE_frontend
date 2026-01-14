@@ -14,25 +14,18 @@ import toast from "react-hot-toast";
 import {
   fetchResultTypes,
 } from "@/lib/api/result-types";
+import { ProjectImpactTypes } from "@/types/project-management-types";
 
-type ImpactData = {
-  impactId: string;
-  statement: string;
-  thematicArea: string;
-  responsiblePerson: string;
-  projectId: string;
-  resultTypeId: string;
-};
 
 type AddProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
   mode?: "create" | "edit";
-  initialData?: ImpactData;
+  initialData?: ProjectImpactTypes;
 };
 
-export default function AddProjectImpactModal({
+export default function ProjectImpactModal({
   isOpen,
   onClose,
   onSuccess,
@@ -55,13 +48,6 @@ export default function AddProjectImpactModal({
     statement: "",
     thematicArea: "",
   });
-
-  // Reset the initialization flag when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      hasInitializedRef.current = false;
-    }
-  }, [isOpen]);
 
   // Initialize form with initialData when in edit mode and modal opens
   useEffect(() => {
@@ -134,7 +120,6 @@ export default function AddProjectImpactModal({
       }
 
       setImpactResultTypeId(impactType.resultTypeId);
-      console.log("Loaded impact result type ID:", impactType.resultTypeId);
     } catch (error) {
       console.error("Error loading result types:", error);
       toast.error("Failed to load result types");
@@ -188,18 +173,12 @@ export default function AddProjectImpactModal({
     setIsSubmitting(true);
 
     try {
-      // For edit mode, we MUST use the existing impactId from initialData
-      // For create mode, impactId should be empty string
       const impactId = mode === "edit" ? (initialData?.impactId || currentImpactId) : "";
 
-      console.log("Mode:", mode);
-      console.log("Using impactId:", impactId);
-      console.log("Using isCreate:", mode === "create");
-
       const payload = {
-        isCreate: mode === "create", // true for create, false for edit
+        isCreate: mode === "create",
         data: {
-          impactId: impactId, // Empty for create, actual ID for edit
+          impactId: impactId,
           statement: formData.statement,
           thematicArea: formData.thematicArea,
           responsiblePerson: responsiblePersons.join(", "),
@@ -207,8 +186,6 @@ export default function AddProjectImpactModal({
           resultTypeId: impactResultTypeId, // Should be same for both create and edit
         }
       };
-
-      console.log(`Submitting impact payload (${mode} mode):`, JSON.stringify(payload, null, 2));
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impact`,
@@ -221,13 +198,7 @@ export default function AddProjectImpactModal({
         }
       );
 
-      console.log("Response:", response.data);
       toast.success(`Project impact ${mode === 'create' ? 'added' : 'updated'} successfully!`);
-
-      // Reset form for create mode
-      if (mode === "create") {
-        resetForm();
-      }
 
       // Close modal and show success
       onClose();
@@ -243,9 +214,6 @@ export default function AddProjectImpactModal({
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || error.message;
         toast.error(`Failed to ${mode === 'create' ? 'add' : 'update'} impact: ${errorMessage}`);
-        console.error("Response data:", error.response?.data);
-        console.error("Response status:", error.response?.status);
-        console.error("Request payload:", error.config?.data);
       } else {
         toast.error(`Failed to ${mode === 'create' ? 'add' : 'update'} project impact`);
       }
@@ -264,18 +232,6 @@ export default function AddProjectImpactModal({
   const handleSuccessModalClose = () => {
     setSuccessModal(false);
   };
-
-  // Debug log to see current state
-  useEffect(() => {
-    console.log("Current state:", {
-      mode,
-      formData,
-      responsiblePersons,
-      currentImpactId,
-      impactResultTypeId,
-      hasInitialized: hasInitializedRef.current,
-    });
-  }, [formData, responsiblePersons, currentImpactId, impactResultTypeId, mode]);
 
   return (
     <>
