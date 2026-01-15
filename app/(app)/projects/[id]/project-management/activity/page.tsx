@@ -3,7 +3,7 @@
 import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
 import Table from "@/ui/table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ProjectActivityTypes } from "@/types/project-management-types";
@@ -11,12 +11,24 @@ import { useEntityModal } from "@/utils/project-management-utility";
 import Link from "next/link";
 import DeleteModal from "@/ui/generic-delete-modal";
 import EditProjectActivity from "@/components/project-management-components/edit-project-activity";
+import { getToken } from "@/lib/api/credentials";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useParams } from "next/navigation";
+import { formatDate } from "@/utils/dates-format-utility";
 
 export default function ProjectActivity() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [data, setData] = useState<ProjectActivityTypes[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const token = getToken();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const params = useParams();
+  const projectId = (params?.id as string) || "";
+
   const head = [
     "Activity Statement",
-    "Linked to Output",
+    "Sub Activity",
     "Budget (₦)",
     "Start Date",
     "End Date",
@@ -24,27 +36,7 @@ export default function ProjectActivity() {
     "Actions",
   ];
 
-  const data: ProjectActivityTypes[] = [
-    {
-      userId: "1",
-      activityStatement: "Seplat",
-      output: "Output 1.1",
-      budget: "300,000",
-      startDate: "May 15, 2025 10:30",
-      endDate: "May 20, 2025 11:00",
-      responsiblePersons: "Ifeoma Ojadi",
-    },
-    {
-      userId: "2",
-      activityStatement: "Seplat",
-      output: "Output 1.2",
-      budget: "300,000",
-      startDate: "May 15, 2025 10:30",
-      endDate: "May 20, 2025 11:00",
-      responsiblePersons: "Isioma Otokini",
-    },
-  ];
-
+  // states for modals
   const {
     editEntity: editActivity,
     setEditEntity: setEditActivity,
@@ -55,13 +47,58 @@ export default function ProjectActivity() {
     selectedEntity: selectedActivity,
   } = useEntityModal<ProjectActivityTypes>();
 
+  // fetch activities
+  const fetchActivities = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities`
+      );
+      toast.success(response.data.message);
+      setData(response.data.data);
+    } catch (error) {
+      console.log(`Error fetching activities: ${error}`);
+      toast.error("Error retrieving activities. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // automatically fetch activities
+  useEffect(() => {
+    fetchActivities();
+  }, []);
+
+  // delete activity
+  const deleteActivity = async (activityId: string) => {
+    setIsDeleting(true);
+    try {
+       const res = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity/${activityId}`, 
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      );
+      toast.success("Project activity deleted successfully!");
+      setRemoveActivity(false)
+      fetchActivities();
+    } catch (error) {
+      console.error(`Error deleting activity: ${error}`);
+      toast.error("An error occurred. Please try again later.")
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <div className="relative mt-12">
       <div className="absolute right-0 -top-18.75">
         <Button
           content="Add Activity"
           icon="si:add-fill"
-          href="/projects/1/project-management/activity/add"
+          href={`/projects/${projectId}/project-management/activity/add`}
         />
       </div>
 
@@ -70,15 +107,15 @@ export default function ProjectActivity() {
           tableHead={head}
           tableData={data}
           checkbox
-          idKey={"userId"}
+          idKey={"activityId"}
           renderRow={(row) => (
             <>
               <td className="px-6">{row.activityStatement}</td>
-              <td className="px-6">{row.output}</td>
-              <td className="px-6">{row.budget}</td>
-              <td className="px-6">{row.startDate}</td>
-              <td className="px-6">{row.endDate}</td>
-              <td className="px-6">{row.responsiblePersons}</td>
+              <td className="px-6">{row.subActivity}</td>
+              <td className="px-6">{row.activityTotalBudget}</td>
+              <td className="px-6">{formatDate(row.startDate, "short")}</td>
+              <td className="px-6">{formatDate(row.endDate, "short")}</td>
+              <td className="px-6">{row.responsiblePerson}</td>
               <td className="px-6 relative">
                 <Icon
                   icon={"uiw:more"}
@@ -88,12 +125,12 @@ export default function ProjectActivity() {
                   color="#909CAD"
                   onClick={() =>
                     setActiveRowId((prev) =>
-                      prev === row.userId ? null : row.userId
+                      prev === row.activityId ? null : row.activityId
                     )
                   }
                 />
 
-                {activeRowId === row.userId && (
+                {activeRowId === row.activityId && (
                   <AnimatePresence>
                     <motion.div
                       initial={{ y: -10, opacity: 0 }}
@@ -128,7 +165,7 @@ export default function ProjectActivity() {
                         </li>
                         <Link
                           href={
-                            "/projects/1/project-management/activity/report-actual-value"
+                           `/projects/${projectId}/project-management/activity/report-actual-value`
                           }
                           className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon icon={"si:add-fill"} height={20} width={20} />
@@ -148,6 +185,10 @@ export default function ProjectActivity() {
         <EditProjectActivity
           isOpen={editActivity}
           onClose={() => setEditActivity(false)}
+          mode="edit"
+          initialData={selectedActivity}
+          onSuccess={fetchActivities}
+          
         />
       )}
       {selectedActivity && (
@@ -155,6 +196,8 @@ export default function ProjectActivity() {
           isOpen={removeActivity}
           onClose={() => setRemoveActivity(false)}
           heading="Do you want to remove this Project Activity?"
+          onDelete={() => deleteActivity(selectedActivity.activityId)}
+          isDeleting={isDeleting}
         />
       )}
     </div>

@@ -9,7 +9,7 @@ export type ProjectTeamDetails = {
 };
 
 export type ProjectPartnerTypes = {
- partnerId: string;
+  partnerId: string;
   organizationName: string;
   email: string;
   roleId: string;
@@ -56,16 +56,22 @@ export type ProjectRequestType = {
   documentName: string;
   documentURL: string;
   projectId: string;
-  status: string;};
+  status: string;
+};
 
 export type ProjectActivityTypes = {
-  userId: string;
+  activityId: string;
   activityStatement: string;
-  output: string;
-  budget: string;
+  outputId: string;
+  activityTotalBudget: 0;
+  responsiblePerson: string;
   startDate: string;
   endDate: string;
-  responsiblePersons: string;
+  activityFrequency: 0;
+  subActivity: string;
+  descriptionAction: string;
+  deliveryDate: string;
+  projectId: string;
 };
 
 export type ProjectOutcomeTypes = {
