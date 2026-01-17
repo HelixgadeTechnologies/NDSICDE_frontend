@@ -25,7 +25,7 @@ function ActivityOverviewChart() {
   ];
   return (
     <div className="flex items-center justify-between px-10">
-      <div className="h-[400px] w-[50%]">
+      <div className="h-[300px] w-[50%]">
         <ResponsiveContainer>
           <PieChart>
             <Pie data={budgetUilization}>
@@ -85,6 +85,22 @@ function ActivityOverviewTable() {
             performance: "50%",
             status: "In Progress",
         },
+        {
+            id: 3,
+            activityStatement: "Statement 1", 
+            targetFrequency: "Frequency 1", 
+            actualFrequency: "Frequency 1",
+            performance: "50%",
+            status: "In Progress",
+        },
+        {
+            id: 4,
+            activityStatement: "Statement 1", 
+            targetFrequency: "Frequency 1", 
+            actualFrequency: "Frequency 1",
+            performance: "50%",
+            status: "In Progress",
+        },
     ];
     return (
         <Table
@@ -101,6 +117,8 @@ function ActivityOverviewTable() {
                 <td className="px-6">{row.status}</td>
             </>
         )}
+         pagination={true}
+        itemsPerPage={3}
         />
     )
 }
