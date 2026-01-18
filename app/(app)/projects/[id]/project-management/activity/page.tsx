@@ -105,7 +105,7 @@ export default function ProjectActivity() {
 
       <CardComponent>
         {isLoading ? (
-          <div className="dots ny-20 mx-auto">
+          <div className="dots my-20 mx-auto">
             <div></div>
             <div></div>
             <div></div>
