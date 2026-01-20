@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect } from "react";
 import DropDown from "@/ui/form/select-dropdown";
 import RadioInput from "@/ui/form/radio";
 import TextInput from "@/ui/form/text-input";
 
-type IndicatorSource = "organizational-kpi" | "custom-indicator";
+type IndicatorSource = "organizational-kpi" | "custom-indicator" | null;
 
 export interface IndicatorSourceData {
   indicatorSource: IndicatorSource;
   thematicAreaPillar: string;
-  indicatorStatement: string;
+  // indicatorStatement: string;
+  customIndicatorStatement?: string;
 }
 
 interface IndicatorSourceSelectorProps {
@@ -23,63 +24,61 @@ interface IndicatorSourceSelectorProps {
 export default function IndicatorSourceSelector({
   onChange,
   thematicAreaOptions = [],
-  indicatorStatementOptions = [],
   initialValues,
 }: IndicatorSourceSelectorProps) {
-  const [indicatorSource, setIndicatorSource] = useState<IndicatorSource>(
-    initialValues?.indicatorSource || "organizational-kpi"
+  const [selectedSource, setSelectedSource] = useState<"organizational-kpi" | "custom-indicator" | null>(
+    initialValues?.indicatorSource === "organizational-kpi" || initialValues?.indicatorSource === "custom-indicator" 
+      ? initialValues.indicatorSource 
+      : null
   );
   const [thematicAreaPillar, setThematicAreaPillar] = useState(
     initialValues?.thematicAreaPillar || ""
   );
-  const [indicatorStatement, setIndicatorStatement] = useState(
-    initialValues?.indicatorStatement || ""
-  );
-
-  // Filter indicator statements based on selected thematic area
-  const filteredIndicatorStatements = indicatorStatementOptions.filter(
-    (option) => {
-      // Add your filtering logic here based on thematicAreaPillar
-      // For now, returning all options - you can customize this
-      return true;
-    }
+  const [customIndicatorStatement, setCustomIndicatorStatement] = useState(
+    initialValues?.customIndicatorStatement || ""
   );
 
   // Notify parent of changes
   useEffect(() => {
-    onChange({
-      indicatorSource,
-      thematicAreaPillar,
-      indicatorStatement,
-    });
-  }, [indicatorSource, thematicAreaPillar, indicatorStatement]);
+    const data: IndicatorSourceData = {
+      indicatorSource: selectedSource,
+      thematicAreaPillar: selectedSource === "organizational-kpi" ? thematicAreaPillar : "",
+      customIndicatorStatement: selectedSource === "custom-indicator" ? customIndicatorStatement : "",
+      // indicatorStatement: ""
+    };
+    onChange(data);
+  }, [selectedSource, thematicAreaPillar, customIndicatorStatement]);
 
-  const handleIndicatorSourceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSource = e.target.value as IndicatorSource;
-    setIndicatorSource(newSource);
-    
-    // Reset thematic area and indicator statement when switching modes
-    if (newSource === "custom-indicator") {
+  const handleSourceSelect = (source: "organizational-kpi" | "custom-indicator") => {
+    if (selectedSource === source) {
+      // Deselect if clicking the same source
+      setSelectedSource(null);
       setThematicAreaPillar("");
-      setIndicatorStatement("");
+      setCustomIndicatorStatement("");
+    } else {
+      // Select new source
+      setSelectedSource(source);
+      if (source === "organizational-kpi") {
+        setCustomIndicatorStatement("");
+      } else {
+        setThematicAreaPillar("");
+      }
     }
   };
 
   const handleThematicAreaChange = (value: string | React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = typeof value === 'string' ? value : value.target.value;
     setThematicAreaPillar(newValue);
-    // Reset indicator statement when thematic area changes
-    setIndicatorStatement("");
   };
 
-  const handleIndicatorStatementChange = (value: string | React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+  const handleCustomIndicatorChange = (value: string | React.ChangeEvent<HTMLInputElement>) => {
     const newValue = typeof value === 'string' ? value : value.target.value;
-    setIndicatorStatement(newValue);
+    setCustomIndicatorStatement(newValue);
   };
 
   return (
     <div className="space-y-4">
-      {/* Indicator Source */}
+      {/* Indicator Source Selection - Radio Buttons */}
       <div className="space-y-1">
         <p className="text-[#101928] text-sm font-medium">Indicator Source</p>
         <div className="flex items-center gap-2">
@@ -87,51 +86,52 @@ export default function IndicatorSourceSelector({
             label="Organization KPI"
             value="organizational-kpi"
             name="indicatorSource"
-            is_checked={indicatorSource === "organizational-kpi"}
-            onChange={handleIndicatorSourceChange}
+            is_checked={selectedSource === "organizational-kpi"}
+            onChange={() => handleSourceSelect("organizational-kpi")}
           />
           <RadioInput
             label="Custom Indicator"
             value="custom-indicator"
             name="indicatorSource"
-            is_checked={indicatorSource === "custom-indicator"}
-            onChange={handleIndicatorSourceChange}
+            is_checked={selectedSource === "custom-indicator"}
+            onChange={() => handleSourceSelect("custom-indicator")}
           />
         </div>
       </div>
 
-      {/* Thematic Area/Pillar */}
-      <DropDown
-        label="Thematic Area/Pillar"
-        value={thematicAreaPillar}
-        name="thematicAreaPillar"
-        placeholder={indicatorSource === "custom-indicator" ? '---' : 'Enter Thematic Area'}
-        onChange={handleThematicAreaChange}
-        options={thematicAreaOptions}
-        isBigger
-        isDisabled={indicatorSource === "custom-indicator"}
-      />
+      {/* Conditional Rendering Based on Selection */}
+      {selectedSource === "organizational-kpi" && (
+        <div className="space-y-4 border-l-2 border-blue-500 pl-4 mt-4">
+          <DropDown
+            label="Thematic Area/Pillar"
+            value={thematicAreaPillar}
+            name="thematicAreaPillar"
+            placeholder="Select Thematic Area"
+            onChange={handleThematicAreaChange}
+            options={thematicAreaOptions}
+            isBigger
+          />
+        </div>
+      )}
 
-      {/* Indicator Statement - Conditional rendering based on source */}
-      {indicatorSource === "organizational-kpi" ? (
-        <DropDown
-          label="Indicator Statement"
-          value={indicatorStatement}
-          name="indicatorStatement"
-          placeholder={!thematicAreaPillar ? '---' : 'Select indicator statement'}
-          onChange={handleIndicatorStatementChange}
-          options={filteredIndicatorStatements}
-          isBigger
-          isDisabled={!thematicAreaPillar}
-        />
-      ) : (
-        <TextInput
-          label="Custom Indicator Statement"
-          value={indicatorStatement}
-          name="indicatorStatement"
-          placeholder="Enter custom indicator statement"
-          onChange={handleIndicatorStatementChange}
-        />
+      {selectedSource === "custom-indicator" && (
+        <div className="space-y-4 border-l-2 border-green-500 pl-4 mt-4">
+          <TextInput
+            label="Custom Indicator Statement"
+            value={customIndicatorStatement}
+            name="customIndicatorStatement"
+            placeholder="Enter custom indicator statement"
+            onChange={handleCustomIndicatorChange}
+            isBigger
+          />
+        </div>
+      )}
+
+      {/* Show message when no source is selected */}
+      {!selectedSource && (
+        <div className="text-gray-500 text-sm italic mt-2">
+          Please select an indicator source above to continue
+        </div>
       )}
     </div>
   );

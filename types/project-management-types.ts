@@ -74,6 +74,23 @@ export type ProjectActivityTypes = {
   projectId: string;
 };
 
+export type ProjectActivityReportTypes = {
+  activityReportId: string;
+  activityId: string;
+  activityStatement: string;
+  activityTotalBudget: number;
+  responsiblePerson: string;
+  startDate: string;
+  endDate: string;
+  percentageCompletion: number;
+  actualStartDate: string;
+  actualEndDate: string;
+  actualCost: number;
+  actualNarrative: string;
+  createAt: string;
+  updateAt?: string;
+};
+
 export type ProjectOutcomeTypes = {
   outcomeId: string;
   outcomeStatement: string;
