@@ -5,7 +5,7 @@ import AddIndicatorForm from "@/components/team-member-components/add-indicator-
 
 export default function AddImpactIndicator() {
   return (
-    <div className="border border-[#E4E7EC] pt-8 px-6 pb-6 rounded-[10px] bg-white w-[624px]">
+    <div className="border border-[#E4E7EC] pt-8 px-6 pb-6 rounded-[10px] bg-white w-156">
       <Heading heading="Add Output Indicator" className="text-center" />
      <AddIndicatorForm/>
     </div>

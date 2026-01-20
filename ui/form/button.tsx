@@ -11,6 +11,7 @@ type ButtonProps = {
   icon?: string;
   isDisabled?: boolean;
   isLoading?: boolean;
+  type?: "button" | "submit" | "reset";
 };
 
 export default function Button({
@@ -21,6 +22,7 @@ export default function Button({
   isSecondary,
   isDisabled,
   isLoading,
+  type,
 }: ButtonProps) {
   const classes = `${
     isDisabled
@@ -56,7 +58,7 @@ export default function Button({
   }
 
   return (
-    <button onClick={onClick} className={classes}>
+    <button onClick={onClick} className={classes} type={type}>
       {isLoading ? (
         <div className="flex justify-center items-center">
           <div className="dots-white">
