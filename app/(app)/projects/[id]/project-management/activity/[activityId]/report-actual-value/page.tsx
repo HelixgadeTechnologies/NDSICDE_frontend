@@ -6,6 +6,7 @@ import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
 import DeleteModal from "@/ui/generic-delete-modal";
 import Table from "@/ui/table";
+import Heading from "@/ui/text-heading";
 import { formatDate } from "@/utils/dates-format-utility";
 import { Icon } from "@iconify/react";
 import axios from "axios";
@@ -31,7 +32,7 @@ export default function ReportActualValue() {
 
   const head = [
     "Activity Statement",
-    "Completion Rate", //linked to output
+    "Linked to Output", //linked to output
     "Total Budget",
     "Responsible Person(s)",
     "Start Date",
@@ -60,6 +61,7 @@ export default function ReportActualValue() {
   useEffect(() => {
     fetchActivityReports();
   }, []);
+  console.log(data)
 
   // Handle delete click - opens confirmation modal
   const handleDeleteClick = (id: string, name: string) => {
@@ -102,9 +104,10 @@ export default function ReportActualValue() {
 
   return (
     <div className="relative mt-12">
-      <div className="absolute right-0 -top-18.75">
+      {/* <div className="absolute right-0 -top-18.75">
         <Button content="Add Indicator Reporting Formats" icon="si:add-fill" href={`/projects/${projectId}/project-management/activity/report-actual-value/add`} />
-      </div>
+      </div> */}
+        <Heading heading="Activity Report" className="mb-5"/>
 
       <CardComponent>
         {isLoading ? (
@@ -126,8 +129,8 @@ export default function ReportActualValue() {
                 <td className="px-6">{row.percentageCompletion}%</td>
                 <td className="px-6">{row.activityTotalBudget}</td>
                 <td className="px-6">{row.responsiblePerson}</td>
-                <td className="px-6">{formatDate(row.startDate, "short")}</td>
-                <td className="px-6">{formatDate(row.endDate, "short")}</td>
+                <td className="px-6">{formatDate(row.startDate, "date-only")}</td>
+                <td className="px-6">{formatDate(row.endDate, "date-only")}</td>
                 <td className="px-6 relative">
                   <Icon
                     icon={"uiw:more"}

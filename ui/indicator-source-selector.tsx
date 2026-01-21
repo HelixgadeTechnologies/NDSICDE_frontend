@@ -8,16 +8,14 @@ import TextInput from "@/ui/form/text-input";
 type IndicatorSource = "organizational-kpi" | "custom-indicator" | null;
 
 export interface IndicatorSourceData {
-  indicatorSource: IndicatorSource;
-  thematicAreaPillar: string;
-  // indicatorStatement: string;
-  customIndicatorStatement?: string;
+  indicatorSource: string; // Changed from IndicatorSource to string to match form expectations
+  thematicAreasOrPillar: string; // Changed from thematicAreaPillar
+  statement: string; // Changed from customIndicatorStatement
 }
 
 interface IndicatorSourceSelectorProps {
   onChange: (data: IndicatorSourceData) => void;
   thematicAreaOptions?: Array<{ label: string; value: string }>;
-  indicatorStatementOptions?: Array<{ label: string; value: string }>;
   initialValues?: Partial<IndicatorSourceData>;
 }
 
@@ -32,19 +30,32 @@ export default function IndicatorSourceSelector({
       : null
   );
   const [thematicAreaPillar, setThematicAreaPillar] = useState(
-    initialValues?.thematicAreaPillar || ""
+    initialValues?.thematicAreasOrPillar || ""
   );
   const [customIndicatorStatement, setCustomIndicatorStatement] = useState(
-    initialValues?.customIndicatorStatement || ""
+    initialValues?.statement || ""
   );
 
   // Notify parent of changes
   useEffect(() => {
+    let indicatorSourceValue = "";
+    let thematicAreaValue = "";
+    let statementValue = "";
+
+    if (selectedSource === "organizational-kpi") {
+      indicatorSourceValue = "Organization KPI";
+      thematicAreaValue = thematicAreaPillar;
+      statementValue = ""; // Organizational KPI doesn't have a custom statement
+    } else if (selectedSource === "custom-indicator") {
+      indicatorSourceValue = "Custom Indicator";
+      thematicAreaValue = ""; // Custom indicator might not have thematic area
+      statementValue = customIndicatorStatement;
+    }
+
     const data: IndicatorSourceData = {
-      indicatorSource: selectedSource,
-      thematicAreaPillar: selectedSource === "organizational-kpi" ? thematicAreaPillar : "",
-      customIndicatorStatement: selectedSource === "custom-indicator" ? customIndicatorStatement : "",
-      // indicatorStatement: ""
+      indicatorSource: indicatorSourceValue,
+      thematicAreasOrPillar: thematicAreaValue,
+      statement: statementValue,
     };
     onChange(data);
   }, [selectedSource, thematicAreaPillar, customIndicatorStatement]);
@@ -105,7 +116,7 @@ export default function IndicatorSourceSelector({
           <DropDown
             label="Thematic Area/Pillar"
             value={thematicAreaPillar}
-            name="thematicAreaPillar"
+            name="thematicAreasOrPillar"
             placeholder="Select Thematic Area"
             onChange={handleThematicAreaChange}
             options={thematicAreaOptions}
@@ -117,10 +128,10 @@ export default function IndicatorSourceSelector({
       {selectedSource === "custom-indicator" && (
         <div className="space-y-4 border-l-2 border-green-500 pl-4 mt-4">
           <TextInput
-            label="Custom Indicator Statement"
+            label="Indicator Statement"
             value={customIndicatorStatement}
-            name="customIndicatorStatement"
-            placeholder="Enter custom indicator statement"
+            name="statement"
+            placeholder="Enter indicator statement"
             onChange={handleCustomIndicatorChange}
             isBigger
           />

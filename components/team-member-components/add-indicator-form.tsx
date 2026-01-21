@@ -1,10 +1,8 @@
-"use client";
-
-import { useState, useEffect, SetStateAction } from "react";
 import { Icon } from "@iconify/react";
+import { useState, useEffect } from "react";
 import IndicatorSourceSelector, {
   IndicatorSourceData,
-} from "@/ui/indicator-source-selector";
+} from "../../ui/indicator-source-selector";
 import DropDown from "@/ui/form/select-dropdown";
 import TextInput from "@/ui/form/text-input";
 import DisaggregationComponent from "@/ui/disaggregation-component";
@@ -13,125 +11,246 @@ import TextareaInput from "@/ui/form/textarea";
 import RadioInput from "@/ui/form/radio";
 import TagInput from "@/ui/form/tag-input";
 import Button from "@/ui/form/button";
-
-// Target type definition (single target now)
-type Target = {
-  targetDate: string;
-  cumulativeTarget: string;
-  targetNarrative: string;
-};
+import { indicatorApi } from "@/lib/api/indicatorApi";
+import { IndicatorFormData } from "@/types/indicator";
+import { fetchResultTypes, transformResultTypesToOptions, ResultType } from "@/lib/api/result-types";
+import toast from "react-hot-toast";
 
 export default function AddIndicatorForm() {
-  // Form state
-  const [indicatorSourceData, setIndicatorSourceData] = useState<IndicatorSourceData | null>(null);
-  const [linkKpiToSdnOrgKpi, setLinkKpiToSdnOrgKpi] = useState("");
-  const [definition, setDefinition] = useState("");
-  const [specificArea, setSpecificArea] = useState("");
-  const [unitOfMeasure, setUnitOfMeasure] = useState("");
-  const [itemInMeasure, setItemInMeasure] = useState("");
-  const [disaggregationId, setDisaggregationId] = useState("");
-  const [baseLineDate, setBaseLineDate] = useState("");
-  const [cumulativeValue, setCumulativeValue] = useState("");
-  const [baselineNarrative, setBaselineNarrative] = useState("");
-  const [targetType, setTargetType] = useState("cumulative");
-  const [responsiblePersons, setResponsiblePersons] = useState<string[]>([]);
-  const [result, setResult] = useState("");
-  const [resultTypeId, setResultTypeId] = useState("360e3b36-e541-464e-90e0-e3ee3095a139");
-
-  // Single target state
-  const [target, setTarget] = useState<Target>({
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingResults, setIsLoadingResults] = useState(false);
+  const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
+  const [resultTypeOptions, setResultTypeOptions] = useState<Array<{ label: string; value: string }>>([]);
+  
+  const [formData, setFormData] = useState<IndicatorFormData>({
+    indicatorId: "",
+    indicatorSource: "",
+    thematicAreasOrPillar: "",
+    statement: "",
+    linkKpiToSdnOrgKpi: "",
+    definition: "",
+    specificArea: "",
+    unitOfMeasure: "",
+    itemInMeasure: "",
+    disaggregationId: "",
+    baseLineDate: "",
+    cumulativeValue: "",
+    baselineNarrative: "",
     targetDate: "",
     cumulativeTarget: "",
     targetNarrative: "",
+    targetType: "cumulative",
+    responsiblePersons: [],
+    result: "",
+    resultTypeId: "",
   });
 
-  // Handle indicator source data
-  const handleIndicatorSourceChange = (data: IndicatorSourceData) => {
-    setIndicatorSourceData(data);
-    console.log("Indicator Source Data:", data);
-  };
-
-  // Handle tag input change
-  const handleTagsChange = (tags: string[]) => {
-    setResponsiblePersons(tags);
-  };
-
-  // Handle target changes
-  const handleTargetChange = (field: keyof Target, value: string) => {
-    setTarget(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  // Sample options for dropdowns (only the ones you requested)
-  const unitOfMeasurementOptions = [
-    { label: "Percentage", value: "Percentage" },
-    { label: "Number", value: "Number" },
-    { label: "Ratio", value: "Ratio" },
-    { label: "Score", value: "Score" },
-    { label: "Count", value: "Count" },
-    { label: "Hours", value: "Hours" },
-    { label: "Days", value: "Days" },
-    { label: "Months", value: "Months" },
-    { label: "Years", value: "Years" },
-  ];
-
-  const sdnKpiOptions = [
-    { label: "KPI-001", value: "KPI-001" },
-    { label: "KPI-002", value: "KPI-002" },
-    { label: "KPI-003", value: "KPI-003" },
-    { label: "KPI-004", value: "KPI-004" },
-    { label: "KPI-005", value: "KPI-005" },
-  ];
-
-  // Submit handler
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Prepare the payload
-    const payload = {
-      isCreate: true,
-      data: {
-        indicatorId: `uuid-${Math.random().toString(36).substr(2, 9)}`, // Generate random ID for now
-        indicatorSource: indicatorSourceData?.indicatorSource === "organizational-kpi" 
-          ? "Organization KPI" 
-          : indicatorSourceData?.indicatorSource === "custom-indicator"
-            ? "Custom Indicator"
-            : null,
-        thematicAreasOrPillar: indicatorSourceData?.indicatorSource === "organizational-kpi" 
-          ? indicatorSourceData?.thematicAreaPillar 
-          : "",
-        statement: indicatorSourceData?.indicatorSource === "custom-indicator"
-            ? indicatorSourceData?.customIndicatorStatement
-            : "",
-        linkKpiToSdnOrgKpi: linkKpiToSdnOrgKpi,
-        definition: definition,
-        specificArea: specificArea,
-        unitOfMeasure: unitOfMeasure,
-        itemInMeasure: itemInMeasure,
-        disaggregationId: disaggregationId,
-        baseLineDate: baseLineDate ? `${baseLineDate}T00:00:00Z` : "",
-        cumulativeValue: cumulativeValue,
-        baselineNarrative: baselineNarrative,
-        targetDate: target.targetDate ? `${target.targetDate}T00:00:00Z` : "",
-        cumulativeTarget: target.cumulativeTarget || "",
-        targetNarrative: target.targetNarrative || "",
-        targetType: targetType === "cumulative" ? "Cumulative" : "Periodic",
-        responsiblePersons: responsiblePersons.join(", "),
-        result: result || `uuid-${Math.random().toString(36).substr(2, 9)}`,
-        resultTypeId: resultTypeId
+  // Fetch result types on component mount
+  useEffect(() => {
+    const loadResultTypes = async () => {
+      setIsLoadingResults(true);
+      try {
+        const results = await fetchResultTypes();
+        setResultTypes(results);
+        
+        // Transform to dropdown options
+        const options = transformResultTypesToOptions(results);
+        setResultTypeOptions(options);
+        
+        // Optionally preselect the first result type if none is selected
+        if (results.length > 0 && !formData.resultTypeId) {
+          setFormData(prev => ({
+            ...prev,
+            result: results[0].resultName,
+            resultTypeId: results[0].resultTypeId,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to load result types:", error);
+      } finally {
+        setIsLoadingResults(false);
       }
     };
 
-    console.log("Form Payload:", JSON.stringify(payload, null, 2));
+    loadResultTypes();
+  }, []);
+
+  // Handle indicator source change
+  const handleIndicatorSourceChange = (data: IndicatorSourceData) => {
+  console.log("Indicator source data received:", data);
+  
+  setFormData(prev => ({
+    ...prev,
+    indicatorSource: data.indicatorSource,
+    thematicAreasOrPillar: data.thematicAreasOrPillar,
+    statement: data.statement,
+  }));
+};
+
+  // Handle general form field changes
+  const handleInputChange = (field: keyof IndicatorFormData, value: string | number | string[]) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Handle dropdown changes
+  const handleDropdownChange = (field: keyof IndicatorFormData) => (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Handle result type selection
+  const handleResultTypeChange = (resultTypeId: string) => {
+    // Find the selected result type
+    const selectedResultType = resultTypes.find(type => type.resultTypeId === resultTypeId);
     
-    // Here you would typically send the payload to an API
-    // fetch('YOUR_API_ENDPOINT', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(payload)
-    // })
+    if (selectedResultType) {
+      setFormData(prev => ({
+        ...prev,
+        result: selectedResultType.resultName,
+        resultTypeId: selectedResultType.resultTypeId,
+      }));
+    }
+  };
+
+  // Handle disaggregation change
+  const handleDisaggregationChange = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      disaggregationId: id,
+    }));
+  };
+
+  // Prepare payload for API
+  const preparePayload = () => {
+    // Convert string values to numbers for cumulative fields
+    const cumulativeValue = parseFloat(formData.cumulativeValue as string) || 0;
+    const cumulativeTarget = parseFloat(formData.cumulativeTarget as string) || 0;
+    
+    // Format dates to ISO string
+    const baseLineDate = formData.baseLineDate 
+      ? new Date(formData.baseLineDate).toISOString() 
+      : "";
+    
+    const targetDate = formData.targetDate 
+      ? new Date(formData.targetDate).toISOString() 
+      : "";
+    
+    const payload = {
+      isCreate: true,
+      data: {
+        indicatorId: formData.indicatorId,
+        indicatorSource: formData.indicatorSource,
+        thematicAreasOrPillar: formData.thematicAreasOrPillar,
+        statement: formData.statement,
+        linkKpiToSdnOrgKpi: formData.linkKpiToSdnOrgKpi,
+        definition: formData.definition,
+        specificArea: formData.specificArea,
+        unitOfMeasure: formData.unitOfMeasure,
+        itemInMeasure: formData.itemInMeasure,
+        disaggregationId: "88hg-9987-iu67",
+        baseLineDate: baseLineDate,
+        cumulativeValue: cumulativeValue,
+        baselineNarrative: formData.baselineNarrative,
+        targetDate: targetDate,
+        cumulativeTarget: cumulativeTarget,
+        targetNarrative: formData.targetNarrative,
+        targetType: formData.targetType,
+        responsiblePersons: formData.responsiblePersons.join(", "),
+        result: formData.result,
+        resultTypeId: formData.resultTypeId,
+      },
+    };
+    
+    return payload;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Validate required fields
+      if (!formData.resultTypeId) {
+        toast.error("Please select a result type");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const payload = preparePayload();
+      console.log("Submitting payload:", payload);
+      
+      const response = await indicatorApi.createIndicator(payload);
+      console.log("Indicator created successfully:", response);
+      
+      // Reset form or show success message
+      toast.success("Indicator added successfully!");
+      
+      // Reset form (but keep result types loaded)
+      setFormData({
+        indicatorId: "",
+        indicatorSource: "",
+        thematicAreasOrPillar: "",
+        statement: "",
+        linkKpiToSdnOrgKpi: "",
+        definition: "",
+        specificArea: "",
+        unitOfMeasure: "",
+        itemInMeasure: "",
+        disaggregationId: "",
+        baseLineDate: "",
+        cumulativeValue: "",
+        baselineNarrative: "",
+        targetDate: "",
+        cumulativeTarget: "",
+        targetNarrative: "",
+        targetType: "cumulative",
+        responsiblePersons: [],
+        result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
+        resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
+      });
+      
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Failed to add indicator. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle cancel
+  const handleCancel = () => {
+    if (window.confirm("Are you sure you want to cancel? All changes will be lost.")) {
+      // Reset form but keep the first result type selected if available
+      setFormData({
+        indicatorId: "",
+        indicatorSource: "",
+        thematicAreasOrPillar: "",
+        statement: "",
+        linkKpiToSdnOrgKpi: "",
+        definition: "",
+        specificArea: "",
+        unitOfMeasure: "",
+        itemInMeasure: "",
+        disaggregationId: "",
+        baseLineDate: "",
+        cumulativeValue: "",
+        baselineNarrative: "",
+        targetDate: "",
+        cumulativeTarget: "",
+        targetNarrative: "",
+        targetType: "cumulative",
+        responsiblePersons: [],
+        result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
+        resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
+      });
+      console.log("Form cancelled");
+    }
   };
 
   return (
@@ -139,145 +258,167 @@ export default function AddIndicatorForm() {
       {/* indicator source */}
       <IndicatorSourceSelector
         onChange={handleIndicatorSourceChange}
-        thematicAreaOptions={[]} // Removed options since it's text input
-        indicatorStatementOptions={[]} // Removed options since it's text input
+        thematicAreaOptions={[]}
       />
 
-      {/* link to indicator sdn - KEEP as dropdown */}
+      {/* result type dropdown - ADDED */}
+      <div className="space-y-1">
+        <DropDown
+          label="Result Type"
+          value={formData.resultTypeId}
+          name="resultTypeId"
+          placeholder={isLoadingResults ? "Loading result types..." : "Select a result type"}
+          onChange={handleResultTypeChange}
+          options={resultTypeOptions}
+          isBigger
+        />
+        {formData.result && (
+          <p className="text-sm text-gray-500 mt-1">
+            Selected: {formData.result}
+          </p>
+        )}
+      </div>
+
+      {/* link to indicator sdn */}
       <DropDown
         label="Link Indicator to SDN Org KPIs (Optional)"
-        value={linkKpiToSdnOrgKpi}
+        value={formData.linkKpiToSdnOrgKpi}
         name="linkKpiToSdnOrgKpi"
         placeholder="---"
-        onChange={(value) => setLinkKpiToSdnOrgKpi(value)}
-        options={sdnKpiOptions}
+        onChange={handleDropdownChange('linkKpiToSdnOrgKpi')}
+        options={[
+          {label: "KPI-001", value: "KPI-001"}
+        ]}
         isBigger
       />
 
-      {/* indicator definition - CHANGED to text input */}
+      {/* indicator definition */}
       <TextInput
         label="Indicator Definition (Optional)"
-        value={definition}
+        value={formData.definition}
         name="definition"
-        placeholder="Enter indicator definition"
-        onChange={(e) => setDefinition(e.target.value)}
+        placeholder="---"
+        onChange={(e) => handleInputChange('definition', e.target.value)}
         isBigger
       />
 
-      {/* specific area - CHANGED to text input */}
+      {/* specific area */}
       <TextInput
         label="Specific Area"
-        value={specificArea}
+        value={formData.specificArea}
         name="specificArea"
-        placeholder="Enter specific area"
-        onChange={(e) => setSpecificArea(e.target.value)}
+        placeholder="---"
+        onChange={(e) => handleInputChange("specificArea", e.target.value)}
         isBigger
       />
 
-      {/* unit of measurement - KEEP as dropdown */}
+      {/* unit of measurement */}
       <DropDown
         label="Unit of Measurement"
-        value={unitOfMeasure}
+        value={formData.unitOfMeasure}
         name="unitOfMeasure"
-        placeholder="Select unit of measurement"
-        onChange={(value) => setUnitOfMeasure(value)}
-        options={unitOfMeasurementOptions}
+        placeholder="---"
+        onChange={handleDropdownChange('unitOfMeasure')}
+        options={[
+          {label: "Percentage", value: "Percentage"}
+        ]}
         isBigger
       />
 
-      {/* items in measurement - CHANGED to text input */}
+      {/* items in measurement */}
       <TextInput
         label="Items in Measurement"
-        value={itemInMeasure}
+        value={formData.itemInMeasure}
         name="itemInMeasure"
-        placeholder="Enter items in measurement"
-        onChange={(e) => setItemInMeasure(e.target.value)}
+        placeholder="---"
+        onChange={(e) => handleInputChange('itemInMeasure', e.target.value)}
         isBigger
       />
 
       {/* checkboxes */}
-      <DisaggregationComponent 
-        onChange={(value: SetStateAction<string>) => setDisaggregationId(value)}
+      <DisaggregationComponent
+        onChange={handleDisaggregationChange}
       />
 
       {/* baseline */}
-      <div className="space-y-1 my-2 rounded-lg">
+      <div className="space-y-1 rounded-lg">
         <p className="text-gray-900 text-sm font-medium mb-3">Baseline</p>
+        
         {/* baseline date */}
-        <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Baseline Date</p>
           <div className="w-2/3">
             <DateInput
-              value={baseLineDate}
-              onChange={(value) => setBaseLineDate(value)}
+              value={formData.baseLineDate}
+              onChange={(value) => handleInputChange('baseLineDate', value)}
             />
           </div>
         </div>
+        
         {/* cumulative value */}
-        <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Cumulative Value</p>
           <div className="w-2/3">
             <TextInput
-              placeholder="30%"
-              value={cumulativeValue}
+              placeholder="200"
+              value={formData.cumulativeValue}
               name="cumulativeValue"
-              onChange={(e) => setCumulativeValue(e.target.value)}
+              onChange={(e) => handleInputChange('cumulativeValue', e.target.value)}
             />
           </div>
         </div>
+        
         {/* baseline narrative */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between">
           <p className="text-sm font-medium w-1/3">Baseline Narrative</p>
           <div className="w-2/3">
             <TextareaInput
-              placeholder="Enter baseline narrative"
-              value={baselineNarrative}
+              placeholder="---"
+              value={formData.baselineNarrative}
               name="baselineNarrative"
-              onChange={(e) => setBaselineNarrative(e.target.value)}
+              onChange={(e) => handleInputChange('baselineNarrative', e.target.value)}
             />
           </div>
         </div>
       </div>
 
-      {/* SINGLE TARGET SECTION */}
-      <div className="space-y-3 rounded-lg">
-        <div className="flex justify-between items-center">
-          <span className="text-gray-900 text-sm font-medium">Target</span>
-        </div>
-
+      {/* target section */}
+      <div className="space-y-1 rounded-lg">
+        <p className="text-gray-900 text-sm font-medium mb-3">Target</p>
+        
         {/* target date */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Target Date</p>
           <div className="w-2/3">
             <DateInput
-              value={target.targetDate}
-              onChange={(value) => handleTargetChange('targetDate', value)}
+              value={formData.targetDate}
+              onChange={(value) => handleInputChange('targetDate', value)}
             />
           </div>
         </div>
         
         {/* cumulative target */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Cumulative Target</p>
           <div className="w-2/3">
             <TextInput
-              placeholder="80%"
-              value={target.cumulativeTarget}
+              placeholder="200"
+              value={formData.cumulativeTarget}
               name="cumulativeTarget"
-              onChange={(e) => handleTargetChange('cumulativeTarget', e.target.value)}
+              onChange={(e) => handleInputChange('cumulativeTarget', e.target.value)}
             />
           </div>
         </div>
         
         {/* target narrative */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between">
           <p className="text-sm font-medium w-1/3">Target Narrative</p>
           <div className="w-2/3">
             <TextareaInput
-              placeholder="Enter target narrative"
-              value={target.targetNarrative}
+              placeholder="---"
+              value={formData.targetNarrative}
               name="targetNarrative"
-              onChange={(e) => handleTargetChange('targetNarrative', e.target.value)}
+              onChange={(e) => handleInputChange('targetNarrative', e.target.value)}
             />
           </div>
         </div>
@@ -291,36 +432,47 @@ export default function AddIndicatorForm() {
             label="Cumulative"
             value="cumulative"
             name="targetType"
-            is_checked={targetType === "cumulative"}
-            onChange={() => setTargetType("cumulative")}
+            is_checked={formData.targetType === "cumulative"}
+            onChange={() => handleInputChange('targetType', 'cumulative')}
           />
           <RadioInput
             label="Periodic"
             value="periodic"
             name="targetType"
-            is_checked={targetType === "periodic"}
-            onChange={() => setTargetType("periodic")}
+            is_checked={formData.targetType === "periodic"}
+            onChange={() => handleInputChange('targetType', 'periodic')}
           />
         </div>
       </div>
 
-      <TagInput 
-        label="Responsible Person(s)" 
-        onChange={handleTagsChange}
+      <TagInput
+        label="Responsible Person(s)"
+        value={formData.responsiblePersons}
+        onChange={(persons) => handleInputChange('responsiblePersons', persons)}
       />
 
       {/* buttons */}
       <div className="flex items-center gap-8 pt-4">
-        <Button 
-          content="Cancel" 
-          isSecondary 
+        <Button
           type="button"
+          content="Cancel"
+          isSecondary
+          onClick={handleCancel}
+          isDisabled={isSubmitting || isLoadingResults}
         />
-        <Button 
-          content="Add Indicator" 
-          onClick={() => {}}
+        <Button
+          type="submit"
+          content={isSubmitting ? "Adding..." : "Add"}
+          isDisabled={isSubmitting || isLoadingResults || !formData.resultTypeId}
         />
       </div>
+
+      {/* Loading state indicator */}
+      {isLoadingResults && (
+        <div className="text-center text-gray-500 text-sm">
+          Loading result types...
+        </div>
+      )}
     </form>
   );
 }

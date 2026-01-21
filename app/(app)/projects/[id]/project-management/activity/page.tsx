@@ -172,10 +172,16 @@ export default function ProjectActivity() {
                             Remove
                           </li>
                           <Link
-                            href={`/projects/${projectId}/project-management/activity/report-actual-value`}
+                            href={`/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value/add`}
                             className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                             <Icon icon={"si:add-fill"} height={20} width={20} />
                             Report Actual Value
+                          </Link>
+                          <Link
+                            href={`/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value`}
+                            className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                            <Icon icon={"hugeicons:view"} height={20} width={20} />
+                            View Actual Value
                           </Link>
                         </ul>
                       </motion.div>

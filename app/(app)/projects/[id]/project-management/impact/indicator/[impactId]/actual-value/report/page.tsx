@@ -11,7 +11,7 @@ import Heading from "@/ui/text-heading";
 
 export default function ReportActualValue() {
   return (
-    <section className="w-[624px]">
+    <section className="w-156">
       <CardComponent>
         <Heading
           heading="Indicator Reporting Format and Attributes"
