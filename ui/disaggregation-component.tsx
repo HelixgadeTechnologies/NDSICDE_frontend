@@ -17,9 +17,13 @@ const checkboxLabels = [
 
 type DisaggregationComponentProps = {
   onChange?: (value: string) => void;
+  onDisaggregationIdChange?: (id: string) => void; // New prop for disaggregationId
 };
 
-export default function DisaggregationComponent({ onChange }: DisaggregationComponentProps) {
+export default function DisaggregationComponent({ 
+  onChange, 
+  onDisaggregationIdChange 
+}: DisaggregationComponentProps) {
   const [checkboxes, setCheckboxes] = useState<boolean[]>(
     Array(checkboxLabels.length).fill(false)
   );
@@ -46,6 +50,12 @@ export default function DisaggregationComponent({ onChange }: DisaggregationComp
   const toggleCheckbox = (index: number) => {
     const updatedCheckboxes = [...checkboxes];
     const isNoneCheckbox = index === checkboxLabels.length - 1;
+    const clickedLabel = checkboxLabels[index];
+
+    // Notify parent about the disaggregationId (clicked checkbox label)
+    if (onDisaggregationIdChange) {
+      onDisaggregationIdChange(clickedLabel);
+    }
 
     if (isNoneCheckbox) {
       const newNoneState = !updatedCheckboxes[index];
@@ -55,7 +65,6 @@ export default function DisaggregationComponent({ onChange }: DisaggregationComp
           .map((_, i) => (i === index ? newNoneState : false));
       
       setCheckboxes(newCheckboxes);
-      // We don't necessarily clear values, but notifyChange will filter them out
       notifyChange(newCheckboxes, values);
     } else {
       updatedCheckboxes[index] = !updatedCheckboxes[index];
@@ -107,7 +116,6 @@ export default function DisaggregationComponent({ onChange }: DisaggregationComp
       case "State":
       case "Product":
       case "Tenure":
-        // Using Generic DropDown with empty options as placeholder
         return (
           <DropDown
             name={label.toLowerCase()}

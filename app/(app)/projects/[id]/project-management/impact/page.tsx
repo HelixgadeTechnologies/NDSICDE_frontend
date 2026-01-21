@@ -14,6 +14,7 @@ import Link from "next/link";
 import axios from "axios"; 
 import toast from "react-hot-toast";
 import { getToken } from "@/lib/api/credentials";
+import { useParams } from "next/navigation";
 
 export default function ProjectImpact() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -21,6 +22,8 @@ export default function ProjectImpact() {
   const [isLoading, setIsLoading] = useState(false);
   const token = getToken();
   const [isDeleting, setIsDeleting] = useState(false);
+  const params = useParams();
+  const projectId = (params?.id as string) || "";
 
   const head = [
     "Project Impact Statement",
@@ -165,7 +168,7 @@ export default function ProjectImpact() {
                           </li>
                           <Link
                             href={
-                              "/projects/1/project-management/impact/indicator/add"
+                              `/projects/${projectId}/project-management/impact/indicator/${row.impactId}/add`
                             }
                             className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                             <Icon icon={"si:add-fill"} height={20} width={20} />
@@ -173,7 +176,7 @@ export default function ProjectImpact() {
                           </Link>
                           <Link
                             href={
-                              "/projects/1/project-management/impact/indicator"
+                             `/projects/${projectId}/project-management/impact/${row.impactId}/indicator`
                             }
                             className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                             <Icon
