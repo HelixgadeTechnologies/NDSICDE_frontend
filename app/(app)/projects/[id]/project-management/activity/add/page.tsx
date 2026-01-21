@@ -66,7 +66,6 @@ export default function AddProjectActivity() {
           }
         );
 
-        console.log("Outputs API response:", response.data);
 
         // Extract data based on API response structure
         let outputsData = [];
@@ -347,7 +346,7 @@ export default function AddProjectActivity() {
           />
           
           <TagInput 
-            label="Responsible Persons" 
+            label="Responsible Persons (After adding a name, press Enter key)" 
             tags={responsiblePersons}
             onChange={handleResponsiblePersonsChange}
             placeholder="Add responsible person and press Enter"

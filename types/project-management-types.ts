@@ -63,6 +63,7 @@ export type ProjectActivityTypes = {
   activityId: string;
   activityStatement: string;
   outputId: string;
+  outputStatement: string;
   activityTotalBudget: 0;
   responsiblePerson: string;
   startDate: string;
