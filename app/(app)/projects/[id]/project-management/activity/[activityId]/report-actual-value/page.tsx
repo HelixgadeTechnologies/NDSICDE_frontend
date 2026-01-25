@@ -127,7 +127,7 @@ export default function ReportActualValue() {
                 <td className="px-6">{row.activityStatement}</td>
                 {/* linked to output */}
                 <td className="px-6">{row.percentageCompletion}%</td>
-                <td className="px-6">{row.activityTotalBudget}</td>
+                <td className="px-6">₦ {row.activityTotalBudget}</td>
                 <td className="px-6">{row.responsiblePerson}</td>
                 <td className="px-6">{formatDate(row.startDate, "date-only")}</td>
                 <td className="px-6">{formatDate(row.endDate, "date-only")}</td>
