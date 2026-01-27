@@ -29,7 +29,7 @@ export default function DashboardStat({
     <div
       key={index}
       className={`${
-        bigger ? "h-[158px]" : "h-[126px]"
+        bigger ? "h-39.5" : "h-31.5"
       } w-full rounded-lg border border-[#E5E5E5] p-2 md:p-4 space-y-2.5`}>
       <div className="flex justify-between items-center">
         <p className="text-xs md:text-[13px] font-medium leading-5 text-[#242424] whitespace-nowrap capitalize">
@@ -40,7 +40,7 @@ export default function DashboardStat({
         )}
       </div>
       {d.lists ? (
-        <div className="space-y-3 h-[120px]">
+        <div className="space-y-3 h-30">
           {d.lists.map((list, index) => (
             <div key={index} className="flex justify-between items-center text-xs text-gray-600 sidebar overflow-y-auto">
               <p>{list.title}</p>
