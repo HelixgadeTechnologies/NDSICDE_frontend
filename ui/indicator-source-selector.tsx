@@ -8,9 +8,9 @@ import TextInput from "@/ui/form/text-input";
 type IndicatorSource = "organizational-kpi" | "custom-indicator" | null;
 
 export interface IndicatorSourceData {
-  indicatorSource: string; // Changed from IndicatorSource to string to match form expectations
-  thematicAreasOrPillar: string; // Changed from thematicAreaPillar
-  statement: string; // Changed from customIndicatorStatement
+  indicatorSource: string;
+  thematicAreasOrPillar: string | null; // Changed to allow null
+  statement: string | null; // Changed to allow null
 }
 
 interface IndicatorSourceSelectorProps {
@@ -29,26 +29,32 @@ export default function IndicatorSourceSelector({
       ? initialValues.indicatorSource 
       : null
   );
-  const [thematicAreaPillar, setThematicAreaPillar] = useState(
-    initialValues?.thematicAreasOrPillar || ""
+  
+  const [thematicAreaPillar, setThematicAreaPillar] = useState<string | null>(
+    initialValues?.thematicAreasOrPillar !== undefined && initialValues?.thematicAreasOrPillar !== null
+      ? initialValues.thematicAreasOrPillar
+      : null
   );
-  const [customIndicatorStatement, setCustomIndicatorStatement] = useState(
-    initialValues?.statement || ""
+  
+  const [customIndicatorStatement, setCustomIndicatorStatement] = useState<string | null>(
+    initialValues?.statement !== undefined && initialValues?.statement !== null
+      ? initialValues.statement
+      : null
   );
 
   // Notify parent of changes
   useEffect(() => {
     let indicatorSourceValue = "";
-    let thematicAreaValue = "";
-    let statementValue = "";
+    let thematicAreaValue: string | null = null;
+    let statementValue: string | null = null;
 
     if (selectedSource === "organizational-kpi") {
       indicatorSourceValue = "Organization KPI";
       thematicAreaValue = thematicAreaPillar;
-      statementValue = ""; // Organizational KPI doesn't have a custom statement
+      statementValue = null; // Set to null for organizational KPI
     } else if (selectedSource === "custom-indicator") {
       indicatorSourceValue = "Custom Indicator";
-      thematicAreaValue = ""; // Custom indicator might not have thematic area
+      thematicAreaValue = null; // Set to null for custom indicator
       statementValue = customIndicatorStatement;
     }
 
@@ -58,33 +64,37 @@ export default function IndicatorSourceSelector({
       statement: statementValue,
     };
     onChange(data);
-  }, [selectedSource, thematicAreaPillar, customIndicatorStatement]);
+  }, [selectedSource, thematicAreaPillar, customIndicatorStatement, onChange]);
 
   const handleSourceSelect = (source: "organizational-kpi" | "custom-indicator") => {
     if (selectedSource === source) {
       // Deselect if clicking the same source
       setSelectedSource(null);
-      setThematicAreaPillar("");
-      setCustomIndicatorStatement("");
+      setThematicAreaPillar(null);
+      setCustomIndicatorStatement(null);
     } else {
       // Select new source
       setSelectedSource(source);
       if (source === "organizational-kpi") {
-        setCustomIndicatorStatement("");
+        setCustomIndicatorStatement(null); // Set to null, not empty string
+        // Keep existing thematicAreaPillar value if already set
       } else {
-        setThematicAreaPillar("");
+        setThematicAreaPillar(null); // Set to null, not empty string
+        // Keep existing customIndicatorStatement value if already set
       }
     }
   };
 
   const handleThematicAreaChange = (value: string | React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = typeof value === 'string' ? value : value.target.value;
-    setThematicAreaPillar(newValue);
+    // Set to null if empty string, otherwise keep the value
+    setThematicAreaPillar(newValue.trim() === "" ? null : newValue);
   };
 
   const handleCustomIndicatorChange = (value: string | React.ChangeEvent<HTMLInputElement>) => {
     const newValue = typeof value === 'string' ? value : value.target.value;
-    setCustomIndicatorStatement(newValue);
+    // Set to null if empty string, otherwise keep the value
+    setCustomIndicatorStatement(newValue.trim() === "" ? null : newValue);
   };
 
   return (
@@ -115,7 +125,7 @@ export default function IndicatorSourceSelector({
         <div className="space-y-4 border-l-2 border-blue-500 pl-4 mt-4">
           <DropDown
             label="Thematic Area/Pillar"
-            value={thematicAreaPillar}
+            value={thematicAreaPillar || ""} // Convert null to empty string for UI
             name="thematicAreasOrPillar"
             placeholder="Select Thematic Area"
             onChange={handleThematicAreaChange}
@@ -129,7 +139,7 @@ export default function IndicatorSourceSelector({
         <div className="space-y-4 border-l-2 border-green-500 pl-4 mt-4">
           <TextInput
             label="Indicator Statement"
-            value={customIndicatorStatement}
+            value={customIndicatorStatement || ""} // Convert null to empty string for UI
             name="statement"
             placeholder="Enter indicator statement"
             onChange={handleCustomIndicatorChange}

@@ -68,7 +68,7 @@ export default function ProjectActivity() {
   useEffect(() => {
     fetchActivities();
   }, []);
-
+  
   // delete activity
   const deleteActivity = async (activityId: string) => {
     setIsDeleting(true);

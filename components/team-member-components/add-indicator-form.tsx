@@ -77,13 +77,13 @@ export default function AddIndicatorForm() {
 
   // Handle indicator source change
   const handleIndicatorSourceChange = (data: IndicatorSourceData) => {
-  console.log("Indicator source data received:", data);
+  // console.log("Indicator source data received:", data);
   
   setFormData(prev => ({
     ...prev,
     indicatorSource: data.indicatorSource,
-    thematicAreasOrPillar: data.thematicAreasOrPillar,
-    statement: data.statement,
+    thematicAreasOrPillar: data.thematicAreasOrPillar || "",
+    statement: data.statement || "",
   }));
 };
 
