@@ -1,5 +1,5 @@
 export interface ReportsDetails {
-  id: number;
+  reportId: string;
   reportTitle: string,
   project: string,
   dateGenerated: string,
@@ -16,29 +16,29 @@ export const reportsHead = [
     "Actions",
   ];
 
-  export const reportsData: ReportsDetails[] = [
-    {
-      id: 1,
-      reportTitle: "Q1 Marketing Performance",
-      project: "Marketing Campaign 2023",
-      dateGenerated: "Jan 15, 2023",
-      status: "Approved",
-      kpiStatus: "Met",
-    },
-    {
-      id: 2,
-      reportTitle: "Q1 Marketing Performance",
-      project: "Marketing Campaign 2023",
-      dateGenerated: "Jan 15, 2023",
-      status: "Pending",
-      kpiStatus: "Not Met",
-    },
-    {
-      id: 3,
-      reportTitle: "Q1 Marketing Performance",
-      project: "Marketing Campaign 2023",
-      dateGenerated: "Jan 15, 2023",
-      status: "Not Approved",
-      kpiStatus: "Not Met",
-    },
-  ];
+  // export const reportsData: ReportsDetails[] = [
+  //   {
+  //     id: 1,
+  //     reportTitle: "Q1 Marketing Performance",
+  //     project: "Marketing Campaign 2023",
+  //     dateGenerated: "Jan 15, 2023",
+  //     status: "Approved",
+  //     kpiStatus: "Met",
+  //   },
+  //   {
+  //     id: 2,
+  //     reportTitle: "Q1 Marketing Performance",
+  //     project: "Marketing Campaign 2023",
+  //     dateGenerated: "Jan 15, 2023",
+  //     status: "Pending",
+  //     kpiStatus: "Not Met",
+  //   },
+  //   {
+  //     id: 3,
+  //     reportTitle: "Q1 Marketing Performance",
+  //     project: "Marketing Campaign 2023",
+  //     dateGenerated: "Jan 15, 2023",
+  //     status: "Not Approved",
+  //     kpiStatus: "Not Met",
+  //   },
+  // ];

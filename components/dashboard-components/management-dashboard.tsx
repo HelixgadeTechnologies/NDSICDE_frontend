@@ -53,7 +53,7 @@ export default function ManagementAndStaffDashboard() {
   });
 
   const [kpiPerformance, setKpiPerformance] = useState<KpiPerformanceType>({});
-  const [selectedYear, setSelectedYear] = useState<number>(2023);
+  const [selectedYear, setSelectedYear] = useState<number>(2026);
   const [isLoadingKpi, setIsLoadingKpi] = useState<boolean>(false);
 
   // State for budget utilization
@@ -182,9 +182,9 @@ export default function ManagementAndStaffDashboard() {
     value: item.percentage,
   }));
 
-  console.log("Budget Chart Data:", budgetChartData);
-  console.log("Project Status Chart Data:", projectStatusChartData);
-  console.log("KPI Chart Data:", kpiChartData);
+  // console.log("Budget Chart Data:", budgetChartData);
+  // console.log("Project Status Chart Data:", projectStatusChartData);
+  // console.log("KPI Chart Data:", kpiChartData);
 
   const dashboardData = [
     {

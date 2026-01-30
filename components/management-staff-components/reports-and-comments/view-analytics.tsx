@@ -8,14 +8,33 @@ import Heading from "@/ui/text-heading";
 import BarChartComponent from "@/ui/bar-chart";
 import LineChartComponent from "@/ui/line-chart";
 import CommentsTab from "@/ui/comments-tab";
-import { comments } from "@/lib/config/charts";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { formatDate } from "@/utils/dates-format-utility";
+
+type CommentsType = {
+  indicatorReportCommentId: string;
+  indicatorReportId: string;
+  comment: string;
+  createAt: string;
+  updateAt?: string;
+};
 
 type ViewAnalyticsProps = {
   isOpen: boolean;
   onClose: () => void;
+  indicatorReportId?: string | number;
 };
 
-export default function ViewAnalytics({ isOpen, onClose }: ViewAnalyticsProps) {
+export default function ViewAnalytics({
+  isOpen,
+  onClose,
+  indicatorReportId,
+}: ViewAnalyticsProps) {
+  const [isFetchingComments, setIsFetchingComments] = useState(false);
+  const [comments, setComments] = useState<CommentsType[]>([]);
+  // for tabs
   const tabs = [
     { id: 1, tabName: "KPI Performance" },
     { id: 2, tabName: "Financial Overview" },
@@ -47,6 +66,26 @@ export default function ViewAnalytics({ isOpen, onClose }: ViewAnalyticsProps) {
     { name: "Customer Retention", target: 30, actual: 18 },
   ];
 
+  useEffect(() => {
+    // fetch data
+    const fetchComments = async () => {
+      setIsFetchingComments(true);
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/indicator-report-comments/${indicatorReportId}`,
+        );
+        setComments(res.data.data);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+        toast.error("Failed to load comments");
+      } finally {
+        setIsFetchingComments(false);
+      }
+    };
+
+    fetchComments();
+  }, []);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="800px">
       <div className="flex justify-end mb-4 cursor-pointer">
@@ -62,10 +101,10 @@ export default function ViewAnalytics({ isOpen, onClose }: ViewAnalyticsProps) {
         renderContent={(rowId) => {
           if (rowId === 1) {
             return (
-              <div className="h-[450px]">
+              <div className="h-112.5">
                 <CardComponent>
                   <Heading heading="KPI Performance" />
-                  <div className="h-[350px]">
+                  <div className="h-87.5">
                     <BarChartComponent data={barData} xKey="name" bars={bars} />
                   </div>
                 </CardComponent>
@@ -73,10 +112,10 @@ export default function ViewAnalytics({ isOpen, onClose }: ViewAnalyticsProps) {
             );
           } else if (rowId === 2) {
             return (
-              <div className="h-[450px]">
+              <div className="h-112.5">
                 <CardComponent>
                   <Heading heading="Financial Overview" />
-                  <div className="h-[350px]">
+                  <div className="h-87.5">
                     <LineChartComponent
                       lines={lines}
                       data={lineData}
@@ -89,19 +128,25 @@ export default function ViewAnalytics({ isOpen, onClose }: ViewAnalyticsProps) {
             );
           } else {
             return (
-              <div className="h-[450px]">
+              <div className="h-112.5">
                 <CardComponent>
                   <Heading heading="Comments & Notes" />
-                  <div className="space-y-3 mt-2">
-                    {comments.map((c) => (
-                      <CommentsTab
-                        key={c.id}
-                        name={c.name}
-                        date={c.date}
-                        time={c.time}
-                        comment={c.comment}
-                      />
-                    ))}
+                  <div className="space-y-3 mt-2 overflow-y-auto h-87.5 custom-scrollbar pr-2">
+                    {isFetchingComments ? (
+                      <div className="dots my-20 mx-auto">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                      </div>
+                    ) : (
+                      comments.map((c) => (
+                        <CommentsTab
+                          key={c.indicatorReportCommentId}
+                          date={formatDate(c.createAt)}
+                          comment={c.comment}
+                        />
+                      ))
+                    )}
                   </div>
                 </CardComponent>
               </div>

@@ -136,7 +136,7 @@ function FormOne({ onClick, formData, updateFormData }: FormOneProps) {
           onChange={(e) => handleChange("totalBudgetAmount", e.target.value)}
           error={errors.totalBudgetAmount}
         />
-        <div className="flex items-center gap-[18px] w-full">
+        <div className="flex items-center gap-4.5 w-full">
           <DateInput
             label="Start Date"
             placeholder="Start Date"
