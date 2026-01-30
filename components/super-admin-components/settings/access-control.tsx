@@ -3,31 +3,74 @@
 import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { useUIStore } from "@/store/ui-store";
-import AddNewRole from "./add-new-role";
-import EditRole from "./edit-role";
+import RoleFormModal from "./role-form-modal";
 import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { formatDate } from "@/utils/dates-format-utility";
+
+type RoleData = {
+  roleId: string;
+  roleName: string;
+  description: string;
+  permission: string;
+  createAt: string;
+  updateAt: string;
+  users: number;
+};
 
 export default function AccessControl() {
-  const head = ["Role Name", "Permission Level", "Users", "Status", "Actions"];
-
-  const data = [
-    {
-      roleName: "Super Admin",
-      permissionLevel: "Full Access",
-      users: 5,
-      status: "Active",
-    },
-    {
-      roleName: "Admin",
-      permissionLevel: "Full Access",
-      users: 5,
-      status: "Inactive",
-    },
+  const head = [
+    "Role Name",
+    "Permission Level",
+    "Users",
+    "Created at",
+    "Actions",
   ];
+  const [roles, setRoles] = useState<RoleData[]>([]);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<RoleData | null>(null);
 
-  const { isAddModalOpen, isEditModalOpen, openAddModal, openEditModal } =
+  const fetchRoles = async () => {
+    setIsLoadingRoles(true);
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/settings/roles`,
+      );
+      setRoles(response.data.data);
+      toast.success("Roles loaded successfully");
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      toast.error("Failed to load roles. Please try again.");
+    } finally {
+      setIsLoadingRoles(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const { isAddModalOpen, isEditModalOpen, openAddModal, openEditModal, closeAddModal, closeEditModal } =
     useUIStore();
+
+  // Handle edit click
+  const handleEditClick = (role: RoleData) => {
+    setSelectedRole(role);
+    openEditModal();
+  };
+
+  // Handle modal close to reset selected role
+  const handleEditModalClose = () => {
+    setSelectedRole(null);
+    closeEditModal();
+  };
+
+  const handleAddModalClose = () => {
+    closeAddModal();
+  };
 
   return (
     <section>
@@ -38,7 +81,7 @@ export default function AccessControl() {
             subtitle="Manage user roles and their associated permissions"
             spacing="1"
           />
-          <div className="w-[228px]">
+          <div className="w-57">
             <Button
               content="Add New Role"
               icon="si:add-fill"
@@ -47,37 +90,56 @@ export default function AccessControl() {
           </div>
         </div>
 
-        <Table
-          tableHead={head}
-          tableData={data}
-          renderRow={(row) => (
-            <>
-              <td className="px-6">{row.roleName}</td>
-              <td className="px-6">{row.permissionLevel}</td>
-              <td className="px-6">{row.users}</td>
-              <td className="px-6">
-                <span
-                  className={
-                    row.status === "Active" ? "text-green-500" : "text-red-500"
-                  }
-                >
-                  {row.status}
-                </span>
-              </td>
-              <td
-                onClick={openEditModal}
-                className="px-6 cursor-pointer hover:text-[#111928]"
-              >
-                Edit
-              </td>
-            </>
-          )}
-        />
+        {isLoadingRoles ? (
+          <div className="dots my-20 mx-auto">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        ) : (
+          <Table
+            tableHead={head}
+            tableData={roles}
+            renderRow={(row) => (
+              <>
+                <td className="px-6">{row.roleName}</td>
+                <td className="px-6">{row.permission}</td>
+                <td className="px-6">{row.users}</td>
+                <td className="px-6">
+                  <span className="px-6">
+                    {formatDate(row.createAt, "short")}
+                  </span>
+                </td>
+                <td 
+                  onClick={() => handleEditClick(row)}
+                  className="px-6 cursor-pointer hover:text-[#111928]">
+                  Edit
+                </td>
+              </>
+            )}
+            pagination={true}
+            itemsPerPage={2}
+          />
+        )}
       </CardComponent>
 
-      {isAddModalOpen && <AddNewRole />}
+      <RoleFormModal 
+        onSuccess={fetchRoles} 
+        mode="create" 
+        isOpen={isAddModalOpen}
+        onClose={handleAddModalClose}
+      />
 
-      {isEditModalOpen && <EditRole />}
+      <RoleFormModal 
+        onSuccess={() => {
+          fetchRoles();
+          handleEditModalClose();
+        }} 
+        mode="edit" 
+        roleData={selectedRole || undefined}
+        isOpen={isEditModalOpen}
+        onClose={handleEditModalClose}
+      />
     </section>
   );
 }

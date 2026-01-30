@@ -68,7 +68,7 @@ export default function DateRangePicker({ onChange, label }: DatePickerProps) {
       <label className="text-sm font-medium text-gray-900 block mb-2">{label}</label>
       <button
         onClick={toggleDateRangePicker}
-        className="border border-[#B6D8FF] rounded-md px-3 py-[6px] flex items-center gap-2 text-sm text-[#667185] bg-[#F8F8F8] focus:outline-none min-w-[180px] w-full h-10"
+        className="border border-[#B6D8FF] rounded-md px-3 py-1.5 flex items-center gap-2 text-sm text-[#667185] bg-[#F8F8F8] focus:outline-none min-w-45 w-full h-10"
       >
         <Icon icon="solar:calendar-outline" width={18} height={18} />
         <span className="whitespace-nowrap">{displayValue}</span>

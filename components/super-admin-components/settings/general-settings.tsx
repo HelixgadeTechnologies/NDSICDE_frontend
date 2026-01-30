@@ -312,7 +312,7 @@ export default function GeneralSettings() {
               />
             </div>
           </section>
-          <div className="flex flex-row items-center gap-2 md:gap-8 md:w-[570px] mt-8">
+          <div className="flex flex-row items-center gap-2 md:gap-8 md:w-142.5 mt-8">
             <Button
               isSecondary
               content="Reset to Default"
