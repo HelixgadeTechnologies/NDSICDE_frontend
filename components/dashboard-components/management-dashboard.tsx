@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import DropDown from "@/ui/form/select-dropdown";
 import { year_options } from "@/lib/config/general-config";
+import ManagementStaffProjectsTable from "../management-staff-components/projects-table";
 
 type SummaryType = {
   totalProjects: number;
@@ -53,7 +54,7 @@ export default function ManagementAndStaffDashboard() {
   });
 
   const [kpiPerformance, setKpiPerformance] = useState<KpiPerformanceType>({});
-  const [selectedYear, setSelectedYear] = useState<number>(2023);
+  const [selectedYear, setSelectedYear] = useState<number>(2026);
   const [isLoadingKpi, setIsLoadingKpi] = useState<boolean>(false);
 
   // State for budget utilization
@@ -94,7 +95,6 @@ export default function ManagementAndStaffDashboard() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/summary`,
         );
-        console.log("Summary Response:", res.data);
         setSummaryData(res.data.data);
       } catch (error) {
         console.error(`Error fetching summary:`, error);
@@ -108,7 +108,6 @@ export default function ManagementAndStaffDashboard() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/budget-utilization`,
         );
-        console.log("Budget Utilization Response:", res.data);
         if (res.data.success && res.data.data) {
           setBudgetUtilization(res.data.data);
         }
@@ -126,7 +125,6 @@ export default function ManagementAndStaffDashboard() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/project-status-distribution`,
         );
-        console.log("Project Status Response:", res.data);
         if (res.data.success && res.data.data) {
           setProjectStatus(res.data.data);
         }
@@ -149,7 +147,6 @@ export default function ManagementAndStaffDashboard() {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/kpi-performance?year=${year}`,
         );
-        console.log("KPI Response:", res.data);
         if (res.data.success) {
           setKpiPerformance(res.data.data);
         }
@@ -181,10 +178,6 @@ export default function ManagementAndStaffDashboard() {
     name: item.label,
     value: item.percentage,
   }));
-
-  console.log("Budget Chart Data:", budgetChartData);
-  console.log("Project Status Chart Data:", projectStatusChartData);
-  console.log("KPI Chart Data:", kpiChartData);
 
   const dashboardData = [
     {
@@ -383,7 +376,8 @@ export default function ManagementAndStaffDashboard() {
         </div>
       </section>
 
-      <ProjectsTable />
+      {/* <ProjectsTable /> */}
+      <ManagementStaffProjectsTable />
     </section>
   );
 }
