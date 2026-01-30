@@ -9,7 +9,7 @@ import "react-date-range/dist/theme/default.css";
 import { useUIStore } from "@/store/ui-store";
 
 type DatePickerProps = {
-  onChange?: (range: { startDate: Date; endDate: Date }) => void;
+  onChange?: (range: { startDate: string; endDate: string }) => void;
   label?: string;
 };
 
@@ -43,17 +43,21 @@ export default function DateRangePicker({ onChange, label }: DatePickerProps) {
 
   const handleChange = (item: import("react-date-range").RangeKeyDict) => {
     if (item.selection.startDate && item.selection.endDate) {
-      // Update the store
-      updateDateRange(
-        item.selection.startDate as Date,
-        item.selection.endDate as Date
-      );
+      const startDate = item.selection.startDate as Date;
+      const endDate = item.selection.endDate as Date;
       
-      // Call optional onChange prop
+      // Update the store
+      updateDateRange(startDate, endDate);
+      
+      // Format dates in M/D/YYYY format (no leading zeros) as shown in Swagger
+      const startDateString = format(startDate, "M/d/yyyy");
+      const endDateString = format(endDate, "M/d/yyyy");
+      
+      // Call onChange prop with formatted dates
       if (onChange) {
         onChange({
-          startDate: item.selection.startDate as Date,
-          endDate: item.selection.endDate as Date,
+          startDate: startDateString,
+          endDate: endDateString,
         });
       }
     }
