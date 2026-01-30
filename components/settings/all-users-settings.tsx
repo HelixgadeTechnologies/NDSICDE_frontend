@@ -23,7 +23,7 @@ export default function GeneralSettings() {
   } = useManagementSettingsState();
   return (
     <div className="space-y-4">
-      <CardComponent>
+      {/* <CardComponent>
         <p className="text-sm">
           Update your account information and manage your profile
         </p>
@@ -72,7 +72,7 @@ export default function GeneralSettings() {
             />
           </div>
         </div>
-      </CardComponent>
+      </CardComponent> */}
 
       <CardComponent>
         <Heading heading="Change Password" />
