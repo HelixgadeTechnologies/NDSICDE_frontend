@@ -10,14 +10,14 @@ export interface CommentsType {
     time: string;
 };
 
-export interface DetailsType {
-  id: number;
-  name: string;
-  project: string;
-  submittedBy: string;
-  date: string;
-  time: string;
-  status: string;
-  submissionDetails: Array<SubmissionDetailsType>;
-  comments?: Array<CommentsType>;
-}
+// export interface DetailsType {
+//   id: string;
+//   name: string;
+//   project: string;
+//   submittedBy: string;
+//   date: string;
+//   time: string;
+//   status: string;
+//   submissionDetails: Array<SubmissionDetailsType>;
+//   comments?: Array<CommentsType>;
+// }
