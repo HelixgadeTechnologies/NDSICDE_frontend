@@ -100,7 +100,7 @@ export default function GeneralSettings() {
           />
         </div>
       </CardComponent>
-      <div className="w-full md:w-[360px]">
+      <div className="w-full md:w-90">
         <Button content="Save Changes" isDisabled />
       </div>
     </div>

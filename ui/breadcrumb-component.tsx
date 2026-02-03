@@ -101,11 +101,11 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         )}
       </>
     ),
-    "/data-validation": (
-      <Button content="Date Range" icon="stash:data-date-light" />
-    ),
+    // "/data-validation": (
+    //   <Button content="Date Range" icon="stash:data-date-light" />
+    // ),
     "/financial-reporting": (
-      <div className="w-[430px] flex items-center gap-4">
+      <div className="w-107.5 flex items-center gap-4">
         <DateRangePicker label="Date Range" />
         <DropDown
           label="Projects"
@@ -118,7 +118,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
       </div>
     ),
     "/performance-analytics": (
-      <div className="w-[430px] flex items-center gap-4">
+      <div className="w-107.5 flex items-center gap-4">
         <DateRangePicker label="Date Range" />
         <DropDown
           label="Projects"
@@ -143,7 +143,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
 
         {/* Render matched action if available */}
         {matched?.href && actionComponents[matched.href] && (
-          <div className="min-w-[228px]">{actionComponents[matched.href]}</div>
+          <div className="min-w-57">{actionComponents[matched.href]}</div>
         )}
       </div>
     </section>

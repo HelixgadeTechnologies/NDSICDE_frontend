@@ -57,6 +57,25 @@ export type ProjectRequestType = {
   documentURL: string;
   projectId: string;
   status: string;
+  project?: {
+    projectName: string;
+  }
+  approval_A?: null | "string",
+  approval_B?: null | "string",
+  approval_C?: null | "string",
+  approval_D?: null | "string",
+  approval_E?: null | "string",
+  approvedBy_A?: null | "string",
+  approvedBy_B?: null | "string",
+  approvedBy_C?: null | "string",
+  approvedBy_D?: null | "string",
+  approvedBy_E?: null | "string",
+  comment_A?: null | "string",
+  comment_B?: null | "string",
+  comment_C?: null | "string",
+  comment_D?: null | "string",
+  comment_E?: null | "string",
+  createAt?: string
 };
 
 export type ProjectActivityTypes = {
