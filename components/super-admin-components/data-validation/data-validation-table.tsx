@@ -332,14 +332,14 @@ const handleSubmission = async (approvalStatus: 1 | 2) => {
                   <>
                     {details?.comment_A && (
                       <CommentsTab
-                        name="Approver A"
+                        // name="Approver A"
                         date={formatDate(details?.createAt || "")}
                         comment={details.comment_A}
                       />
                     )}
                     {details?.comment_B && (
                       <CommentsTab
-                        name="Approver B"
+                        // name="Approver B"
                         date={formatDate(details?.createAt || "")}
                         time=""
                         comment={details.comment_B}
@@ -347,7 +347,7 @@ const handleSubmission = async (approvalStatus: 1 | 2) => {
                     )}
                     {details?.comment_C && (
                       <CommentsTab
-                        name="Approver C"
+                        // name="Approver C"
                         date={formatDate(details?.createAt || "")}
                         time=""
                         comment={details.comment_C}
@@ -355,7 +355,7 @@ const handleSubmission = async (approvalStatus: 1 | 2) => {
                     )}
                     {details?.comment_D && (
                       <CommentsTab
-                        name="Approver D"
+                        // name="Approver D"
                         date={formatDate(details?.createAt || "")}
                         time=""
                         comment={details.comment_D}
@@ -363,7 +363,7 @@ const handleSubmission = async (approvalStatus: 1 | 2) => {
                     )}
                     {details?.comment_E && (
                       <CommentsTab
-                        name="Approver E"
+                        // name="Approver E"
                         date={formatDate(details?.createAt || "")}
                         time=""
                         comment={details.comment_E}

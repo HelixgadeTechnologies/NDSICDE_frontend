@@ -117,19 +117,6 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         />
       </div>
     ),
-    "/performance-analytics": (
-      <div className="w-107.5 flex items-center gap-4">
-        <DateRangePicker label="Date Range" />
-        <DropDown
-          label="Projects"
-          name="dropdown"
-          options={[]}
-          placeholder="All Projects"
-          value=""
-          onChange={() => {}}
-        />
-      </div>
-    ),
   };
 
   const hiddenRoutes = ["/dashboard/create-project", "/kpi-reporting/new-kpi"];

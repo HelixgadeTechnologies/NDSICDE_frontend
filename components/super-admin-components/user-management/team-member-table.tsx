@@ -17,20 +17,13 @@ import EmptyState from "@/ui/empty-state";
 import { useRoleStore } from "@/store/role-store";
 import { formatDate } from "@/utils/dates-format-utility";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
-
-// Loading state component
-const LoadingState = () => (
-  <section className="flex justify-center items-center h-75">
-    <div className="dots">
-      <div className=""></div>
-      <div className=""></div>
-      <div className=""></div>
-    </div>
-  </section>
-);
+import { DropdownOption } from "@/types/project-management-types";
+import { fetchRoles } from "@/lib/api/roles";
+// import { TeamMember } from "@/types/team-members";
 
 export default function TeamMembersTable() {
   const { roleId, status, setField } = useUserManagementState();
+  const [roleOptions, setRoleOptions] = useState<DropdownOption[]>([]);
   const { token } = useRoleStore();
 
   // Use our custom hook - replaces all the manual state management
@@ -52,6 +45,11 @@ export default function TeamMembersTable() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
+  // Fetch roles on component mount
+  useEffect(() => {
+    loadRoles();
+  }, []);
+
   // Listen for custom events from other components
   useEffect(() => {
     const handleTeamMemberUpdate = () => {
@@ -65,32 +63,73 @@ export default function TeamMembersTable() {
     };
   }, [refetch]);
 
-  // Filter data based on search query
-  const filteredData = users.filter((item) =>
-    `${item.fullName} ${item.email} ${item.roleName} ${item.assignedProjectId}`
+  // Filter data based on search query, role, and status
+  const filteredData = users.filter((item) => {
+    // Search filter
+    const matchesSearch = `${item.fullName} ${item.email} ${item.roleName} ${item.assignedProjectId}`
       .toLowerCase()
-      .includes(query.trim().toLowerCase())
-  );
+      .includes(query.trim().toLowerCase());
+
+    // Role filter (if roleId is selected)
+    const matchesRole = !roleId || item.roleId === roleId;
+
+    // Status filter (if status is selected)
+    const matchesStatus = !status || 
+      item.status.toLowerCase() === status.toLowerCase() ||
+      (status === "Active" && item.status.toLowerCase() === "active") ||
+      (status === "inactive" && item.status.toLowerCase() === "inactive");
+
+    return matchesSearch && matchesRole && matchesStatus;
+  });
+
+  // Fetch roles and transform them to DropdownOption format
+  const loadRoles = async () => {
+    try {
+      const rolesData = await fetchRoles();
+      
+      // Transform roles to DropdownOption format
+      const transformedRoles = rolesData.map((role) => ({
+        label: role.roleName,
+        value: role.roleId
+      }));
+
+      // Add "All Roles" option at the beginning
+      const optionsWithAll = [
+        { label: "All Roles", value: "" },
+        ...transformedRoles
+      ];
+
+      setRoleOptions(optionsWithAll);
+
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  // Handle role filter change
+  const handleRoleFilterChange = (value: string) => {
+    setField("roleId", value);
+  };
+
+  // Handle status filter change
+  const handleStatusFilterChange = (value: string) => {
+    setField("status", value);
+  };
 
   // Determine what content to render
   const renderTableContent = () => {
     if (isFetching) {
-      return <LoadingState />;
-    }
-
-    // No data at all (initial empty state)
-    if (users.length === 0) {
       return (
-        <EmptyState
-          hasSearchQuery={false}
-          searchQuery=""
-          userType="team members"
-        />
+        <div className="dots my-20 mx-auto">
+          <div className=""></div>
+          <div className=""></div>
+          <div className=""></div>
+        </div>
       );
     }
 
     // Has data but no search results
-    if (filteredData.length === 0 && query.trim() !== "") {
+    if (filteredData.length === 0 && (query.trim() !== "" || roleId || status)) {
       return (
         <EmptyState
           hasSearchQuery={true}
@@ -132,7 +171,7 @@ export default function TeamMembersTable() {
                   color="#909CAD"
                   onClick={() =>
                     setActiveRowId((prev) =>
-                      prev === row.userId ? null : row.userId
+                      prev === row.userId ? null : row.userId,
                     )
                   }
                 />
@@ -204,20 +243,23 @@ export default function TeamMembersTable() {
                 label="Role"
                 placeholder="All Role"
                 name="role"
-                onChange={(value: string) => setField("roleId", value)}
-                options={[]}
+                onChange={handleRoleFilterChange}
+                options={roleOptions}
               />
               <DropDown
                 value={status}
                 label="Status"
                 placeholder="All Status"
                 name="status"
-                onChange={(value: string) => setField("status", value)}
-                options={[]}
+                onChange={handleStatusFilterChange}
+                options={[
+                  { label: "All Status", value: "" },
+                  { label: "Active", value: "Active" },
+                  { label: "Inactive", value: "inactive" },
+                ]}
               />
             </div>
           </div>
-
           {/* Dynamic content based on state */}
           {renderTableContent()}
         </div>

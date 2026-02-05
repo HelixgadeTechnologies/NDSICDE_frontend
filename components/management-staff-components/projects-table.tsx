@@ -9,45 +9,30 @@ import { managementTypeChecker } from "@/utils/ui-utility";
 import DateRangePicker from "@/ui/form/date-range";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import axios from "axios";
+import { fetchProjects, type ProjectType } from "@/lib/api/projects";
 import { formatDate } from "@/utils/dates-format-utility";
-
-type ProjectType = {
-  projectId: string;
-  projectName: string;
-  status: string;
-  startDate: string;
-  endDate: string;
-  thematicAreasOrPillar: string;
-  strategicObjective: {
-    statement: string;
-  };
-  teamMember: Array<{
-    fullName: string;
-  }>;
-};
 
 export default function ManagementStaffDashboardTable() {
   const [projects, setProjects] = useState<ProjectType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      setIsLoading(true);
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/projects`,
-        );
-        setProjects(res.data.data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-        toast.error("Failed to load projects. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Single reusable function to load projects
+  const loadProjects = async () => {
+    setIsLoading(true);
+    try {
+      const projectsData = await fetchProjects();
+      setProjects(projectsData);
+      toast.success("Projects loaded successfully");
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      toast.error("Failed to load projects. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchProjects();
+  useEffect(() => {
+    loadProjects();
   }, []);
 
   const head = [
@@ -111,11 +96,6 @@ export default function ManagementStaffDashboardTable() {
                     height={22}
                     className="cursor-pointer"
                     color="#909CAD"
-                    // onClick={() =>
-                    //   setActiveRowId((prev) =>
-                    //     prev === row.id ? null : row.id
-                    //   )
-                    // }
                   />
                 </div>
               </td> */}

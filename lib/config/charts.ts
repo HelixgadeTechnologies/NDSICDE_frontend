@@ -132,11 +132,11 @@ export const ECBColors = [
   "#003B99",
 ];
 export const expenseCategoriesBreakdown = [
-  { name: "Personnel", value: 33 },
-  { name: "Equipment", value: 27 },
-  { name: "Services", value: 14 },
-  { name: "Travel", value: 14 },
-  { name: "Other", value: 14 },
+  { name: "Personnel", value: 0.5 },
+  { name: "Equipment", value: 0.5 },
+  { name: "Services", value: 0.5 },
+  { name: "Travel", value: 0.5 },
+  { name: "Other", value: 0.5 },
 ];
 
 // export const recentActivities = [

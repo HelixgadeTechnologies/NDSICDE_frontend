@@ -13,18 +13,18 @@ export default function FinancialReporting() {
   const dashboardData = [
     {
       title: "Total Budget Allocated",
-      value: "$1,250,000",
+      value: "₦0",
       percentInfo: "for current fiscal year",
     },
     {
       title: "Total Expenses Incurred",
-      value: "$875,000",
-      percentage: 70,
+      value: "₦0",
+      percentage: 0,
       percentInfo: "of total budget",
     },
     {
       title: "Budget Variance",
-      value: "-7.5%",
+      value: "0%",
       percentInfo: "Over budget",
     },
   ];
