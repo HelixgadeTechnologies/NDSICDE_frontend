@@ -12,8 +12,7 @@ import DateRangePicker from "@/ui/form/date-range";
 import { fetchProjects, type ProjectType } from "@/lib/api/projects";
 import { fetchResultTypes, transformResultTypesToOptions, type ResultType } from "@/lib/api/result-types";
 import { APIResponse, SummaryAPIResponse } from "@/types/performance-dashboard-types";
-
-
+import toast from "react-hot-toast";
 
 export default function PerformanceAnalytics() {
   const [loading, setLoading] = useState(true);
@@ -30,7 +29,6 @@ export default function PerformanceAnalytics() {
     endDate: new Date().toISOString(),
   });
 
-  // Fetch projects and result types on mount
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -40,46 +38,48 @@ export default function PerformanceAnalytics() {
         ]);
         setProjects(projectsData);
         setResultTypes(resultTypesData);
+        toast.success("Filters loaded successfully");
       } catch (error) {
         console.error("Error fetching data:", error);
+        toast.error("Failed to load filters");
       }
     };
 
     loadData();
   }, []);
 
-  // Fetch data from API
   useEffect(() => {
     const fetchPerformanceData = async () => {
       try {
         setLoading(true);
         
-        // Build URL with query parameters
         let url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/performance-dashboard?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
         
-        // Add projectId if selected
         if (selectedProjectId) {
           url += `&projectId=${selectedProjectId}`;
           
-          // Add thematicArea from the selected project
           const selectedProject = projects.find(p => p.projectId === selectedProjectId);
           if (selectedProject?.thematicAreasOrPillar) {
             url += `&thematicArea=${encodeURIComponent(selectedProject.thematicAreasOrPillar)}`;
           }
         }
         
-        // Add resultType if selected
         if (selectedResultType) {
           url += `&resultType=${encodeURIComponent(selectedResultType)}`;
         }
         
         const response = await axios.get<APIResponse>(url);
 
-        const data = response.data.data; // This is your SummaryAPIResponse
-        setApiData(data);
+        if (response.data.success) {
+          setApiData(response.data.data);
+          toast.success(response.data.message || "Performance data loaded successfully");
+        } else {
+          toast.error("Failed to fetch performance data");
+        }
       } catch (error) {
         console.error("Error fetching performance analytics:", error);
-        // Keep default/previous data if API fails
+        toast.error("An error occurred while fetching data");
+        setApiData(null);
       } finally {
         setLoading(false);
       }
@@ -100,13 +100,11 @@ export default function PerformanceAnalytics() {
     setSelectedResultType(value);
   };
 
-  // Prepare dropdown options for projects
   const projectOptions = projects.map((project) => ({
     value: project.projectId,
     label: project.projectName,
   }));
 
-  // Transform result types to dropdown options
   const resultTypeOptions = [
     { value: "", label: "All Result Types" },
     ...transformResultTypesToOptions(resultTypes),
@@ -152,14 +150,13 @@ export default function PerformanceAnalytics() {
   ];
 
   return (
-    <section className="relative ">
-      <div className="w-107.5 flex items-center gap-4">
-        <DateRangePicker label="Date Range" onChange={handleDateRangeChange} />
+    <section className="relative">
+      <div className="w-107.5 flex items-center gap-4 mt-10">
         <DropDown
           label="Projects"
           name="projects"
           options={projectOptions}
-          placeholder="All Projects"
+          // placeholder="All Projects"
           value={selectedProjectId}
           onChange={handleProjectChange}
         />
@@ -167,16 +164,21 @@ export default function PerformanceAnalytics() {
           label="Result Type"
           name="resultType"
           options={resultTypeOptions}
-          placeholder="Select Result Type"
+          // placeholder="Select Result Type"
           value={selectedResultType}
           onChange={handleResultTypeChange}
         />
+        <DateRangePicker label="Date Range" onChange={handleDateRangeChange} />
       </div>
       {loading ? (
         <div className="dots my-20 mx-auto">
           <div></div>
           <div></div>
           <div></div>
+        </div>
+      ) : !apiData ? (
+        <div className="text-center my-20">
+          <p className="text-gray-500">No data available. Please adjust your filters and try again.</p>
         </div>
       ) : (
         <>
@@ -188,23 +190,11 @@ export default function PerformanceAnalytics() {
               data={tabs}
               renderContent={(tabId) => {
                 if (tabId === 1) {
-                  return (
-                    <ProjectResultPerformance
-                    // apiData={apiData}
-                    />
-                  );
+                  return <ProjectResultPerformance apiData={apiData} />;
                 } else if (tabId === 2) {
-                  return (
-                    <FinancialPerformance
-                    // apiData={apiData}
-                    />
-                  );
+                  return <FinancialPerformance />;
                 } else {
-                  return (
-                    <CustomReports
-                    // apiData={apiData}
-                    />
-                  );
+                  return <CustomReports />;
                 }
               }}
             />

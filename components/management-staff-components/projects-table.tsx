@@ -1,3 +1,4 @@
+// app/dashboard/management-staff/page.tsx (or wherever this component is)
 "use client";
 
 import CardComponent from "@/ui/card-wrapper";
@@ -7,33 +8,11 @@ import DropDown from "@/ui/form/select-dropdown";
 import { Icon } from "@iconify/react";
 import { managementTypeChecker } from "@/utils/ui-utility";
 import DateRangePicker from "@/ui/form/date-range";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { fetchProjects, type ProjectType } from "@/lib/api/projects";
 import { formatDate } from "@/utils/dates-format-utility";
+import { useProjects } from "@/context/ProjectsContext";
 
 export default function ManagementStaffDashboardTable() {
-  const [projects, setProjects] = useState<ProjectType[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Single reusable function to load projects
-  const loadProjects = async () => {
-    setIsLoading(true);
-    try {
-      const projectsData = await fetchProjects();
-      setProjects(projectsData);
-      toast.success("Projects loaded successfully");
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      toast.error("Failed to load projects. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadProjects();
-  }, []);
+  const { projects, isLoading, projectOptions } = useProjects();
 
   const head = [
     "Project Name",
@@ -50,7 +29,7 @@ export default function ManagementStaffDashboardTable() {
       <div className="mb-6 flex gap-4 items-end">
         <div className="w-3/5">
           <SearchInput
-            name=""
+            name="search"
             value=""
             onChange={() => {}}
             placeholder="Search Projects"
@@ -64,6 +43,14 @@ export default function ManagementStaffDashboardTable() {
             value=""
             onChange={() => {}}
             options={[]}
+          />
+          <DropDown
+            label="Projects"
+            placeholder="Select Project"
+            name="project"
+            value=""
+            onChange={() => {}}
+            options={projectOptions}
           />
           <DateRangePicker label="Date Range" />
         </div>
@@ -86,7 +73,9 @@ export default function ManagementStaffDashboardTable() {
               <td className="px-6">{formatDate(row.startDate, "date-only")}</td>
               <td className="px-6">{formatDate(row.endDate, "date-only")}</td>
               <td className="px-6">
-                {row.teamMember.length === 0 ? "No team members" : row.teamMember.map((member) => member.fullName).join(", ")}
+                {row.teamMember.length === 0
+                  ? "No team members"
+                  : row.teamMember.map((member) => member.fullName).join(", ")}
               </td>
               {/* <td className="px-6">
                 <div className="flex justify-center items-center">

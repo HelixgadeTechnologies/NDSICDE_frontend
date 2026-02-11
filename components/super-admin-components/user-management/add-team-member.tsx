@@ -11,6 +11,7 @@ import TagInput from "@/ui/form/tag-input";
 import { useRoleStore } from "@/store/role-store";
 import { createUser } from "@/lib/api/user-management";
 import { getRoleOptions, RoleOption } from "@/lib/api/settings";
+import { useProjects } from "@/context/ProjectsContext";
 
 type AddProps = {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   const [roles, setRoles] = useState<RoleOption[]>([]);
   const [isFetchingRoles, setIsFetchingRoles] = useState(false);
   const [layerOfApproval, setLayerOfApproval] = useState<string>("");
+  const { projectOptions } = useProjects();
 
   const {
     fullName,
@@ -36,12 +38,12 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   } = useUserManagementState();
   const { token } = useRoleStore();
 
-  const options = [
-    "Healthcare Initiative",
-    "Education Program",
-    "Clean Water Project",
-    "Clean Water One",
-  ];
+  // const options = [
+  //   "Healthcare Initiative",
+  //   "Education Program",
+  //   "Clean Water Project",
+  //   "Clean Water One",
+  // ];
 
   const departments = [
     { label: "Finance", value: "Finance" },
@@ -202,7 +204,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
           <div className="col-span-2">
             <TagInput
               label="Assigned Projects"
-              options={options}
+              options={projectOptions}
               tags={[]}
               onChange={() => setField("assignedProjects", [])}
             />

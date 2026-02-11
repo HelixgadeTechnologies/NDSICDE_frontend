@@ -37,6 +37,7 @@ type FormTwoProps = {
   strategicObjectives: Array<{ label: string; value: string }>;
   isLoadingSO: boolean;
   errorSO: string | null;
+  isSubmitting: boolean;
 };
 
 function FormOne({ onClick, formData, updateFormData }: FormOneProps) {
@@ -181,7 +182,8 @@ function FormTwo({
   updateFormData, 
   strategicObjectives,
   isLoadingSO,
-  errorSO 
+  errorSO,
+  isSubmitting,
 }: FormTwoProps) {
   const [errors, setErrors] = useState<
     Partial<Record<keyof CreateProjectFormDataType, string>>
@@ -332,7 +334,7 @@ function FormTwo({
             <Button isSecondary content="Back" onClick={handleBack} />
           </div>
           <div className="w-3/5">
-            <Button content="Create Project" onClick={handleSubmit} />
+            <Button content="Create Project" onClick={handleSubmit} isLoading={isSubmitting} />
           </div>
         </div>
       </form>
@@ -509,6 +511,7 @@ export default function CreateNewProject() {
               strategicObjectives={strategicObjectives}
               isLoadingSO={isLoadingSO}
               errorSO={errorSO}
+              isSubmitting={isSubmitting}
             />
           )}
         </CardComponent>

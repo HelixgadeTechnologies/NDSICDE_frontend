@@ -13,8 +13,9 @@ import PieChartComponent from "../../../ui/pie-chart";
 import BarChartComponent from "../../../ui/bar-chart";
 import Percentage from "@/ui/percentage-component";
 import { usePerformanceAnalyticsReportsState } from "@/store/super-admin-store/performance-analytics-store";
+import { SummaryAPIResponse } from "@/types/performance-dashboard-types";
 
-export default function ProjectResultPerformance() {
+export default function ProjectResultPerformance({ apiData }: { apiData: SummaryAPIResponse }) {
   const { KPIName, result, projects, PSDFilter, setField } =
     usePerformanceAnalyticsReportsState();
 
@@ -29,6 +30,101 @@ export default function ProjectResultPerformance() {
     { value: "3", label: "Priority" },
   ];
 
+  // Transform API data for KPI Actuals vs Targets chart
+  const kpiChartData = Array.isArray(apiData.kpiActualsVsTargets) && apiData.kpiActualsVsTargets.length > 0
+    ? apiData.kpiActualsVsTargets.map((item, index) => {
+        if (typeof item === 'object' && item !== null) {
+          return {
+            name: item.name || item.kpiName || `KPI ${index + 1}`,
+            target: typeof item.target === 'number' ? item.target : 0,
+            actual: typeof item.actual === 'number' ? item.actual : 0,
+          };
+        }
+        return null;
+      }).filter((item): item is { name: string | number; target: number; actual: number } => item !== null)
+    : KPIActualTarget;
+
+  // Transform API data for Project Status Distribution
+  const statusDistributionData = apiData.statusDistribution && apiData.statusDistribution.length > 0
+    ? apiData.statusDistribution.map((item) => ({
+        name: item.status,
+        value: item.count,
+        percentage: item.percentage,
+      }))
+    : projectDistributionStatus;
+
+  // Transform API data for Progress Tracking
+  // Check the KPIProgressTracking structure to match the format
+  const progressTrackingData = apiData.progressTracking
+    ? [
+        {
+          title: "Activity",
+          percentages: [
+            {
+              name: apiData.progressTracking.activity.status,
+              percent: apiData.progressTracking.activity.percentage,
+            },
+          ],
+        },
+        {
+          title: "Output",
+          percentages: [
+            {
+              name: apiData.progressTracking.output.status,
+              percent: apiData.progressTracking.output.percentage,
+            },
+          ],
+        },
+        {
+          title: "Outcomes",
+          percentages: [
+            {
+              name: apiData.progressTracking.outcomes.status,
+              percent: apiData.progressTracking.outcomes.percentage,
+            },
+          ],
+        },
+        {
+          title: "Impact",
+          percentages: [
+            {
+              name: apiData.progressTracking.impact.status,
+              percent: apiData.progressTracking.impact.percentage,
+            },
+          ],
+        },
+      ]
+    : KPIProgressTracking;
+
+  // Extract unique KPI names for dropdown (if available in API data)
+  const kpiOptions = Array.isArray(apiData.kpiActualsVsTargets) && apiData.kpiActualsVsTargets.length > 0
+    ? apiData.kpiActualsVsTargets
+        .map((item, index) => {
+          if (typeof item === 'object' && item !== null) {
+            const name = item.name || item.kpiName;
+            return name ? { value: String(index), label: String(name) } : null;
+          }
+          return null;
+        })
+        .filter((item): item is { value: string; label: string } => item !== null)
+    : [];
+
+  // Extract project names for dropdown
+  const projectOptions = apiData.projectDetails && apiData.projectDetails.length > 0
+    ? apiData.projectDetails.map((project) => ({
+        value: project.projectId,
+        label: project.projectName,
+      }))
+    : [];
+
+  // Result type options (placeholder - not available in current API structure)
+  const resultOptions = [
+    { value: "activity", label: "Activity" },
+    { value: "output", label: "Output" },
+    { value: "outcomes", label: "Outcomes" },
+    { value: "impact", label: "Impact" },
+  ];
+
   return (
     <section className="space-y-5">
       <div className="flex flex-col md:flex-row items-start gap-4">
@@ -37,36 +133,36 @@ export default function ProjectResultPerformance() {
           <CardComponent>
             <div className="flex justify-between items-start">
               <Heading heading="KPI Actuals vs. Targets" />
-              <div className="gap-2 flex items-center w-[440px]">
+              <div className="gap-2 flex items-center w-40">
                 <DropDown
                   name="KPIName"
                   label="KPI"
                   placeholder="KPI name"
                   value={KPIName}
                   onChange={(value: string) => setField("KPIName", value)}
-                  options={[]}
+                  options={kpiOptions.length > 0 ? kpiOptions : [{ value: "N/A", label: "N/A" }]}
                 />
-                <DropDown
+                {/* <DropDown
                   name="result"
                   label="Result"
                   placeholder="Impact"
                   value={result}
                   onChange={(value: string) => setField("result", value)}
-                  options={[]}
-                />
-                <DropDown
+                  options={resultOptions}
+                /> */}
+                {/* <DropDown
                   name="projects"
                   label="Projects"
                   placeholder="Project Alpha"
                   value={projects}
                   onChange={(value: string) => setField("projects", value)}
-                  options={[]}
-                />
+                  options={projectOptions.length > 0 ? projectOptions : [{ value: "N/A", label: "N/A" }]}
+                /> */}
               </div>
             </div>
-            <div className="h-[460px]">
+            <div className="h-115">
               <BarChartComponent
-                data={KPIActualTarget}
+                data={kpiChartData}
                 bars={bars}
                 xKey="name"
               />
@@ -85,14 +181,13 @@ export default function ProjectResultPerformance() {
               <DropDown
                 name="PSDFilter"
                 label="Filter"
-                // placeholder="Department"
                 value={PSDFilter}
                 onChange={(value: string) => setField("PSDFilter", value)}
                 options={PSDOptions}
               />
             </div>
             <PieChartComponent
-              data={projectDistributionStatus}
+              data={statusDistributionData}
               colors={PDSColors}
             />
           </CardComponent>
@@ -106,7 +201,7 @@ export default function ProjectResultPerformance() {
           subtitle="Activity, Output, Outcome, Impact"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mt-5">
-          {KPIProgressTracking.map((k, i) => (
+          {progressTrackingData.map((k, i) => (
             <CardComponent key={i}>
               <h4 className="text-[#242424] text-base leading-5 font-semibold mb-2">
                 {k.title}
