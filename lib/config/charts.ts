@@ -196,16 +196,17 @@ export const expenseCategoriesBreakdown = [
 //   },
 // ];
 
-export interface Activity {
-  id: string | number;
-  name: string;
-  activity: string;
-  project: string;
-  time: string;
-  role?: string;
-  status?: "Success" | "Pending"
+export interface RecentActivities {
+  activityId: string;
+  activityType: string;
+  title: string;
+  description: string;
+  actor: string;
+  projectName: string;
+  projectId: string;
+  timestamp: string;
+  timeAgo: string;
 }
-export const recentActivities: Activity[] = [];
 
 export const pendingActivityFundRequest = [
   {

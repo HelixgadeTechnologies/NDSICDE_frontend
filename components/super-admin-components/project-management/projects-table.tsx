@@ -25,7 +25,7 @@ export default function ProjectsTable() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const { user } = useRoleStore();
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState<string | null>(null); // Add this
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const { token } = useRoleStore();
 
   // Status options for dropdown
@@ -74,17 +74,9 @@ export default function ProjectsTable() {
     setFilteredData(result);
   }, [query, filters, data]);
 
-  // const handleFilterChange = (name: string, value: string) => {
-  //   setFilters(prev => ({
-  //     ...prev,
-  //     [name]: value
-  //   }));
-  // };
-
   const head = [
     "Project Name",
-    // "Project ID",
-    "SO Alignment",
+    "Strategic Objective",
     "Status",
     "Start Date",
     "End Date",
@@ -185,11 +177,6 @@ export default function ProjectsTable() {
                   {row.projectName}
                 </Link>
               </td>
-              {/* <td className="px-4 py-3">
-                <span className="font-mono text-sm text-gray-600">
-                  {row.projectId.substring(0, 8)}...
-                </span>
-              </td> */}
               <td className="px-4 py-3">
                 {row.strategicObjectiveStatement || "N/A"}
               </td>

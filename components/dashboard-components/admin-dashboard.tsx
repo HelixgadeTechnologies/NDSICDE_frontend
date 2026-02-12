@@ -1,56 +1,90 @@
+"use client";
+
 import DashboardStat from "@/ui/dashboard-stat-card";
 import RecentActivityTab from "@/components/super-admin-components/dashboard/recent-activity-summary";
 import PendingActivityCards from "@/components/super-admin-components/dashboard/pending-activity-cards";
-// import OrganizationalProjectPerformance from "@/components/admin-components/dashboard/organizational-project-performance";
 import ProjectsTable from "@/components/super-admin-components/project-management/projects-table";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-export const metadata = {
-  title: "Dashboard - NDSICDE",
-  description: "View your dashboard in detail",
-};
+type Summary = {
+  count: number;
+  trend: string;
+}
+
+type DashboardData = {
+  totalProjects: Summary;
+  teamMembers: Summary;
+  activeKpis: Summary;
+  financialRequests: Summary;
+  upcomingDeadlines: Summary;
+  pendingReviews: Summary;
+}
 
 export default function SuperAdminDashboardPage() {
+  const [loading, setLoading] = useState(false);
+  const [summaryData, setSummaryData] = useState<DashboardData>({
+    totalProjects: { count: 0, trend: "0" },
+    teamMembers: { count: 0, trend: "0" },
+    activeKpis: { count: 0, trend: "0" },
+    financialRequests: { count: 0, trend: "0" },
+    upcomingDeadlines: { count: 0, trend: "0" },
+    pendingReviews: { count: 0, trend: "0" },
+  });
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard-overview/stats`,
+        );
+        setSummaryData(response.data.data);
+      } catch (error) {
+        console.error(`Error: ${error}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [])
+
   const dashboardData = [
     {
       title: "Total Projects",
-      value: 0,
-      percentage: 2,
-      percentInfo: "since last month",
+      value: summaryData.totalProjects.count,
+      percentInfo: summaryData.totalProjects.trend,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "Team Members",
-      value: 0,
-      percentage: 12,
-      percentInfo: "since last month",
+      value: summaryData.teamMembers.count,
+      percentInfo: summaryData.teamMembers.trend,
       icon: "majesticons:users-line",
     },
     {
       title: "Active Organizational KPIs",
-      value: 0,
-      percentage: 5,
-      percentInfo: "since last month",
+      value: summaryData.activeKpis.count,
+      percentInfo: summaryData.activeKpis.trend,
       icon: "fluent:target-24-filled",
     },
     {
       title: "Financial Requests",
-      value: 0,
-      percentage: 7,
-      percentInfo: "pending approval",
+      value: summaryData.financialRequests.count,
+      percentInfo: summaryData.financialRequests.trend,
       icon: "basil:card-outline",
     },
     {
       title: "Upcoming Deadlines",
-      value: 0,
-      percentage: 3,
-      percentInfo: "this week",
+      value: summaryData.upcomingDeadlines.count,
+      percentInfo: summaryData.upcomingDeadlines.trend,
       icon: "majesticons:calendar-line",
     },
     {
       title: "Pending Reviews",
-      value: 0,
-      percentage: 4,
-      percentInfo: "awaiting action",
+      value: summaryData.pendingReviews.count,
+      percentInfo: summaryData.pendingReviews.trend,
       icon: "material-symbols:pending-actions-rounded",
     },
   ];
