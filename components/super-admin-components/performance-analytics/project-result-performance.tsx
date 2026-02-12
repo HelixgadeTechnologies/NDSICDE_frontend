@@ -35,9 +35,9 @@ export default function ProjectResultPerformance({ apiData }: { apiData: Summary
     ? apiData.kpiActualsVsTargets.map((item, index) => {
         if (typeof item === 'object' && item !== null) {
           return {
-            name: item.name || item.kpiName || `KPI ${index + 1}`,
-            target: typeof item.target === 'number' ? item.target : 0,
-            actual: typeof item.actual === 'number' ? item.actual : 0,
+            name: item.period,
+            target: item.target,
+            actual: item.actual,
           };
         }
         return null;
@@ -48,13 +48,12 @@ export default function ProjectResultPerformance({ apiData }: { apiData: Summary
   const statusDistributionData = apiData.statusDistribution && apiData.statusDistribution.length > 0
     ? apiData.statusDistribution.map((item) => ({
         name: item.status,
-        value: item.count,
+        value: item.percentage,
         percentage: item.percentage,
       }))
     : projectDistributionStatus;
 
   // Transform API data for Progress Tracking
-  // Check the KPIProgressTracking structure to match the format
   const progressTrackingData = apiData.progressTracking
     ? [
         {
@@ -96,19 +95,6 @@ export default function ProjectResultPerformance({ apiData }: { apiData: Summary
       ]
     : KPIProgressTracking;
 
-  // Extract unique KPI names for dropdown (if available in API data)
-  const kpiOptions = Array.isArray(apiData.kpiActualsVsTargets) && apiData.kpiActualsVsTargets.length > 0
-    ? apiData.kpiActualsVsTargets
-        .map((item, index) => {
-          if (typeof item === 'object' && item !== null) {
-            const name = item.name || item.kpiName;
-            return name ? { value: String(index), label: String(name) } : null;
-          }
-          return null;
-        })
-        .filter((item): item is { value: string; label: string } => item !== null)
-    : [];
-
   // Extract project names for dropdown
   const projectOptions = apiData.projectDetails && apiData.projectDetails.length > 0
     ? apiData.projectDetails.map((project) => ({
@@ -117,13 +103,6 @@ export default function ProjectResultPerformance({ apiData }: { apiData: Summary
       }))
     : [];
 
-  // Result type options (placeholder - not available in current API structure)
-  const resultOptions = [
-    { value: "activity", label: "Activity" },
-    { value: "output", label: "Output" },
-    { value: "outcomes", label: "Outcomes" },
-    { value: "impact", label: "Impact" },
-  ];
 
   return (
     <section className="space-y-5">
@@ -140,7 +119,8 @@ export default function ProjectResultPerformance({ apiData }: { apiData: Summary
                   placeholder="KPI name"
                   value={KPIName}
                   onChange={(value: string) => setField("KPIName", value)}
-                  options={kpiOptions.length > 0 ? kpiOptions : [{ value: "N/A", label: "N/A" }]}
+                  // options={kpiOptions.length > 0 ? kpiOptions : [{ value: "N/A", label: "N/A" }]}
+                  options={[]}
                 />
                 {/* <DropDown
                   name="result"

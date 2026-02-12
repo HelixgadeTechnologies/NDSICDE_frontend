@@ -9,14 +9,14 @@ import BarChartComponent from "@/ui/bar-chart";
 
 
 const data = [
-  { name: "Project 1", value: 80 },
-  { name: "Project 2", value: 90 },
-  { name: "Project 3", value: 80 },
-  { name: "Project 4", value: 50 },
-  { name: "Project 5", value: 80 },
-  { name: "Project 6", value: 80 },
-  { name: "Project 7", value: 90 },
-  { name: "Project 8", value: 50 },
+  { name: "Project 1", value: 10 },
+  { name: "Project 2", value: 0 },
+  { name: "Project 3", value: 0 },
+  { name: "Project 4", value: 0 },
+  { name: "Project 5", value: 0 },
+  { name: "Project 6", value: 0 },
+  { name: "Project 7", value: 0 },
+  { name: "Project 8", value: 0 },
 ];
 
 const colorsSpi = ["#0047AB", "#F44336", "#FBC02D"];

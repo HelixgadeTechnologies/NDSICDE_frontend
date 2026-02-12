@@ -3,21 +3,22 @@
 import DashboardStat from "@/ui/dashboard-stat-card";
 import TabComponent from "@/ui/tab-component";
 import ProjectResultPerformance from "@/components/super-admin-components/performance-analytics/project-result-performance";
-import FinancialPerformance from "@/components/super-admin-components/financial-reporting/cpi-spi-parent";
+
 import CustomReports from "@/components/super-admin-components/performance-analytics/custom-reports";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
-import { fetchProjects, type ProjectType } from "@/lib/api/projects";
+import { type ProjectType } from "@/lib/api/projects";
+import { useProjects } from "@/context/ProjectsContext";
 import { fetchResultTypes, transformResultTypesToOptions, type ResultType } from "@/lib/api/result-types";
 import { APIResponse, SummaryAPIResponse } from "@/types/performance-dashboard-types";
 import toast from "react-hot-toast";
 
 export default function PerformanceAnalytics() {
+  const { projects, projectOptions, isLoading: isProjectsLoading } = useProjects();
   const [loading, setLoading] = useState(true);
   const [apiData, setApiData] = useState<SummaryAPIResponse | null>(null);
-  const [projects, setProjects] = useState<ProjectType[]>([]);
   const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
   const [selectedResultType, setSelectedResultType] = useState<string>("");
@@ -32,11 +33,7 @@ export default function PerformanceAnalytics() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [projectsData, resultTypesData] = await Promise.all([
-          fetchProjects(),
-          fetchResultTypes(),
-        ]);
-        setProjects(projectsData);
+        const resultTypesData = await fetchResultTypes();
         setResultTypes(resultTypesData);
         toast.success("Filters loaded successfully");
       } catch (error) {
@@ -100,11 +97,6 @@ export default function PerformanceAnalytics() {
     setSelectedResultType(value);
   };
 
-  const projectOptions = projects.map((project) => ({
-    value: project.projectId,
-    label: project.projectName,
-  }));
-
   const resultTypeOptions = [
     { value: "", label: "All Result Types" },
     ...transformResultTypesToOptions(resultTypes),
@@ -145,7 +137,6 @@ export default function PerformanceAnalytics() {
 
   const tabs = [
     { tabName: "Project Result Performance", id: 1 },
-    { tabName: "Financial Performance", id: 2 },
     { tabName: "Custom Reports", id: 3 },
   ];
 
@@ -191,8 +182,6 @@ export default function PerformanceAnalytics() {
               renderContent={(tabId) => {
                 if (tabId === 1) {
                   return <ProjectResultPerformance apiData={apiData} />;
-                } else if (tabId === 2) {
-                  return <FinancialPerformance />;
                 } else {
                   return <CustomReports />;
                 }

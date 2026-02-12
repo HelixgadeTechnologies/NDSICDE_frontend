@@ -87,7 +87,7 @@ export default function DataValidationTable({
   const handleNewComment = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setNewComment(e.target.value);
   };
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  // const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 const handleSubmission = async (approvalStatus: 1 | 2) => {
   if (!details || !user) return;
@@ -153,26 +153,24 @@ const handleSubmission = async (approvalStatus: 1 | 2) => {
                 <td className="px-6">{formatDate(row.activityStartDate)}</td>
                 <td className="px-6">{row.status}</td>
                 <td className="px-6">
-                  <div className="flex gap-2">
+                  <div className="flex gap-2" onClick={() => handleModalOpen(row.requestId)}>
                     <Icon
                       icon={"fluent-mdl2:view"}
                       width={16}
                       height={16}
-                      onClick={() => handleModalOpen(row.requestId)}
                     />
                     <Icon
                       icon={"fluent-mdl2:accept"}
                       width={16}
                       height={16}
                       color="#22C55E"
-                      onClick={() => handleSubmission(1)}
+                    
                     />
                     <Icon
                       icon={"fluent-mdl2:cancel"}
                       width={16}
                       height={16}
                       color="#EF4444"
-                      onClick={() => handleSubmission(2)}
                     />
                   </div>
                 </td>

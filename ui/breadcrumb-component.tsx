@@ -68,7 +68,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
       <>
         <Button
           onClick={handleAddSO}
-          content="Add New Member"
+          content="Add Strategic Objective"
           icon="si:add-fill"
         />
         {addStrategicObjective && (
