@@ -33,17 +33,11 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     phoneNumber,
     roleId,
     status,
-    // assignedProjects,
+    assignedProjects,
     setField,
   } = useUserManagementState();
   const { token } = useRoleStore();
 
-  // const options = [
-  //   "Healthcare Initiative",
-  //   "Education Program",
-  //   "Clean Water Project",
-  //   "Clean Water One",
-  // ];
 
   const departments = [
     { label: "Finance", value: "Finance" },
@@ -113,7 +107,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         department,
         phoneNumber,
         status,
-        assignedProjectId: "",
+        assignedProjectId: assignedProjects[0] || "",
         ...(isRetirementManager && layerOfApproval && { layerOfApproval }),
       };
 
@@ -202,11 +196,12 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             </div>
           )}
           <div className="col-span-2">
-            <TagInput
+            <DropDown
               label="Assigned Projects"
               options={projectOptions}
-              tags={[]}
-              onChange={() => setField("assignedProjects", [])}
+              name="assignedProjects"
+              value={assignedProjects[0] || ""}
+              onChange={(value: string) => setField("assignedProjects", [value])}
             />
           </div>
         </div>
