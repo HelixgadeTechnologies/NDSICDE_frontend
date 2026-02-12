@@ -13,18 +13,18 @@ export default function BudgetVSExpenditureTrends() {
   ];
 
   const data = [
-    { name: "Jan", budget: 6000, expenditure: 4500 },
-    { name: "Feb", budget: 5000, expenditure: 10000 },
-    { name: "Mar", budget: 5000, expenditure: 1500 },
-    { name: "Apr", budget: 6000, expenditure: 5000 },
-    { name: "May", budget: 3000, expenditure: 7000 },
-    { name: "Jun", budget: 10000, expenditure: 7000 },
-    { name: "Jul", budget: 9000, expenditure: 6000 },
-    { name: "Aug", budget: 10000, expenditure: 2000 },
-    { name: "Sep", budget: 4000, expenditure: 8000 },
-    { name: "Oct", budget: 5000, expenditure: 3000 },
-    { name: "Nov", budget: 2000, expenditure: 4000 },
-    { name: "Dec", budget: 6000, expenditure: 1000 },
+    { name: "Jan", budget: 0, expenditure: 0 },
+    { name: "Feb", budget: 0, expenditure: 0 },
+    { name: "Mar", budget: 0, expenditure: 0 },
+    { name: "Apr", budget: 0, expenditure: 0 },
+    { name: "May", budget: 0, expenditure: 0 },
+    { name: "Jun", budget: 0, expenditure: 0 },
+    { name: "Jul", budget: 0, expenditure: 0 },
+    { name: "Aug", budget: 0, expenditure: 0 },
+    { name: "Sep", budget: 0, expenditure: 0 },
+    { name: "Oct", budget: 0, expenditure: 0 },
+    { name: "Nov", budget: 0, expenditure: 0 },
+    { name: "Dec", budget: 0, expenditure: 0 },
   ];
 
   return (
@@ -35,7 +35,7 @@ export default function BudgetVSExpenditureTrends() {
             heading="Budget vs. Expenditure Trends"
             subtitle="Monthly comparison of budget allocation and actual expenses"
           />
-          <div className="h-[510px]">
+          <div className="h-127.5">
             <LineChartComponent data={data} lines={lines} xKey="name" legend />
           </div>
         </CardComponent>

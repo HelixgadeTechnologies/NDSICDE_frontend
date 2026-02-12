@@ -63,10 +63,10 @@ export const COUNTRY_OPTIONS = [
 
 // Thematic areas
 export const THEMATIC_AREAS = [
-  "Environment",
   "Economic Diversification",
+  "Environment and Climate Change",
   "Governance",
   "Peace and Security",
+  "Cross-Cutting",
   "Organizational Transformation",
-  "Strategic Partnership",
 ];

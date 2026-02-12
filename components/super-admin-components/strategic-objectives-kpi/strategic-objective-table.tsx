@@ -9,7 +9,7 @@ import AddKPIModal from "./add-kpi-form";
 import axios from "axios";
 import { getStrategicObjectives } from "@/lib/api/admin-api-calls";
 import DeleteModal from "@/ui/generic-delete-modal";
-import LinkedKPIsModal from "./linked-kpis-modal"; // Add this import
+import LinkedKPIsModal from "./linked-kpis-modal";
 
 type ExpectedData = {
   createAt: string;

@@ -8,18 +8,8 @@ import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import axios from "axios";
+import { fetchRoles, type RoleData } from "@/lib/api/roles";
 import { formatDate } from "@/utils/dates-format-utility";
-
-type RoleData = {
-  roleId: string;
-  roleName: string;
-  description: string;
-  permission: string;
-  createAt: string;
-  updateAt: string;
-  users: number;
-};
 
 export default function AccessControl() {
   const head = [
@@ -33,13 +23,12 @@ export default function AccessControl() {
   const [isLoadingRoles, setIsLoadingRoles] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleData | null>(null);
 
-  const fetchRoles = async () => {
+  // Single reusable function to load roles
+  const loadRoles = async () => {
     setIsLoadingRoles(true);
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/settings/roles`,
-      );
-      setRoles(response.data.data);
+      const rolesData = await fetchRoles();
+      setRoles(rolesData);
       toast.success("Roles loaded successfully");
     } catch (error) {
       console.error("Error fetching roles:", error);
@@ -50,19 +39,17 @@ export default function AccessControl() {
   };
 
   useEffect(() => {
-    fetchRoles();
+    loadRoles();
   }, []);
 
   const { isAddModalOpen, isEditModalOpen, openAddModal, openEditModal, closeAddModal, closeEditModal } =
     useUIStore();
 
-  // Handle edit click
   const handleEditClick = (role: RoleData) => {
     setSelectedRole(role);
     openEditModal();
   };
 
-  // Handle modal close to reset selected role
   const handleEditModalClose = () => {
     setSelectedRole(null);
     closeEditModal();
@@ -124,7 +111,7 @@ export default function AccessControl() {
       </CardComponent>
 
       <RoleFormModal 
-        onSuccess={fetchRoles} 
+        onSuccess={loadRoles} 
         mode="create" 
         isOpen={isAddModalOpen}
         onClose={handleAddModalClose}
@@ -132,7 +119,7 @@ export default function AccessControl() {
 
       <RoleFormModal 
         onSuccess={() => {
-          fetchRoles();
+          loadRoles();
           handleEditModalClose();
         }} 
         mode="edit" 

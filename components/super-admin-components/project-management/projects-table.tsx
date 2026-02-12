@@ -14,13 +14,13 @@ import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import Heading from "@/ui/text-heading";
 import { ProjectApiResponse } from "@/types/admin-types";
+import { useProjects } from "@/context/ProjectsContext";
 import Modal from "@/ui/popup-modal";
 import Button from "@/ui/form/button";
 
 export default function ProjectsTable() {
+  const { projects: data, isLoading: loading, refreshProjects } = useProjects();
   const [query, setQuery] = useState("");
-  const [data, setData] = useState<ProjectApiResponse[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState<ProjectApiResponse[]>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const { user } = useRoleStore();
@@ -43,31 +43,9 @@ export default function ProjectsTable() {
     year: "",
   });
 
-  // Fetch data for table
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/projects`
-        );
-        setData(res.data.data);
-        setFilteredData(res.data.data);
-      } catch (error) {
-        console.error(`Error fetching projects:`, error);
-        setData([]);
-        setFilteredData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   // Apply filters whenever query or filters change
   useEffect(() => {
-    let result = data;
+    let result = (data as unknown as ProjectApiResponse[]) || [];
     // Apply search filter
     if (query) {
       const lowerQuery = query.toLowerCase();
@@ -132,9 +110,8 @@ export default function ProjectsTable() {
       );
 
       console.log("Deleted successfully:", response.data);
-      // Refresh the table by removing the deleted project
-    setData(prev => prev.filter(p => p.projectId !== projectId));
-    setFilteredData(prev => prev.filter(p => p.projectId !== projectId));
+      // Refresh the table by re-fetching projects from context
+      refreshProjects(true);
     } catch (error) {
       console.error(`Error: ${error}`);
     }

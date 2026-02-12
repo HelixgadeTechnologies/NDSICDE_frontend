@@ -1,6 +1,6 @@
 interface P {
-    name: string;
-    percent: number;
+    name: string | number;
+    percent: string | number;
 }
 
 type PercentProps = {
@@ -14,7 +14,7 @@ export default function Percentage({data}: PercentProps) {
             <span>{p.name}</span>
             <span>{p.percent}%</span>
           </div>
-          <div className="h-2 bg-[var(--primary)] rounded-lg" style={{ width: `${p.percent}%` }}></div>
+          <div className="h-2 bg-(--primary) rounded-lg" style={{ width: `${p.percent}%` }}></div>
         </div>
     ))
 }

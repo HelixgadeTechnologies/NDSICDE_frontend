@@ -12,8 +12,11 @@ type PerformanceAnalyticsReportsState = {
     projects: string;
     PSDFilter: string;
     reportType: string;
+    reportName: string;
+    startDate: string;
+    endDate: string;
     reportConfigurationProjects: string;
-    metricsAndKPIs: string;
+    metricsAndKPIs: string[];
     setField: <K extends keyof PerformanceAnalyticsReportsState>(key: K, value: PerformanceAnalyticsReportsState[K]) => void;
     resetForm: () => void;
 }
@@ -24,8 +27,11 @@ const defaultFormState: Omit<PerformanceAnalyticsReportsState, "setField" | "res
     projects: "",
     PSDFilter: "",
     reportType: "",
+    reportName: "",
+    startDate: "",
+    endDate: "",
     reportConfigurationProjects: "",
-    metricsAndKPIs: "",
+    metricsAndKPIs: [],
 }
 
 export const usePerformanceAnalyticsReportsState = create<PerformanceAnalyticsReportsState>((set) => ({

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider } from "@/context/SidebarContext";
+import { ProjectsProvider } from "@/context/ProjectsContext";
 
 
 const geistSans = Geist({
@@ -40,9 +41,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${inter.className} antialiased`}
       >
+        <ProjectsProvider>
           <SidebarProvider>
             {children}
           </SidebarProvider>
+        </ProjectsProvider>
       </body>
     </html>
   );

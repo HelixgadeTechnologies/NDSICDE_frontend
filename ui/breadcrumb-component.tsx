@@ -68,7 +68,7 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
       <>
         <Button
           onClick={handleAddSO}
-          content="Add New Member"
+          content="Add Strategic Objective"
           icon="si:add-fill"
         />
         {addStrategicObjective && (
@@ -105,19 +105,6 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     //   <Button content="Date Range" icon="stash:data-date-light" />
     // ),
     "/financial-reporting": (
-      <div className="w-107.5 flex items-center gap-4">
-        <DateRangePicker label="Date Range" />
-        <DropDown
-          label="Projects"
-          name="dropdown"
-          options={[]}
-          placeholder="All Projects"
-          value=""
-          onChange={() => {}}
-        />
-      </div>
-    ),
-    "/performance-analytics": (
       <div className="w-107.5 flex items-center gap-4">
         <DateRangePicker label="Date Range" />
         <DropDown

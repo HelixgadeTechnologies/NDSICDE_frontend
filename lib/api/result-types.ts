@@ -14,17 +14,11 @@ export type ResultTypeResponse = {
  * Fetch all result types
  * @returns Promise with result types data
  */
-export const fetchResultTypes = async (): Promise<ResultType[]> => {
-  // const token = getToken();
-  
+export const fetchResultTypes = async (): Promise<ResultType[]> => {  
   try {
     const response = await axios.get<ResultTypeResponse>(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/result_types`,
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   }
+
     );
 
     return response.data.data || [];
