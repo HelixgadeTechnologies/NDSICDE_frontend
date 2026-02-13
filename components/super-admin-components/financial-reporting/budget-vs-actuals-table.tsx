@@ -5,62 +5,45 @@ import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
 import { typeChecker } from "@/utils/ui-utility";
 
-export default function BudgetVSActuals() {
+interface BudgetVSActualsProps {
+  data: {
+    projectId: string;
+    projectName: string;
+    approvedExpenses: number;
+    actualExpenses: number;
+    varianceAmount: number;
+    variancePercentage: number;
+    status: string;
+  }[];
+}
+
+export default function BudgetVSActuals({ data }: BudgetVSActualsProps) {
   const head = [
     "Project Name",
     "Approved Budget",
     "Actual Expenses",
     "Variance Amount",
     "Variance (%)",
-    "Actions",
+    "Status",
   ];
 
-  const data = [
-    {
-      id: 1,
-      projectName: "Digital Transformation",
-      approvedBudget: "350,000",
-      actualExpenses: "320,000",
-      varianceAmount: "30,000",
-      variance: "8.57",
-      status: "Under Budget",
-    },
-    {
-      id: 2,
-      projectName: "Digital Transformation",
-      approvedBudget: "350,000",
-      actualExpenses: "320,000",
-      varianceAmount: "30,000",
-      variance: "8.57",
-      status: "Over Budget",
-    },
-    {
-      id: 3,
-      projectName: "Digital Transformation",
-      approvedBudget: "350,000",
-      actualExpenses: "320,000",
-      varianceAmount: "30,000",
-      variance: "8.57",
-      status: "On Track",
-    },
-  ];
   return (
     <CardComponent>
       <Heading heading="Budget vs. Actuals" />
       <div className="mt-5">
         <Table
           tableHead={head}
-          tableData={data}
+          tableData={data || []}
           checkbox
-          idKey="id"
+          idKey="projectId"
           renderRow={(row) => {
             return (
               <>
                 <td className="px-6">{row.projectName}</td>
-                <td className="px-6">${row.approvedBudget}</td>
-                <td className="px-6">${row.actualExpenses}</td>
-                <td className="px-6">${row.varianceAmount}</td>
-                <td className="px-6">{row.variance}%</td>
+                <td className="px-6">₦{row.approvedExpenses.toLocaleString()}</td>
+                <td className="px-6">₦{row.actualExpenses.toLocaleString()}</td>
+                <td className="px-6">₦{row.varianceAmount.toLocaleString()}</td>
+                <td className="px-6">{row.variancePercentage}%</td>
                 <td className={typeChecker(row)}>{row.status}</td>
               </>
             );
@@ -70,3 +53,4 @@ export default function BudgetVSActuals() {
     </CardComponent>
   );
 }
+

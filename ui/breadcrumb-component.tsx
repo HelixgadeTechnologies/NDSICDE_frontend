@@ -79,13 +79,6 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         )}
       </>
     ),
-    // "/admin/project-management": (
-    //   <Button
-    //     content="New Project"
-    //     icon="si:add-fill"
-    //     href="/admin/project-management/create-project"
-    //   />
-    // ),
     "/user-management": (
       <>
         <Button
@@ -101,22 +94,19 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         )}
       </>
     ),
-    // "/data-validation": (
-    //   <Button content="Date Range" icon="stash:data-date-light" />
+    // "/financial-reporting": (
+    //   <div className="w-107.5 flex items-center gap-4">
+    //     <DateRangePicker label="Date Range" />
+    //     <DropDown
+    //       label="Projects"
+    //       name="dropdown"
+    //       options={[]}
+    //       placeholder="All Projects"
+    //       value=""
+    //       onChange={() => {}}
+    //     />
+    //   </div>
     // ),
-    "/financial-reporting": (
-      <div className="w-107.5 flex items-center gap-4">
-        <DateRangePicker label="Date Range" />
-        <DropDown
-          label="Projects"
-          name="dropdown"
-          options={[]}
-          placeholder="All Projects"
-          value=""
-          onChange={() => {}}
-        />
-      </div>
-    ),
   };
 
   const hiddenRoutes = ["/dashboard/create-project", "/kpi-reporting/new-kpi"];
