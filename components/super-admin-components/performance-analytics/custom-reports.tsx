@@ -51,7 +51,9 @@ export default function CustomReports() {
     startDate,
     endDate,
     setField,
+    resetForm,
   } = usePerformanceAnalyticsReportsState();
+
   const { projectOptions } = useProjects();
   const { user } = useRoleStore();
   const token = getToken();
@@ -88,6 +90,7 @@ export default function CustomReports() {
         }
       );
       toast.success("Report generated successfully");
+      resetForm();
       handleFetchReports();
     } catch (error: any) {
       console.error("Error generating report:", error);
@@ -122,7 +125,10 @@ export default function CustomReports() {
     <section className="flex flex-col md:flex-row gap-4">
       {/* generate report form */}
       <div className="w-full md:w-[30%]">
-        <CardComponent height="380px" className="overflow-y-scroll custom-scrollbar">
+        <CardComponent 
+        // height="380px" 
+        // className="overflow-y-scroll custom-scrollbar"
+        >
           <Heading
             heading="Report Configuration"
             subtitle="Customize your report parameters"

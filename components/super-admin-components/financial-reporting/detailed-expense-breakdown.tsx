@@ -8,21 +8,30 @@ import BarChartComponent from "@/ui/bar-chart";
 import Button from "@/ui/form/button";
 import { Icon } from "@iconify/react";
 
-export default function DetailedExpenseBreakdown() {
+interface DetailedExpenseBreakdownProps {
+  detailedExpenses: {
+    id: string | number;
+    transactionID: string;
+    project: string;
+    date: string;
+    category: string;
+    amount: number;
+    description: string;
+  }[];
+  expenseCategories: { name: string; value: number; [key: string]: unknown }[];
+
+}
+
+export default function DetailedExpenseBreakdown({
+  detailedExpenses,
+  expenseCategories,
+}: DetailedExpenseBreakdownProps) {
   const tabs = [
     { tabName: "Transactions", id: 1 },
     { tabName: "Categories", id: 2 },
   ];
 
   const bars = [{ key: "value", label: "Category", color: "#D2091E" }];
-
-  const barData = [
-    { name: "Personnel", value: 35000 },
-    { name: "Equipment", value: 15000 },
-    { name: "Logistics", value: 50000 },
-    { name: "Software", value: 25000 },
-    { name: "Marketing", value: 35000 },
-  ];
 
   const head = [
     "Transaction ID",
@@ -34,26 +43,6 @@ export default function DetailedExpenseBreakdown() {
     "Receipt",
   ];
 
-  const tableData = [
-    {
-      id: 1,
-      transactionID: "TRX-001",
-      project: "Digital Transformation",
-      date: "May 15, 2023 10:30",
-      category: "Equipment",
-      amount: "12,500",
-      description: "Server hardware purchase",
-    },
-    {
-      id: 2,
-      transactionID: "TRX-001",
-      project: "Digital Transformation",
-      date: "May 15, 2023 10:30",
-      category: "Equipment",
-      amount: "12,500",
-      description: "Server hardware purchase",
-    },
-  ];
   return (
     <>
       <CardComponent>
@@ -66,7 +55,7 @@ export default function DetailedExpenseBreakdown() {
                 return (
                   <Table
                     tableHead={head}
-                    tableData={tableData}
+                    tableData={detailedExpenses || []}
                     checkbox
                     idKey="id"
                     onSelectionChange={(selected) => {
@@ -78,7 +67,7 @@ export default function DetailedExpenseBreakdown() {
                         <td className="px-6">{row.project}</td>
                         <td className="px-6">{row.date}</td>
                         <td className="px-6">{row.category}</td>
-                        <td className="px-6">${row.amount}</td>
+                        <td className="px-6">₦{row.amount.toLocaleString()}</td>
                         <td className="px-6">{row.description}</td>
                         <td className="px-6 cursor-pointer">
                           <Icon
@@ -95,7 +84,7 @@ export default function DetailedExpenseBreakdown() {
                 return (
                   <div className="h-[330px]">
                     <BarChartComponent
-                      data={barData}
+                      data={expenseCategories || []}
                       xKey="name"
                       bars={bars}
                       legend={false}
@@ -113,3 +102,4 @@ export default function DetailedExpenseBreakdown() {
     </>
   );
 }
+

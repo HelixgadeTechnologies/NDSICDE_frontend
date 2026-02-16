@@ -38,7 +38,6 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
     return regex.test(pathname);
   });
 
-
   const { setAddTeamMember, addTeamMember, handleAddUser } =
     useTeamMemberModal();
 
@@ -79,13 +78,6 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         )}
       </>
     ),
-    // "/admin/project-management": (
-    //   <Button
-    //     content="New Project"
-    //     icon="si:add-fill"
-    //     href="/admin/project-management/create-project"
-    //   />
-    // ),
     "/user-management": (
       <>
         <Button
@@ -101,28 +93,26 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         )}
       </>
     ),
-    // "/data-validation": (
-    //   <Button content="Date Range" icon="stash:data-date-light" />
+    // "/financial-reporting": (
+    //   <div className="w-107.5 flex items-center gap-4">
+    //     <DateRangePicker label="Date Range" />
+    //     <DropDown
+    //       label="Projects"
+    //       name="dropdown"
+    //       options={[]}
+    //       placeholder="All Projects"
+    //       value=""
+    //       onChange={() => {}}
+    //     />
+    //   </div>
     // ),
-    "/financial-reporting": (
-      <div className="w-107.5 flex items-center gap-4">
-        <DateRangePicker label="Date Range" />
-        <DropDown
-          label="Projects"
-          name="dropdown"
-          options={[]}
-          placeholder="All Projects"
-          value=""
-          onChange={() => {}}
-        />
-      </div>
-    ),
   };
 
   const hiddenRoutes = ["/dashboard/create-project", "/kpi-reporting/new-kpi"];
 
   return (
-    <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""} no-print`}>
+    <section
+      className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""} no-print`}>
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-base md:text-[22px] text-[#242424]">
           {matched?.header || fallbackTitle}

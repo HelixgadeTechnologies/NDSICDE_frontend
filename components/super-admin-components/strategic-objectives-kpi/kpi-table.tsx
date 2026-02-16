@@ -239,6 +239,7 @@ export default function KPITable() {
           heading="Confirm"
           subtitle="Are you sure you want to delete this KPI? This action is irreversible!"
           onDelete={handleDelete}
+          isDeleting={deleting}
         />
       )}
     </>
