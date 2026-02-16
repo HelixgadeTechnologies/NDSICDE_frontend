@@ -29,11 +29,13 @@ export default function SOTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openLinkedKPI, setOpenLinkedKPI] = useState(false);
-  const [selectedObjectiveForKPIs, setSelectedObjectiveForKPIs] = useState<string>("");
+  const [selectedObjectiveForKPIs, setSelectedObjectiveForKPIs] =
+    useState<string>("");
 
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // State to track which objective is being added to
   const [selectedObjectiveId, setSelectedObjectiveId] = useState<string>("");
@@ -48,31 +50,37 @@ export default function SOTable() {
     if (!itemToDelete) return;
 
     try {
-      // Optimistically update UI
+      setIsDeleting(true);
+
+      // Optimistically update UI so it feels snappy, we'll refetch afterwards
       setData((prev) =>
-        prev.filter((item) => item.strategicObjectiveId !== itemToDelete)
+        prev.filter((item) => item.strategicObjectiveId !== itemToDelete),
       );
-      
+
       // Make DELETE request with proper endpoint and data
       const response = await axios.delete(
-        `/api/strategic-objectivesAndKpi/delete`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/delete`,
         {
           data: {
-            strategicObjectiveId: itemToDelete
+            strategicObjectiveId: itemToDelete,
           },
           headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+            "Content-Type": "application/json",
+          },
+        },
       );
 
       if (response.status !== 200) {
         throw new Error("Delete failed");
       }
-      
-      console.log("Item deleted successfully");
-      setShowDeleteModal(false);
-      setItemToDelete(null);
+
+      // After successful delete, refresh the table from the server
+      try {
+        const objectives = await getStrategicObjectives();
+        setData(objectives);
+      } catch (refetchError) {
+        console.error("Error refetching data after delete:", refetchError);
+      }
     } catch (error: any) {
       // Refetch to ensure we have correct data
       try {
@@ -81,10 +89,14 @@ export default function SOTable() {
       } catch (refetchError) {
         console.error("Error refetching data:", refetchError);
       }
-      
-      const errorMessage = error.response?.data?.message || error.message || "Failed to delete item";
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to delete item";
       console.error("Delete error:", error);
     } finally {
+      setIsDeleting(false);
       setShowDeleteModal(false);
       setItemToDelete(null);
     }
@@ -176,7 +188,7 @@ export default function SOTable() {
         renderRow={(row) => (
           <>
             <td className="px-6 py-4 capitalize">{row.statement || "N/A"}</td>
-            <td 
+            <td
               onClick={() => handleViewLinkedKPIs(row.strategicObjectiveId)}
               className="px-6 py-4 hover:cursor-pointer hover:underline hover:text-(--primary)">
               {row.linkedKpi !== undefined ? row.linkedKpi : 0}
@@ -187,8 +199,8 @@ export default function SOTable() {
                   row.status === "Active"
                     ? "text-green-500"
                     : row.status === "Inactive"
-                    ? "text-red-500"
-                    : "text-yellow-500"
+                      ? "text-red-500"
+                      : "text-yellow-500"
                 }`}>
                 {row.status || "Unknown"}
               </span>
@@ -214,7 +226,9 @@ export default function SOTable() {
                     className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-52.5">
                     <ul className="text-sm">
                       <li
-                        onClick={() => handleAddKPIClick(row.strategicObjectiveId)}
+                        onClick={() =>
+                          handleAddKPIClick(row.strategicObjectiveId)
+                        }
                         className="cursor-pointer hover:bg-gray-50 flex gap-2 p-3 items-center">
                         <Icon
                           icon="fluent:arrow-growth-24-regular"
@@ -232,7 +246,9 @@ export default function SOTable() {
                         Edit
                       </li>
                       <li
-                        onClick={() => handleDeleteClick(row.strategicObjectiveId)}
+                        onClick={() =>
+                          handleDeleteClick(row.strategicObjectiveId)
+                        }
                         className="cursor-pointer hover:bg-red-50 text-red-600 flex gap-2 p-3 items-center">
                         <Icon
                           icon="pixelarticons:trash"
@@ -251,9 +267,9 @@ export default function SOTable() {
       />
 
       {addKPI && (
-        <AddKPIModal 
-          isOpen={addKPI} 
-          onClose={() => setAddKPI(false)} 
+        <AddKPIModal
+          isOpen={addKPI}
+          onClose={() => setAddKPI(false)}
           strategicObjectiveId={selectedObjectiveId}
         />
       )}
@@ -264,6 +280,7 @@ export default function SOTable() {
         heading="Delete Strategic Objective"
         subtitle="Are you sure you want to delete this strategic objective? This action cannot be undone."
         onDelete={handleDeleteConfirm}
+        isDeleting={isDeleting}
       />
 
       {/* Linked KPI modal */}

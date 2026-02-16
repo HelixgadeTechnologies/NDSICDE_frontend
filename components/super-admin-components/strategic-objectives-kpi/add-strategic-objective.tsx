@@ -7,18 +7,20 @@ import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
 import axios from "axios";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { getToken } from "@/lib/api/credentials";
 import { THEMATIC_AREAS } from "@/lib/config/admin-settings";
 
 type AddSOProps = {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit?: () => void;
 };
 
 export default function AddStrategicObjectiveModal({
   isOpen,
   onClose,
+  onSubmit,
 }: AddSOProps) {
   const {
     strategicObjectiveStatement,
@@ -26,6 +28,7 @@ export default function AddStrategicObjectiveModal({
     pillarLeadEmail,
     setField,
   } = useStrategicObjectivesAndKPIsState();
+  const [isSending, setIsSending] = useState(false);
 
   const handleSO = async (e: FormEvent) => {
     e.preventDefault();
@@ -45,7 +48,7 @@ export default function AddStrategicObjectiveModal({
         status: "Active",
       },
     };
-
+    setIsSending(true);
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/strategic-objective`,
@@ -61,6 +64,7 @@ export default function AddStrategicObjectiveModal({
       console.log("Strategic Objective added:", res.data);
 
       onClose();
+      if (onSubmit) onSubmit();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Error details:", {
@@ -70,6 +74,8 @@ export default function AddStrategicObjectiveModal({
         });
       }
       console.error("Error adding Strategic Objective:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -112,7 +118,7 @@ export default function AddStrategicObjectiveModal({
           onChange={(e) => setField("pillarLeadEmail", e.target.value)}
         />
 
-        <Button content="Add Objective" />
+        <Button content="Add Objective" isLoading={isSending} />
       </form>
     </Modal>
   );
