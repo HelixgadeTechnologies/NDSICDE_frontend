@@ -149,7 +149,6 @@ export default function AddKPIModal({
               { label: "Output", value: "Output"},
               { label: "Impact", value: "Impact"},
               { label: "Outcome", value: "Outcome"},
-              { label: "Input", value: "Input"},
             ]}
           />
           <DropDown
@@ -162,11 +161,18 @@ export default function AddKPIModal({
               { label: "Training", value: "Training" },
             ]}
           />
-          <TextInput
+          <DropDown
             name="unitOfMeasure"
             value={formData.unitOfMeasure}
             label="Unit of Measurement"
-            onChange={(e) => handleInputChange("unitOfMeasure", e.target.value)}
+            placeholder="Select Unit"
+            options={[
+              {label: "Number", value: "Number"},
+              {label: "Percentage of", value: "Percentage of"},
+              {label: "Percentage Change", value: "Percentage Change"},
+              {label: "Status of", value: "Status of"},
+            ]}
+            onChange={(value: string) => handleInputChange("unitOfMeasure", value)}
           />
           <DropDown
             name="itemInMeasure"

@@ -10,6 +10,8 @@ import axios from "axios";
 import { getStrategicObjectives } from "@/lib/api/admin-api-calls";
 import DeleteModal from "@/ui/generic-delete-modal";
 import LinkedKPIsModal from "./linked-kpis-modal";
+import { useStrategicObjectivesAndKPIsState } from "@/store/super-admin-store/strategic-objectives-kpi-store";
+import AddStrategicObjectiveModal from "./add-strategic-objective";
 
 type ExpectedData = {
   createAt: string;
@@ -107,13 +109,30 @@ export default function SOTable() {
     setItemToDelete(null);
   };
 
-  const { addKPI, setAddKPI, handleAddKPI } =
-    useStrategicObjectivesAndKPIsModal();
+  const {
+    addKPI,
+    setAddKPI,
+    handleAddKPI,
+    editStrategicObjective,
+    setEditStrategicObjective,
+    handleEditSO,
+  } = useStrategicObjectivesAndKPIsModal();
+
+  const { setField, resetForm } = useStrategicObjectivesAndKPIsState();
 
   // Modified function to handle KPI addition with the objective ID
   const handleAddKPIClick = (objectiveId: string) => {
     setSelectedObjectiveId(objectiveId);
     handleAddKPI(() => setActiveRowId(null));
+  };
+
+  const handleEditClick = (row: ExpectedData) => {
+    setField("strategicObjectiveId", row.strategicObjectiveId);
+    setField("strategicObjectiveStatement", row.statement);
+    setField("thematicAreas", row.thematicAreas);
+    setField("pillarLeadEmail", row.pillarLead);
+    handleEditSO();
+    setActiveRowId(null);
   };
 
   // Handle opening linked KPIs modal
@@ -187,7 +206,7 @@ export default function SOTable() {
         tableData={data}
         renderRow={(row) => (
           <>
-            <td className="px-6 py-4 capitalize">{row.statement || "N/A"}</td>
+            <td className="px-6 py-4 capitalize max-w-125">{row.statement || "N/A"}</td>
             <td
               onClick={() => handleViewLinkedKPIs(row.strategicObjectiveId)}
               className="px-6 py-4 hover:cursor-pointer hover:underline hover:text-(--primary)">
@@ -237,7 +256,9 @@ export default function SOTable() {
                         />
                         Add Organizational KPI
                       </li>
-                      <li className="cursor-pointer hover:bg-gray-50 flex gap-2 border-y border-gray-200 p-3 items-center">
+                      <li
+                        onClick={() => handleEditClick(row)}
+                        className="cursor-pointer hover:bg-gray-50 flex gap-2 border-y border-gray-200 p-3 items-center">
                         <Icon
                           icon="ph:pencil-simple-line"
                           height={20}
@@ -282,6 +303,18 @@ export default function SOTable() {
         onDelete={handleDeleteConfirm}
         isDeleting={isDeleting}
       />
+
+      {editStrategicObjective && (
+        <AddStrategicObjectiveModal
+          mode="Edit"
+          isOpen={editStrategicObjective}
+          onClose={() => {
+            setEditStrategicObjective(false);
+            resetForm();
+          }}
+          onSubmit={() => window.location.reload()}
+        />
+      )}
 
       {/* Linked KPI modal */}
       {openLinkedKPI && (

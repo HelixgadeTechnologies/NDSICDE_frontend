@@ -68,12 +68,12 @@ export default function ManagementStaffDashboardTable() {
           renderRow={(row) => (
             <>
               <td className="px-6">{row.projectName}</td>
-              <td className="px-6">{row.strategicObjective.statement}</td>
+              <td className="px-6">{row.strategicObjective?.statement || "N/A"}</td>
               <td className={managementTypeChecker(row)}>{row.status}</td>
               <td className="px-6">{formatDate(row.startDate, "date-only")}</td>
               <td className="px-6">{formatDate(row.endDate, "date-only")}</td>
               <td className="px-6">
-                {row.teamMember.length === 0
+                {!row.teamMember || row.teamMember.length === 0
                   ? "No team members"
                   : row.teamMember.map((member) => member.fullName).join(", ")}
               </td>

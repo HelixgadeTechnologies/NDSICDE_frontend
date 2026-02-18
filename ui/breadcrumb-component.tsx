@@ -5,11 +5,12 @@ import { breadcrumbs } from "@/lib/config/breadcrumbs";
 import Button from "@/ui/form/button";
 import { useTeamMemberModal } from "@/utils/team-member-utility";
 import AddTeamMember from "@/components/super-admin-components/user-management/add-team-member";
-import DateRangePicker from "./form/date-range";
-import DropDown from "./form/select-dropdown";
+// import DateRangePicker from "./form/date-range";
+// import DropDown from "./form/select-dropdown";
 import { useStrategicObjectivesAndKPIsModal } from "@/utils/strategic-objective-kpi-utility";
 import AddStrategicObjectiveModal from "@/components/super-admin-components/strategic-objectives-kpi/add-strategic-objective";
 import { useRoleStore } from "@/store/role-store";
+import { useStrategicObjectivesAndKPIsState } from "@/store/super-admin-store/strategic-objectives-kpi-store";
 
 type Props = {
   fallbackTitle?: string;
@@ -45,6 +46,8 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
   const { setAddStrategicObjective, addStrategicObjective, handleAddSO } =
     useStrategicObjectivesAndKPIsModal();
 
+  const { resetForm } = useStrategicObjectivesAndKPIsState();
+
   //for handle add team member
   const handleTeamMemberClose = () => {
     setAddTeamMember(false);
@@ -73,8 +76,12 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
         />
         {addStrategicObjective && (
           <AddStrategicObjectiveModal
+            mode="Add"
             isOpen={addStrategicObjective}
-            onClose={() => setAddStrategicObjective(false)}
+            onClose={() => {
+              setAddStrategicObjective(false);
+              resetForm();
+            }}
             onSubmit={() => window.location.reload()}
           />
         )}
