@@ -9,6 +9,8 @@ import Heading from "@/ui/text-heading";
 import Button from "@/ui/form/button";
 import { Icon } from "@iconify/react";
 import { useManagementSettingsState } from "@/store/management-staff-store/settings-store";
+import Image from "next/image";
+import { useRoleStore } from "@/store/role-store";
 
 export default function GeneralSettings() {
   const {
@@ -21,21 +23,27 @@ export default function GeneralSettings() {
     confirmPassword,
     setField,
   } = useManagementSettingsState();
+  const { user } = useRoleStore();
   return (
     <div className="space-y-4">
-      {/* <CardComponent>
+      <CardComponent>
         <p className="text-sm">
           Update your account information and manage your profile
         </p>
         <div className="flex flex-col md:flex-row items-center mt-6 gap-6">
           <div className="flex flex-col justify-center items-center gap-2">
-            <div className="h-[110px] w-[110px] rounded-full bg-[#EAEAEA] p-2 flex justify-center items-center">
-              <Icon
+            <div className="h-[110px] w-[110px] rounded-full bg-[#EAEAEA] p-2 flex justify-center items-center relative">
+              {user?.avatar ? <Image
+              src={user?.avatar}
+              alt="avatar"
+              fill
+              className="rounded-full object-cover"
+              /> : <Icon
                 icon={"radix-icons:avatar"}
                 height={80}
                 width={80}
                 color="#000"
-              />
+              />}
             </div>
             <p className="text-[#D2091E] text-sm font-medium leading-5 whitespace-nowrap">
               Update Profile Picture
@@ -72,7 +80,7 @@ export default function GeneralSettings() {
             />
           </div>
         </div>
-      </CardComponent> */}
+      </CardComponent>
 
       <CardComponent>
         <Heading heading="Change Password" />
