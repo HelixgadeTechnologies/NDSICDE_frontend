@@ -49,7 +49,7 @@ export default function GeneralSettings() {
               Update Profile Picture
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-between items-center w-full">
+          <div className="grid grid-cols-1 md:grid-co ls-2 gap-4 justify-between items-center w-full">
             <TextInput
               name="name"
               value={name}

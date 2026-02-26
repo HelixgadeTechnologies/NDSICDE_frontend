@@ -18,7 +18,7 @@ import { getStrategicObjectives } from "@/lib/api/admin-api-calls";
 import { useProjects } from "@/context/ProjectsContext";
 import { getToken } from "@/lib/api/credentials";
 
-export default function AddNewKPIForm() {
+export default function EditKPIForm({ id }: { id: string }) {
   const router = useRouter();
   const { user } = useRoleStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,24 +33,6 @@ export default function AddNewKPIForm() {
     { label: "Impact", value: "Impact" }
   ]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getStrategicObjectives();
-        const options = data.map((obj: any) => ({
-          label: obj.statement,
-          value: obj.strategicObjectiveId
-        }));
-        setObjectiveOptions(options);
-      } catch (error) {
-        console.error("Error fetching objectives for dropdown: ", error);
-      }
-
-
-    };
-    fetchData();
-  }, []);
-
   const {
     strategicObjective,
     projectId,
@@ -64,6 +46,52 @@ export default function AddNewKPIForm() {
     resetForm,
   } = useKPIReportState();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getStrategicObjectives();
+        const options = data.map((obj: any) => ({
+          label: obj.statement,
+          value: obj.strategicObjectiveId
+        }));
+        setObjectiveOptions(options);
+      } catch (error) {
+        console.error("Error fetching objectives for dropdown: ", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchExistingKPI = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/report/${id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const currentKPI = response.data.data;
+        
+        if (currentKPI) {
+          setField("kpiName", currentKPI.kpiName || "");
+          setField("kpiType", currentKPI.kpiType || "");
+          setField("baseline", currentKPI.baseline?.toString() || "");
+          setField("target", currentKPI.target?.toString() || "");
+          setField("actualValue", currentKPI.actualValue?.toString() || "");
+          setField("narrative", currentKPI.observation || currentKPI.narrative || "");
+          setField("projectId", currentKPI.project?.projectId || currentKPI.projectId || "");
+          setField("strategicObjective", currentKPI.strategicObjective?.strategicObjectiveId || currentKPI.strategicObjectiveId || "");
+          if (currentKPI.evidence) setEvidenceUrl(currentKPI.evidence);
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load KPI details");
+      }
+    };
+    if (id && token) {
+      fetchExistingKPI();
+    }
+  }, [id, token, setField]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -71,8 +99,10 @@ export default function AddNewKPIForm() {
 
     try {
       const payload = {
-        isCreate: true,
+        isCreate: false,
+        kpiReportId: id,
         payload: {
+          kpiReportId: id,
           strategicObjectiveId: strategicObjective,
           projectId,
           userId: user?.id,
@@ -99,12 +129,12 @@ export default function AddNewKPIForm() {
       );
 
       if (response.status === 200 || response.status === 201) {
-        toast.success("KPI Report created successfully!");
+        toast.success("KPI Report updated successfully!");
         resetForm();
         router.push("/kpi-reporting");
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Failed to create KPI Report";
+      const errorMessage = error.response?.data?.message || "Failed to update KPI Report";
       console.error(error);
       toast.error(errorMessage);
     } finally {
@@ -133,7 +163,6 @@ export default function AddNewKPIForm() {
             onChange={(value: string) => setField("strategicObjective", value)}
             options={objectiveOptions}
             isBigger
-            
           />
           <TextInput
             value={kpiName}
@@ -193,7 +222,7 @@ export default function AddNewKPIForm() {
         />
         <div className="w-[290px] mx-auto">
             <Button 
-              content={isSubmitting ? "Submitting..." : "Submit KPI Report"} 
+              content={isSubmitting ? "Submitting..." : "Update KPI Report"} 
               icon="fluent:clipboard-bullet-list-ltr-16-regular" 
               isDisabled={isSubmitting} 
             />
