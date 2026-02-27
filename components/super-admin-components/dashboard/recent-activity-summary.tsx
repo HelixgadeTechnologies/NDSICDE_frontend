@@ -19,7 +19,6 @@ export default function RecentActivityTab() {
       try {
        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/dashboard-overview/recent-activities`);
         setRecentActivities(res.data.data);
-        console.log(res.data.data);
       } catch (error) {
         console.error("Error fetching recent activities:", error);
         setError("Failed to fetch recent activities");
