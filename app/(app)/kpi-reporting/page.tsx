@@ -11,6 +11,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import DeleteModal from "@/ui/generic-delete-modal";
+import EditKPIModal from "./components/edit-kpi-modal";
+import ViewKPIModal from "./components/view-kpi-modal";
 
 type KPIReportType = {
 actualValue: number;
@@ -38,6 +40,11 @@ export default function AssignedKPITable() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [kpiToDelete, setKpiToDelete] = useState<string | null>(null);
+  const [editModal, setEditModal] = useState(false);
+  const [kpiToEdit, setKpiToEdit] = useState<string | null>(null);
+  const [viewModal, setViewModal] = useState(false);
+  const [kpiToView, setKpiToView] = useState<string | null>(null);
+  
   const head = [
     "KPI Name",
     "Type",
@@ -48,22 +55,21 @@ export default function AssignedKPITable() {
     "Actions",
   ];
 
-  useEffect(() => {
-    // fetch data
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/assigned`,
-        );
-        setData(response.data.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/assigned`,
+      );
+      setData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -150,25 +156,29 @@ export default function AssignedKPITable() {
                         transition={{ duration: 0.2, ease: "easeOut" }}
                         className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-40">
                         <ul className="text-sm">
-                          <li className="hover:text-blue-600 border-b border-gray-100 p-3">
-                            <Link
-                              href={`/kpi-reporting/${row.kpiReportId}/view`}
-                              className="flex gap-2 items-center cursor-pointer w-full">
-                              <Icon icon={"hugeicons:view"} height={20} width={20} />
-                              View
-                            </Link>
+                          <li 
+                            onClick={() => {
+                              setKpiToView(row.kpiReportId);
+                              setViewModal(true);
+                              setActiveRowId(null);
+                            }}
+                            className="hover:text-blue-600 border-b border-gray-100 p-3 flex gap-2 items-center cursor-pointer w-full">
+                            <Icon icon={"hugeicons:view"} height={20} width={20} />
+                            View
                           </li>
-                          <li className="hover:text-blue-600 border-b border-gray-100 p-3">
-                            <Link
-                              href={`/kpi-reporting/${row.kpiReportId}/edit`}
-                              className="flex gap-2 items-center cursor-pointer w-full">
-                              <Icon
-                                icon={"ph:pencil-simple-line"}
-                                height={20}
-                                width={20}
-                              />
-                              Edit
-                            </Link>
+                          <li 
+                            onClick={() => {
+                              setKpiToEdit(row.kpiReportId);
+                              setEditModal(true);
+                              setActiveRowId(null);
+                            }}
+                            className="hover:text-blue-600 border-b border-gray-100 p-3 flex gap-2 items-center cursor-pointer w-full">
+                            <Icon
+                              icon={"ph:pencil-simple-line"}
+                              height={20}
+                              width={20}
+                            />
+                            Edit
                           </li>
                           <li
                             onClick={() => {
@@ -206,6 +216,31 @@ export default function AssignedKPITable() {
         subtitle="Are you sure you want to delete this KPI report?"
         isDeleting={isDeleting}
       />
+
+      {editModal && kpiToEdit && (
+        <EditKPIModal
+          isOpen={editModal}
+          onClose={() => {
+            setEditModal(false);
+            setKpiToEdit(null);
+          }}
+          kpiId={kpiToEdit}
+          onEdit={() => {
+            fetchData();
+          }}
+        />
+      )}
+
+      {viewModal && kpiToView && (
+        <ViewKPIModal
+          isOpen={viewModal}
+          onClose={() => {
+            setViewModal(false);
+            setKpiToView(null);
+          }}
+          kpiId={kpiToView}
+        />
+      )}
     </>
   );
 }

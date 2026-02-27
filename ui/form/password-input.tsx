@@ -11,6 +11,7 @@ type PasswordProps = {
   placeholder?: string;
   uppercase?: boolean;
   isBigger?: boolean;
+  isDisabled?: boolean;
 };
 
 export default function PasswordInput({
@@ -20,6 +21,7 @@ export default function PasswordInput({
   name,
   placeholder,
   uppercase = false,
+  isDisabled,
   isBigger = false,
 }: PasswordProps) {
   const [isHidden, setIsHidden] = useState(true);
@@ -44,7 +46,7 @@ export default function PasswordInput({
         placeholder={placeholder}
         className={`${
           isBigger ? "h-12" : "h-10"
-        } w-full outline-none border border-gray-300 focus:border-(--primary-light) rounded-md p-4 text-sm`}
+        } w-full outline-none border border-gray-300 focus:border-(--primary-light) rounded-md p-4 text-sm ${isDisabled ? "cursor-not-allowed text-gray-400" : ""}`}
       />
       <span
         onClick={handlePasswordVisibility}

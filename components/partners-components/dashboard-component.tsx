@@ -12,6 +12,7 @@ import PieChartComponent from "@/ui/pie-chart";
 import LineChartComponent from "@/ui/line-chart";
 import Table from "@/ui/table";
 import { progressTrackingColors, progressTracking } from "@/lib/config/charts";
+import { formatDate } from "@/utils/dates-format-utility";
 
 type ChartData = {
   month: string;
@@ -202,8 +203,8 @@ export default function PartnersDashboardComponent({
             tableData={submissions}
             renderRow={(row) => (
               <>
-                <td className="px-6">{row.kpi || row.strategicObjective?.name || row.title || "N/A"}</td>
-                <td className="px-6">{row.submissionDate || row.createdAt ? new Date(row.submissionDate || row.createdAt).toLocaleString() : "N/A"}</td>
+                <td className="px-6">{row.kpiName || "N/A"}</td>
+                <td className="px-6">{formatDate(row.createdAt)}</td>
                 <td
                     className={`px-6 capitalize ${
                       (row.status || "").toLowerCase() === "approved"

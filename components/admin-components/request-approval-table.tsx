@@ -15,6 +15,7 @@ import {
 } from "@/lib/config/request-approvals-dashboard";
 import DashboardStat from "@/ui/dashboard-stat-card";
 import { Icon } from "@iconify/react";
+import { formatDate } from "@/utils/dates-format-utility";
 
 export default function RequestApprovalsTable({ showStats }: { showStats?: boolean }) {
   const tabs = [
@@ -27,7 +28,7 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
       "Activity Description",
       "Total Budget (₦)",
       "Responsible Person(s)",
-      "Projects",
+      "Project",
       "Start Date",
       "End Date",
       "Status",
@@ -55,7 +56,8 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
             }
           );
           // Assuming response has a 'data' array
-          setData(res.data?.data || []);
+          setData(res.data.data || []);
+          console.log(res.data.data)
         } catch (error) {
           console.error("Failed to fetch requests", error);
         } finally {
@@ -111,14 +113,14 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
             <>
               <td className="px-6 cursor-pointer hover:underline">
                 <Link href={`/request-approvals/requests/${row.id}`}>
-                  {row.description || row.activityDesc || "N/A"}
+                  {row.activityLineDescription || "N/A"}
                 </Link>
               </td>
-              <td className="px-6">{row.totalBudget || "0"}</td>
-              <td className="px-6">{row.responsiblePersons || row.responsiblePerson || "N/A"}</td>
+              <td className="px-6">{row.total || "0"}</td>
+              <td className="px-6">{row.staff || "N/A"}</td>
               <td className="px-6">{row.project || "N/A"}</td>
-              <td className="px-6">{row.startDate || "N/A"}</td>
-              <td className="px-6">{row.endDate || "N/A"}</td>
+              <td className="px-6">{formatDate(row.activityStartDate, "date-only") || "N/A"}</td>
+              <td className="px-6">{formatDate(row.activityEndDate, "date-only") || "N/A"}</td>
               <td
                 className={`px-6 ${
                   row.status === "Pending"
