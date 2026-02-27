@@ -101,7 +101,6 @@ export default function ProjectsTable() {
         }
       );
 
-      console.log("Deleted successfully:", response.data);
       // Refresh the table by re-fetching projects from context
       refreshProjects(true);
     } catch (error) {

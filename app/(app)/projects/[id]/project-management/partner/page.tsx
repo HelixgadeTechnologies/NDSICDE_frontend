@@ -8,13 +8,16 @@ import Table from "@/ui/table";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
-import { ProjectPartnerTypes, DropdownOption } from "@/types/project-management-types";
+import {
+  ProjectPartnerTypes,
+  DropdownOption,
+} from "@/types/project-management-types";
 import { useEntityModal } from "@/utils/project-management-utility";
 import ProjectPartnerModal from "@/components/project-management-components/project-partner-modal";
 import DeleteModal from "@/ui/generic-delete-modal";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
 
 // Define the type for role from API
@@ -56,11 +59,11 @@ export default function ProjectPartner() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      
+
       console.log("Partners API response:", response.data);
-      
+
       // Ensure data is an array
       const partners = response.data?.data || [];
       setData(Array.isArray(partners) ? partners : []);
@@ -83,17 +86,17 @@ export default function ProjectPartner() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      
+
       // Transform the API response to dropdown options
       const transformedRoles: DropdownOption[] = res.data.data.map(
         (role: ApiRole) => ({
           label: role.roleName,
           value: role.roleId,
-        })
+        }),
       );
-      
+
       setRoles(transformedRoles);
     } catch (error) {
       console.error("Error fetching roles:", error);
@@ -120,9 +123,9 @@ export default function ProjectPartner() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      
+
       toast.success("Project partner deleted successfully!");
       fetchProjectPartners();
       setRemovePartner(false);
@@ -221,7 +224,7 @@ export default function ProjectPartner() {
                       color="#909CAD"
                       onClick={() =>
                         setActiveRowId((prev) =>
-                          prev === row.partnerId ? null : row.partnerId
+                          prev === row.partnerId ? null : row.partnerId,
                         )
                       }
                     />
@@ -234,13 +237,13 @@ export default function ProjectPartner() {
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: -10, opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50"
-                      >
+                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
                         <ul className="text-sm">
                           <li
-                            onClick={() => handleEditPartner(row, setActiveRowId)}
-                            className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center"
-                          >
+                            onClick={() =>
+                              handleEditPartner(row, setActiveRowId)
+                            }
+                            className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
                             <Icon
                               icon={"ph:pencil-simple-line"}
                               height={20}
@@ -252,8 +255,7 @@ export default function ProjectPartner() {
                             onClick={() =>
                               handleRemovePartner(row, setActiveRowId)
                             }
-                            className="cursor-pointer hover:text-(--primary-light) flex gap-2 p-3 items-center"
-                          >
+                            className="cursor-pointer hover:text-(--primary-light) flex gap-2 p-3 items-center">
                             <Icon
                               icon={"pixelarticons:trash"}
                               height={20}

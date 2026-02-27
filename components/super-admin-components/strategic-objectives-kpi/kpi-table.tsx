@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { getToken } from "@/lib/api/credentials";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
 import EditKPIModal from "./edit-kpi-form";
 
@@ -44,7 +44,7 @@ export default function KPITable() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [kpiToDelete, setKpiToDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
-  
+
   // Edit modal states
   const [showEditModal, setShowEditModal] = useState(false);
   const [kpiToEdit, setKpiToEdit] = useState<KPI | null>(null);
@@ -55,7 +55,7 @@ export default function KPITable() {
       setLoading(true);
       setError(null);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/kpis`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/kpis`,
       );
       setData(res.data.data);
     } catch (error) {
@@ -86,7 +86,7 @@ export default function KPITable() {
 
   const handleDelete = async () => {
     if (!kpiToDelete) return;
-    
+
     const token = getToken();
     try {
       setDeleting(true);
@@ -98,10 +98,10 @@ export default function KPITable() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       toast.success("Deleted successfully!");
-      
+
       // Refresh the table data
       await fetchData();
     } catch (error) {
@@ -177,7 +177,7 @@ export default function KPITable() {
                   color="#909CAD"
                   onClick={() =>
                     setActiveRowId((prev) =>
-                      prev === row.kpiId ? null : row.kpiId
+                      prev === row.kpiId ? null : row.kpiId,
                     )
                   }
                 />
@@ -191,7 +191,7 @@ export default function KPITable() {
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-52.5">
                     <ul className="text-sm">
-                      <li 
+                      <li
                         onClick={() => handleEditClick(row)}
                         className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
                         <Icon

@@ -10,7 +10,7 @@ import DropDown from "@/ui/form/select-dropdown";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 type AddProps = {
   isOpen: boolean;
@@ -54,9 +54,9 @@ export default function ProjectTeamModal({
   // Initialize form data based on mode
   useEffect(() => {
     if (!isOpen) return; // Only run when modal is open
-    
+
     const projectId = propProjectId || (params?.id as string) || "";
-    
+
     if (mode === "update" && initialData) {
       setFormData({
         teamMemberId: initialData.teamMemberId || "",
@@ -85,12 +85,15 @@ export default function ProjectTeamModal({
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
-        
-        console.log("Team members response:", response.data);
-        
-        if (response.data && response.data.data && Array.isArray(response.data.data)) {
+
+
+        if (
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data)
+        ) {
           setTeam(response.data.data);
 
           // Format team data for dropdown
@@ -100,13 +103,13 @@ export default function ProjectTeamModal({
               label: member.email,
               value: member.email,
             }));
-          
+
           // Add a default option
           const optionsWithDefault = [
             { label: "Select a team member", value: "" },
             ...formattedOptions,
           ];
-          
+
           setTeamOptions(optionsWithDefault);
         }
       } catch (error) {
@@ -114,7 +117,7 @@ export default function ProjectTeamModal({
         toast.error("Failed to load team members");
       }
     };
-    
+
     if (isOpen && mode === "create") {
       getTeamMembers();
     }
@@ -147,9 +150,8 @@ export default function ProjectTeamModal({
         projectId: formData.projectId,
       },
     };
-    
-    console.log("Submitting payload:", payload);
-    
+
+
     setIsSubmitting(true);
 
     try {
@@ -162,26 +164,32 @@ export default function ProjectTeamModal({
         },
       });
 
-      console.log("Response:", response.data);
-      
+
       toast.success(
-        `Team member ${mode === "create" ? "added" : "updated"} successfully!`
+        `Team member ${mode === "create" ? "added" : "updated"} successfully!`,
       );
-      
+
       onClose();
       setSuccessModal(true);
-      
+
       if (onSuccess) {
         onSuccess();
       }
     } catch (error: any) {
-      console.error(`Error ${mode === "create" ? "submitting" : "updating"}:`, error);
-      
+      console.error(
+        `Error ${mode === "create" ? "submitting" : "updating"}:`,
+        error,
+      );
+
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || error.message;
-        toast.error(`Failed to ${mode === "create" ? "add" : "update"} team member: ${errorMessage}`);
+        toast.error(
+          `Failed to ${mode === "create" ? "add" : "update"} team member: ${errorMessage}`,
+        );
       } else {
-        toast.error(`Failed to ${mode === "create" ? "add" : "update"} team member`);
+        toast.error(
+          `Failed to ${mode === "create" ? "add" : "update"} team member`,
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -190,8 +198,8 @@ export default function ProjectTeamModal({
 
   // Handle dropdown changes - KEPT THE SAME
   const handleSelectChange = (name: string, value: string) => {
-    console.log(`Dropdown ${name} changed to:`, value);
-    
+
+
     // Special handling for email selection
     if (name === "email" && team && Array.isArray(team)) {
       const selectedMember = team.find((member: any) => member.email === value);
@@ -239,7 +247,9 @@ export default function ProjectTeamModal({
         <div className="space-y-6">
           {mode === "update" ? (
             <div>
-              <label className="block text-sm font-medium mb-2">Email Address</label>
+              <label className="block text-sm font-medium mb-2">
+                Email Address
+              </label>
               <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">
                 {formData.email}
               </div>
@@ -292,10 +302,7 @@ export default function ProjectTeamModal({
         />
 
         <div className="mt-4 flex justify-end gap-2">
-          <Button
-            content="Close"
-            onClick={handleSuccessClose}
-          />
+          <Button content="Close" onClick={handleSuccessClose} />
         </div>
       </Modal>
     </>

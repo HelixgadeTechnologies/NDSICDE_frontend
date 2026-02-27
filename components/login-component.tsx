@@ -9,16 +9,16 @@ import Button from "@/ui/form/button";
 import { useRoleStore, UserRole } from "@/store/role-store";
 import { useRouter } from "next/navigation";
 import { apiLogin, decodeJWT } from "@/lib/api/auth";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 // Map role names from API to your UserRole type
 function mapRoleNameToUserRole(roleName: string): UserRole {
   const roleMap: Record<string, UserRole> = {
     "SUPER ADMIN": "super-admin",
-    "ADMIN": "admin",
-    "PARTNERS": "partners",
-    "PARTNER": "partners",
-    "MANAGEMENT": "management",
+    ADMIN: "admin",
+    PARTNERS: "partners",
+    PARTNER: "partners",
+    MANAGEMENT: "management",
     "MANAGEMENT & STAFF": "management",
     "RETIREMENT MANAGER": "r-managers",
     "R-MANAGER": "r-managers",
@@ -110,11 +110,10 @@ export default function Login() {
 
       // Login the user with both user object and token
       login(user, token);
-      
+
       sessionStorage.setItem("isAuthenticated", JSON.stringify(true));
       sessionStorage.setItem("user", JSON.stringify(user));
       sessionStorage.setItem("token", token);
-    
 
       // Redirect to dashboard
       // const redirectPath = getDefaultRouteForRole(mappedRole);
@@ -125,7 +124,7 @@ export default function Login() {
       toast.error(`Error: ${error.message}`);
       setError(
         error?.message ||
-          "Login failed. Please check your credentials and try again."
+          "Login failed. Please check your credentials and try again.",
       );
     } finally {
       setIsLoading(false);
@@ -174,8 +173,7 @@ export default function Login() {
           />
           <Link
             href={"/reset-password"}
-            className="primary hidden md:block text-sm font-medium hover:underline whitespace-nowrap"
-          >
+            className="primary hidden md:block text-sm font-medium hover:underline whitespace-nowrap">
             Forgot Password?
           </Link>
         </div>
@@ -191,8 +189,7 @@ export default function Login() {
 
         <Link
           href={"/reset-password"}
-          className="primary block md:hidden text-xs font-medium hover:underline whitespace-nowrap text-center"
-        >
+          className="primary block md:hidden text-xs font-medium hover:underline whitespace-nowrap text-center">
           Forgot Password?
         </Link>
       </form>

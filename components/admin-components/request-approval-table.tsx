@@ -7,13 +7,15 @@ import Table from "@/ui/table";
 import DateRangePicker from "@/ui/form/date-range";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   activity_financial_request,
   activity_financial_retirement,
 } from "@/lib/config/request-approvals-dashboard";
 import DashboardStat from "@/ui/dashboard-stat-card";
 import { Icon } from "@iconify/react";
+import { formatDate } from "@/utils/dates-format-utility";
 
 export default function RequestApprovalsTable({ showStats }: { showStats?: boolean }) {
   const tabs = [
@@ -21,44 +23,83 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
     { tabName: "Activity Financial Retirement", id: 2 },
   ];
 
-  const [data, setData] = useState<any>([])
-
   function ActivityFinancialRequestTable() {
     const activityFinancialRequestHead = [
       "Activity Description",
       "Total Budget (₦)",
       "Responsible Person(s)",
-      "Projects",
+      "Project",
       "Start Date",
       "End Date",
       "Status",
     ];
 
+    const [data, setData] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("");
+    const [project, setProject] = useState("");
+
+    useEffect(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list`,
+            {
+              params: {
+                type: "request",
+                search: search || undefined,
+                status: status === "All" ? undefined : (status || undefined),
+                projectId: project || undefined,
+              },
+            }
+          );
+          setData(res.data.data);
+          console.log(res.data.data)
+        } catch (error) {
+          console.error("Failed to fetch requests", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const debounceId = setTimeout(() => {
+        fetchData();
+      }, 500);
+
+      return () => clearTimeout(debounceId);
+    }, [search, status, project]);
 
     return (
       <div className="space-y-5">
         <div className="w-full flex items-end justify-end gap-4">
           <SearchInput
-            value=""
+            value={search}
             name="search"
-            onChange={() => {}}
+            onChange={(e: any) => setSearch(e.target.value)}
             placeholder="Search Request"
           />
           <DropDown
-            value=""
+            value={status}
             name="status"
             placeholder="All Status"
             label="Status"
-            onChange={() => {}}
-            options={[]}
+            onChange={(e: any) => setStatus(e.target.value)}
+            options={[
+              { label: "All", value: "All" },
+              { label: "Pending", value: "Pending" },
+              { label: "Approved", value: "Approved" },
+              { label: "Rejected", value: "Rejected" },
+            ]}
           />
           <DropDown
-            value=""
+            value={project}
             name="project"
             placeholder="All Projects"
             label="Project"
-            onChange={() => {}}
-            options={[]}
+            onChange={(e: any) => setProject(e.target.value)}
+            options={[]} // Add project options if available
           />
           <DateRangePicker label="Date" />
         </div>
@@ -68,29 +109,28 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
           checkbox
           idKey={"id"}
           renderRow={(row) => (
-            // <>
-            //   <td className="px-6 cursor-pointer hover:underline">
-            //     <Link href={`/request-approvals/requests/${row.id}`}>
-            //       {row.description}
-            //     </Link>
-            //   </td>
-            //   <td className="px-6">{row.totalBudget}</td>
-            //   <td className="px-6">{row.responsiblePersons}</td>
-            //   <td className="px-6">{row.project}</td>
-            //   <td className="px-6">{row.startDate}</td>
-            //   <td className="px-6">{row.endDate}</td>
-            //   <td
-            //     className={`px-6 ${
-            //       row.status === "Pending"
-            //         ? "text-yellow-500"
-            //         : row.status === "Approved"
-            //         ? "text-green-500"
-            //         : "text-red-500"
-            //     }`}>
-            //     {row.status}
-            //   </td>
-            // </>
-            <></>
+            <>
+              <td className="px-6 cursor-pointer hover:underline">
+                <Link href={`/request-approvals/requests/${row.id}`}>
+                  {row.activityLineDescription || "N/A"}
+                </Link>
+              </td>
+              <td className="px-6">{row.total || "0"}</td>
+              <td className="px-6">{row.staff || "N/A"}</td>
+              <td className="px-6">{row.project || "N/A"}</td>
+              <td className="px-6">{formatDate(row.activityStartDate, "date-only") || "N/A"}</td>
+              <td className="px-6">{formatDate(row.activityEndDate, "date-only") || "N/A"}</td>
+              <td
+                className={`px-6 ${
+                  row.status === "Pending"
+                    ? "text-yellow-500"
+                    : row.status === "Approved"
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}>
+                {row.status || "N/A"}
+              </td>
+            </>
           )}
         />
       </div>
@@ -109,32 +149,72 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
       "Actions",
     ];
 
-    const [data, setData] = useState<any>([])
+    const [data, setData] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("");
+    const [project, setProject] = useState("");
+
+    useEffect(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list`,
+            {
+              params: {
+                type: "retirement",
+                search: search || undefined,
+                status: status === "All" ? undefined : (status || undefined),
+                projectId: project || undefined,
+              },
+            }
+          );
+          setData(res.data?.data);
+          console.log(res.data.data)
+        } catch (error) {
+          console.error("Failed to fetch retirements", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const debounceId = setTimeout(() => {
+        fetchData();
+      }, 500);
+
+      return () => clearTimeout(debounceId);
+    }, [search, status, project]);
 
     return (
       <div className="space-y-5">
         <div className="w-full flex items-end justify-end gap-4">
           <SearchInput
-            value=""
+            value={search}
             name="search"
-            onChange={() => {}}
+            onChange={(e: any) => setSearch(e.target.value)}
             placeholder="Search Request"
           />
           <DropDown
-            value=""
+            value={status}
             name="status"
             placeholder="All Status"
             label="Status"
-            onChange={() => {}}
-            options={[]}
+            onChange={(e: any) => setStatus(e.target.value)}
+            options={[
+              { label: "All", value: "All" },
+              { label: "Pending", value: "Pending" },
+              { label: "Approved", value: "Approved" },
+              { label: "Rejected", value: "Rejected" },
+            ]}
           />
           <DropDown
-            value=""
+            value={project}
             name="project"
             placeholder="All Projects"
             label="Project"
-            onChange={() => {}}
-            options={[]}
+            onChange={(e: any) => setProject(e.target.value)}
+            options={[]} // Add project options if available
           />
           <SearchInput
             value=""
@@ -150,27 +230,28 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
           checkbox
           idKey={"id"}
           renderRow={(row) => (
-            // <>
-            //   <td className="px-6">
-            //     <Link href={`/request-approvals/retirement/${row.id}`} className="hover:underline">{row.lineItemDesc}</Link>
-            //   </td>
-            //   <td className="px-6">{row.quantity}</td> 
-            //   <td className="px-6">{row.frequency}</td>
-            //   <td className="px-6">{row.unit_cost}</td>
-            //   <td className="px-6">{row.total_budget}</td>
-            //   <td className="px-6">{row.actual_cost}</td>
-            //   <td className="px-6">{row.variance}</td>
-            //   <td className="px-6 relative">
-            //     <Icon
-            //       icon={"uiw:more"}
-            //       width={22}
-            //       height={22}
-            //       className="cursor-pointer"
-            //       color="#909CAD"              
-            //        />
-            //   </td>
-            // </>
-            <></>
+            <>
+              <td className="px-6">
+                <Link href={`/request-approvals/retirement/${row.id}`} className="hover:underline">
+                  {row.lineItemDesc || row.description || "N/A"}
+                </Link>
+              </td>
+              <td className="px-6">{row.quantity || "0"}</td> 
+              <td className="px-6">{row.frequency || "0"}</td>
+              <td className="px-6">{row.unit_cost || row.unitCost || "0"}</td>
+              <td className="px-6">{row.total_budget || row.totalBudget || "0"}</td>
+              <td className="px-6">{row.actual_cost || row.actualCost || "0"}</td>
+              <td className="px-6">{row.variance || "0"}</td>
+              <td className="px-6 relative">
+                <Icon
+                  icon={"uiw:more"}
+                  width={22}
+                  height={22}
+                  className="cursor-pointer"
+                  color="#909CAD"              
+                   />
+              </td>
+            </>
           )}
         />
         <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
@@ -181,6 +262,7 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
       </div>
     );
   }
+
   const [activeTab, setActiveTab] = useState(1);
 
   return (

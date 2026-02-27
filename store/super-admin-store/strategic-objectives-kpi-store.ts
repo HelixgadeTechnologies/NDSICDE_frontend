@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 type StrategicObjectivesAndKPIsState = {
     // add SO
+    strategicObjectiveId: string;
     strategicObjectiveStatement: string;
     thematicAreas: string;
     pillarLeadEmail: string;
@@ -18,7 +19,8 @@ type StrategicObjectivesAndKPIsState = {
     resetForm: () => void;
 }
 
-const defaultFormState: Omit<StrategicObjectivesAndKPIsState, "setField" | "resetForm" | "toggleCheckbox" | "setAllCheckboxes"> = {
+const defaultFormState: Omit<StrategicObjectivesAndKPIsState, "setField" | "resetForm"> = {
+    strategicObjectiveId: "",
     strategicObjectiveStatement: "",
     thematicAreas: "",
     pillarLeadEmail: "",

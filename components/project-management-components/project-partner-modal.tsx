@@ -11,7 +11,7 @@ import TextInput from "@/ui/form/text-input";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 type AddProps = {
   isOpen: boolean;
@@ -41,7 +41,7 @@ export default function ProjectPartnerModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailOptions, setEmailOptions] = useState<DropdownOption[]>([]);
   const [isLoadingEmails, setIsLoadingEmails] = useState(false);
-  
+
   const token = getToken();
   const params = useParams();
 
@@ -51,14 +51,14 @@ export default function ProjectPartnerModal({
     organizationName: "",
     email: "",
     roleId: "",
-    projectId: ""
+    projectId: "",
   });
 
   // Initialize form when modal opens
   useEffect(() => {
     if (isOpen) {
       const projectId = propProjectId || (params?.id as string) || "";
-      
+
       if (mode === "update" && initialData) {
         // Pre-fill form with existing data
         setFormData({
@@ -97,10 +97,9 @@ export default function ProjectPartnerModal({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
-      console.log("Email options response:", response.data);
 
       // Extract data based on API response structure
       let usersData = [];
@@ -114,10 +113,12 @@ export default function ProjectPartnerModal({
 
       // Transform for dropdown - filter users with email
       const validUsers = usersData.filter((user: any) => user.email);
-      const formattedOptions: DropdownOption[] = validUsers.map((user: any) => ({
-        label: user.email,
-        value: user.email,
-      }));
+      const formattedOptions: DropdownOption[] = validUsers.map(
+        (user: any) => ({
+          label: user.email,
+          value: user.email,
+        }),
+      );
 
       // Add default option
       const optionsWithDefault = [
@@ -181,7 +182,10 @@ export default function ProjectPartnerModal({
       const payload = {
         isCreate: mode === "create",
         data: {
-          partnerId: mode === "update" ? initialData?.partnerId || formData.partnerId : "",
+          partnerId:
+            mode === "update"
+              ? initialData?.partnerId || formData.partnerId
+              : "",
           organizationName: formData.organizationName,
           email: formData.email,
           roleId: formData.roleId,
@@ -189,7 +193,10 @@ export default function ProjectPartnerModal({
         },
       };
 
-      console.log("Submitting partner payload:", JSON.stringify(payload, null, 2));
+      console.log(
+        "Submitting partner payload:",
+        JSON.stringify(payload, null, 2),
+      );
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/partner`,
@@ -199,13 +206,12 @@ export default function ProjectPartnerModal({
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
-      console.log("API Response:", response.data);
 
       toast.success(
-        `Project partner ${mode === "create" ? "added" : "updated"} successfully!`
+        `Project partner ${mode === "create" ? "added" : "updated"} successfully!`,
       );
 
       // Reset form and close modal
@@ -239,10 +245,12 @@ export default function ProjectPartnerModal({
           error.response?.data?.message ||
           error.response?.data?.error ||
           error.message;
-        toast.error(`Failed to ${mode === "create" ? "add" : "update"}: ${errorMessage}`);
+        toast.error(
+          `Failed to ${mode === "create" ? "add" : "update"}: ${errorMessage}`,
+        );
       } else {
         toast.error(
-          `Failed to ${mode === "create" ? "add" : "update"} project partner`
+          `Failed to ${mode === "create" ? "add" : "update"} project partner`,
         );
       }
     } finally {
@@ -258,17 +266,16 @@ export default function ProjectPartnerModal({
     setSuccessModal(false);
   };
 
-  const modalTitle = mode === "create" 
-    ? "Add Project Partner" 
-    : "Edit Project Partner";
-  
-  const buttonText = mode === "create" 
-    ? "Add Project Partner" 
-    : "Update Project Partner";
-  
-  const successMessage = mode === "create"
-    ? "Partner added successfully"
-    : "Partner updated successfully";
+  const modalTitle =
+    mode === "create" ? "Add Project Partner" : "Edit Project Partner";
+
+  const buttonText =
+    mode === "create" ? "Add Project Partner" : "Update Project Partner";
+
+  const successMessage =
+    mode === "create"
+      ? "Partner added successfully"
+      : "Partner updated successfully";
 
   return (
     <>
@@ -287,7 +294,9 @@ export default function ProjectPartnerModal({
           <DropDown
             name="email"
             label="Contact Person Email Address"
-            placeholder={isLoadingEmails ? "Loading emails..." : "Select email address"}
+            placeholder={
+              isLoadingEmails ? "Loading emails..." : "Select email address"
+            }
             options={emailOptions}
             value={formData.email}
             onChange={(value) => handleDropdownChange("email", value)}
@@ -322,7 +331,10 @@ export default function ProjectPartnerModal({
       </Modal>
 
       {/* Success Modal */}
-      <Modal isOpen={successModal} onClose={handleSuccessClose} maxWidth="400px">
+      <Modal
+        isOpen={successModal}
+        onClose={handleSuccessClose}
+        maxWidth="400px">
         <div className="flex justify-center text-green-500 mb-4">
           <Icon icon="simple-line-icons:check" width={64} height={64} />
         </div>
@@ -332,10 +344,7 @@ export default function ProjectPartnerModal({
           className="text-center"
         />
         <div className="mt-6 flex justify-center">
-          <Button
-            content="Close"
-            onClick={handleSuccessClose}
-          />
+          <Button content="Close" onClick={handleSuccessClose} />
         </div>
       </Modal>
     </>

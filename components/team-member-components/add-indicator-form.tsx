@@ -13,15 +13,21 @@ import TagInput from "@/ui/form/tag-input";
 import Button from "@/ui/form/button";
 import { indicatorApi } from "@/lib/api/indicatorApi";
 import { IndicatorFormData } from "@/types/indicator";
-import { fetchResultTypes, transformResultTypesToOptions, ResultType } from "@/lib/api/result-types";
-import toast from "react-hot-toast";
+import {
+  fetchResultTypes,
+  transformResultTypesToOptions,
+  ResultType,
+} from "@/lib/api/result-types";
+import { toast } from "react-toastify";
 
 export default function AddIndicatorForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
-  const [resultTypeOptions, setResultTypeOptions] = useState<Array<{ label: string; value: string }>>([]);
-  
+  const [resultTypeOptions, setResultTypeOptions] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
+
   const [formData, setFormData] = useState<IndicatorFormData>({
     indicatorId: "",
     indicatorSource: "",
@@ -52,14 +58,14 @@ export default function AddIndicatorForm() {
       try {
         const results = await fetchResultTypes();
         setResultTypes(results);
-        
+
         // Transform to dropdown options
         const options = transformResultTypesToOptions(results);
         setResultTypeOptions(options);
-        
+
         // Optionally preselect the first result type if none is selected
         if (results.length > 0 && !formData.resultTypeId) {
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             result: results[0].resultName,
             resultTypeId: results[0].resultTypeId,
@@ -77,39 +83,45 @@ export default function AddIndicatorForm() {
 
   // Handle indicator source change
   const handleIndicatorSourceChange = (data: IndicatorSourceData) => {
-  // console.log("Indicator source data received:", data);
-  
-  setFormData(prev => ({
-    ...prev,
-    indicatorSource: data.indicatorSource,
-    thematicAreasOrPillar: data.thematicAreasOrPillar || "",
-    statement: data.statement || "",
-  }));
-};
+
+
+    setFormData((prev) => ({
+      ...prev,
+      indicatorSource: data.indicatorSource,
+      thematicAreasOrPillar: data.thematicAreasOrPillar || "",
+      statement: data.statement || "",
+    }));
+  };
 
   // Handle general form field changes
-  const handleInputChange = (field: keyof IndicatorFormData, value: string | number | string[]) => {
-    setFormData(prev => ({
+  const handleInputChange = (
+    field: keyof IndicatorFormData,
+    value: string | number | string[],
+  ) => {
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
   // Handle dropdown changes
-  const handleDropdownChange = (field: keyof IndicatorFormData) => (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  const handleDropdownChange =
+    (field: keyof IndicatorFormData) => (value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    };
 
   // Handle result type selection
   const handleResultTypeChange = (resultTypeId: string) => {
     // Find the selected result type
-    const selectedResultType = resultTypes.find(type => type.resultTypeId === resultTypeId);
-    
+    const selectedResultType = resultTypes.find(
+      (type) => type.resultTypeId === resultTypeId,
+    );
+
     if (selectedResultType) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         result: selectedResultType.resultName,
         resultTypeId: selectedResultType.resultTypeId,
@@ -119,7 +131,7 @@ export default function AddIndicatorForm() {
 
   // Handle disaggregation change
   const handleDisaggregationChange = (id: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       disaggregationId: id,
     }));
@@ -129,17 +141,18 @@ export default function AddIndicatorForm() {
   const preparePayload = () => {
     // Convert string values to numbers for cumulative fields
     const cumulativeValue = parseFloat(formData.cumulativeValue as string) || 0;
-    const cumulativeTarget = parseFloat(formData.cumulativeTarget as string) || 0;
-    
+    const cumulativeTarget =
+      parseFloat(formData.cumulativeTarget as string) || 0;
+
     // Format dates to ISO string
-    const baseLineDate = formData.baseLineDate 
-      ? new Date(formData.baseLineDate).toISOString() 
+    const baseLineDate = formData.baseLineDate
+      ? new Date(formData.baseLineDate).toISOString()
       : "";
-    
-    const targetDate = formData.targetDate 
-      ? new Date(formData.targetDate).toISOString() 
+
+    const targetDate = formData.targetDate
+      ? new Date(formData.targetDate).toISOString()
       : "";
-    
+
     const payload = {
       isCreate: true,
       data: {
@@ -165,7 +178,7 @@ export default function AddIndicatorForm() {
         resultTypeId: formData.resultTypeId,
       },
     };
-    
+
     return payload;
   };
 
@@ -183,14 +196,14 @@ export default function AddIndicatorForm() {
       }
 
       const payload = preparePayload();
-      console.log("Submitting payload:", payload);
-      
+
+
       const response = await indicatorApi.createIndicator(payload);
-      console.log("Indicator created successfully:", response);
-      
+
+
       // Reset form or show success message
       toast.success("Indicator added successfully!");
-      
+
       // Reset form (but keep result types loaded)
       setFormData({
         indicatorId: "",
@@ -214,7 +227,6 @@ export default function AddIndicatorForm() {
         result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
       });
-      
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Failed to add indicator. Please try again.");
@@ -225,7 +237,11 @@ export default function AddIndicatorForm() {
 
   // Handle cancel
   const handleCancel = () => {
-    if (window.confirm("Are you sure you want to cancel? All changes will be lost.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to cancel? All changes will be lost.",
+      )
+    ) {
       // Reset form but keep the first result type selected if available
       setFormData({
         indicatorId: "",
@@ -249,12 +265,14 @@ export default function AddIndicatorForm() {
         result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
       });
-      console.log("Form cancelled");
+
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 my-8 max-w-4xl mx-auto p-6">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 my-8 max-w-4xl mx-auto p-6">
       {/* indicator source */}
       <IndicatorSourceSelector
         onChange={handleIndicatorSourceChange}
@@ -267,7 +285,11 @@ export default function AddIndicatorForm() {
           label="Result Type"
           value={formData.resultTypeId}
           name="resultTypeId"
-          placeholder={isLoadingResults ? "Loading result types..." : "Select a result type"}
+          placeholder={
+            isLoadingResults
+              ? "Loading result types..."
+              : "Select a result type"
+          }
           onChange={handleResultTypeChange}
           options={resultTypeOptions}
           isBigger
@@ -285,10 +307,8 @@ export default function AddIndicatorForm() {
         value={formData.linkKpiToSdnOrgKpi}
         name="linkKpiToSdnOrgKpi"
         placeholder="---"
-        onChange={handleDropdownChange('linkKpiToSdnOrgKpi')}
-        options={[
-          {label: "KPI-001", value: "KPI-001"}
-        ]}
+        onChange={handleDropdownChange("linkKpiToSdnOrgKpi")}
+        options={[{ label: "KPI-001", value: "KPI-001" }]}
         isBigger
       />
 
@@ -298,7 +318,7 @@ export default function AddIndicatorForm() {
         value={formData.definition}
         name="definition"
         placeholder="---"
-        onChange={(e) => handleInputChange('definition', e.target.value)}
+        onChange={(e) => handleInputChange("definition", e.target.value)}
         isBigger
       />
 
@@ -318,10 +338,8 @@ export default function AddIndicatorForm() {
         value={formData.unitOfMeasure}
         name="unitOfMeasure"
         placeholder="---"
-        onChange={handleDropdownChange('unitOfMeasure')}
-        options={[
-          {label: "Percentage", value: "Percentage"}
-        ]}
+        onChange={handleDropdownChange("unitOfMeasure")}
+        options={[{ label: "Percentage", value: "Percentage" }]}
         isBigger
       />
 
@@ -331,30 +349,28 @@ export default function AddIndicatorForm() {
         value={formData.itemInMeasure}
         name="itemInMeasure"
         placeholder="---"
-        onChange={(e) => handleInputChange('itemInMeasure', e.target.value)}
+        onChange={(e) => handleInputChange("itemInMeasure", e.target.value)}
         isBigger
       />
 
       {/* checkboxes */}
-      <DisaggregationComponent
-        onChange={handleDisaggregationChange}
-      />
+      <DisaggregationComponent onChange={handleDisaggregationChange} />
 
       {/* baseline */}
       <div className="space-y-1 rounded-lg">
         <p className="text-gray-900 text-sm font-medium mb-3">Baseline</p>
-        
+
         {/* baseline date */}
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Baseline Date</p>
           <div className="w-2/3">
             <DateInput
               value={formData.baseLineDate}
-              onChange={(value) => handleInputChange('baseLineDate', value)}
+              onChange={(value) => handleInputChange("baseLineDate", value)}
             />
           </div>
         </div>
-        
+
         {/* cumulative value */}
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Cumulative Value</p>
@@ -363,11 +379,13 @@ export default function AddIndicatorForm() {
               placeholder="200"
               value={formData.cumulativeValue}
               name="cumulativeValue"
-              onChange={(e) => handleInputChange('cumulativeValue', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("cumulativeValue", e.target.value)
+              }
             />
           </div>
         </div>
-        
+
         {/* baseline narrative */}
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium w-1/3">Baseline Narrative</p>
@@ -376,7 +394,9 @@ export default function AddIndicatorForm() {
               placeholder="---"
               value={formData.baselineNarrative}
               name="baselineNarrative"
-              onChange={(e) => handleInputChange('baselineNarrative', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("baselineNarrative", e.target.value)
+              }
             />
           </div>
         </div>
@@ -385,18 +405,18 @@ export default function AddIndicatorForm() {
       {/* target section */}
       <div className="space-y-1 rounded-lg">
         <p className="text-gray-900 text-sm font-medium mb-3">Target</p>
-        
+
         {/* target date */}
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Target Date</p>
           <div className="w-2/3">
             <DateInput
               value={formData.targetDate}
-              onChange={(value) => handleInputChange('targetDate', value)}
+              onChange={(value) => handleInputChange("targetDate", value)}
             />
           </div>
         </div>
-        
+
         {/* cumulative target */}
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Cumulative Target</p>
@@ -405,11 +425,13 @@ export default function AddIndicatorForm() {
               placeholder="200"
               value={formData.cumulativeTarget}
               name="cumulativeTarget"
-              onChange={(e) => handleInputChange('cumulativeTarget', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("cumulativeTarget", e.target.value)
+              }
             />
           </div>
         </div>
-        
+
         {/* target narrative */}
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium w-1/3">Target Narrative</p>
@@ -418,7 +440,9 @@ export default function AddIndicatorForm() {
               placeholder="---"
               value={formData.targetNarrative}
               name="targetNarrative"
-              onChange={(e) => handleInputChange('targetNarrative', e.target.value)}
+              onChange={(e) =>
+                handleInputChange("targetNarrative", e.target.value)
+              }
             />
           </div>
         </div>
@@ -433,14 +457,14 @@ export default function AddIndicatorForm() {
             value="cumulative"
             name="targetType"
             is_checked={formData.targetType === "cumulative"}
-            onChange={() => handleInputChange('targetType', 'cumulative')}
+            onChange={() => handleInputChange("targetType", "cumulative")}
           />
           <RadioInput
             label="Periodic"
             value="periodic"
             name="targetType"
             is_checked={formData.targetType === "periodic"}
-            onChange={() => handleInputChange('targetType', 'periodic')}
+            onChange={() => handleInputChange("targetType", "periodic")}
           />
         </div>
       </div>
@@ -448,7 +472,7 @@ export default function AddIndicatorForm() {
       <TagInput
         label="Responsible Person(s)"
         value={formData.responsiblePersons}
-        onChange={(persons) => handleInputChange('responsiblePersons', persons)}
+        onChange={(persons) => handleInputChange("responsiblePersons", persons)}
       />
 
       {/* buttons */}
@@ -463,7 +487,9 @@ export default function AddIndicatorForm() {
         <Button
           type="submit"
           content={isSubmitting ? "Adding..." : "Add"}
-          isDisabled={isSubmitting || isLoadingResults || !formData.resultTypeId}
+          isDisabled={
+            isSubmitting || isLoadingResults || !formData.resultTypeId
+          }
         />
       </div>
 

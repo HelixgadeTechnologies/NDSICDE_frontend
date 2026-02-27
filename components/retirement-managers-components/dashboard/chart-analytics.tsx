@@ -4,13 +4,26 @@ import CardComponent from "@/ui/card-wrapper";
 import Heading from "@/ui/text-heading";
 import BarChartComponent from "@/ui/bar-chart";
 
-export default function RetirementManagersChartAnalytics() {
+type ChartAnalyticsProps = {
+  stats: {
+    statusDistribution: {
+      approved: number;
+      rejected: number;
+      pending: number;
+    };
+    totalApprovedAmount: number;
+    totalRetiredAmount: number;
+    percentAmountRetired: number;
+  } | null;
+};
+
+export default function RetirementManagersChartAnalytics({ stats }: ChartAnalyticsProps) {
   const bars = [{ key: "value", label: "Category", color: "#D2091E" }];
 
   const barData = [
-    { name: "Approved", value: 80 },
-    { name: "Rejected", value: 96 },
-    { name: "Pending", value: 67 },
+    { name: "Approved", value: stats?.statusDistribution?.approved || 0 },
+    { name: "Rejected", value: stats?.statusDistribution?.rejected || 0 },
+    { name: "Pending", value: stats?.statusDistribution?.pending || 0 },
   ];
 
   return (
@@ -34,14 +47,14 @@ export default function RetirementManagersChartAnalytics() {
       <CardComponent height="100%">
         <div className="space-y-8 text-center flex flex-col justify-center items-center h-full">
             <h3 className="text-[#737373] font-bold text-xl leading-[33.6px]">Total Project Activity Request Approved</h3>
-            <h2 className="text-[#1D2739] font-extrabold text-4xl">₦ 10,000,000</h2>
+            <h2 className="text-[#1D2739] font-extrabold text-4xl">₦ {stats?.totalApprovedAmount?.toLocaleString() || "0"}</h2>
         </div>
       </CardComponent>
       <CardComponent height="100%">
         <div className="space-y-8 text-center flex flex-col justify-center items-center h-full">
             <h3 className="text-[#737373] font-bold text-xl leading-[33.6px]">Total Project Activity Amount Retired</h3>
-            <h2 className="text-[#1D2739] font-extrabold text-4xl">₦ 10,000,000</h2>
-            <p className="text-[#22C55E] font-medium text-base">Percent Amount Retired: 10%</p>
+            <h2 className="text-[#1D2739] font-extrabold text-4xl">₦ {stats?.totalRetiredAmount?.toLocaleString() || "0"}</h2>
+            <p className="text-[#22C55E] font-medium text-base">Percent Amount Retired: {stats?.percentAmountRetired || 0}%</p>
         </div>
       </CardComponent>
     </section>

@@ -56,7 +56,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
 
   const handleChildClick = (child: SidebarItem) => {
     closeMobile();
-    // console.log(`Navigating to ${child.href}`);
+
   };
 
   // for active on settings
@@ -65,7 +65,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
   const handleLogout = () => {
     logout();
     closeMobile();
-    console.log("User logged out");
+
     redirect("/login");
   };
 

@@ -216,7 +216,7 @@ export default function ManagementAndStaffDashboard() {
 
   // Handler for year change
   const handleYearChange = (value: string | number) => {
-    console.log("Year changed to:", value);
+
     const year = typeof value === "string" ? parseInt(value, 10) : value;
     if (!isNaN(year)) {
       setSelectedYear(year);

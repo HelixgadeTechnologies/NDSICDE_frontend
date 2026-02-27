@@ -15,7 +15,7 @@ import DashboardStat from "@/ui/dashboard-stat-card";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import { useParams } from "next/navigation";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 
 export default function ProjectRequest() {
@@ -82,7 +82,7 @@ export default function ProjectRequest() {
     setIsLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/requests`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/requests`,
       );
       setData(res.data.data);
       toast.success(res.data.message);
@@ -110,7 +110,7 @@ export default function ProjectRequest() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       toast.success("Project request deleted successfully!");
       setRemoveRequest(false);
@@ -182,7 +182,7 @@ export default function ProjectRequest() {
                       color="#909CAD"
                       onClick={() =>
                         setActiveRowId((prev) =>
-                          prev === row.requestId ? null : row.requestId
+                          prev === row.requestId ? null : row.requestId,
                         )
                       }
                     />

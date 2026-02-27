@@ -13,10 +13,11 @@ import { useProjects } from "@/context/ProjectsContext";
 import axios from "axios";
 import { useUIStore } from "@/store/ui-store";
 import { format } from "date-fns";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export default function FinancialReporting() {
-  const [summaryData, setSummaryData] = useState<FinancialReportApiResponse | null>(null);
+  const [summaryData, setSummaryData] =
+    useState<FinancialReportApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedProject, setSelectedProject] = useState("");
   const { projectOptions } = useProjects();
@@ -30,11 +31,11 @@ export default function FinancialReporting() {
         const end = format(dateRange.endDate, "yyyy-MM-dd");
 
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/financial-dashboard?startDate=${start}&endDate=${end}&projectId=${selectedProject}`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/financial-dashboard?startDate=${start}&endDate=${end}&projectId=${selectedProject}`,
         );
         setSummaryData(response.data.data);
-        console.log(response.data.data)
-        toast.success(response.data.message)
+        console.log(response.data.data);
+        toast.success(response.data.message);
       } catch (error) {
         console.error("Error fetching summary data:", error);
       } finally {
@@ -59,7 +60,11 @@ export default function FinancialReporting() {
     {
       title: "Budget Variance",
       value: `${summaryData?.summary?.budgetVariancePercentage || 0}%`,
-      percentInfo: summaryData?.summary?.budgetVariancePercentage && summaryData.summary.budgetVariancePercentage > 0 ? "Over budget" : "Under budget",
+      percentInfo:
+        summaryData?.summary?.budgetVariancePercentage &&
+        summaryData.summary.budgetVariancePercentage > 0
+          ? "Over budget"
+          : "Under budget",
     },
   ];
 
@@ -91,7 +96,9 @@ export default function FinancialReporting() {
             budgetTrends={summaryData?.budgetTrends || []}
             expenseBreakdown={summaryData?.expenseBreakdown || []}
           />
-          <FinancialPerformance performanceData={summaryData?.projectPerformance || []} />
+          <FinancialPerformance
+            performanceData={summaryData?.projectPerformance || []}
+          />
           <BudgetVSActuals data={summaryData?.budgetVsActuals || []} />
           <DetailedExpenseBreakdown
             detailedExpenses={summaryData?.detailedExpenses || []}
@@ -100,6 +107,5 @@ export default function FinancialReporting() {
         </>
       )}
     </section>
-
   );
 }

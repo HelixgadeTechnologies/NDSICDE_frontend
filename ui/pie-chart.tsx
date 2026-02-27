@@ -14,12 +14,30 @@ type P = {
 type PieChartProps = {
   data: Array<P>;
   colors?: Array<string>;
+  isLoading?: boolean;
 };
 
 export default function PieChartComponent({
   data,
   colors = [],
+  isLoading = false,
 }: PieChartProps) {
+  if (isLoading) {
+    return (
+      <div className="h-[350px] w-full flex items-center justify-center text-sm text-gray-400">
+        Loading chart...
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-[350px] w-full flex items-center justify-center text-sm text-gray-400">
+        No data available
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="h-[350px]">

@@ -8,7 +8,7 @@ import Button from "@/ui/form/button";
 import { useState, FormEvent } from "react";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 type AddKPIFormProps = {
   isOpen: boolean;
@@ -29,11 +29,11 @@ type KPIFormData = {
   target: string;
 };
 
-export default function AddKPIModal({ 
-  isOpen, 
-  onClose, 
+export default function AddKPIModal({
+  isOpen,
+  onClose,
   strategicObjectiveId,
-  onSuccess
+  onSuccess,
 }: AddKPIFormProps) {
   const token = getToken();
   const [formData, setFormData] = useState<KPIFormData>({
@@ -51,27 +51,26 @@ export default function AddKPIModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: keyof KPIFormData, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     setIsSubmitting(true);
 
     try {
       const payload = {
         isCreate: true,
-        data: { 
-          ...formData, 
-          strategicObjectiveId 
-        }
+        data: {
+          ...formData,
+          strategicObjectiveId,
+        },
       };
 
-      console.log("Sending payload:", payload);
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/kpi`,
@@ -79,15 +78,15 @@ export default function AddKPIModal({
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       if (response.status === 200 || response.status === 201) {
-        console.log("KPI added successfully:", response.data);
+
         toast.success("KPI added successfully!");
-        
+
         // Reset form
         setFormData({
           statement: "",
@@ -100,17 +99,18 @@ export default function AddKPIModal({
           baseLine: "",
           target: "",
         });
-        
+
         // Call onSuccess to refresh the table
         if (onSuccess) {
           onSuccess();
         }
-        
+
         // Close modal
         onClose();
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || "Failed to add KPI";
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to add KPI";
       console.error("Add KPI error:", error);
       console.error("Error response:", error.response?.data);
       toast.error(errorMessage);
@@ -146,10 +146,9 @@ export default function AddKPIModal({
             value={formData.type}
             onChange={(value: string) => handleInputChange("type", value)}
             options={[
-              { label: "Output", value: "Output"},
-              { label: "Impact", value: "Impact"},
-              { label: "Outcome", value: "Outcome"},
-              { label: "Input", value: "Input"},
+              { label: "Output", value: "Output" },
+              { label: "Impact", value: "Impact" },
+              { label: "Outcome", value: "Outcome" },
             ]}
           />
           <DropDown
@@ -157,33 +156,44 @@ export default function AddKPIModal({
             label="Specific Area"
             placeholder="Select Area"
             value={formData.specificAreas}
-            onChange={(value: string) => handleInputChange("specificAreas", value)}
-            options={[
-              { label: "Training", value: "Training" },
-            ]}
+            onChange={(value: string) =>
+              handleInputChange("specificAreas", value)
+            }
+            options={[{ label: "Training", value: "Training" }]}
           />
-          <TextInput
+          <DropDown
             name="unitOfMeasure"
             value={formData.unitOfMeasure}
             label="Unit of Measurement"
-            onChange={(e) => handleInputChange("unitOfMeasure", e.target.value)}
+            placeholder="Select Unit"
+            options={[
+              { label: "Number", value: "Number" },
+              { label: "Percentage of", value: "Percentage of" },
+              { label: "Percentage Change", value: "Percentage Change" },
+              { label: "Status of", value: "Status of" },
+            ]}
+            onChange={(value: string) =>
+              handleInputChange("unitOfMeasure", value)
+            }
           />
           <DropDown
             name="itemInMeasure"
             label="Item in Measure"
             placeholder="Select Item"
             value={formData.itemInMeasure}
-            onChange={(value: string) => handleInputChange("itemInMeasure", value)}
-            options={[
-              { label: "Infrastructure", value: "Infrastructure" },
-            ]}
+            onChange={(value: string) =>
+              handleInputChange("itemInMeasure", value)
+            }
+            options={[{ label: "Infrastructure", value: "Infrastructure" }]}
           />
           <DropDown
             name="disaggregation"
             label="Disaggregation"
             placeholder="Select Disaggregation"
             value={formData.disaggregation}
-            onChange={(value: string) => handleInputChange("disaggregation", value)}
+            onChange={(value: string) =>
+              handleInputChange("disaggregation", value)
+            }
             options={[
               { label: "Department", value: "Department" },
               { label: "State", value: "State" },
@@ -206,8 +216,8 @@ export default function AddKPIModal({
             name="target"
             onChange={(e) => handleInputChange("target", e.target.value)}
           />
-          <Button 
-            content={isSubmitting ? "Adding KPI..." : "Add KPI"} 
+          <Button
+            content={isSubmitting ? "Adding KPI..." : "Add KPI"}
             isDisabled={isSubmitting}
           />
         </form>

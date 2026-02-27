@@ -45,7 +45,7 @@ export default function Navigation() {
       <div className="flex justify-end items-center gap-1.5 md:gap-3">
         {/* <NotificationTab /> */}
         <div className="hidden md:flex justify-center items-center gap-3">
-          <Avatar name={user?.name} />
+          <Avatar name={user?.name} src={user?.avatar} />
           <div>
             <h3 className="font-medium text-gray-900 leading-5 text-xs">
               {user?.name}

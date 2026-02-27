@@ -2,7 +2,10 @@
 
 import { getToken } from "@/lib/api/credentials";
 import { fetchResultTypes } from "@/lib/api/result-types";
-import { DropdownOption, ProjectOutcomeTypes } from "@/types/project-management-types";
+import {
+  DropdownOption,
+  ProjectOutcomeTypes,
+} from "@/types/project-management-types";
 import Button from "@/ui/form/button";
 import DropDown from "@/ui/form/select-dropdown";
 import TagInput from "@/ui/form/tag-input";
@@ -12,8 +15,7 @@ import Heading from "@/ui/text-heading";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
-
+import { toast } from "react-toastify";
 
 type AddProps = {
   isOpen: boolean;
@@ -47,7 +49,7 @@ export default function ProjectOutcomeModal({
     outcomeStatement: "",
     outcomeType: "",
     impactId: "",
-    thematicAreas: "", 
+    thematicAreas: "",
   });
 
   // Fetch impacts when modal opens
@@ -110,7 +112,7 @@ export default function ProjectOutcomeModal({
     try {
       const types = await fetchResultTypes();
       const outcomeType = types.find(
-        (type) => type.resultName.toLowerCase() === "outcome"
+        (type) => type.resultName.toLowerCase() === "outcome",
       );
 
       if (!outcomeType) {
@@ -137,7 +139,7 @@ export default function ProjectOutcomeModal({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       // Extract data based on API response structure
@@ -155,12 +157,12 @@ export default function ProjectOutcomeModal({
         (impact: any) => ({
           label: impact.statement || `Impact`,
           value: impact.impactId || "",
-        })
+        }),
       );
 
       // Filter out invalid options
       const validOptions = transformedOptions.filter(
-        (option) => option.value && option.label
+        (option) => option.value && option.label,
       );
 
       // Add a default option at the beginning
@@ -259,11 +261,11 @@ export default function ProjectOutcomeModal({
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       toast.success(
-        `Project outcome ${mode === "create" ? "added" : "updated"} successfully!`
+        `Project outcome ${mode === "create" ? "added" : "updated"} successfully!`,
       );
 
       // Reset and close
@@ -289,10 +291,12 @@ export default function ProjectOutcomeModal({
           error.response?.data?.message ||
           error.response?.data?.error ||
           error.message;
-        toast.error(`Failed to ${mode === "create" ? "add" : "update"}: ${errorMessage}`);
+        toast.error(
+          `Failed to ${mode === "create" ? "add" : "update"}: ${errorMessage}`,
+        );
       } else {
         toast.error(
-          `Failed to ${mode === "create" ? "add" : "update"} project outcome`
+          `Failed to ${mode === "create" ? "add" : "update"} project outcome`,
         );
       }
     } finally {
@@ -308,7 +312,9 @@ export default function ProjectOutcomeModal({
   return (
     <Modal isOpen={isOpen} onClose={handleModalClose} maxWidth="600px">
       <Heading
-        heading={mode === "create" ? "Add Project Outcome" : "Edit Project Outcome"}
+        heading={
+          mode === "create" ? "Add Project Outcome" : "Edit Project Outcome"
+        }
         className="text-center"
       />
       <div className="space-y-6 mt-6">
@@ -326,7 +332,6 @@ export default function ProjectOutcomeModal({
           onChange={handleInputChange}
           value={formData.outcomeType}
           placeholder="Enter outcome type"
-
         />
 
         <DropDown
@@ -335,7 +340,7 @@ export default function ProjectOutcomeModal({
           onChange={(value) => handleDropdownChange("impactId", value)}
           options={impactOptions}
           value={formData.impactId}
-          placeholder={isLoadingImpacts? "Loading..." :"Select an impact"}
+          placeholder={isLoadingImpacts ? "Loading..." : "Select an impact"}
         />
 
         <TextInput

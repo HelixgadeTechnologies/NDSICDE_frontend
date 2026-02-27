@@ -26,6 +26,7 @@ type BarChartProps = {
   isSingleBar?: boolean;
   colors?: string[];
   labels?: string[];
+  isLoading?: boolean;
 };
 
 export default function BarChartComponent({
@@ -36,7 +37,24 @@ export default function BarChartComponent({
   isSingleBar = false,
   colors,
   labels,
+  isLoading = false,
 }: BarChartProps) {
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">
+        Loading chart...
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">
+        No data available
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} barCategoryGap={20}>

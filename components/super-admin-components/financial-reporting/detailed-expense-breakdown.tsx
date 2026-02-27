@@ -59,7 +59,7 @@ export default function DetailedExpenseBreakdown({
                     checkbox
                     idKey="id"
                     onSelectionChange={(selected) => {
-                      console.log("Selected rows:", selected);
+
                     }}
                     renderRow={(row) => (
                       <>

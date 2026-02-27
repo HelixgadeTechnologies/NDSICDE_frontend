@@ -12,7 +12,7 @@ import Link from "next/link";
 import DeleteModal from "@/ui/generic-delete-modal";
 import EditProjectActivity from "@/components/project-management-components/edit-project-activity";
 import { getToken } from "@/lib/api/credentials";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { formatDate } from "@/utils/dates-format-utility";
@@ -52,7 +52,7 @@ export default function ProjectActivity() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities`,
       );
       toast.success(response.data.message);
       setData(response.data.data);
@@ -68,7 +68,7 @@ export default function ProjectActivity() {
   useEffect(() => {
     fetchActivities();
   }, []);
-  
+
   // delete activity
   const deleteActivity = async (activityId: string) => {
     setIsDeleting(true);
@@ -80,7 +80,7 @@ export default function ProjectActivity() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       toast.success("Project activity deleted successfully!");
       setRemoveActivity(false);
@@ -133,7 +133,7 @@ export default function ProjectActivity() {
                     color="#909CAD"
                     onClick={() =>
                       setActiveRowId((prev) =>
-                        prev === row.activityId ? null : row.activityId
+                        prev === row.activityId ? null : row.activityId,
                       )
                     }
                   />
@@ -180,7 +180,11 @@ export default function ProjectActivity() {
                           <Link
                             href={`/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value`}
                             className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                            <Icon icon={"hugeicons:view"} height={20} width={20} />
+                            <Icon
+                              icon={"hugeicons:view"}
+                              height={20}
+                              width={20}
+                            />
                             View Actual Value
                           </Link>
                         </ul>

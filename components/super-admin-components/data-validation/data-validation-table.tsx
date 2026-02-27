@@ -16,7 +16,7 @@ import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import { formatDate } from "@/utils/dates-format-utility";
 import { useRoleStore } from "@/store/role-store";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 type DataValidationTableProps = {
   startDate: string;
@@ -37,38 +37,39 @@ export default function DataValidationTable({
   ];
   const [data, setData] = useState<ProjectRequestType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSubmittingApproval, setIsSubmittingApproval] = useState<boolean>(false);
+  const [isSubmittingApproval, setIsSubmittingApproval] =
+    useState<boolean>(false);
   const token = getToken();
-   const { user } = useRoleStore();
+  const { user } = useRoleStore();
 
-   const fetchData = async () => {
-     setIsLoading(true);
+  const fetchData = async () => {
+    setIsLoading(true);
 
-     const payload = {
-       startDate: startDate,
-       endDate: endDate,
-     };
+    const payload = {
+      startDate: startDate,
+      endDate: endDate,
+    };
 
-     try {
-       const response = await axios.post(
-         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/data-validation/list`,
-         payload,
-         {
-           headers: {
-             "Content-Type": "application/json",
-             Authorization: `Bearer ${token}`,
-           },
-         },
-       );
-       setData(response.data.data);
-       console.log(response.data.data);
-     } catch (error) {
-       console.error("Error fetching data validation records:", error);
-     } finally {
-       setIsLoading(false);
-     }
-   };
-   
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/data-validation/list`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setData(response.data.data);
+
+    } catch (error) {
+      console.error("Error fetching data validation records:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -89,46 +90,51 @@ export default function DataValidationTable({
   };
   // const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-const handleSubmission = async (approvalStatus: 1 | 2) => {
-  if (!details || !user) return;
+  const handleSubmission = async (approvalStatus: 1 | 2) => {
+    if (!details || !user) return;
 
-  if (!newComment.trim()) {
-    toast.error("Please add a comment before submitting.");
-    return;
-  }
+    if (!newComment.trim()) {
+      toast.error("Please add a comment before submitting.");
+      return;
+    }
 
-  setIsSubmittingApproval(true);
-  try {
-    const payload = {
-      requestId: details.requestId,
-      approvalStatus: approvalStatus,
-      approvedBy: user.id,
-      comment: newComment,
-    };
+    setIsSubmittingApproval(true);
+    try {
+      const payload = {
+        requestId: details.requestId,
+        approvalStatus: approvalStatus,
+        approvedBy: user.id,
+        comment: newComment,
+      };
 
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/approve`,
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/approve`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      }
-    );
+      );
 
-    toast.success(response.data.message);
-    setIsOpenModal(false);
-    setNewComment("");
-    
-    fetchData();
-  } catch (error) {
-    console.error(`Error ${approvalStatus === 1 ? 'approving' : 'rejecting'} request:`, error);
-    toast.error(`Failed to ${approvalStatus === 1 ? 'approve' : 'reject'} the request.`);
-  } finally {
-    setIsSubmittingApproval(false);
-  }
-};
+      toast.success(response.data.message);
+      setIsOpenModal(false);
+      setNewComment("");
+
+      fetchData();
+    } catch (error) {
+      console.error(
+        `Error ${approvalStatus === 1 ? "approving" : "rejecting"} request:`,
+        error,
+      );
+      toast.error(
+        `Failed to ${approvalStatus === 1 ? "approve" : "reject"} the request.`,
+      );
+    } finally {
+      setIsSubmittingApproval(false);
+    }
+  };
 
   return (
     <>
@@ -153,18 +159,15 @@ const handleSubmission = async (approvalStatus: 1 | 2) => {
                 <td className="px-6">{formatDate(row.activityStartDate)}</td>
                 <td className="px-6">{row.status}</td>
                 <td className="px-6">
-                  <div className="flex gap-2" onClick={() => handleModalOpen(row.requestId)}>
-                    <Icon
-                      icon={"fluent-mdl2:view"}
-                      width={16}
-                      height={16}
-                    />
+                  <div
+                    className="flex gap-2"
+                    onClick={() => handleModalOpen(row.requestId)}>
+                    <Icon icon={"fluent-mdl2:view"} width={16} height={16} />
                     <Icon
                       icon={"fluent-mdl2:accept"}
                       width={16}
                       height={16}
                       color="#22C55E"
-                    
                     />
                     <Icon
                       icon={"fluent-mdl2:cancel"}
@@ -179,7 +182,6 @@ const handleSubmission = async (approvalStatus: 1 | 2) => {
           />
         )}
       </CardComponent>
-
 
       {/* details */}
       <Modal
@@ -384,8 +386,17 @@ const handleSubmission = async (approvalStatus: 1 | 2) => {
             />
           </div>
           <div className="flex items-center gap-4">
-            <Button content="Reject Submission" isLoading={isSubmittingApproval} isSecondary onClick={() => handleSubmission(2)} />
-            <Button content="Approve Submission" isLoading={isSubmittingApproval} onClick={() => handleSubmission(1)} />
+            <Button
+              content="Reject Submission"
+              isLoading={isSubmittingApproval}
+              isSecondary
+              onClick={() => handleSubmission(2)}
+            />
+            <Button
+              content="Approve Submission"
+              isLoading={isSubmittingApproval}
+              onClick={() => handleSubmission(1)}
+            />
           </div>
         </div>
       </Modal>

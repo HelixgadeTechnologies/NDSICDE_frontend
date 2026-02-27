@@ -8,7 +8,7 @@ import Button from "@/ui/form/button";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
 
 type AddCommentsProps = {
@@ -17,24 +17,30 @@ type AddCommentsProps = {
   selectedReportId?: string | number;
 };
 
-export default function AddComment({ isOpen, onClose, selectedReportId }: AddCommentsProps) {
+export default function AddComment({
+  isOpen,
+  onClose,
+  selectedReportId,
+}: AddCommentsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     indicatorReportId: selectedReportId || "",
-    comment: ""
+    comment: "",
   });
   const token = getToken();
 
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/indicator-report-comments`, formData,
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/indicator-report-comments`,
+        formData,
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
       toast.success("Comment added successfully");
       onClose();
@@ -44,12 +50,17 @@ export default function AddComment({ isOpen, onClose, selectedReportId }: AddCom
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="700px">
       <div className="flex justify-end mb-6 cursor-pointer">
-        <Icon onClick={onClose} icon={"ic:round-close"} height={20} width={20} />
+        <Icon
+          onClick={onClose}
+          icon={"ic:round-close"}
+          height={20}
+          width={20}
+        />
       </div>
       <CardComponent>
         <Heading heading="Add Comments" />
@@ -61,7 +72,7 @@ export default function AddComment({ isOpen, onClose, selectedReportId }: AddCom
             onChange={(e) => {
               setFormData({
                 ...formData,
-                comment: e.target.value
+                comment: e.target.value,
               });
             }}
             maxLength={120}

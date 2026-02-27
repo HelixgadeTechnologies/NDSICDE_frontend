@@ -15,14 +15,17 @@ type AddSOProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: () => void;
+  mode?: "Add" | "Edit";
 };
 
 export default function AddStrategicObjectiveModal({
   isOpen,
   onClose,
   onSubmit,
+  mode = "Add",
 }: AddSOProps) {
   const {
+    strategicObjectiveId,
     strategicObjectiveStatement,
     thematicAreas,
     pillarLeadEmail,
@@ -40,8 +43,9 @@ export default function AddStrategicObjectiveModal({
     }
 
     const payload = {
-      isCreate: true,
+      isCreate: mode === "Add",
       data: {
+        strategicObjectiveId: mode === "Edit" ? strategicObjectiveId : undefined,
         statement: strategicObjectiveStatement,
         thematicAreas,
         pillarLead: pillarLeadEmail,
@@ -61,7 +65,6 @@ export default function AddStrategicObjectiveModal({
         }
       );
 
-      console.log("Strategic Objective added:", res.data);
 
       onClose();
       if (onSubmit) onSubmit();
@@ -73,7 +76,7 @@ export default function AddStrategicObjectiveModal({
           headers: error.response?.headers,
         });
       }
-      console.error("Error adding Strategic Objective:", error);
+      console.error(`Error ${mode === "Add" ? "adding" : "updating"} Strategic Objective:`, error);
     } finally {
       setIsSending(false);
     }
@@ -82,8 +85,12 @@ export default function AddStrategicObjectiveModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="550px">
       <Heading
-        heading="Add New Strategic Objective"
-        subtitle="Create a new strategic objective for your organization, make sure it’s specific, measurable and aligned with your overall goals."
+        heading={mode === "Add" ? "Add New Strategic Objective" : "Edit Strategic Objective"}
+        subtitle={
+          mode === "Add"
+            ? "Create a new strategic objective for your organization, make sure it’s specific, measurable and aligned with your overall goals."
+            : "Update the details of your strategic objective to ensure it remains aligned with your organizational goals."
+        }
       />
       <form onSubmit={handleSO} className="space-y-5 mt-4">
         <TextInput
@@ -118,8 +125,12 @@ export default function AddStrategicObjectiveModal({
           onChange={(e) => setField("pillarLeadEmail", e.target.value)}
         />
 
-        <Button content="Add Objective" isLoading={isSending} />
+        <Button
+          content={mode === "Add" ? "Add Objective" : "Update Objective"}
+          isLoading={isSending}
+        />
       </form>
     </Modal>
   );
 }
+

@@ -14,7 +14,7 @@ import TextInput from "@/ui/form/text-input";
 import { useRoleStore } from "@/store/role-store";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
 import { formatDate, convertDateToISO8601 } from "@/utils/dates-format-utility";
 import DateInput from "@/ui/form/date-input";
@@ -39,8 +39,8 @@ type ReportsTable = {
   updateAt: string;
   project: {
     projectName: string;
-  }
-}
+  };
+};
 
 export default function CustomReports() {
   const {
@@ -81,13 +81,14 @@ export default function CustomReports() {
         generatedBy: user?.id,
       };
 
-      await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/reports/generate`, 
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/reports/generate`,
         payload,
         {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       toast.success("Report generated successfully");
       resetForm();
@@ -104,7 +105,7 @@ export default function CustomReports() {
     setIsFetchingReports(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/reports/all?projectId=${filterProjectId}&reportType=${filterReportType}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/reports/all?projectId=${filterProjectId}&reportType=${filterReportType}`,
       );
       setReportData(response.data.data);
     } catch (error: any) {
@@ -125,8 +126,8 @@ export default function CustomReports() {
     <section className="flex flex-col md:flex-row gap-4">
       {/* generate report form */}
       <div className="w-full md:w-[30%]">
-        <CardComponent 
-        // height="380px" 
+        <CardComponent
+        // height="380px"
         // className="overflow-y-scroll custom-scrollbar"
         >
           <Heading
@@ -182,9 +183,9 @@ export default function CustomReports() {
                 "Budget Utilization",
                 "Completion Rate",
                 "Approval Rate",
-                "Timeline Adherence", 
+                "Timeline Adherence",
                 "Cost Variance",
-                "Activity Progress", 
+                "Activity Progress",
                 "Request Turnaround Time",
                 "Retirement Completion Rate",
               ]}
@@ -221,34 +222,38 @@ export default function CustomReports() {
           />
         </div>
         <CardComponent height="auto">
-         {isFetchingReports ? (
-           <div className="dots my-20 mx-auto">
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-         ) : <Table
-            tableHead={head}
-            tableData={reportData}
-            renderRow={(row) => {
-              return (
-                <>
-                  <td className="px-6">{row.reportName}</td>
-                  <td className="px-6">{row.reportType}</td>
-                  <td className="px-6">{formatDate(row.startDate, "short")}</td>
-                  <td>
-                    <div className="flex gap-1">
-                      <PDF title="PDF" />
-                      <PDF title="Excel" />
-                    </div>
-                  </td>
-                </>
-              );
-            }}
-            pagination={true}
-            itemsPerPage={3}
-            showPaginationControls={true}
-          />}
+          {isFetchingReports ? (
+            <div className="dots my-20 mx-auto">
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          ) : (
+            <Table
+              tableHead={head}
+              tableData={reportData}
+              renderRow={(row) => {
+                return (
+                  <>
+                    <td className="px-6">{row.reportName}</td>
+                    <td className="px-6">{row.reportType}</td>
+                    <td className="px-6">
+                      {formatDate(row.startDate, "short")}
+                    </td>
+                    <td>
+                      <div className="flex gap-1">
+                        <PDF title="PDF" />
+                        <PDF title="Excel" />
+                      </div>
+                    </td>
+                  </>
+                );
+              }}
+              pagination={true}
+              itemsPerPage={3}
+              showPaginationControls={true}
+            />
+          )}
         </CardComponent>
       </div>
     </section>

@@ -11,12 +11,23 @@ import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
 import { type ProjectType } from "@/lib/api/projects";
 import { useProjects } from "@/context/ProjectsContext";
-import { fetchResultTypes, transformResultTypesToOptions, type ResultType } from "@/lib/api/result-types";
-import { APIResponse, SummaryAPIResponse } from "@/types/performance-dashboard-types";
-import toast from "react-hot-toast";
+import {
+  fetchResultTypes,
+  transformResultTypesToOptions,
+  type ResultType,
+} from "@/lib/api/result-types";
+import {
+  APIResponse,
+  SummaryAPIResponse,
+} from "@/types/performance-dashboard-types";
+import { toast } from "react-toastify";
 
 export default function PerformanceAnalytics() {
-  const { projects, projectOptions, isLoading: isProjectsLoading } = useProjects();
+  const {
+    projects,
+    projectOptions,
+    isLoading: isProjectsLoading,
+  } = useProjects();
   const [loading, setLoading] = useState(true);
   const [apiData, setApiData] = useState<SummaryAPIResponse | null>(null);
   const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
@@ -26,7 +37,9 @@ export default function PerformanceAnalytics() {
     startDate: string;
     endDate: string;
   }>({
-    startDate: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString(),
+    startDate: new Date(
+      new Date().setDate(new Date().getDate() - 30),
+    ).toISOString(),
     endDate: new Date().toISOString(),
   });
 
@@ -49,27 +62,31 @@ export default function PerformanceAnalytics() {
     const fetchPerformanceData = async () => {
       try {
         setLoading(true);
-        
+
         let url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/performance-dashboard?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
-        
+
         if (selectedProjectId) {
           url += `&projectId=${selectedProjectId}`;
-          
-          const selectedProject = projects.find(p => p.projectId === selectedProjectId);
+
+          const selectedProject = projects.find(
+            (p) => p.projectId === selectedProjectId,
+          );
           if (selectedProject?.thematicAreasOrPillar) {
             url += `&thematicArea=${encodeURIComponent(selectedProject.thematicAreasOrPillar)}`;
           }
         }
-        
+
         if (selectedResultType) {
           url += `&resultType=${encodeURIComponent(selectedResultType)}`;
         }
-        
+
         const response = await axios.get<APIResponse>(url);
 
         if (response.data.success) {
           setApiData(response.data.data);
-          toast.success(response.data.message || "Performance data loaded successfully");
+          toast.success(
+            response.data.message || "Performance data loaded successfully",
+          );
         } else {
           toast.error("Failed to fetch performance data");
         }
@@ -85,7 +102,10 @@ export default function PerformanceAnalytics() {
     fetchPerformanceData();
   }, [dateRange, selectedProjectId, selectedResultType, projects]);
 
-  const handleDateRangeChange = (range: { startDate: string; endDate: string }) => {
+  const handleDateRangeChange = (range: {
+    startDate: string;
+    endDate: string;
+  }) => {
     setDateRange(range);
   };
 
@@ -169,7 +189,9 @@ export default function PerformanceAnalytics() {
         </div>
       ) : !apiData ? (
         <div className="text-center my-20">
-          <p className="text-gray-500">No data available. Please adjust your filters and try again.</p>
+          <p className="text-gray-500">
+            No data available. Please adjust your filters and try again.
+          </p>
         </div>
       ) : (
         <>
