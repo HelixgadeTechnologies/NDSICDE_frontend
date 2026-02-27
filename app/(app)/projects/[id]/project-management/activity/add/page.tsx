@@ -15,7 +15,7 @@ import TagInput from "@/ui/form/tag-input";
 import TextInput from "@/ui/form/text-input";
 import TextareaInput from "@/ui/form/textarea";
 import Heading from "@/ui/text-heading";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 type SubActivity = {
   id: number;
@@ -28,8 +28,10 @@ export default function AddProjectActivity() {
   const params = useParams();
   const token = getToken();
   const projectId = (params?.id as string) || "";
-  
-  const [activityType, setActivityType] = useState<"oneOff" | "multiple">("oneOff");
+
+  const [activityType, setActivityType] = useState<"oneOff" | "multiple">(
+    "oneOff",
+  );
   const [subActivities, setSubActivities] = useState<SubActivity[]>([
     {
       id: 1,
@@ -63,9 +65,8 @@ export default function AddProjectActivity() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
-
 
         // Extract data based on API response structure
         let outputsData = [];
@@ -80,9 +81,10 @@ export default function AddProjectActivity() {
         // Transform data for dropdown
         const transformedOptions: DropdownOption[] = outputsData
           .map((output: any) => {
-            const statement = output.outputStatement || output.statement || `Output`;
+            const statement =
+              output.outputStatement || output.statement || `Output`;
             const id = output.outputId || output.id || "";
-            
+
             if (!id) {
               console.warn("Skipping output without ID:", output);
               return null;
@@ -117,7 +119,7 @@ export default function AddProjectActivity() {
 
   const handleActivityTypeChange = (type: "oneOff" | "multiple") => {
     setActivityType(type);
-    
+
     // Reset to single activity when switching to "One Off"
     if (type === "oneOff" && subActivities.length > 1) {
       setSubActivities([subActivities[0]]);
@@ -125,7 +127,7 @@ export default function AddProjectActivity() {
   };
 
   const addSubActivity = () => {
-    const newId = Math.max(...subActivities.map(sa => sa.id), 0) + 1;
+    const newId = Math.max(...subActivities.map((sa) => sa.id), 0) + 1;
     setSubActivities([
       ...subActivities,
       {
@@ -138,15 +140,19 @@ export default function AddProjectActivity() {
 
   const removeSubActivity = (id: number) => {
     if (subActivities.length > 1) {
-      setSubActivities(subActivities.filter(sa => sa.id !== id));
+      setSubActivities(subActivities.filter((sa) => sa.id !== id));
     }
   };
 
-  const updateSubActivity = (id: number, field: keyof SubActivity, value: string) => {
+  const updateSubActivity = (
+    id: number,
+    field: keyof SubActivity,
+    value: string,
+  ) => {
     setSubActivities(
-      subActivities.map(sa =>
-        sa.id === id ? { ...sa, [field]: value } : sa
-      )
+      subActivities.map((sa) =>
+        sa.id === id ? { ...sa, [field]: value } : sa,
+      ),
     );
   };
 
@@ -248,17 +254,23 @@ export default function AddProjectActivity() {
           startDate: new Date(formData.startDate).toISOString(),
           endDate: new Date(formData.endDate).toISOString(),
           activityFrequency: parseInt(formData.activityFrequency) || 0,
-          subActivity: activityType === "multiple" ? `Sub-Activity ${index + 1}` : "One Off",
+          subActivity:
+            activityType === "multiple"
+              ? `Sub-Activity ${index + 1}`
+              : "One Off",
           descriptionAction: subActivity.description,
           deliveryDate: new Date(subActivity.deliveryDate).toISOString(),
           projectId: projectId,
         },
       }));
 
-      console.log("Submitting activity payloads:", JSON.stringify(payloads, null, 2));
+      console.log(
+        "Submitting activity payloads:",
+        JSON.stringify(payloads, null, 2),
+      );
 
       // Send all sub-activities
-      const promises = payloads.map(payload =>
+      const promises = payloads.map((payload) =>
         axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity`,
           payload,
@@ -267,20 +279,22 @@ export default function AddProjectActivity() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
-        )
+          },
+        ),
       );
 
       const responses = await Promise.all(promises);
-      console.log("API Responses:", responses.map(r => r.data));
+      console.log(
+        "API Responses:",
+        responses.map((r) => r.data),
+      );
 
       toast.success(
-        `Project activity${subActivities.length > 1 ? ' and sub-activities' : ''} added successfully!`
+        `Project activity${subActivities.length > 1 ? " and sub-activities" : ""} added successfully!`,
       );
 
       // Redirect back or to activities list
       router.back();
-      
     } catch (error: any) {
       console.error("Error submitting activity:", error);
 
@@ -325,17 +339,19 @@ export default function AddProjectActivity() {
             isBigger
             placeholder="Enter activity statement"
           />
-          
+
           <DropDown
             name="outputId"
             label="Linked to Output"
-            placeholder={isLoadingOutputs ? "Loading outputs..." : "Select an output"}
+            placeholder={
+              isLoadingOutputs ? "Loading outputs..." : "Select an output"
+            }
             options={outputOptions}
             value={formData.outputId}
             onChange={handleDropdownChange}
             isBigger
           />
-          
+
           <TextInput
             name="activityTotalBudget"
             value={formData.activityTotalBudget}
@@ -344,27 +360,27 @@ export default function AddProjectActivity() {
             isBigger
             placeholder="Enter total budget"
           />
-          
-          <TagInput 
-            label="Responsible Persons (After adding a name, press Enter key)" 
+
+          <TagInput
+            label="Responsible Persons (After adding a name, press Enter key)"
             tags={responsiblePersons}
             onChange={handleResponsiblePersonsChange}
             placeholder="Add responsible person and press Enter"
           />
-          
+
           <div className="flex items-center gap-2">
-            <DateInput 
-              label="Activity Start Date" 
+            <DateInput
+              label="Activity Start Date"
               value={formData.startDate}
               onChange={(value) => handleDateChange("startDate", value)}
             />
-            <DateInput 
-              label="Activity End Date" 
+            <DateInput
+              label="Activity End Date"
               value={formData.endDate}
               onChange={(value) => handleDateChange("endDate", value)}
             />
           </div>
-          
+
           <TextInput
             name="activityFrequency"
             value={formData.activityFrequency}
@@ -405,26 +421,32 @@ export default function AddProjectActivity() {
                     activityType === "multiple" && subActivities.length > 1
                       ? "rounded-lg relative"
                       : ""
-                  }`}
-                >
+                  }`}>
                   {/* Remove button */}
                   {activityType === "multiple" && subActivities.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeSubActivity(subActivity.id)}
                       className="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white size-7 rounded-full flex items-center justify-center transition-colors shadow-md z-10"
-                      title="Remove sub-activity"
-                    >
+                      title="Remove sub-activity">
                       <Icon icon="heroicons:x-mark" className="size-4" />
                     </button>
                   )}
 
                   <TextareaInput
-                    label={index === 0 ? "Describe Action" : `Describe Action ${index + 1}`}
+                    label={
+                      index === 0
+                        ? "Describe Action"
+                        : `Describe Action ${index + 1}`
+                    }
                     name={`describeAction-${subActivity.id}`}
                     value={subActivity.description}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      updateSubActivity(subActivity.id, "description", e.target.value)
+                      updateSubActivity(
+                        subActivity.id,
+                        "description",
+                        e.target.value,
+                      )
                     }
                     placeholder="Describe the action to be taken"
                   />
@@ -436,7 +458,9 @@ export default function AddProjectActivity() {
                         : `Delivery Date ${index + 1}`
                     }
                     value={subActivity.deliveryDate}
-                    onChange={(value) => updateSubActivity(subActivity.id, "deliveryDate", value)}
+                    onChange={(value) =>
+                      updateSubActivity(subActivity.id, "deliveryDate", value)
+                    }
                   />
                 </div>
               ))}
@@ -446,8 +470,7 @@ export default function AddProjectActivity() {
                 <button
                   type="button"
                   onClick={addSubActivity}
-                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border-2 border-dashed border-blue-300 hover:border-blue-400 w-full justify-center"
-                >
+                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border-2 border-dashed border-blue-300 hover:border-blue-400 w-full justify-center">
                   <Icon icon="ic:round-plus" height={20} width={20} />
                   Add Another Sub-Activity
                 </button>
@@ -463,8 +486,8 @@ export default function AddProjectActivity() {
               onClick={handleCancel}
               isDisabled={isSubmitting}
             />
-            <Button 
-              content="Add Project Activity" 
+            <Button
+              content="Add Project Activity"
               onClick={handleSubmit}
               isLoading={isSubmitting}
               isDisabled={isSubmitting}

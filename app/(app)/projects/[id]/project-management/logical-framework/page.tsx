@@ -13,7 +13,7 @@ import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import TextInput from "@/ui/form/text-input";
 import { useParams } from "next/navigation";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 
 type LogicalFramework = {
@@ -65,7 +65,7 @@ export default function ProjectLogicalFramework() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       setData(response.data.data);
     } catch (error) {
@@ -86,7 +86,7 @@ export default function ProjectLogicalFramework() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       setSelectedFramework(response.data.data);
       setIsViewModalOpen(true);
@@ -132,7 +132,7 @@ export default function ProjectLogicalFramework() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       console.log(response.data);
       toast.success("Framework deleted successfully!");
@@ -209,7 +209,7 @@ export default function ProjectLogicalFramework() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       console.log("Response:", response.data);
@@ -318,7 +318,7 @@ export default function ProjectLogicalFramework() {
                       setActiveRowId((prev) =>
                         prev === row.logicalFrameworkId
                           ? null
-                          : row.logicalFrameworkId
+                          : row.logicalFrameworkId,
                       )
                     }
                   />
@@ -356,7 +356,7 @@ export default function ProjectLogicalFramework() {
                             onClick={() =>
                               handleDeleteClick(
                                 row.logicalFrameworkId,
-                                row.documentName
+                                row.documentName,
                               )
                             }>
                             <Icon

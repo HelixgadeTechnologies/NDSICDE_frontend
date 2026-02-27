@@ -9,29 +9,29 @@ import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
 import EditKPIModal from "./components/edit-kpi-modal";
 import ViewKPIModal from "./components/view-kpi-modal";
 
 type KPIReportType = {
-actualValue: number;
-baseline: number;
-createdAt: string;
-kpiName: string;
-kpiReportId: string;
-kpiType: string;
-project: {
-  projectId: string;
-  projectName: string;
+  actualValue: number;
+  baseline: number;
+  createdAt: string;
+  kpiName: string;
+  kpiReportId: string;
+  kpiType: string;
+  project: {
+    projectId: string;
+    projectName: string;
+  };
+  status: string;
+  strategicObjective: {
+    statement: string;
+    strategicObjectiveId: string;
+  };
+  target: number;
 };
-status: string;
-strategicObjective: {
-  statement: string;
-strategicObjectiveId: string;
-};
-target: number;
-}
 
 export default function AssignedKPITable() {
   const [data, setData] = useState<KPIReportType[]>([]);
@@ -44,7 +44,7 @@ export default function AssignedKPITable() {
   const [kpiToEdit, setKpiToEdit] = useState<string | null>(null);
   const [viewModal, setViewModal] = useState(false);
   const [kpiToView, setKpiToView] = useState<string | null>(null);
-  
+
   const head = [
     "KPI Name",
     "Type",
@@ -81,12 +81,14 @@ export default function AssignedKPITable() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/report/${kpiToDelete}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token") || ""}`
-          }
-        }
+            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+          },
+        },
       );
       toast.success("KPI Report deleted successfully");
-      setData((prev) => prev.filter((item) => item.kpiReportId !== kpiToDelete));
+      setData((prev) =>
+        prev.filter((item) => item.kpiReportId !== kpiToDelete),
+      );
       setActiveRowId(null);
       setDeleteModal(false);
       setKpiToDelete(null);
@@ -126,10 +128,14 @@ export default function AssignedKPITable() {
                 <td className="px-6">{row.kpiType}</td>
                 <td className="px-6">{row.baseline}</td>
                 <td className="px-6">{row.target}</td>
-                <td className="px-6">{formatDate(row.createdAt, "date-only")}</td>
+                <td className="px-6">
+                  {formatDate(row.createdAt, "date-only")}
+                </td>
                 <td
                   className={`px-6 ${
-                    row.status === "Active" ? "text-green-500" : "text-yellow-500"
+                    row.status === "Active"
+                      ? "text-green-500"
+                      : "text-yellow-500"
                   }`}>
                   {row.status}
                 </td>
@@ -142,11 +148,11 @@ export default function AssignedKPITable() {
                     color="#909CAD"
                     onClick={() =>
                       setActiveRowId((prev) =>
-                        prev === row.kpiReportId ? null : row.kpiReportId
+                        prev === row.kpiReportId ? null : row.kpiReportId,
                       )
                     }
                   />
-                  
+
                   {activeRowId === row.kpiReportId && (
                     <AnimatePresence>
                       <motion.div
@@ -156,17 +162,21 @@ export default function AssignedKPITable() {
                         transition={{ duration: 0.2, ease: "easeOut" }}
                         className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-40">
                         <ul className="text-sm">
-                          <li 
+                          <li
                             onClick={() => {
                               setKpiToView(row.kpiReportId);
                               setViewModal(true);
                               setActiveRowId(null);
                             }}
                             className="hover:text-blue-600 border-b border-gray-100 p-3 flex gap-2 items-center cursor-pointer w-full">
-                            <Icon icon={"hugeicons:view"} height={20} width={20} />
+                            <Icon
+                              icon={"hugeicons:view"}
+                              height={20}
+                              width={20}
+                            />
                             View
                           </li>
-                          <li 
+                          <li
                             onClick={() => {
                               setKpiToEdit(row.kpiReportId);
                               setEditModal(true);

@@ -7,7 +7,7 @@ import RoleFormModal from "./role-form-modal";
 import Heading from "@/ui/text-heading";
 import CardComponent from "@/ui/card-wrapper";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { fetchRoles, type RoleData } from "@/lib/api/roles";
 import { formatDate } from "@/utils/dates-format-utility";
 
@@ -42,8 +42,14 @@ export default function AccessControl() {
     loadRoles();
   }, []);
 
-  const { isAddModalOpen, isEditModalOpen, openAddModal, openEditModal, closeAddModal, closeEditModal } =
-    useUIStore();
+  const {
+    isAddModalOpen,
+    isEditModalOpen,
+    openAddModal,
+    openEditModal,
+    closeAddModal,
+    closeEditModal,
+  } = useUIStore();
 
   const handleEditClick = (role: RoleData) => {
     setSelectedRole(role);
@@ -97,7 +103,7 @@ export default function AccessControl() {
                     {formatDate(row.createAt, "short")}
                   </span>
                 </td>
-                <td 
+                <td
                   onClick={() => handleEditClick(row)}
                   className="px-6 cursor-pointer hover:text-[#111928]">
                   Edit
@@ -110,19 +116,19 @@ export default function AccessControl() {
         )}
       </CardComponent>
 
-      <RoleFormModal 
-        onSuccess={loadRoles} 
-        mode="create" 
+      <RoleFormModal
+        onSuccess={loadRoles}
+        mode="create"
         isOpen={isAddModalOpen}
         onClose={handleAddModalClose}
       />
 
-      <RoleFormModal 
+      <RoleFormModal
         onSuccess={() => {
           loadRoles();
           handleEditModalClose();
-        }} 
-        mode="edit" 
+        }}
+        mode="edit"
         roleData={selectedRole || undefined}
         isOpen={isEditModalOpen}
         onClose={handleEditModalClose}

@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
-import { DropdownOption, ProjectActivityTypes } from "@/types/project-management-types";
+import {
+  DropdownOption,
+  ProjectActivityTypes,
+} from "@/types/project-management-types";
 import Button from "@/ui/form/button";
 import DateInput from "@/ui/form/date-input";
 import RadioInput from "@/ui/form/radio";
@@ -15,14 +18,13 @@ import TextareaInput from "@/ui/form/textarea";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 type SubActivity = {
   id: number;
   description: string;
   deliveryDate: string;
 };
-
 
 type EditProps = {
   isOpen: boolean;
@@ -32,18 +34,20 @@ type EditProps = {
   initialData?: ProjectActivityTypes;
 };
 
-export default function EditProjectActivity({ 
-  isOpen, 
-  onClose, 
+export default function EditProjectActivity({
+  isOpen,
+  onClose,
   onSuccess,
   mode = "edit",
-  initialData 
+  initialData,
 }: EditProps) {
   const token = getToken();
   const params = useParams();
   const projectId = (params?.id as string) || "";
-  
-  const [activityType, setActivityType] = useState<"oneOff" | "multiple">("oneOff");
+
+  const [activityType, setActivityType] = useState<"oneOff" | "multiple">(
+    "oneOff",
+  );
   const [subActivities, setSubActivities] = useState<SubActivity[]>([
     {
       id: 1,
@@ -71,7 +75,7 @@ export default function EditProjectActivity({
   useEffect(() => {
     if (isOpen) {
       fetchOutputs();
-      
+
       if (mode === "edit" && initialData) {
         // Pre-fill form with existing data
         setFormData({
@@ -94,25 +98,32 @@ export default function EditProjectActivity({
         }
 
         // Determine activity type and sub-activities
-        if (initialData.subActivity && initialData.subActivity.includes("Sub-Activity")) {
+        if (
+          initialData.subActivity &&
+          initialData.subActivity.includes("Sub-Activity")
+        ) {
           setActivityType("multiple");
           // If we have descriptionAction and deliveryDate, use them
           if (initialData.descriptionAction && initialData.deliveryDate) {
-            setSubActivities([{
-              id: 1,
-              description: initialData.descriptionAction,
-              deliveryDate: initialData.deliveryDate,
-            }]);
+            setSubActivities([
+              {
+                id: 1,
+                description: initialData.descriptionAction,
+                deliveryDate: initialData.deliveryDate,
+              },
+            ]);
           }
         } else {
           setActivityType("oneOff");
           // For one-off, use the main activity data
           if (initialData.descriptionAction && initialData.deliveryDate) {
-            setSubActivities([{
-              id: 1,
-              description: initialData.descriptionAction,
-              deliveryDate: initialData.deliveryDate,
-            }]);
+            setSubActivities([
+              {
+                id: 1,
+                description: initialData.descriptionAction,
+                deliveryDate: initialData.deliveryDate,
+              },
+            ]);
           }
         }
       } else {
@@ -134,11 +145,13 @@ export default function EditProjectActivity({
     });
     setResponsiblePersons([]);
     setActivityType("oneOff");
-    setSubActivities([{
-      id: 1,
-      description: "",
-      deliveryDate: "",
-    }]);
+    setSubActivities([
+      {
+        id: 1,
+        description: "",
+        deliveryDate: "",
+      },
+    ]);
   };
 
   // Fetch outputs for dropdown
@@ -151,7 +164,7 @@ export default function EditProjectActivity({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       console.log("Outputs API response:", response.data);
@@ -169,9 +182,10 @@ export default function EditProjectActivity({
       // Transform data for dropdown
       const transformedOptions: DropdownOption[] = outputsData
         .map((output: any) => {
-          const statement = output.outputStatement || output.statement || `Output`;
+          const statement =
+            output.outputStatement || output.statement || `Output`;
           const id = output.outputId || output.id || "";
-          
+
           if (!id) {
             console.warn("Skipping output without ID:", output);
             return null;
@@ -201,7 +215,7 @@ export default function EditProjectActivity({
 
   const handleActivityTypeChange = (type: "oneOff" | "multiple") => {
     setActivityType(type);
-    
+
     // Reset to single activity when switching to "One Off"
     if (type === "oneOff" && subActivities.length > 1) {
       setSubActivities([subActivities[0]]);
@@ -209,7 +223,7 @@ export default function EditProjectActivity({
   };
 
   const addSubActivity = () => {
-    const newId = Math.max(...subActivities.map(sa => sa.id), 0) + 1;
+    const newId = Math.max(...subActivities.map((sa) => sa.id), 0) + 1;
     setSubActivities([
       ...subActivities,
       {
@@ -222,15 +236,19 @@ export default function EditProjectActivity({
 
   const removeSubActivity = (id: number) => {
     if (subActivities.length > 1) {
-      setSubActivities(subActivities.filter(sa => sa.id !== id));
+      setSubActivities(subActivities.filter((sa) => sa.id !== id));
     }
   };
 
-  const updateSubActivity = (id: number, field: keyof SubActivity, value: string) => {
+  const updateSubActivity = (
+    id: number,
+    field: keyof SubActivity,
+    value: string,
+  ) => {
     setSubActivities(
-      subActivities.map(sa =>
-        sa.id === id ? { ...sa, [field]: value } : sa
-      )
+      subActivities.map((sa) =>
+        sa.id === id ? { ...sa, [field]: value } : sa,
+      ),
     );
   };
 
@@ -330,16 +348,18 @@ export default function EditProjectActivity({
           startDate: new Date(formData.startDate).toISOString(),
           endDate: new Date(formData.endDate).toISOString(),
           activityFrequency: parseInt(formData.activityFrequency) || 0,
-          subActivity: activityType === "multiple" ? `Sub-Activity ${index + 1}` : "One Off",
+          subActivity:
+            activityType === "multiple"
+              ? `Sub-Activity ${index + 1}`
+              : "One Off",
           descriptionAction: subActivity.description,
           deliveryDate: new Date(subActivity.deliveryDate).toISOString(),
           projectId: projectId,
         },
       }));
 
-
       // Send all sub-activities
-      const promises = payloads.map(payload =>
+      const promises = payloads.map((payload) =>
         axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity`,
           payload,
@@ -348,15 +368,18 @@ export default function EditProjectActivity({
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
-        )
+          },
+        ),
       );
 
       const responses = await Promise.all(promises);
-      console.log("API Responses:", responses.map(r => r.data));
+      console.log(
+        "API Responses:",
+        responses.map((r) => r.data),
+      );
 
       toast.success(
-        `Project activity ${mode === "create" ? "added" : "updated"} successfully!`
+        `Project activity ${mode === "create" ? "added" : "updated"} successfully!`,
       );
 
       // Reset and close
@@ -367,7 +390,6 @@ export default function EditProjectActivity({
       if (onSuccess) {
         onSuccess();
       }
-      
     } catch (error: any) {
       console.error("Error submitting activity:", error);
 
@@ -383,9 +405,13 @@ export default function EditProjectActivity({
           error.response?.data?.message ||
           error.response?.data?.error ||
           error.message;
-        toast.error(`Failed to ${mode === "create" ? "add" : "update"} activity: ${errorMessage}`);
+        toast.error(
+          `Failed to ${mode === "create" ? "add" : "update"} activity: ${errorMessage}`,
+        );
       } else {
-        toast.error(`Failed to ${mode === "create" ? "add" : "update"} project activity`);
+        toast.error(
+          `Failed to ${mode === "create" ? "add" : "update"} project activity`,
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -397,13 +423,11 @@ export default function EditProjectActivity({
     onClose();
   };
 
-  const modalTitle = mode === "create" 
-    ? "Add Project Activity" 
-    : "Edit Project Activity";
-  
-  const buttonText = mode === "create" 
-    ? "Add Project Activity" 
-    : "Update Project Activity";
+  const modalTitle =
+    mode === "create" ? "Add Project Activity" : "Edit Project Activity";
+
+  const buttonText =
+    mode === "create" ? "Add Project Activity" : "Update Project Activity";
 
   return (
     <Modal isOpen={isOpen} onClose={handleModalClose} maxWidth="600px">
@@ -417,17 +441,19 @@ export default function EditProjectActivity({
           placeholder="Enter activity statement"
           isBigger
         />
-        
+
         <DropDown
           name="outputId"
           label="Linked to Output"
-          placeholder={isLoadingOutputs ? "Loading outputs..." : "Select an output"}
+          placeholder={
+            isLoadingOutputs ? "Loading outputs..." : "Select an output"
+          }
           options={outputOptions}
           value={formData.outputId}
           onChange={handleDropdownChange}
           isBigger
         />
-        
+
         <TextInput
           name="activityTotalBudget"
           value={formData.activityTotalBudget}
@@ -436,27 +462,27 @@ export default function EditProjectActivity({
           placeholder="Enter total budget"
           isBigger
         />
-        
-        <TagInput 
-          label="Responsible Persons" 
+
+        <TagInput
+          label="Responsible Persons"
           tags={responsiblePersons}
           onChange={handleResponsiblePersonsChange}
           placeholder="Add responsible person and press Enter"
         />
-        
+
         <div className="flex items-center gap-2">
-          <DateInput 
-            label="Activity Start Date" 
+          <DateInput
+            label="Activity Start Date"
             value={formData.startDate}
             onChange={(value) => handleDateChange("startDate", value)}
           />
-          <DateInput 
-            label="Activity End Date" 
+          <DateInput
+            label="Activity End Date"
             value={formData.endDate}
             onChange={(value) => handleDateChange("endDate", value)}
           />
         </div>
-        
+
         <TextInput
           name="activityFrequency"
           value={formData.activityFrequency}
@@ -497,26 +523,32 @@ export default function EditProjectActivity({
                   activityType === "multiple" && subActivities.length > 1
                     ? "rounded-lg relative"
                     : ""
-                }`}
-              >
+                }`}>
                 {/* Remove button */}
                 {activityType === "multiple" && subActivities.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeSubActivity(subActivity.id)}
                     className="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white size-7 rounded-full flex items-center justify-center transition-colors shadow-md z-10"
-                    title="Remove sub-activity"
-                  >
+                    title="Remove sub-activity">
                     <Icon icon="heroicons:x-mark" className="size-4" />
                   </button>
                 )}
 
                 <TextareaInput
-                  label={index === 0 ? "Describe Action" : `Describe Action ${index + 1}`}
+                  label={
+                    index === 0
+                      ? "Describe Action"
+                      : `Describe Action ${index + 1}`
+                  }
                   name={`describeAction-${subActivity.id}`}
                   value={subActivity.description}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    updateSubActivity(subActivity.id, "description", e.target.value)
+                    updateSubActivity(
+                      subActivity.id,
+                      "description",
+                      e.target.value,
+                    )
                   }
                   placeholder="Describe the action to be taken"
                 />
@@ -528,7 +560,9 @@ export default function EditProjectActivity({
                       : `Delivery Date ${index + 1}`
                   }
                   value={subActivity.deliveryDate}
-                  onChange={(value) => updateSubActivity(subActivity.id, "deliveryDate", value)}
+                  onChange={(value) =>
+                    updateSubActivity(subActivity.id, "deliveryDate", value)
+                  }
                 />
               </div>
             ))}
@@ -538,8 +572,7 @@ export default function EditProjectActivity({
               <button
                 type="button"
                 onClick={addSubActivity}
-                className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border-2 border-dashed border-blue-300 hover:border-blue-400 w-full justify-center"
-              >
+                className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border-2 border-dashed border-blue-300 hover:border-blue-400 w-full justify-center">
                 <Icon icon="ic:round-plus" height={20} width={20} />
                 Add Another Sub-Activity
               </button>
@@ -547,7 +580,7 @@ export default function EditProjectActivity({
           </div>
         </div>
       </div>
-      
+
       <div className="flex items-center gap-6 pt-4">
         <Button
           content="Cancel"

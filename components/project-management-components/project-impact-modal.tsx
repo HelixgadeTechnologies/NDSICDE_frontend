@@ -10,12 +10,9 @@ import TagInput from "@/ui/form/tag-input";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { getToken } from "@/lib/api/credentials";
-import toast from "react-hot-toast";
-import {
-  fetchResultTypes,
-} from "@/lib/api/result-types";
+import { toast } from "react-toastify";
+import { fetchResultTypes } from "@/lib/api/result-types";
 import { ProjectImpactTypes } from "@/types/project-management-types";
-
 
 type AddProps = {
   isOpen: boolean;
@@ -54,7 +51,7 @@ export default function ProjectImpactModal({
     if (isOpen && !hasInitializedRef.current) {
       if (mode === "edit" && initialData) {
         console.log("Prefilling form with initialData:", initialData);
-        
+
         // Pre-fill form with existing data
         setFormData({
           statement: initialData.statement || "",
@@ -68,8 +65,8 @@ export default function ProjectImpactModal({
         if (initialData.responsiblePerson) {
           const persons = initialData.responsiblePerson
             .split(",")
-            .map(person => person.trim())
-            .filter(person => person.length > 0);
+            .map((person) => person.trim())
+            .filter((person) => person.length > 0);
           console.log("Parsed responsible persons:", persons);
           setResponsiblePersons(persons);
         } else {
@@ -111,7 +108,7 @@ export default function ProjectImpactModal({
       const types = await fetchResultTypes();
 
       const impactType = types.find(
-        (type) => type.resultName.toLowerCase() === "impact"
+        (type) => type.resultName.toLowerCase() === "impact",
       );
 
       if (!impactType) {
@@ -173,7 +170,8 @@ export default function ProjectImpactModal({
     setIsSubmitting(true);
 
     try {
-      const impactId = mode === "edit" ? (initialData?.impactId || currentImpactId) : "";
+      const impactId =
+        mode === "edit" ? initialData?.impactId || currentImpactId : "";
 
       const payload = {
         isCreate: mode === "create",
@@ -184,7 +182,7 @@ export default function ProjectImpactModal({
           responsiblePerson: responsiblePersons.join(", "),
           projectId: projectId,
           resultTypeId: impactResultTypeId, // Should be same for both create and edit
-        }
+        },
       };
 
       const response = await axios.post(
@@ -195,10 +193,12 @@ export default function ProjectImpactModal({
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
-      toast.success(`Project impact ${mode === 'create' ? 'added' : 'updated'} successfully!`);
+      toast.success(
+        `Project impact ${mode === "create" ? "added" : "updated"} successfully!`,
+      );
 
       // Close modal and show success
       onClose();
@@ -209,13 +209,20 @@ export default function ProjectImpactModal({
         onSuccess();
       }
     } catch (error) {
-      console.error(`Error ${mode === 'create' ? 'adding' : 'updating'} project impact:`, error);
+      console.error(
+        `Error ${mode === "create" ? "adding" : "updating"} project impact:`,
+        error,
+      );
 
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || error.message;
-        toast.error(`Failed to ${mode === 'create' ? 'add' : 'update'} impact: ${errorMessage}`);
+        toast.error(
+          `Failed to ${mode === "create" ? "add" : "update"} impact: ${errorMessage}`,
+        );
       } else {
-        toast.error(`Failed to ${mode === 'create' ? 'add' : 'update'} project impact`);
+        toast.error(
+          `Failed to ${mode === "create" ? "add" : "update"} project impact`,
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -237,8 +244,10 @@ export default function ProjectImpactModal({
     <>
       <Modal isOpen={isOpen} onClose={handleModalClose} maxWidth="600px">
         <div className="flex justify-between items-start mb-4">
-          <Heading 
-            heading={mode === "create" ? "Add Project Impact" : "Edit Project Impact"} 
+          <Heading
+            heading={
+              mode === "create" ? "Add Project Impact" : "Edit Project Impact"
+            }
           />
         </div>
 
@@ -276,11 +285,19 @@ export default function ProjectImpactModal({
               isDisabled={isSubmitting}
             />
             <Button
-              content={isSubmitting ? 
-                (mode === "create" ? "Adding..." : "Updating...") : 
-                (mode === "create" ? "Add Project Impact" : "Update Project Impact")}
+              content={
+                isSubmitting
+                  ? mode === "create"
+                    ? "Adding..."
+                    : "Updating..."
+                  : mode === "create"
+                    ? "Add Project Impact"
+                    : "Update Project Impact"
+              }
               onClick={handleSubmit}
-              isDisabled={isSubmitting || isLoadingResultTypes || !impactResultTypeId}
+              isDisabled={
+                isSubmitting || isLoadingResultTypes || !impactResultTypeId
+              }
               icon={isSubmitting ? "eos-icons:loading" : undefined}
             />
           </div>
@@ -293,7 +310,7 @@ export default function ProjectImpactModal({
         </div>
         <Heading
           heading="Congratulations!"
-          subtitle={`Project Impact ${mode === 'create' ? 'added' : 'updated'} successfully`}
+          subtitle={`Project Impact ${mode === "create" ? "added" : "updated"} successfully`}
           className="text-center"
         />
 

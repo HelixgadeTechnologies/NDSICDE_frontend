@@ -8,7 +8,7 @@ import Button from "@/ui/form/button";
 import { useState, FormEvent, useEffect } from "react";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 type KPI = {
   baseLine: string;
@@ -47,11 +47,11 @@ type KPIFormData = {
   strategicObjectiveId: string;
 };
 
-export default function EditKPIModal({ 
-  isOpen, 
-  onClose, 
+export default function EditKPIModal({
+  isOpen,
+  onClose,
   kpiData,
-  onSuccess
+  onSuccess,
 }: EditKPIModalProps) {
   const token = getToken();
   const [formData, setFormData] = useState<KPIFormData>({
@@ -90,21 +90,21 @@ export default function EditKPIModal({
   }, [kpiData]);
 
   const handleInputChange = (field: keyof KPIFormData, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     setIsSubmitting(true);
 
     try {
       const payload = {
         isCreate: false,
-        data: formData
+        data: formData,
       };
 
       console.log("Sending payload:", payload);
@@ -115,25 +115,28 @@ export default function EditKPIModal({
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       if (response.status === 200 || response.status === 201) {
         console.log("KPI updated successfully:", response.data);
         toast.success("KPI updated successfully!");
-        
+
         // Call onSuccess to refresh the table
         if (onSuccess) {
           onSuccess();
         }
-        
+
         // Close modal
         onClose();
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || "Failed to update KPI";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update KPI";
       console.error("Update KPI error:", error);
       console.error("Error response:", error.response?.data);
       toast.error(errorMessage);
@@ -169,10 +172,10 @@ export default function EditKPIModal({
             value={formData.type}
             onChange={(value: string) => handleInputChange("type", value)}
             options={[
-              { label: "Output", value: "Output"},
-              { label: "Impact", value: "Impact"},
-              { label: "Outcome", value: "Outcome"},
-              { label: "Input", value: "Input"},
+              { label: "Output", value: "Output" },
+              { label: "Impact", value: "Impact" },
+              { label: "Outcome", value: "Outcome" },
+              { label: "Input", value: "Input" },
             ]}
           />
           <DropDown
@@ -180,10 +183,10 @@ export default function EditKPIModal({
             label="Specific Area"
             placeholder="Select Area"
             value={formData.specificAreas}
-            onChange={(value: string) => handleInputChange("specificAreas", value)}
-            options={[
-              { label: "Training", value: "Training" },
-            ]}
+            onChange={(value: string) =>
+              handleInputChange("specificAreas", value)
+            }
+            options={[{ label: "Training", value: "Training" }]}
           />
           <TextInput
             name="unitOfMeasure"
@@ -196,17 +199,19 @@ export default function EditKPIModal({
             label="Item in Measure"
             placeholder="Select Item"
             value={formData.itemInMeasure}
-            onChange={(value: string) => handleInputChange("itemInMeasure", value)}
-            options={[
-              { label: "Infrastructure", value: "Infrastructure" },
-            ]}
+            onChange={(value: string) =>
+              handleInputChange("itemInMeasure", value)
+            }
+            options={[{ label: "Infrastructure", value: "Infrastructure" }]}
           />
           <DropDown
             name="disaggregation"
             label="Disaggregation"
             placeholder="Select Disaggregation"
             value={formData.disaggregation}
-            onChange={(value: string) => handleInputChange("disaggregation", value)}
+            onChange={(value: string) =>
+              handleInputChange("disaggregation", value)
+            }
             options={[
               { label: "Department", value: "Department" },
               { label: "State", value: "State" },
@@ -229,8 +234,8 @@ export default function EditKPIModal({
             name="target"
             onChange={(e) => handleInputChange("target", e.target.value)}
           />
-          <Button 
-            content={isSubmitting ? "Updating KPI..." : "Update KPI"} 
+          <Button
+            content={isSubmitting ? "Updating KPI..." : "Update KPI"}
             isDisabled={isSubmitting}
           />
         </form>

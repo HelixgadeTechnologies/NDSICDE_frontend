@@ -11,8 +11,8 @@ import DeleteModal from "@/ui/generic-delete-modal";
 import { useEntityModal } from "@/utils/project-management-utility";
 import ProjectImpactModal from "@/components/project-management-components/project-impact-modal";
 import Link from "next/link";
-import axios from "axios"; 
-import toast from "react-hot-toast";
+import axios from "axios";
+import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
 import { useParams } from "next/navigation";
 
@@ -51,7 +51,7 @@ export default function ProjectImpact() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impacts`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impacts`,
       );
       toast.success(response.data.message);
       setData(response.data.data);
@@ -72,24 +72,25 @@ export default function ProjectImpact() {
   const deleteImpact = async (impactId: string) => {
     setIsDeleting(true);
     try {
-      const res = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impact/${impactId}`, 
+      const res = await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impact/${impactId}`,
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-          }
-        }
+          },
+        },
       );
       toast.success("Project impact deleted successfully!");
-      setRemoveProjectImpact(false)
+      setRemoveProjectImpact(false);
       fetchImpact();
     } catch (error) {
       console.error(`Error deleting impact: ${error}`);
-      toast.error("An error occurred. Please try again later.")
+      toast.error("An error occurred. Please try again later.");
     } finally {
       setIsDeleting(false);
     }
-  }
+  };
 
   return (
     <div className="relative mt-12">
@@ -128,7 +129,7 @@ export default function ProjectImpact() {
                     color="#909CAD"
                     onClick={() =>
                       setActiveRowId((prev) =>
-                        prev === row.impactId ? null : row.impactId
+                        prev === row.impactId ? null : row.impactId,
                       )
                     }
                   />
@@ -167,17 +168,13 @@ export default function ProjectImpact() {
                             Remove
                           </li>
                           <Link
-                            href={
-                              `/projects/${projectId}/project-management/impact/indicator/${row.impactId}/add`
-                            }
+                            href={`/projects/${projectId}/project-management/impact/indicator/${row.impactId}/add`}
                             className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                             <Icon icon={"si:add-fill"} height={20} width={20} />
                             Add Indicator
                           </Link>
                           <Link
-                            href={
-                             `/projects/${projectId}/project-management/impact/${row.impactId}/indicator`
-                            }
+                            href={`/projects/${projectId}/project-management/impact/${row.impactId}/indicator`}
                             className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                             <Icon
                               icon={"hugeicons:view"}

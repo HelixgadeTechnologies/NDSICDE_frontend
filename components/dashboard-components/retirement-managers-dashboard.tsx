@@ -5,7 +5,7 @@ import DashboardStat from "@/ui/dashboard-stat-card";
 import RequestApprovalsTable from "../admin-components/request-approval-table";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 type DashboardStats = {
   pendingRequests: {
@@ -39,7 +39,7 @@ export default function RetirementManagersDashboard() {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/stats`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/stats`,
         );
         if (response.data.success) {
           setStats(response.data.data);

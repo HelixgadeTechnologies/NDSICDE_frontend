@@ -10,7 +10,7 @@ import Button from "@/ui/form/button";
 import { useKPIReportState } from "@/store/partners-store/kpi-report-store";
 import { FormEvent, useState } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useRoleStore } from "@/store/role-store";
 import { useEffect } from "react";
@@ -25,12 +25,14 @@ export default function AddNewKPIForm() {
   const token = getToken();
 
   const { projectOptions } = useProjects();
-  const [objectiveOptions, setObjectiveOptions] = useState<{label: string; value: string}[]>([]);
+  const [objectiveOptions, setObjectiveOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [evidenceUrl, setEvidenceUrl] = useState<string>("");
-  const [kpiTypeOptions] = useState<{label: string; value: string}[]>([
+  const [kpiTypeOptions] = useState<{ label: string; value: string }[]>([
     { label: "Outcome", value: "Outcome" },
     { label: "Output", value: "Output" },
-    { label: "Impact", value: "Impact" }
+    { label: "Impact", value: "Impact" },
   ]);
 
   useEffect(() => {
@@ -39,14 +41,12 @@ export default function AddNewKPIForm() {
         const data = await getStrategicObjectives();
         const options = data.map((obj: any) => ({
           label: obj.statement,
-          value: obj.strategicObjectiveId
+          value: obj.strategicObjectiveId,
         }));
         setObjectiveOptions(options);
       } catch (error) {
         console.error("Error fetching objectives for dropdown: ", error);
       }
-
-
     };
     fetchData();
   }, []);
@@ -84,7 +84,7 @@ export default function AddNewKPIForm() {
           status: "Pending",
           observation: narrative,
           evidence: evidenceUrl,
-        }
+        },
       };
 
       const response = await axios.post(
@@ -93,9 +93,9 @@ export default function AddNewKPIForm() {
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       if (response.status === 200 || response.status === 201) {
@@ -104,7 +104,8 @@ export default function AddNewKPIForm() {
         router.push("/kpi-reporting");
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Failed to create KPI Report";
+      const errorMessage =
+        error.response?.data?.message || "Failed to create KPI Report";
       console.error(error);
       toast.error(errorMessage);
     } finally {
@@ -133,7 +134,6 @@ export default function AddNewKPIForm() {
             onChange={(value: string) => setField("strategicObjective", value)}
             options={objectiveOptions}
             isBigger
-            
           />
           <TextInput
             value={kpiName}
@@ -184,19 +184,22 @@ export default function AddNewKPIForm() {
           placeholder="Provide context or explanations for the KPI values"
           onChange={(e) => setField("narrative", e.target.value)}
         />
-        <Heading heading="Supporting Evidence" subtitle="Attach files to support your activity report" />
-        <FileUploader 
-          onUploadComplete={(url) => setEvidenceUrl(url)} 
-          autoUpload={true} 
+        <Heading
+          heading="Supporting Evidence"
+          subtitle="Attach files to support your activity report"
+        />
+        <FileUploader
+          onUploadComplete={(url) => setEvidenceUrl(url)}
+          autoUpload={true}
           token={token ?? undefined}
           maxFiles={1}
         />
         <div className="w-[290px] mx-auto">
-            <Button 
-              content={isSubmitting ? "Submitting..." : "Submit KPI Report"} 
-              icon="fluent:clipboard-bullet-list-ltr-16-regular" 
-              isDisabled={isSubmitting} 
-            />
+          <Button
+            content={isSubmitting ? "Submitting..." : "Submit KPI Report"}
+            icon="fluent:clipboard-bullet-list-ltr-16-regular"
+            isDisabled={isSubmitting}
+          />
         </div>
       </form>
     </CardComponent>

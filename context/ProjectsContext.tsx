@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 // ============================================================================
 // TYPES
@@ -56,7 +56,7 @@ type ProjectsContextType = {
 export const fetchProjectsAPI = async (): Promise<ProjectType[]> => {
   try {
     const response = await axios.get<ProjectsResponse>(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/projects`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/projects`,
     );
 
     // Validate response structure
@@ -73,7 +73,7 @@ export const fetchProjectsAPI = async (): Promise<ProjectType[]> => {
       throw new Error(
         error.response?.data?.message ||
           error.message ||
-          "Failed to fetch projects"
+          "Failed to fetch projects",
       );
     }
 
@@ -88,7 +88,7 @@ export const fetchProjectsAPI = async (): Promise<ProjectType[]> => {
  */
 export const fetchProjectsWithCallbacks = async (
   onSuccess?: (projects: ProjectType[]) => void,
-  onError?: (error: Error) => void
+  onError?: (error: Error) => void,
 ): Promise<ProjectType[] | null> => {
   try {
     const projects = await fetchProjectsAPI();
@@ -107,7 +107,7 @@ export const fetchProjectsWithCallbacks = async (
  * @returns Array of options for dropdown component
  */
 export const transformProjectsToOptions = (
-  projects: ProjectType[]
+  projects: ProjectType[],
 ): ProjectOption[] => {
   if (!projects || projects.length === 0) {
     return [];
@@ -124,7 +124,7 @@ export const transformProjectsToOptions = (
 // ============================================================================
 
 const ProjectsContext = createContext<ProjectsContextType | undefined>(
-  undefined
+  undefined,
 );
 
 // ============================================================================
@@ -146,22 +146,22 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
     try {
       const projectsData = await fetchProjectsAPI();
       setProjects(projectsData);
-      
+
       if (showToasts) {
         toast.success("Projects loaded successfully");
       }
-      
+
       return projectsData;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to load projects";
-      
+
       setError(errorMessage);
-      
+
       if (showToasts) {
         toast.error(`Failed to load projects: ${errorMessage}`);
       }
-      
+
       throw error;
     } finally {
       setIsLoading(false);

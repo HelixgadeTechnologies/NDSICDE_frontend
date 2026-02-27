@@ -8,7 +8,7 @@ import TextInput from "@/ui/form/text-input";
 import Checkbox from "@/ui/form/checkbox";
 import Button from "@/ui/form/button";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
 
 // Define the role data type
@@ -28,12 +28,12 @@ type RoleFormModalProps = {
   onClose: () => void; // Add onClose prop
 };
 
-export default function RoleFormModal({ 
-  onSuccess, 
-  mode, 
-  roleData, 
+export default function RoleFormModal({
+  onSuccess,
+  mode,
+  roleData,
   isOpen,
-  onClose
+  onClose,
 }: RoleFormModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const token = getToken();
@@ -53,7 +53,7 @@ export default function RoleFormModal({
     if (mode === "edit" && roleData) {
       // Parse permission string to checkboxes
       const permissions = roleData.permission.split(",").map(Number);
-      
+
       setRoleForm({
         roleId: roleData.roleId || "",
         roleName: roleData.roleName || "",
@@ -109,20 +109,20 @@ export default function RoleFormModal({
   // Function to convert checkboxes to permission string
   const getPermissionString = () => {
     const permissions: number[] = [];
-    
+
     // Map checkboxes to numbers based on order (view=1, edit=2, delete=3, fullAccess=4)
     if (roleForm.view) permissions.push(1);
     if (roleForm.edit) permissions.push(2);
     if (roleForm.delete) permissions.push(3);
     if (roleForm.fullAccess) permissions.push(4);
-    
+
     // Return comma-separated string or empty string if no permissions
     return permissions.length > 0 ? permissions.join(",") : "";
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
     if (!roleForm.roleName.trim()) {
       toast.error("Please enter a role name");
@@ -141,7 +141,7 @@ export default function RoleFormModal({
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const isCreate = mode === "create";
       const payload = {
@@ -154,7 +154,10 @@ export default function RoleFormModal({
         },
       };
 
-      console.log(`${mode === "create" ? "Creating" : "Updating"} role with payload:`, payload);
+      console.log(
+        `${mode === "create" ? "Creating" : "Updating"} role with payload:`,
+        payload,
+      );
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/settings/register-role`,
@@ -162,18 +165,19 @@ export default function RoleFormModal({
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data.success) {
-        const successMessage = mode === "create" 
-          ? "Role created successfully!" 
-          : "Role updated successfully!";
-        
+        const successMessage =
+          mode === "create"
+            ? "Role created successfully!"
+            : "Role updated successfully!";
+
         toast.success(successMessage);
-        
+
         // Reset form for create mode only
         if (mode === "create") {
           setRoleForm({
@@ -186,7 +190,7 @@ export default function RoleFormModal({
             fullAccess: false,
           });
         }
-        
+
         // Close modal
         onClose();
         onSuccess();
@@ -195,7 +199,7 @@ export default function RoleFormModal({
       }
     } catch (error: any) {
       console.error(`Error ${mode}ing role:`, error);
-      
+
       if (error.response) {
         // Server responded with error status
         toast.error(error.response.data?.message || "Server error occurred");
@@ -228,9 +232,10 @@ export default function RoleFormModal({
   };
 
   const modalTitle = mode === "create" ? "Add New Role" : "Edit Role";
-  const modalDescription = mode === "create" 
-    ? "Create a new user role with specific permissions" 
-    : "Update the user role with new permissions";
+  const modalDescription =
+    mode === "create"
+      ? "Create a new user role with specific permissions"
+      : "Update the user role with new permissions";
   const buttonText = mode === "create" ? "Create Role" : "Update Role";
 
   return (
@@ -296,8 +301,8 @@ export default function RoleFormModal({
             />
           </div>
         </div>
-        <Button 
-          content={buttonText} 
+        <Button
+          content={buttonText}
           isLoading={isSubmitting}
           type="submit"
           isDisabled={isSubmitting}

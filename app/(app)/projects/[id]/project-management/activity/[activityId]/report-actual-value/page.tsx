@@ -13,7 +13,7 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export default function ReportActualValue() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -26,7 +26,7 @@ export default function ReportActualValue() {
     id: string;
     name: string;
   } | null>(null);
-  
+
   const params = useParams();
   const projectId = (params.id as string) || "";
 
@@ -61,7 +61,7 @@ export default function ReportActualValue() {
   useEffect(() => {
     fetchActivityReports();
   }, []);
-  console.log(data)
+  console.log(data);
 
   // Handle delete click - opens confirmation modal
   const handleDeleteClick = (id: string, name: string) => {
@@ -73,7 +73,7 @@ export default function ReportActualValue() {
   // delete activity report
   const deleteActivity = async () => {
     if (!itemToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       const res = await axios.delete(
@@ -107,7 +107,7 @@ export default function ReportActualValue() {
       {/* <div className="absolute right-0 -top-18.75">
         <Button content="Add Indicator Reporting Formats" icon="si:add-fill" href={`/projects/${projectId}/project-management/activity/report-actual-value/add`} />
       </div> */}
-        <Heading heading="Activity Report" className="mb-5"/>
+      <Heading heading="Activity Report" className="mb-5" />
 
       <CardComponent>
         {isLoading ? (
@@ -129,7 +129,9 @@ export default function ReportActualValue() {
                 <td className="px-6">{row.percentageCompletion}%</td>
                 <td className="px-6">₦ {row.activityTotalBudget}</td>
                 <td className="px-6">{row.responsiblePerson}</td>
-                <td className="px-6">{formatDate(row.startDate, "date-only")}</td>
+                <td className="px-6">
+                  {formatDate(row.startDate, "date-only")}
+                </td>
                 <td className="px-6">{formatDate(row.endDate, "date-only")}</td>
                 <td className="px-6 relative">
                   <Icon
@@ -165,10 +167,12 @@ export default function ReportActualValue() {
                             Edit
                           </li>
                           <li
-                            onClick={() => handleDeleteClick(
-                              row.activityReportId, 
-                              row.activityStatement || "this activity"
-                            )}
+                            onClick={() =>
+                              handleDeleteClick(
+                                row.activityReportId,
+                                row.activityStatement || "this activity",
+                              )
+                            }
                             className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
                             <Icon
                               icon={"pixelarticons:trash"}
@@ -187,7 +191,7 @@ export default function ReportActualValue() {
           />
         )}
       </CardComponent>
-      
+
       {itemToDelete && (
         <DeleteModal
           isOpen={confirmDeleteModal}

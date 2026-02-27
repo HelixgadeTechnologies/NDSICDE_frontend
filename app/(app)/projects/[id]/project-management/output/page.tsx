@@ -12,7 +12,7 @@ import ProjectOutputModal from "@/components/project-management-components/proje
 import DeleteModal from "@/ui/generic-delete-modal";
 import Link from "next/link";
 import { getToken } from "@/lib/api/credentials";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import axios from "axios";
 
 export default function ProjectOutput() {
@@ -49,7 +49,7 @@ export default function ProjectOutput() {
     setIsLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs`,
       );
       toast.success(res.data.message);
       setData(res.data.data);
@@ -77,7 +77,7 @@ export default function ProjectOutput() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       toast.success("Project output deleted successfully!");
       setRemoveProjectOutput(false);
@@ -128,7 +128,7 @@ export default function ProjectOutput() {
                     color="#909CAD"
                     onClick={() =>
                       setActiveRowId((prev) =>
-                        prev === row.outputId ? null : row.outputId
+                        prev === row.outputId ? null : row.outputId,
                       )
                     }
                   />

@@ -1,9 +1,9 @@
 "use client";
 
-import { Icon } from "@iconify/react";
+// import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import SearchInput from "@/ui/form/search";
 import DropDown from "@/ui/form/select-dropdown";
 import Heading from "@/ui/text-heading";
@@ -18,13 +18,13 @@ type ChartData = {
   month: string;
   target: number;
   actual: number;
-}
+};
 
 type PieChartData = {
   type: string;
   count: number;
   percentage: number;
-}
+};
 
 type PartnersDashboardComponentProps = {
   projectId?: string;
@@ -38,7 +38,7 @@ export default function PartnersDashboardComponent({
   endDate,
 }: PartnersDashboardComponentProps) {
   // table data headers
-  const head = ["KPI", "Submission Date", "Status", "Actions"];
+  const head = ["KPI", "Submission Date", "Status"];
   // line chart data
   const lines = [
     { key: "target", label: "Target", color: "#003B99" },
@@ -67,10 +67,12 @@ export default function PartnersDashboardComponent({
         if (startDate) params.append("startDate", startDate);
         if (endDate) params.append("endDate", endDate);
 
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/performance-chart?${params.toString()}`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/performance-chart?${params.toString()}`,
+        );
         setChartData(res.data.data);
       } catch (error) {
-        console.error('error getting line data: ', error)
+        console.error("error getting line data: ", error);
       } finally {
         setChartDataLoading(false);
       }
@@ -83,10 +85,12 @@ export default function PartnersDashboardComponent({
         if (startDate) params.append("startDate", startDate);
         if (endDate) params.append("endDate", endDate);
 
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/type-distribution?${params.toString()}`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/type-distribution?${params.toString()}`,
+        );
         setPieChartData(res.data.data);
       } catch (error) {
-        console.error('error getting pie data: ', error)
+        console.error("error getting pie data: ", error);
       } finally {
         setPieChartDataLoading(false);
       }
@@ -105,9 +109,12 @@ export default function PartnersDashboardComponent({
         if (startDate) params.append("startDate", startDate);
         if (endDate) params.append("endDate", endDate);
         if (query) params.append("search", query);
-        if (statusFilter && statusFilter !== "All") params.append("status", statusFilter);
+        if (statusFilter && statusFilter !== "All")
+          params.append("status", statusFilter);
 
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/submissions?${params.toString()}`);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/submissions?${params.toString()}`,
+        );
         setSubmissions(res.data.data || []);
       } catch (error) {
         console.error("error getting submissions: ", error);
@@ -124,47 +131,62 @@ export default function PartnersDashboardComponent({
   }, [projectId, startDate, endDate, query, statusFilter]);
   return (
     <section className="space-y-8">
-        <div className="flex gap-6 items-start">
-            <div className="w-[70%]">
-                <CardComponent>
-                    <Heading heading="KPI Performance Overview" subtitle="Targets vs. Actuals over the last 6 months" />
-                    <div className="h-110">
-                      {chartDataLoading ? (
-                        <div className="flex items-center justify-center h-full text-gray-500">
-                          Loading KPI data...
-                        </div>
-                      ) : chartData.length > 0 ? (
-                        <LineChartComponent data={chartData} lines={lines} xKey="month" legend />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-gray-500">
-                          No KPI data available
-                        </div>
-                      )}
-                    </div>
-                </CardComponent>
+      <div className="flex gap-6 items-start">
+        <div className="w-[70%]">
+          <CardComponent>
+            <Heading
+              heading="KPI Performance Overview"
+              subtitle="Targets vs. Actuals over the last 6 months"
+            />
+            <div className="h-110">
+              {chartDataLoading ? (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Loading KPI data...
+                </div>
+              ) : chartData.length > 0 ? (
+                <LineChartComponent
+                  data={chartData}
+                  lines={lines}
+                  xKey="month"
+                  legend
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  No KPI data available
+                </div>
+              )}
             </div>
-            <div className="w-[30%]">
-                <CardComponent>
-                    <Heading heading="Progress Tracking" subtitle="KPI Types Distribution" className="text-center" />
-                    <div className="h-110">
-                      {pieChartDataLoading ? (
-                        <div className="flex items-center justify-center h-full text-gray-500">
-                           Loading Pie data...
-                        </div>
-                      ) : pieChartData?.length > 0 ? (
-                        <PieChartComponent
-                          data={pieChartData.map(item => ({ name: item.type, value: item.percentage }))}
-                          colors={progressTrackingColors}
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-gray-500">
-                           No Pie data available
-                        </div>
-                      )}
-                    </div>
-                </CardComponent>
-            </div>
+          </CardComponent>
         </div>
+        <div className="w-[30%]">
+          <CardComponent>
+            <Heading
+              heading="Progress Tracking"
+              subtitle="KPI Types Distribution"
+              className="text-center"
+            />
+            <div className="h-110">
+              {pieChartDataLoading ? (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Loading Pie data...
+                </div>
+              ) : pieChartData?.length > 0 ? (
+                <PieChartComponent
+                  data={pieChartData.map((item) => ({
+                    name: item.type,
+                    value: item.percentage,
+                  }))}
+                  colors={progressTrackingColors}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  No Pie data available
+                </div>
+              )}
+            </div>
+          </CardComponent>
+        </div>
+      </div>
 
       <CardComponent>
         <div className="flex justify-between items-center mb-4">
@@ -206,24 +228,24 @@ export default function PartnersDashboardComponent({
                 <td className="px-6">{row.kpiName || "N/A"}</td>
                 <td className="px-6">{formatDate(row.createdAt)}</td>
                 <td
-                    className={`px-6 capitalize ${
-                      (row.status || "").toLowerCase() === "approved"
-                        ? "text-green-500"
-                        : (row.status || "").toLowerCase() === "pending" ? "text-yellow-500"
+                  className={`px-6 capitalize ${
+                    (row.status || "").toLowerCase() === "approved"
+                      ? "text-green-500"
+                      : (row.status || "").toLowerCase() === "pending"
+                        ? "text-yellow-500"
                         : "text-red-500"
-                    }`}
-                  >
-                    {row.status || "N/A"}
-                  </td>
-                <td className="pl-10 relative">
-                    <Icon
-                      icon={"uiw:more"}
-                      width={22}
-                      height={22}
-                      className="cursor-pointer"
-                      color="#909CAD"
-                    />
+                  }`}>
+                  {row.status || "N/A"}
                 </td>
+                {/* <td className="pl-10 relative">
+                  <Icon
+                    icon={"uiw:more"}
+                    width={22}
+                    height={22}
+                    className="cursor-pointer"
+                    color="#909CAD"
+                  />
+                </td> */}
               </>
             )}
           />

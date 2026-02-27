@@ -9,8 +9,7 @@ import DateRangePicker from "@/ui/form/date-range";
 import DropDown from "@/ui/form/select-dropdown";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-
+import { toast } from "react-toastify";
 
 type DashboardStats = {
   totalAssignedKpis: number;
@@ -24,7 +23,10 @@ export default function PartnersDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [projectId, setProjectId] = useState<string>("");
-  const [dateRange, setDateRange] = useState<{ startDate?: string; endDate?: string }>({});
+  const [dateRange, setDateRange] = useState<{
+    startDate?: string;
+    endDate?: string;
+  }>({});
   const { user } = useRoleStore();
   const { projectOptions } = useProjects();
 
@@ -83,13 +85,13 @@ export default function PartnersDashboardPage() {
             onChange={(val) => setProjectId(val)}
             options={[{ label: "All Projects", value: "" }, ...projectOptions]}
           />
-          <DateRangePicker 
-            label="Date Range" 
+          <DateRangePicker
+            label="Date Range"
             onChange={(range) => {
               if (range.startDate && range.endDate) {
                 setDateRange({
                   startDate: new Date(range.startDate).toISOString(),
-                  endDate: new Date(range.endDate).toISOString()
+                  endDate: new Date(range.endDate).toISOString(),
                 });
               }
             }}
@@ -99,10 +101,10 @@ export default function PartnersDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <DashboardStat data={dashboardData} />
       </div>
-      <PartnersDashboardComponent 
-         projectId={projectId} 
-         startDate={dateRange.startDate} 
-         endDate={dateRange.endDate} 
+      <PartnersDashboardComponent
+        projectId={projectId}
+        startDate={dateRange.startDate}
+        endDate={dateRange.endDate}
       />
     </section>
   );

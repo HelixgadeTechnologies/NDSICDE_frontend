@@ -10,7 +10,7 @@ import Button from "@/ui/form/button";
 import { useKPIReportState } from "@/store/partners-store/kpi-report-store";
 import { FormEvent, useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useRoleStore } from "@/store/role-store";
 import { getStrategicObjectives } from "@/lib/api/admin-api-calls";
 import { useProjects } from "@/context/ProjectsContext";
@@ -23,19 +23,26 @@ type EditKPIModalProps = {
   onEdit: () => void;
 };
 
-export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPIModalProps) {
+export default function EditKPIModal({
+  isOpen,
+  onClose,
+  kpiId,
+  onEdit,
+}: EditKPIModalProps) {
   const { user } = useRoleStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const token = getToken();
 
   const { projectOptions } = useProjects();
-  const [objectiveOptions, setObjectiveOptions] = useState<{label: string; value: string}[]>([]);
+  const [objectiveOptions, setObjectiveOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [evidenceUrl, setEvidenceUrl] = useState<string>("");
-  const [kpiTypeOptions] = useState<{label: string; value: string}[]>([
+  const [kpiTypeOptions] = useState<{ label: string; value: string }[]>([
     { label: "Outcome", value: "Outcome" },
     { label: "Output", value: "Output" },
-    { label: "Impact", value: "Impact" }
+    { label: "Impact", value: "Impact" },
   ]);
 
   const {
@@ -59,7 +66,7 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
         if (isMounted) {
           const options = data.map((obj: any) => ({
             label: obj.statement,
-            value: obj.strategicObjectiveId
+            value: obj.strategicObjectiveId,
           }));
           setObjectiveOptions(options);
         }
@@ -68,7 +75,9 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
       }
     };
     fetchData();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -78,19 +87,30 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/report/${kpiId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         const currentKPI = response.data.data;
-        
+
         if (currentKPI && isMounted) {
           setField("kpiName", currentKPI.kpiName || "");
           setField("kpiType", currentKPI.kpiType || "");
           setField("baseline", currentKPI.baseline?.toString() || "");
           setField("target", currentKPI.target?.toString() || "");
           setField("actualValue", currentKPI.actualValue?.toString() || "");
-          setField("narrative", currentKPI.observation || currentKPI.narrative || "");
-          setField("projectId", currentKPI.project?.projectId || currentKPI.projectId || "");
-          setField("strategicObjective", currentKPI.strategicObjective?.strategicObjectiveId || currentKPI.strategicObjectiveId || "");
+          setField(
+            "narrative",
+            currentKPI.observation || currentKPI.narrative || "",
+          );
+          setField(
+            "projectId",
+            currentKPI.project?.projectId || currentKPI.projectId || "",
+          );
+          setField(
+            "strategicObjective",
+            currentKPI.strategicObjective?.strategicObjectiveId ||
+              currentKPI.strategicObjectiveId ||
+              "",
+          );
           if (currentKPI.evidence) setEvidenceUrl(currentKPI.evidence);
         }
       } catch (error) {
@@ -103,7 +123,9 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
     if (kpiId && token && isOpen) {
       fetchExistingKPI();
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [kpiId, token, isOpen, setField]);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -123,11 +145,13 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
           kpiType,
           baseline: baseline ? parseInt(baseline as string, 10) : undefined,
           target: target ? parseInt(target as string, 10) : undefined,
-          actualValue: actualValue ? parseInt(actualValue as string, 10) : undefined,
+          actualValue: actualValue
+            ? parseInt(actualValue as string, 10)
+            : undefined,
           status: "Pending",
           observation: narrative,
           evidence: evidenceUrl,
-        }
+        },
       };
 
       const response = await axios.post(
@@ -136,9 +160,9 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       if (response.status === 200 || response.status === 201) {
@@ -148,7 +172,8 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
         onClose();
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Failed to update KPI Report";
+      const errorMessage =
+        error.response?.data?.message || "Failed to update KPI Report";
       console.error(error);
       toast.error(errorMessage);
     } finally {
@@ -157,12 +182,23 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={() => { resetForm(); onClose(); }} maxWidth="850px">
-      <Heading heading="Edit KPI Report" subtitle="Update the details about your KPI"/>
+    <Modal
+      isOpen={isOpen}
+      onClose={() => {
+        resetForm();
+        onClose();
+      }}
+      maxWidth="850px">
+      <Heading
+        heading="Edit KPI Report"
+        subtitle="Update the details about your KPI"
+      />
       <div className="h-130 overflow-auto custom-scrollbar">
         {loading ? (
           <div className="dots my-20 mx-auto">
-            <div></div><div></div><div></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 mt-6">
@@ -181,7 +217,9 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
                 name="strategicObjective"
                 label="Strategic Objective"
                 placeholder="Select Strategic Objective"
-                onChange={(value: string) => setField("strategicObjective", value)}
+                onChange={(value: string) =>
+                  setField("strategicObjective", value)
+                }
                 options={objectiveOptions}
                 isBigger
               />
@@ -234,20 +272,23 @@ export default function EditKPIModal({ isOpen, onClose, kpiId, onEdit }: EditKPI
               placeholder="Provide context or explanations for the KPI values"
               onChange={(e: any) => setField("narrative", e.target.value)}
             />
-            <Heading heading="Supporting Evidence" subtitle="Attach files to support your activity report" />
-            <FileUploader 
-              onUploadComplete={(url) => setEvidenceUrl(url)} 
-              autoUpload={true} 
+            <Heading
+              heading="Supporting Evidence"
+              subtitle="Attach files to support your activity report"
+            />
+            <FileUploader
+              onUploadComplete={(url) => setEvidenceUrl(url)}
+              autoUpload={true}
               token={token ?? undefined}
               maxFiles={1}
               // Add existing evidence URL if needed
             />
             <div className="w-[290px] mx-auto mt-6">
-                <Button 
-                  content={isSubmitting ? "Submitting..." : "Update KPI Report"} 
-                  icon="fluent:clipboard-bullet-list-ltr-16-regular" 
-                  isDisabled={isSubmitting} 
-                />
+              <Button
+                content={isSubmitting ? "Submitting..." : "Update KPI Report"}
+                icon="fluent:clipboard-bullet-list-ltr-16-regular"
+                isDisabled={isSubmitting}
+              />
             </div>
           </form>
         )}

@@ -9,7 +9,7 @@ import BarChartComponent from "@/ui/bar-chart";
 import LineChartComponent from "@/ui/line-chart";
 import CommentsTab from "@/ui/comments-tab";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 
@@ -51,7 +51,9 @@ export default function ViewAnalytics({
   indicatorReportId,
 }: ViewAnalyticsProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsDataType | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsDataType | null>(
+    null,
+  );
 
   // for tabs
   const tabs = [
@@ -79,7 +81,7 @@ export default function ViewAnalytics({
     }
 
     const { months, budget, actualSpending } = analyticsData.financialOverview;
-    
+
     return months.map((month, index) => ({
       name: month,
       budget: budget[index] || 0,
@@ -95,7 +97,7 @@ export default function ViewAnalytics({
     }
 
     const { categories, baseline, target } = analyticsData.kpiPerformance;
-    
+
     return categories.map((category, index) => ({
       name: category,
       baseline: baseline[index] || 0,
@@ -106,11 +108,11 @@ export default function ViewAnalytics({
   useEffect(() => {
     const fetchAnalytics = async () => {
       if (!indicatorReportId) return;
-      
+
       setIsLoading(true);
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/indicator-reports-overview/${indicatorReportId}`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/indicator-reports-overview/${indicatorReportId}`,
         );
         setAnalyticsData(res.data.data);
       } catch (error) {
@@ -153,14 +155,16 @@ export default function ViewAnalytics({
                         <div></div>
                       </div>
                     ) : getKPIData().length > 0 ? (
-                      <BarChartComponent 
-                        data={getKPIData()} 
-                        xKey="name" 
-                        bars={kpiBars} 
+                      <BarChartComponent
+                        data={getKPIData()}
+                        xKey="name"
+                        bars={kpiBars}
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full">
-                        <p className="text-gray-500">No KPI performance data available</p>
+                        <p className="text-gray-500">
+                          No KPI performance data available
+                        </p>
                       </div>
                     )}
                   </div>
@@ -189,7 +193,9 @@ export default function ViewAnalytics({
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full">
-                        <p className="text-gray-500">No financial data available</p>
+                        <p className="text-gray-500">
+                          No financial data available
+                        </p>
                       </div>
                     )}
                   </div>
@@ -209,7 +215,8 @@ export default function ViewAnalytics({
                         <div></div>
                         <div></div>
                       </div>
-                    ) : analyticsData?.comments && analyticsData.comments.length > 0 ? (
+                    ) : analyticsData?.comments &&
+                      analyticsData.comments.length > 0 ? (
                       analyticsData.comments.map((c) => (
                         <CommentsTab
                           key={c.indicatorReportCommentId}
