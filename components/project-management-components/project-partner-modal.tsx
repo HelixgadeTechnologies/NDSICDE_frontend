@@ -100,7 +100,6 @@ export default function ProjectPartnerModal({
         },
       );
 
-      console.log("Email options response:", response.data);
 
       // Extract data based on API response structure
       let usersData = [];
@@ -210,7 +209,6 @@ export default function ProjectPartnerModal({
         },
       );
 
-      console.log("API Response:", response.data);
 
       toast.success(
         `Project partner ${mode === "create" ? "added" : "updated"} successfully!`,

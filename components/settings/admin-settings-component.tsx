@@ -14,7 +14,7 @@ export default function SuperAdminSettingsComponent() {
 
   // for changing data through the parent or fetching data in children component
   // const handleTabChange = (tabId: number) => {
-  //     console.log("Active tab is:", tabId);
+
   // };
 
   return (

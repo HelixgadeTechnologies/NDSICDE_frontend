@@ -112,7 +112,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
       };
 
       const response = await createUser(userData, token);
-      console.log("User created successfully:", response.message);
+
       onClose();
       window.dispatchEvent(new CustomEvent("teamMemberUpdated"));
     } catch (error) {

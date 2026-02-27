@@ -47,7 +47,7 @@ export default function ResetPassword() {
         email: userData.email,
       });
 
-      // console.log('Reset password response:', response);
+
 
       // Check if reset was successful
       if (response.success) {

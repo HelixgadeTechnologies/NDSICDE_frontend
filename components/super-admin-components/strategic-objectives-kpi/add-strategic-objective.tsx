@@ -65,7 +65,6 @@ export default function AddStrategicObjectiveModal({
         }
       );
 
-      console.log(`Strategic Objective ${mode === "Add" ? "added" : "updated"}:`, res.data);
 
       onClose();
       if (onSubmit) onSubmit();

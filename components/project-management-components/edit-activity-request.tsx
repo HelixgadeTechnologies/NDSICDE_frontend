@@ -198,7 +198,7 @@ export default function EditActivityRequest({ isOpen, onClose }: EditProps) {
   };
 
   //   const handleSubmit = () => {
-  //     console.log("Final form data:", formData);
+
   //     // Handle form submission here
   //     onClose();
   //   };

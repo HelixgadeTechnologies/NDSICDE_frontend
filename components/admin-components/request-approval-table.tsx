@@ -55,8 +55,7 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
               },
             }
           );
-          // Assuming response has a 'data' array
-          setData(res.data.data || []);
+          setData(res.data.data);
           console.log(res.data.data)
         } catch (error) {
           console.error("Failed to fetch requests", error);
@@ -171,8 +170,8 @@ export default function RequestApprovalsTable({ showStats }: { showStats?: boole
               },
             }
           );
-          // Assuming response has a 'data' array
-          setData(res.data?.data || []);
+          setData(res.data?.data);
+          console.log(res.data.data)
         } catch (error) {
           console.error("Failed to fetch retirements", error);
         } finally {

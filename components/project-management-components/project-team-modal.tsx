@@ -88,7 +88,6 @@ export default function ProjectTeamModal({
           },
         );
 
-        console.log("Team members response:", response.data);
 
         if (
           response.data &&
@@ -152,7 +151,6 @@ export default function ProjectTeamModal({
       },
     };
 
-    console.log("Submitting payload:", payload);
 
     setIsSubmitting(true);
 
@@ -166,7 +164,6 @@ export default function ProjectTeamModal({
         },
       });
 
-      console.log("Response:", response.data);
 
       toast.success(
         `Team member ${mode === "create" ? "added" : "updated"} successfully!`,
@@ -201,7 +198,7 @@ export default function ProjectTeamModal({
 
   // Handle dropdown changes - KEPT THE SAME
   const handleSelectChange = (name: string, value: string) => {
-    console.log(`Dropdown ${name} changed to:`, value);
+
 
     // Special handling for email selection
     if (name === "email" && team && Array.isArray(team)) {

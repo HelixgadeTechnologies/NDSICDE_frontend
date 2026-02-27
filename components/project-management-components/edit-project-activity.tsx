@@ -167,7 +167,6 @@ export default function EditProjectActivity({
         },
       );
 
-      console.log("Outputs API response:", response.data);
 
       // Extract data based on API response structure
       let outputsData = [];
@@ -263,7 +262,7 @@ export default function EditProjectActivity({
 
   // Handle dropdown changes
   const handleDropdownChange = (value: string) => {
-    console.log(`Dropdown outputId changed to:`, value);
+
     setFormData((prev) => ({
       ...prev,
       outputId: value,

@@ -83,7 +83,7 @@ export default function AddIndicatorForm() {
 
   // Handle indicator source change
   const handleIndicatorSourceChange = (data: IndicatorSourceData) => {
-    // console.log("Indicator source data received:", data);
+
 
     setFormData((prev) => ({
       ...prev,
@@ -196,10 +196,10 @@ export default function AddIndicatorForm() {
       }
 
       const payload = preparePayload();
-      console.log("Submitting payload:", payload);
+
 
       const response = await indicatorApi.createIndicator(payload);
-      console.log("Indicator created successfully:", response);
+
 
       // Reset form or show success message
       toast.success("Indicator added successfully!");
@@ -265,7 +265,7 @@ export default function AddIndicatorForm() {
         result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
       });
-      console.log("Form cancelled");
+
     }
   };
 

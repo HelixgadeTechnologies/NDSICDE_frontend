@@ -47,7 +47,7 @@ export default function DeleteTeamMember({
 
       try {
         const response = await deleteUser(user.userId, token);
-        console.log("User deleted successfully:", response.message);
+
         onClose();
         onDelete();
       } catch (error) {

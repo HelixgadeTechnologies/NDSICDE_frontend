@@ -111,7 +111,6 @@ export default function ProjectOutputModal({
         },
       );
 
-      console.log("Outcomes API response:", response.data);
 
       // extract data based on API response structure
       let outcomesData = [];
@@ -123,7 +122,6 @@ export default function ProjectOutputModal({
         outcomesData = [response.data.data];
       }
 
-      console.log("Processed outcomes data:", outcomesData);
 
       // transform data for dropdown - adjust property names based on your actual API response
       const transformedOptions: DropdownOption[] = outcomesData
@@ -140,7 +138,6 @@ export default function ProjectOutputModal({
         })
         .filter((option: any): option is DropdownOption => option !== null);
 
-      console.log("Transformed options:", transformedOptions);
 
       // Filter out invalid options
       const validOptions = transformedOptions.filter(
@@ -198,7 +195,7 @@ export default function ProjectOutputModal({
 
   // Handle dropdown changes
   const handleDropdownChange = (value: string) => {
-    console.log(`Dropdown changed: value="${value}"`);
+
     setFormData((prev) => ({
       ...prev,
       outcomeId: value,
@@ -254,7 +251,6 @@ export default function ProjectOutputModal({
         },
       };
 
-      console.log("Submitting payload:", JSON.stringify(payload, null, 2));
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output`,
@@ -267,7 +263,6 @@ export default function ProjectOutputModal({
         },
       );
 
-      console.log("API Response:", response.data);
 
       toast.success(
         `Project output ${mode === "create" ? "added" : "updated"} successfully!`,

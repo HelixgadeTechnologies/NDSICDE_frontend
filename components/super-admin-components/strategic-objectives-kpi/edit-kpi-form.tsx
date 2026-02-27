@@ -107,7 +107,6 @@ export default function EditKPIModal({
         data: formData,
       };
 
-      console.log("Sending payload:", payload);
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/kpi`,
@@ -121,7 +120,7 @@ export default function EditKPIModal({
       );
 
       if (response.status === 200 || response.status === 201) {
-        console.log("KPI updated successfully:", response.data);
+
         toast.success("KPI updated successfully!");
 
         // Call onSuccess to refresh the table

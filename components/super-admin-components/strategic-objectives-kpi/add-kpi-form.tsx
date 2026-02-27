@@ -71,7 +71,6 @@ export default function AddKPIModal({
         },
       };
 
-      console.log("Sending payload:", payload);
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/kpi`,
@@ -85,7 +84,7 @@ export default function AddKPIModal({
       );
 
       if (response.status === 200 || response.status === 201) {
-        console.log("KPI added successfully:", response.data);
+
         toast.success("KPI added successfully!");
 
         // Reset form

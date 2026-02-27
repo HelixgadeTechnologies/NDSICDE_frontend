@@ -50,7 +50,7 @@ export default function ProjectImpactModal({
   useEffect(() => {
     if (isOpen && !hasInitializedRef.current) {
       if (mode === "edit" && initialData) {
-        console.log("Prefilling form with initialData:", initialData);
+
 
         // Pre-fill form with existing data
         setFormData({
@@ -67,7 +67,7 @@ export default function ProjectImpactModal({
             .split(",")
             .map((person) => person.trim())
             .filter((person) => person.length > 0);
-          console.log("Parsed responsible persons:", persons);
+
           setResponsiblePersons(persons);
         } else {
           setResponsiblePersons([]);
@@ -76,7 +76,7 @@ export default function ProjectImpactModal({
         hasInitializedRef.current = true;
       } else if (mode === "create") {
         // Reset form for create mode
-        console.log("Resetting form for create mode");
+
         resetForm();
         hasInitializedRef.current = true;
       }
