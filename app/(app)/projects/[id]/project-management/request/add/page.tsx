@@ -9,10 +9,71 @@ import FormTwo from "./form-two";
 import Button from "@/ui/form/button";
 import SubmitAndReview from "./submit-and-review";
 import FormThree from "./form-three";
+import { useParams } from "next/navigation";
+
+export type RequestFormData = {
+  staff: string;
+  outputId: string;
+  activityTitle: string;
+  activityBudgetCode: string;
+  activityLocation: string;
+  activityPurposeDescription: string;
+  activityStartDate: string;
+  activityEndDate: string;
+  activityLineDescription: string;
+  quantity: string;
+  frequency: string;
+  unitCost: string;
+  budgetCode: string; // fallback if needed
+  total: string;
+  modeOfTransport: string;
+  driverName: string;
+  driversPhoneNumber: string;
+  vehiclePlateNumber: string;
+  vehicleColor: string;
+  departureTime: string;
+  route: string;
+  recipientPhoneNumber: string;
+  documentName: string;
+  documentURL: string;
+};
 
 export default function FormParent() {
   const [activeTab, setActiveTab] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const params = useParams();
+  const projectId = params.id as string;
+
+  const [formData, setFormData] = useState<RequestFormData>({
+    staff: "",
+    outputId: "",
+    activityTitle: "",
+    activityBudgetCode: "",
+    activityLocation: "",
+    activityPurposeDescription: "",
+    activityStartDate: "",
+    activityEndDate: "",
+    activityLineDescription: "",
+    quantity: "",
+    frequency: "",
+    unitCost: "",
+    budgetCode: "",
+    total: "",
+    modeOfTransport: "Road",
+    driverName: "",
+    driversPhoneNumber: "",
+    vehiclePlateNumber: "",
+    vehicleColor: "",
+    departureTime: "",
+    route: "",
+    recipientPhoneNumber: "",
+    documentName: "",
+    documentURL: "",
+  });
+
+  const updateFormData = (data: Partial<RequestFormData>) => {
+    setFormData((prev) => ({ ...prev, ...data }));
+  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -41,17 +102,18 @@ export default function FormParent() {
   ];
 
   const formSteps: Record<number, JSX.Element> = {
-    1: <FormOne onNext={() => setActiveTab(2)} />,
+    1: <FormOne formData={formData} updateFormData={updateFormData} onNext={() => setActiveTab(2)} />,
     2: (
-      <FormTwo onBack={() => setActiveTab(1)} onNext={() => setActiveTab(3)} />
+      <FormTwo formData={formData} updateFormData={updateFormData} onBack={() => setActiveTab(1)} onNext={() => setActiveTab(3)} />
     ),
     3: (
       <FormThree
+        formData={formData} updateFormData={updateFormData}
         onBack={() => setActiveTab(2)}
         onNext={() => setActiveTab(4)}
       />
     ),
-    4: <SubmitAndReview onBack={() => setActiveTab(3)} onSubmit={openModal} />,
+    4: <SubmitAndReview formData={formData} onBack={() => setActiveTab(3)} onSubmit={openModal} />,
   };
 
   return (
@@ -103,7 +165,7 @@ export default function FormParent() {
           Project successfully created
         </p>
         <div className="mt-6">
-          <Button href="/project-management/request" content="Close" />
+          <Button href={`/projects/${projectId}/project-management/request`} content="Close" />
         </div>
       </Modal>
     </section>

@@ -161,16 +161,17 @@ export default function ProjectRequest() {
                 <td className="px-6">{row.staff}</td>
                 <td
                   className={`px-6 ${
-                    row.status === "Active" ? "text-green-500" : "text-red-500"
+                    row.status === "Active" ? "text-green-500" :
+                    row.status === "Pending" ? 'text-yellow-500' 
+                    : "text-red-500"
                   }`}>
                   {row.status}
                 </td>
-                {/* <td className="px-6">{row.projectId}</td> */}
                 <td className="px-6">
-                  {formatDate(row.activityStartDate, "short")}
+                  {formatDate(row.activityStartDate, "date-only")}
                 </td>
                 <td className="px-6">
-                  {formatDate(row.activityEndDate, "short")}
+                  {formatDate(row.activityEndDate, "date-only")}
                 </td>
                 <td className="px-6 relative">
                   <div className="flex justify-center items-center">
@@ -227,14 +228,14 @@ export default function ProjectRequest() {
                             <Icon icon={"si:add-fill"} height={20} width={20} />
                             Retire
                           </Link>
-                          <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                          <Link href={`/request-approvals/retirement/${row.requestId}` || ''} className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                             <Icon
                               icon={"hugeicons:view"}
                               height={20}
                               width={20}
                             />
                             View Activity
-                          </li>
+                          </Link>
                         </ul>
                       </motion.div>
                     </AnimatePresence>
@@ -249,7 +250,12 @@ export default function ProjectRequest() {
       {selectedRequest && (
         <EditActivityRequest
           isOpen={editRequest}
-          onClose={() => setEditRequest(false)}
+          onClose={() => {
+            setEditRequest(false);
+            fetchRequests(); // Refresh table data after editing
+          }}
+          initialData={selectedRequest}
+          projectId={projectId}
         />
       )}
 
