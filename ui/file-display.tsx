@@ -6,7 +6,7 @@ import Heading from "./text-heading";
 
 type FileProps = {
     filename: string;
-    filesize: string;
+    filesize?: string;
     url?: string;
 }
 

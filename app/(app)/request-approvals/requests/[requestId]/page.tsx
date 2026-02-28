@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
@@ -26,12 +26,19 @@ import BackButton from "@/ui/back-button";
 import DeleteModal from "@/ui/generic-delete-modal";
 import TextareaInput from "@/ui/form/textarea";
 import InfoItem from "@/ui/info-item";
+import { useParams } from "next/navigation";
+import axios from "axios";
+import { RequestRetirementType } from "@/types/retirement-request";
+import { formatDate } from "@/utils/dates-format-utility";
+import { ProjectOutputTypes } from "@/types/project-management-types";
+
 
 export default function FinancialRequestModal() {
   const [rejectRequest, setRejectRequest] = useState(false);
   const [approveRequest, setApproveRequest] = useState(false);
   const [reviewRequest, setReviewRequest] = useState(false);
 
+  // dummy stuff
   const head = [
     "Item Line Description",
     "Quantity",
@@ -40,22 +47,58 @@ export default function FinancialRequestModal() {
     "Total (₦)",
   ];
 
-  const data = [
-    {
-      description: "Lorem ipsum dolor sit amet. lorem ipsum dolor sit amet",
-      quantity: 200,
-      frequency: 200,
-      unit_cost: 200,
-      total: 600,
-    },
-    {
-      description: "Lorem ipsum dolor sit amet",
-      quantity: 250,
-      frequency: 200,
-      unit_cost: 200,
-      total: 650,
-    },
-  ];
+  // real stuff
+  const params = useParams();
+  const { requestId } = params;
+  const [requests, setRequests] = useState<RequestRetirementType[]>([]);
+  const [outputDetails, setOutputDetails] = useState<ProjectOutputTypes | null>(null);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list?type=${"request"}`,
+        );
+        setRequests(res.data.data);
+      } catch (error) {
+        console.error("Error fetching request details:", error);
+      }
+    };
+    fetchRequests();
+  }, []);
+
+  const selectedRequest = requests.find((r) => {
+    return r.requestId === requestId;
+  });
+
+  useEffect(() => {
+    const fetchOutput = async () => {
+      if (!selectedRequest?.outputId) return;
+
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${selectedRequest.outputId}`,
+        );
+        setOutputDetails(res.data.data);
+      } catch (error) {
+        console.error("Error fetching output details:", error);
+      }
+    };
+
+    if (selectedRequest?.outputId) {
+      fetchOutput();
+    }
+  }, [selectedRequest]);
+
+  console.log(selectedRequest);
+
+  if (!selectedRequest) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Request not found.</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -68,7 +111,7 @@ export default function FinancialRequestModal() {
               <div>
                 <Heading
                   heading="Financial Request"
-                  subtitle="Community Health Initiative - Submitted on May 15, 2023 at 10:30"
+                  subtitle={`${selectedRequest.activityTitle} - Submitted on ${formatDate(selectedRequest.activityStartDate)}`}
                 />
               </div>
               <div className="w-50">
@@ -93,37 +136,37 @@ export default function FinancialRequestModal() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InfoItem
                     label="Submitted by"
-                    value="John Doe"
+                    value={selectedRequest.staff}
                     icon={<User className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Output"
-                    value="Output Name"
+                    value={outputDetails?.outputStatement || "N/A"}
                     icon={<FileOutput className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity Title"
-                    value="Activity Title"
+                    value={selectedRequest.activityTitle}
                     icon={<ActivityIcon className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity Budget Code"
-                    value="000000"
+                    value={selectedRequest.activityBudgetCode.toString()}
                     icon={<ActivityIcon className="w-4 h-4" />}
                   />
                   <InfoItem
-                    label="Activity Locations"
-                    value="Location 1"
+                    label="Activity Location(s)"
+                    value={selectedRequest.activityLocation}
                     icon={<Navigation className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity Start Date"
-                    value="12/04/2025"
+                    value={formatDate(selectedRequest.activityStartDate, "date-only")}
                     icon={<Calendar className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity End Date"
-                    value="12/04/2025"
+                    value={formatDate(selectedRequest.activityEndDate, "date-only")}
                     icon={<Calendar className="w-4 h-4" />}
                   />
                 </div>
@@ -131,7 +174,7 @@ export default function FinancialRequestModal() {
                 <div className="mt-6">
                   <TitleAndContent
                     title="Activity Purpose/Description"
-                    content="Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
+                    content={selectedRequest.activityPurposeDescription}
                   />
                 </div>
               </div>
@@ -144,23 +187,23 @@ export default function FinancialRequestModal() {
                 </h3>
                 <Table
                   tableHead={head}
-                  tableData={data}
+                  tableData={[``]}
                   renderRow={(row) => (
                     <>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        <p className="w-[160px] truncate">{row.description}</p>
+                        <p className="w-40 truncate">{selectedRequest.activityLineDescription}</p>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {row.quantity}
+                        {selectedRequest.quantity}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {row.frequency}
+                        {selectedRequest.frequency}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        ₦{row.unit_cost.toLocaleString()}
+                        ₦{selectedRequest.unitCost.toLocaleString()}
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                        ₦{row.total.toLocaleString()}
+                        ₦{selectedRequest.total.toLocaleString()}
                       </td>
                     </>
                   )}
@@ -169,7 +212,7 @@ export default function FinancialRequestModal() {
                 <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Grand Total</p>
-                    <p className="text-2xl font-bold text-gray-900">₦1,250</p>
+                    <p className="text-2xl font-bold text-gray-900">₦{selectedRequest.unitCost + selectedRequest.total} </p>
                   </div>
                 </div>
               </CardComponent>
@@ -186,37 +229,37 @@ export default function FinancialRequestModal() {
                 <div className="space-y-6">
                   <InfoItem
                     label="Mode of Transport"
-                    value="Road"
+                    value={selectedRequest.modeOfTransport}
                     icon={<BusFront className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Driver's Name"
-                    value="John Doe"
+                    value={selectedRequest.driverName}
                     icon={<User className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Driver's Phone Number"
-                    value="09039776534"
+                    value={selectedRequest.driversPhoneNumber}
                     icon={<Phone className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Vehicle Color"
-                    value="Red"
+                    value={selectedRequest.vehicleColor}
                     icon={<Paintbrush className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Departure Date"
-                    value="12/04/2025"
+                    value={formatDate(selectedRequest.departureTime, "date-only")}
                     icon={<Calendar className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Recipient's Phone Number"
-                    value="09039776534"
+                    value={selectedRequest.recipientPhoneNumber}
                     icon={<Phone className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Route"
-                    value="Some road, some street, more road"
+                    value={selectedRequest.route}
                     icon={<MapPin className="w-4 h-4" />}
                     className="col-span-2"
                   />
@@ -229,8 +272,9 @@ export default function FinancialRequestModal() {
                   Supporting Document
                 </h3>
                 <FileDisplay
-                  filename="progress_photos.zip"
-                  filesize="15.2 MB"
+                  filename={selectedRequest.documentName}
+                  // filesize="15.2 MB"
+                  url={selectedRequest.documentURL}
                 />
 
                 {/* Action Buttons */}
