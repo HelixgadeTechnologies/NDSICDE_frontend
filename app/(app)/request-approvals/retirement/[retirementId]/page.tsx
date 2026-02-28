@@ -18,6 +18,10 @@ import BackButton from "@/ui/back-button";
 import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 import Heading from "@/ui/text-heading";
 import InfoItem from "@/ui/info-item";
+import { RetirementRequestType } from "@/types/retirement-request";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams } from "next/navigation";
 
 export default function FinancialRequestModal() {
   // const [rejectRequest, setRejectRequest] = useState(false);
@@ -34,28 +38,73 @@ export default function FinancialRequestModal() {
     "Variance",
   ];
 
-  const data = [
-    {
-      userId: "1",
-      lineItemDesc: "Lorem ipsum dolor sit amet",
-      quantity: 2,
-      frequency: 3,
-      unit_cost: 300,
-      total_budget: 180,
-      actual_cost: 240,
-      variance: 600,
-    },
-    {
-      userId: "2",
-      lineItemDesc: "Lorem ipsum dolor sit amet",
-      quantity: 2,
-      frequency: 3,
-      unit_cost: 300,
-      total_budget: 180,
-      actual_cost: 240,
-      variance: 600,
-    },
-  ];
+  const { retirementId } = useParams();
+  const [retirement, setRetirement] = useState<RetirementRequestType | null>(null);
+  const [outputDetails, setOutputDetails] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRetirement = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list?type=${"retirement"}`,
+        );
+        const retirements = res.data.data;
+        const found = retirements.find((r: RetirementRequestType) => r.retirementId === retirementId);
+        setRetirement(found || null);
+      } catch (error) {
+        console.error("Error fetching request details:", error);
+      }
+    };
+    fetchRetirement();
+  }, [retirementId]);
+
+  useEffect(() => {
+    const fetchOutput = async () => {
+      if (!retirement?.outputId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const res = await axios.get(
+           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${retirement.outputId}`,
+        );
+        setOutputDetails(res.data.data);
+      } catch (error) {
+        console.error("Error fetching output details:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (retirement) {
+      fetchOutput();
+    } else {
+       // if retirement is missing or fetching failed, we still want to remove loader
+       setIsLoading(false);
+    }
+  }, [retirement]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="dots my-20 mx-auto">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!retirement) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Retirement not found.</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -68,7 +117,7 @@ export default function FinancialRequestModal() {
               <div>
                 <Heading
                   heading="Financial Retirement"
-                  subtitle="Community Health Initiative - Submitted on May 15, 2023 at 10:30"
+                  subtitle={`${retirement.requestActivityTitle} - Submitted on ${new Date(retirement.createAt).toLocaleString()}`}
                 />
               </div>
               <div className="w-50">
@@ -94,37 +143,32 @@ export default function FinancialRequestModal() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InfoItem
                     label="Submitted by"
-                    value="John Doe"
+                    value={retirement.requestStaff || "N/A"}
                     icon={<User className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Output"
-                    value="Output Name"
+                    value={outputDetails?.outputStatement || "N/A"}
                     icon={<FileOutput className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity Title"
-                    value="Activity Title"
+                    value={retirement.requestActivityTitle || "N/A"}
                     icon={<ActivityIcon className="w-4 h-4" />}
                   />
                   <InfoItem
-                    label="Activity Budget Code"
-                    value="000000"
-                    icon={<ActivityIcon className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Activity Locations"
-                    value="Location 1"
+                    label="Activity Location(s)"
+                    value={retirement.activityLocation || "N/A"}
                     icon={<Navigation className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity Start Date"
-                    value="12/04/2025"
+                    value={retirement.activityStartDate ? new Date(retirement.activityStartDate).toLocaleDateString() : "N/A"}
                     icon={<Calendar className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity End Date"
-                    value="12/04/2025"
+                    value={retirement.activityEndDate ? new Date(retirement.activityEndDate).toLocaleDateString() : "N/A"}
                     icon={<Calendar className="w-4 h-4" />}
                   />
                 </div>
@@ -132,7 +176,7 @@ export default function FinancialRequestModal() {
                 <div className="mt-6">
                   <TitleAndContent
                     title="Activity Purpose/Description"
-                    content="Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
+                    content={retirement.activityPurposeDescription || "N/A"}
                   />
                 </div>
               </div>
@@ -147,8 +191,8 @@ export default function FinancialRequestModal() {
                   Supporting Document (s)
                 </h3>
                 <FileDisplay
-                  filename="progress_photos.zip"
-                  filesize="15.2 MB"
+                  filename={retirement.documentName}
+                  url={retirement.documentURL}
                 />
               </CardComponent>
             </div>
@@ -158,23 +202,23 @@ export default function FinancialRequestModal() {
           <CardComponent>
             <Table
               tableHead={head}
-              tableData={data}
+              tableData={[retirement]}
               renderRow={(row) => (
                 <>
-                  <td className="px-6">{row.lineItemDesc}</td>
-                  <td className="px-6">{row.quantity}</td>
-                  <td className="px-6">{row.frequency}</td>
-                  <td className="px-6">{row.unit_cost}</td>
-                  <td className="px-6">{row.total_budget}</td>
-                  <td className="px-6">{row.actual_cost}</td>
-                  <td className="px-6">{row.variance}</td>
+                  <td className="px-6">{row.activityLineDescription || "N/A"}</td>
+                  <td className="px-6">{row.quantity || "0"}</td>
+                  <td className="px-6">{row.frequency || "0"}</td>
+                  <td className="px-6">{row.unitCost || "0"}</td>
+                  <td className="px-6">{row.totalBudget || "0"}</td>
+                  <td className="px-6">{row.actualCost || "0"}</td>
+                  <td className="px-6">{ (Number(row.totalBudget) || 0) - (Number(row.actualCost) || 0) }</td>
                 </>
               )}
             />
             <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-              <p>Total Activity Cost (N): 100,00</p>
-              <p>Amount to reimburse to NDSICDE (N): 200,000</p>
-              <p>Amount to reimburse to Staff (N): 200,000</p>
+              <p>Total Activity Cost (N): 0</p>
+              <p>Amount to reimburse to NDSICDE (N): 0</p>
+              <p>Amount to reimburse to Staff (N): 0</p>
             </div>
           </CardComponent>
         </div>

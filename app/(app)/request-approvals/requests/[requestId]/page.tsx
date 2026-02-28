@@ -28,7 +28,7 @@ import TextareaInput from "@/ui/form/textarea";
 import InfoItem from "@/ui/info-item";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { RequestRetirementType } from "@/types/retirement-request";
+import { ActivityRequestType } from "@/types/retirement-request";
 import { formatDate } from "@/utils/dates-format-utility";
 import { ProjectOutputTypes } from "@/types/project-management-types";
 
@@ -50,8 +50,9 @@ export default function FinancialRequestModal() {
   // real stuff
   const params = useParams();
   const { requestId } = params;
-  const [requests, setRequests] = useState<RequestRetirementType[]>([]);
+  const [requests, setRequests] = useState<ActivityRequestType[]>([]);
   const [outputDetails, setOutputDetails] = useState<ProjectOutputTypes | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -73,7 +74,10 @@ export default function FinancialRequestModal() {
 
   useEffect(() => {
     const fetchOutput = async () => {
-      if (!selectedRequest?.outputId) return;
+      if (!selectedRequest?.outputId) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const res = await axios.get(
@@ -82,15 +86,31 @@ export default function FinancialRequestModal() {
         setOutputDetails(res.data.data);
       } catch (error) {
         console.error("Error fetching output details:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (selectedRequest?.outputId) {
+    if (selectedRequest) {
       fetchOutput();
+    } else if (requests.length > 0) {
+      setIsLoading(false);
     }
-  }, [selectedRequest]);
+  }, [selectedRequest, requests.length]);
 
   console.log(selectedRequest);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="dots my-20 mx-auto">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    );
+  }
 
   if (!selectedRequest) {
     return (

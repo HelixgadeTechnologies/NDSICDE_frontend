@@ -16,7 +16,7 @@ import {
 import DashboardStat from "@/ui/dashboard-stat-card";
 import { Icon } from "@iconify/react";
 import { convertDateToISO8601, formatDate } from "@/utils/dates-format-utility";
-import { RequestRetirementType } from "@/types/retirement-request";
+import { ActivityRequestType, RetirementRequestType } from "@/types/retirement-request";
 import { useProjects } from "@/context/ProjectsContext";
 
 
@@ -31,7 +31,7 @@ function ActivityFinancialRequestTable({ type }: { type?: string }) {
     "Status",
   ];
 
-  const [data, setData] = useState<RequestRetirementType[]>([]);
+  const [data, setData] = useState<ActivityRequestType[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -119,7 +119,7 @@ function ActivityFinancialRequestTable({ type }: { type?: string }) {
             </td>
             <td className="px-6">{row.total || "0"}</td>
             <td className="px-6">{row.staff || "N/A"}</td>
-            <td className="px-6">{row.project || "N/A"}</td>
+            <td className="px-6">{row.project.projectName || "N/A"}</td>
             <td className="px-6">
               {formatDate(row.activityStartDate, "date-only") || "N/A"}
             </td>
@@ -151,11 +151,9 @@ function ActivityFinancialRetirement() {
     "Unit Cost (₦)",
     "Total Budget (₦)",
     "Actual Cost (₦)",
-    "Variance",
-    "Actions",
   ];
 
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<RetirementRequestType[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -240,40 +238,30 @@ function ActivityFinancialRetirement() {
         tableHead={head}
         tableData={data}
         checkbox
-        idKey={"id"}
+        idKey={"retirementId"}
         renderRow={(row) => (
           <>
             <td className="px-6">
               <Link
-                href={`/request-approvals/retirement/${row.id}`}
+                href={`/request-approvals/retirement/${row.retirementId}`}
                 className="hover:underline">
-                {row.lineItemDesc || row.description || "N/A"}
+                {row.activityLineDescription || "N/A"}
               </Link>
             </td>
             <td className="px-6">{row.quantity || "0"}</td>
             <td className="px-6">{row.frequency || "0"}</td>
-            <td className="px-6">{row.unit_cost || row.unitCost || "0"}</td>
+            <td className="px-6">{row.unitCost || "0"}</td>
             <td className="px-6">
-              {row.total_budget || row.totalBudget || "0"}
+              {row.totalBudget || "0"}
             </td>
-            <td className="px-6">{row.actual_cost || row.actualCost || "0"}</td>
-            <td className="px-6">{row.variance || "0"}</td>
-            <td className="px-6 relative">
-              <Icon
-                icon={"uiw:more"}
-                width={22}
-                height={22}
-                className="cursor-pointer"
-                color="#909CAD"
-              />
-            </td>
+            <td className="px-6">{row.actualCost || "0"}</td>
           </>
         )}
       />}
       <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-        <p>Total Activity Cost (N): 100,00</p>
-        <p>Amount to reimburse to NDSICDE (N): 200,000</p>
-        <p>Amount to reimburse to Staff (N): 200,000</p>
+        <p>Total Activity Cost (₦): 100,000</p>
+        <p>Amount to reimburse to NDSICDE (₦): 200,000</p>
+        <p>Amount to reimburse to Staff (₦): 200,000</p>
       </div>
     </div>
   );

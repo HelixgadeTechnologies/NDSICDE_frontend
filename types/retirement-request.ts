@@ -53,7 +53,7 @@ export const RetirementRequestData: RetirementRequest[] = [
   },
 ];
 
-export type RequestRetirementType = {
+export type ActivityRequestType = {
   activityBudgetCode: number;
   activityEndDate: string;
   activityLineDescription: string;
@@ -86,8 +86,10 @@ export type RequestRetirementType = {
   frequency: number;
   modeOfTransport: string;
   outputId: string;
-  project: string;
-  projectId: string;
+  project: {
+    projectName: string;
+    projectId: string;
+  };
   quantity: number;
   recipientPhoneNumber: string;
   requestId: string;
@@ -99,4 +101,28 @@ export type RequestRetirementType = {
   updateAt: string;
   vehicleColor: string;
   vehiclePlateNumber: string;
+};
+
+export type RetirementRequestType = {
+  retirementId: string;
+  activityLineDescription: string | null;
+  quantity: number | null;
+  frequency: number | null;
+  unitCost: number | null;
+  actualCost: number | null;
+  totalBudget: number | null;
+  documentName: string;
+  documentURL: string;
+  requestId: string;
+  requestActivityTitle: string;
+  requestStaff: string;
+  requestStatus: string;
+  retirementStatus: string;
+  createAt: string;
+  updateAt: string;
+  activityLocation?: string; 
+  activityPurposeDescription?: string;
+  activityStartDate?: string;
+  activityEndDate?: string;
+  outputId?: string;
 };

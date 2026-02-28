@@ -11,6 +11,7 @@ import { useEntityModal } from "@/utils/project-management-utility";
 import DeleteModal from "@/ui/generic-delete-modal";
 import Link from "next/link";
 import EditActivityRequest from "@/components/project-management-components/edit-activity-request";
+import ViewActivityRequestModal from "@/components/project-management-components/view-activity-request-modal";
 import DashboardStat from "@/ui/dashboard-stat-card";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
@@ -22,6 +23,8 @@ export default function ProjectRequest() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [data, setData] = useState<ProjectRequestType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [viewRequestOpen, setViewRequestOpen] = useState(false);
+  const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
   const token = getToken();
   const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
@@ -228,14 +231,14 @@ export default function ProjectRequest() {
                             <Icon icon={"si:add-fill"} height={20} width={20} />
                             Retire
                           </Link>
-                          <Link href={`/request-approvals/retirement/${row.requestId}` || ''} className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                          <li onClick={() => { setViewRequestOpen(true); setSelectedViewId(row.requestId); setActiveRowId(null); }} className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                             <Icon
                               icon={"hugeicons:view"}
                               height={20}
                               width={20}
                             />
                             View Activity
-                          </Link>
+                          </li>
                         </ul>
                       </motion.div>
                     </AnimatePresence>
@@ -268,6 +271,12 @@ export default function ProjectRequest() {
           isDeleting={isDeleting}
         />
       )}
+
+      <ViewActivityRequestModal 
+         isOpen={viewRequestOpen} 
+         onClose={() => { setViewRequestOpen(false); setSelectedViewId(null); }} 
+         requestId={selectedViewId} 
+      />
     </div>
   );
 }
