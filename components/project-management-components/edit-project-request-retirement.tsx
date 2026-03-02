@@ -5,17 +5,19 @@ import TextInput from "@/ui/form/text-input";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter, useParams } from "next/navigation";
 import { ProjectRequestType } from "@/types/project-management-types";
+import { RetirementRequestType } from "@/types/retirement-request";
 import { getToken } from "@/lib/api/credentials";
 
-type AddProps = {
+type EditProps = {
   isOpen: boolean;
   onClose: () => void;
   selectedRequest?: ProjectRequestType;
+  retirementData: RetirementRequestType;
 };
 
 type LineItem = {
@@ -57,11 +59,12 @@ function LineItemInput({ onRemove, showRemove, lineItem, onChange }: LineItemPro
   );
 }
 
-export default function AddProjectRequestRetirement({
+export default function EditProjectRequestRetirement({
   isOpen,
   onClose,
-  selectedRequest
-}: AddProps) {
+  selectedRequest,
+  retirementData
+}: EditProps) {
   const router = useRouter();
   const params = useParams();
   const projectId = params?.id as string;
@@ -72,6 +75,20 @@ export default function AddProjectRequestRetirement({
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { id: 1, value: "" }
   ]);
+
+  useEffect(() => {
+    if (retirementData) {
+      // API might not strictly have lineItem in the type or it's named something else
+      const existingLineItemString = (retirementData as any).lineItem || (retirementData as any).activityLineDescription || "";
+      const parsedLineItems = existingLineItemString.split(",").map((item: string, index: number) => ({ id: index + 1, value: item.trim() })).filter((item: LineItem) => item.value !== "");
+      
+      if (parsedLineItems.length > 0) {
+        setLineItems(parsedLineItems);
+      }
+      
+      setActualCost(retirementData.actualCost?.toString() || "");
+    }
+  }, [retirementData]);
 
   // add line item
   const addLineItem = () => {
@@ -98,8 +115,8 @@ export default function AddProjectRequestRetirement({
   };
 
   const submitRetirement = async () => {
-    if (!selectedRequest) {
-      toast.error("No request selected for retirement.");
+    if (!retirementData) {
+      toast.error("No retirement data found.");
       return;
     }
     
@@ -109,21 +126,21 @@ export default function AddProjectRequestRetirement({
     const numericCost = Number(actualCost) || 0;
 
     const payload = {
-      isCreate: true,
+      isCreate: false,
       payload: {
-        retirementId: "",
-        activityLineDescription: selectedRequest.activityLineDescription || "string",
+        retirementId: retirementData.retirementId,
+        activityLineDescription: selectedRequest?.activityLineDescription || retirementData.activityLineDescription || "string",
         lineItem: combinedLineItems,
-        quantity: selectedRequest.quantity || 0,
-        frequency: selectedRequest.frequency || 0,
-        unitCost: selectedRequest.unitCost || 0,
+        quantity: selectedRequest?.quantity || retirementData.quantity || 0,
+        frequency: selectedRequest?.frequency || retirementData.frequency || 0,
+        unitCost: selectedRequest?.unitCost || retirementData.unitCost || 0,
         actualCost: numericCost,
-        totalBudget: selectedRequest.total || 0,
+        totalBudget: selectedRequest?.total || retirementData.totalBudget || 0,
         actualCostOfLineItem: numericCost,
-        documentName: selectedRequest.documentName || "string",
-        documentURL: selectedRequest.documentURL || "string",
-        requestId: selectedRequest.requestId,
-        status: "Pending"
+        documentName: selectedRequest?.documentName || retirementData.documentName || "string",
+        documentURL: selectedRequest?.documentURL || retirementData.documentURL || "string",
+        requestId: selectedRequest?.requestId || retirementData.requestId,
+        status: retirementData.retirementStatus || "Pending"
       }
     };
 
@@ -132,14 +149,14 @@ export default function AddProjectRequestRetirement({
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement`, payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Retirement request created successfully!");
+      toast.success("Retirement request updated successfully!");
       if (projectId) {
           router.push(`/projects/${projectId}/project-management/request`);
       }
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create retirement request.");
+      toast.error("Failed to update retirement request.");
     } finally {
       setIsSubmitting(false);
     }
@@ -148,7 +165,7 @@ export default function AddProjectRequestRetirement({
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} maxWidth="700px">
-        <Heading heading="Retirement" className="text-center" />
+        <Heading heading="Edit Retirement" className="text-center" />
         <div className="space-y-6 h-[350px] custom-scrollbar overflow-y-auto px-2">
           <button onClick={addLineItem} className="text-sm primary">Add Line Items</button>
           {lineItems.map((lineItem, index) => (
@@ -171,7 +188,7 @@ export default function AddProjectRequestRetirement({
           />
           <div className="flex items-center gap-6">
             <Button content="Close" isSecondary onClick={onClose} />
-            <Button content={isSubmitting ? "Submitting..." : "Submit for Review"} onClick={submitRetirement} isDisabled={isSubmitting} />
+            <Button content={isSubmitting ? "Submitting..." : "Update Request"} onClick={submitRetirement} isDisabled={isSubmitting} />
           </div>
         </div>
       </Modal>

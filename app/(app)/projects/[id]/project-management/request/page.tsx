@@ -226,7 +226,7 @@ export default function ProjectRequest() {
                             Remove
                           </li>
                           <Link
-                            href={`/projects/${projectId}/project-management/request/retire`}
+                            href={`/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`}
                             className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
                             <Icon icon={"si:add-fill"} height={20} width={20} />
                             Retire

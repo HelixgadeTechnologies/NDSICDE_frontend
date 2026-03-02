@@ -28,8 +28,9 @@ import TextareaInput from "@/ui/form/textarea";
 import InfoItem from "@/ui/info-item";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { ActivityRequestType } from "@/types/retirement-request";
+import { ProjectRequestType } from "@/types/project-management-types";
 import { formatDate } from "@/utils/dates-format-utility";
+import { useRequests } from "@/context/RequestsContext";
 import { ProjectOutputTypes } from "@/types/project-management-types";
 
 
@@ -50,53 +51,45 @@ export default function FinancialRequestModal() {
   // real stuff
   const params = useParams();
   const { requestId } = params;
-  const [requests, setRequests] = useState<ActivityRequestType[]>([]);
+  const { requests, fetchRequests } = useRequests();
+  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestType | null>(null);
   const [outputDetails, setOutputDetails] = useState<ProjectOutputTypes | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list?type=${"request"}`,
-        );
-        setRequests(res.data.data);
-      } catch (error) {
-        console.error("Error fetching request details:", error);
-      }
-    };
-    fetchRequests();
-  }, []);
-
-  const selectedRequest = requests.find((r) => {
-    return r.requestId === requestId;
-  });
-
-  useEffect(() => {
-    const fetchOutput = async () => {
-      if (!selectedRequest?.outputId) {
-        setIsLoading(false);
-        return;
-      }
+    const loadRequest = async () => {
+      setIsLoading(true);
+      if (!requestId) return;
 
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${selectedRequest.outputId}`,
-        );
-        setOutputDetails(res.data.data);
+        let requestDetails = requests.find((r) => r.requestId === requestId);
+        
+        // Fetch specific details from individual endpoint if not in current array context to populate single info
+        if (!requestDetails) {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${requestId}`);
+            requestDetails = res.data.data;
+        }
+
+        if (requestDetails) {
+            setSelectedRequest(requestDetails);
+            
+            // Cascade Output Call
+            if (requestDetails.outputId) {
+                const outputRes = await axios.get(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${requestDetails.outputId}`,
+                );
+                setOutputDetails(outputRes.data.data);
+            }
+        }
       } catch (error) {
-        console.error("Error fetching output details:", error);
+        console.error("Error finding request specifics:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
-    if (selectedRequest) {
-      fetchOutput();
-    } else if (requests.length > 0) {
-      setIsLoading(false);
-    }
-  }, [selectedRequest, requests.length]);
+    
+    loadRequest();
+  }, [requestId, requests]);
 
   console.log(selectedRequest);
 

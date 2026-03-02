@@ -5,12 +5,17 @@ import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { AnimatePresence, motion } from "framer-motion";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useRequests } from "@/context/RequestsContext";
+import { useEffect, useState } from "react";
 import AddProjectRequestRetirement from "@/components/project-management-components/add-project-request-retirement";
-import DashboardStat from "@/ui/dashboard-stat-card";
-import SimpleFileInput from "@/ui/form/simple-file-input";
-import TextInput from "@/ui/form/text-input";
+import EditProjectRequestRetirement from "@/components/project-management-components/edit-project-request-retirement";
+import FileDisplay from "@/ui/file-display";
 import InfoItem from "@/ui/info-item";
+import { ProjectRequestType, ProjectOutputTypes } from "@/types/project-management-types";
+import { RetirementRequestType } from "@/types/retirement-request";
+import axios from "axios";
+import { formatDate } from "@/utils/dates-format-utility";
 import {
   ActivityIcon,
   Calendar,
@@ -19,96 +24,120 @@ import {
   User,
 } from "lucide-react";
 import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
+import { toast } from "react-toastify";
+import DeleteModal from "@/ui/generic-delete-modal";
 
 export default function ProjectRequestRetirementPage() {
-  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const requestId = searchParams.get("requestId");
+  const { requests, fetchRetirements } = useRequests();
+  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestType | null>(null);
+  const [outputDetails, setOutputDetails] = useState<ProjectOutputTypes | null>(null);
+  const [requestRetirements, setRequestRetirements] = useState<RetirementRequestType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [openAddRetirement, setOpenAddRetirement] = useState(false);
-  const [fileInputs, setFileInputs] = useState<string[]>(["file-1"]);
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openEditRetirement, setOpenEditRetirement] = useState(false);
+  const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
+  useEffect(() => {
+    const loadRequest = async () => {
+      setIsLoading(true);
+      if (!requestId) return;
+      try {
+        let requestDetails = requests.find((r) => r.requestId === requestId);
+        if (!requestDetails) {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${requestId}`);
+            requestDetails = res.data.data;
+        }
+        if (requestDetails) {
+            setSelectedRequest(requestDetails);
+            if (requestDetails.outputId) {
+                const outputRes = await axios.get(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${requestDetails.outputId}`,
+                );
+                setOutputDetails(outputRes.data.data);
+            }
+
+            try {
+                const res = await axios.get(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list`,
+                  {
+                    params: { type: "retirement" },
+                  },
+                );
+                const allRetirements = res.data?.data || [];
+                const matchingRetirements = allRetirements.filter((r: RetirementRequestType) => r.requestId === requestId);
+                setRequestRetirements(matchingRetirements);
+            } catch (err) {
+                console.error("Failed to fetch retirements", err);
+            }
+        }
+      } catch (error) {
+        console.error("Error finding request specifics:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadRequest();
+  }, [requestId, requests]);
 
   const head = [
-    "Activity Line Description",
+    "Item Line Description",
     "Quantity",
     "Frequency",
     "Unit Cost (₦)",
     "Total Budget (₦)",
     "Actual Cost (₦)",
-    "Variance",
     "Actions",
   ];
 
-  const data = [
-    {
-      userId: "1",
-      lineItemDesc: "Lorem ipsum dolor sit amet",
-      quantity: 2,
-      frequency: 3,
-      unit_cost: 300,
-      total_budget: 180,
-      actual_cost: 240,
-      variance: 600,
-    },
-    {
-      userId: "2",
-      lineItemDesc: "Lorem ipsum dolor sit amet",
-      quantity: 2,
-      frequency: 3,
-      unit_cost: 300,
-      total_budget: 180,
-      actual_cost: 240,
-      variance: 600,
-    },
-  ];
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="dots my-20 mx-auto">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    );
+  }
 
-  const dashboardData = [
-    {
-      title: "Total Requests",
-      value: 0,
-      icon: "fluent:target-24-filled",
-    },
-    {
-      title: "Total Approved",
-      value: 0,
-      icon: "fluent:target-24-filled",
-    },
-    {
-      title: "Total Rejected",
-      value: 0,
-      icon: "fluent:target-24-filled",
-    },
-    {
-      title: "Total Pending",
-      value: 0,
-      icon: "fluent:target-24-filled",
-    },
-    {
-      title: "Total Retired",
-      value: 0,
-      icon: "fluent:target-24-filled",
-    },
-  ];
+  if (!selectedRequest) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-lg">Request not found.</p>
+      </div>
+    );
+  }
 
-  const handleAddFileInput = () => {
-    const newId = `file-${Date.now()}`;
-    setFileInputs([...fileInputs, newId]);
-  };
-
-  const handleRemoveFileInput = (id: string) => {
-    if (fileInputs.length > 1) {
-      setFileInputs(fileInputs.filter((inputId) => inputId !== id));
+  const deleteRetirement = async (retirementId: string) => {
+    setIsDeleting(true);
+    try {
+      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/${retirementId}`);
+      toast.success("Retirement deleted successfully");
+      setRequestRetirements((prev) =>
+        prev.filter((r) => r.retirementId !== retirementId)
+      );
+    } catch (error) {
+      console.error(`Error deleting retirement: ${error}`);
+      toast.error("Failed to delete retirement");
+    } finally {
+      setIsDeleting(false);
+      setOpenDeleteModal(false);
+      fetchRetirements();
     }
-  };
+  }
 
   return (
     <div className="mt-12 space-y-7">
-      {/* stat cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <DashboardStat data={dashboardData} icon="basil:plus-solid" />
-      </div>
-
       {/* add retirement button */}
       <div className="w-50">
         <Button
-          content="Add Retirement"
+          content="Retire Request"
           icon="si:add-fill"
           onClick={() => setOpenAddRetirement(true)}
         />
@@ -119,40 +148,40 @@ export default function ProjectRequestRetirementPage() {
           Submission Details
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <InfoItem
             label="Submitted by"
-            value="John Doe"
+            value={selectedRequest.staff || "N/A"}
             icon={<User className="w-4 h-4" />}
           />
           <InfoItem
             label="Output"
-            value="Output Name"
+            value={outputDetails?.outputStatement || "N/A"}
             icon={<FileOutput className="w-4 h-4" />}
           />
           <InfoItem
             label="Activity Title"
-            value="Activity Title"
+            value={selectedRequest.activityTitle || "N/A"}
             icon={<ActivityIcon className="w-4 h-4" />}
           />
           <InfoItem
             label="Activity Budget Code"
-            value="000000"
+            value={selectedRequest.activityBudgetCode?.toString() || "N/A"}
             icon={<ActivityIcon className="w-4 h-4" />}
           />
           <InfoItem
             label="Activity Locations"
-            value="Location 1"
+            value={selectedRequest.activityLocation || "N/A"}
             icon={<Navigation className="w-4 h-4" />}
           />
           <InfoItem
             label="Activity Start Date"
-            value="12/04/2025"
+            value={selectedRequest.activityStartDate ? formatDate(selectedRequest.activityStartDate, "date-only") : "N/A"}
             icon={<Calendar className="w-4 h-4" />}
           />
           <InfoItem
             label="Activity End Date"
-            value="12/04/2025"
+            value={selectedRequest.activityEndDate ? formatDate(selectedRequest.activityEndDate, "date-only") : "N/A"}
             icon={<Calendar className="w-4 h-4" />}
           />
         </div>
@@ -160,7 +189,7 @@ export default function ProjectRequestRetirementPage() {
         <div className="mt-6">
           <TitleAndContent
             title="Activity Purpose/Description"
-            content="Conducted a 2-hour workshop with the client team to gather detailed requirements for the new dashboard feature. The session was highly productive with active participation from all stakeholders."
+            content={selectedRequest.activityPurposeDescription || "N/A"}
           />
         </div>
       </div>
@@ -169,18 +198,19 @@ export default function ProjectRequestRetirementPage() {
       <CardComponent>
         <Table
           tableHead={head}
-          tableData={data}
+          tableData={requestRetirements}
           checkbox
-          idKey={"userId"}
-          renderRow={(row) => (
+          idKey={"retirementId"}
+          renderRow={(row: RetirementRequestType) => (
             <>
-              <td className="px-6">{row.lineItemDesc}</td>
-              <td className="px-6">{row.quantity}</td>
-              <td className="px-6">{row.frequency}</td>
-              <td className="px-6">{row.unit_cost}</td>
-              <td className="px-6">{row.total_budget}</td>
-              <td className="px-6">{row.actual_cost}</td>
-              <td className="px-6">{row.variance}</td>
+             <td className="px-6">{row.activityLineDescription || "N/A"}</td>
+            <td className="px-6">{row.quantity || "0"}</td>
+            <td className="px-6">{row.frequency || "0"}</td>
+            <td className="px-6">{row.unitCost || "0"}</td>
+            <td className="px-6">
+              {row.totalBudget || "0"}
+            </td>
+            <td className="px-6">{row.actualCost || "0"}</td>
               <td className="px-6 relative">
                 <Icon
                   icon={"uiw:more"}
@@ -190,12 +220,12 @@ export default function ProjectRequestRetirementPage() {
                   color="#909CAD"
                   onClick={() =>
                     setActiveRowId((prev) =>
-                      prev === row.userId ? null : row.userId
+                      prev === row.retirementId ? null : row.retirementId
                     )
                   }
                 />
 
-                {activeRowId === row.userId && (
+                {activeRowId === row.retirementId && (
                   <AnimatePresence>
                     <motion.div
                       initial={{ y: -10, opacity: 0 }}
@@ -204,7 +234,13 @@ export default function ProjectRequestRetirementPage() {
                       transition={{ duration: 0.2, ease: "easeOut" }}
                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
                       <ul className="text-sm">
-                        <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                        <li 
+                          onClick={() => {
+                            setSelectedRetirement(row);
+                            setOpenEditRetirement(true);
+                            setActiveRowId(null);
+                          }}
+                          className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"ph:pencil-simple-line"}
                             height={20}
@@ -212,7 +248,7 @@ export default function ProjectRequestRetirementPage() {
                           />
                           Edit
                         </li>
-                        <li className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
+                        <li onClick={() => setOpenDeleteModal(true)} className="cursor-pointer hover:text-[--primary-light] border-y border-gray-300 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"pixelarticons:trash"}
                             height={20}
@@ -229,54 +265,51 @@ export default function ProjectRequestRetirementPage() {
           )}
         />
         <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-          <p>Total Activity Cost (N): 100,00</p>
-          <p>Amount to reimburse to NDSICDE (N): 200,000</p>
-          <p>Amount to reimburse to Staff (N): 200,000</p>
+          <p>Total Activity Cost (₦): {requestRetirements.reduce((acc, curr) => acc + (curr.actualCost || 0), 0).toLocaleString()}</p>
+          <p>Amount to reimburse to NDSICDE (₦): 0</p>
+          <p>Amount to reimburse to Staff (₦): 0</p>
         </div>
       </CardComponent>
 
-      <div className="space-y-4">
-        {fileInputs.map((id) => (
-          <div key={id} className="flex items-center gap-4">
-            <div className="flex items-center flex-1 gap-5">
-              <SimpleFileInput id={id} />
-              <TextInput
-                placeholder="Enter File Name"
-                value=""
-                onChange={() => {}}
-                name="fileName"
-              />
-            </div>
-            {fileInputs.length > 1 && (
-              <button
-                type="button"
-                onClick={() => handleRemoveFileInput(id)}
-                className="text-red-500 hover:text-red-700 transition-colors"
-                aria-label="Remove file input">
-                <Icon icon="pixelarticons:trash" width={20} height={20} />
-              </button>
-            )}
-          </div>
-        ))}
-
-        <button
-          type="button"
-          onClick={handleAddFileInput}
-          className="flex items-center gap-2 text-gray-400 text-sm hover:text-gray-500 font-medium transition-color cursor-pointers">
-          <Icon icon="si:add-fill" width={18} height={18} />
-          Add file
-        </button>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+         <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+            Attached Documents
+         </h3>
+         {selectedRequest.documentURL ? (
+            <FileDisplay
+            filename={selectedRequest.documentName}
+            url={selectedRequest.documentURL}
+            />
+        ) : (
+            <p className="text-sm text-gray-500">No documents attached.</p>
+        )}
       </div>
 
-      <div className="w-[400px] gap-6 mt-6 flex">
-        <Button content="Submit" isSecondary />
-        <Button content="Print" onClick={() => window.print()} />
-      </div>
+      {/* <div className="w-[400px] gap-6 mt-6 flex">
+        <Button content="Retire Selected" isSecondary onClick={() => setOpenAddRetirement(true)} />
+      </div> */}
 
-      <AddProjectRequestRetirement
+      {openAddRetirement && <AddProjectRequestRetirement
         isOpen={openAddRetirement}
         onClose={() => setOpenAddRetirement(false)}
-      />
+        selectedRequest={selectedRequest}
+      />}
+
+      {openEditRetirement && selectedRetirement && <EditProjectRequestRetirement
+        isOpen={openEditRetirement}
+        onClose={() => { setOpenEditRetirement(false); fetchRetirements(); }}
+        selectedRequest={selectedRequest}
+        retirementData={selectedRetirement}
+      />}
+
+      {openDeleteModal && <DeleteModal
+        isOpen={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        onDelete={() => deleteRetirement(activeRowId!)}
+        isDeleting={isDeleting}
+        heading="Delete Retirement"
+        subtitle="Are you sure you want to delete this retirement?"
+      />}
     </div>
   );
 }

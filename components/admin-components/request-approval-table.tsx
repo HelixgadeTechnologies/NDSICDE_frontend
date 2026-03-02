@@ -259,9 +259,9 @@ function ActivityFinancialRetirement() {
         )}
       />}
       <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-        <p>Total Activity Cost (₦): 100,000</p>
-        <p>Amount to reimburse to NDSICDE (₦): 200,000</p>
-        <p>Amount to reimburse to Staff (₦): 200,000</p>
+        <p>Total Activity Cost (₦): {data.reduce((acc, curr) => acc + (curr.actualCost || 0), 0).toLocaleString()}</p>
+        <p>Amount to reimburse to NDSICDE (₦): 0</p>
+        <p>Amount to reimburse to Staff (₦): 0</p>
       </div>
     </div>
   );

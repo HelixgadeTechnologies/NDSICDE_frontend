@@ -22,6 +22,7 @@ import { RetirementRequestType } from "@/types/retirement-request";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import { useRequests } from "@/context/RequestsContext";
 
 export default function FinancialRequestModal() {
   // const [rejectRequest, setRejectRequest] = useState(false);
@@ -39,25 +40,35 @@ export default function FinancialRequestModal() {
   ];
 
   const { retirementId } = useParams();
+  const { retirements, fetchRetirements } = useRequests();
   const [retirement, setRetirement] = useState<RetirementRequestType | null>(null);
   const [outputDetails, setOutputDetails] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRetirement = async () => {
+    const loadRetirement = async () => {
+      setIsLoading(true);
+      if (!retirementId) return;
+
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list?type=${"retirement"}`,
-        );
-        const retirements = res.data.data;
-        const found = retirements.find((r: RetirementRequestType) => r.retirementId === retirementId);
-        setRetirement(found || null);
+        let retirementDetails = retirements.find((r) => r.retirementId === retirementId);
+        
+        // Setup direct individual fetch in the future if a specific /api/retirement/retirement/{id} analogous endpoint gets built, for now rely on context data filter
+        if (!retirementDetails) {
+            const fetched = await fetchRetirements();
+            retirementDetails = fetched.find((r) => r.retirementId === retirementId);
+        }
+
+        if (retirementDetails) setRetirement(retirementDetails || null);
       } catch (error) {
-        console.error("Error fetching request details:", error);
+        console.error("Error finding retirement specifics:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchRetirement();
-  }, [retirementId]);
+    
+    loadRetirement();
+  }, [retirementId, retirements, fetchRetirements]);
 
   useEffect(() => {
     const fetchOutput = async () => {
