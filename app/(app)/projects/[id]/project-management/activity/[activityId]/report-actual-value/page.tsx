@@ -29,6 +29,7 @@ export default function ReportActualValue() {
 
   const params = useParams();
   const projectId = (params.id as string) || "";
+  const activityId = (params.activityId as string) || "";
 
   const head = [
     "Activity Statement",
@@ -46,9 +47,20 @@ export default function ReportActualValue() {
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity-reports`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       toast.success(response.data.message);
-      setData(response.data.data);
+      
+      const allReports = response.data.data || [];
+      const filteredReports = activityId 
+        ? allReports.filter((report: ProjectActivityReportTypes) => report.activityId === activityId)
+        : allReports;
+        
+      setData(filteredReports);
     } catch (error) {
       console.log(`Error fetching activity reports: ${error}`);
       toast.error("Error retrieving activity report. Please try again.");

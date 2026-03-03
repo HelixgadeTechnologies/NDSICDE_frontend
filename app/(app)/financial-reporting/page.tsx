@@ -92,18 +92,12 @@ export default function FinancialReporting() {
         </div>
       ) : (
         <>
-          <BudgetVSExpenditureTrends
-            budgetTrends={summaryData?.budgetTrends || []}
-            expenseBreakdown={summaryData?.expenseBreakdown || []}
-          />
+          <BudgetVSExpenditureTrends/>
           <FinancialPerformance
             performanceData={summaryData?.projectPerformance || []}
           />
           <BudgetVSActuals data={summaryData?.budgetVsActuals || []} />
-          <DetailedExpenseBreakdown
-            detailedExpenses={summaryData?.detailedExpenses || []}
-            expenseCategories={summaryData?.expenseBreakdown || []}
-          />
+          <DetailedExpenseBreakdown/>
         </>
       )}
     </section>

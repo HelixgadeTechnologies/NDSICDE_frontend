@@ -49,6 +49,7 @@ function SPI({ data }: { data: PerformanceMetric[] }) {
 interface FinancialPerformanceProps {
   performanceData: {
     projectName: string;
+    variancePercentage?: number;
     cpi?: number;
     spi?: number;
   }[];
@@ -69,12 +70,12 @@ export default function FinancialPerformance({ performanceData }: FinancialPerfo
 
   const cpiData = performanceData?.map(p => ({
     name: p.projectName,
-    value: p.cpi || 0
+    value: p.cpi ?? p.variancePercentage ?? 0
   })) || [];
 
   const spiData = performanceData?.map(p => ({
     name: p.projectName,
-    value: p.spi || 0
+    value: p.spi ?? p.variancePercentage ?? 0
   })) || [];
 
   return (

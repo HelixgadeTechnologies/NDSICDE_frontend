@@ -1,13 +1,16 @@
 import axios from 'axios';
 import { IndicatorPayload } from '@/types/indicator';
+import { getToken } from './credentials';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const token = getToken();
 
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
   },
 });
 
@@ -22,7 +25,6 @@ export const indicatorApi = {
     }
   },
   
-  // You can add more methods here as needed
   // getIndicators: async () => { ... },
   // updateIndicator: async (id: string, payload: IndicatorPayload) => { ... },
   // deleteIndicator: async (id: string) => { ... },

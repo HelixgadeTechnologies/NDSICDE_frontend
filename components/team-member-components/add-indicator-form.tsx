@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import IndicatorSourceSelector, {
   IndicatorSourceData,
 } from "../../ui/indicator-source-selector";
@@ -82,7 +82,7 @@ export default function AddIndicatorForm() {
   }, []);
 
   // Handle indicator source change
-  const handleIndicatorSourceChange = (data: IndicatorSourceData) => {
+  const handleIndicatorSourceChange = useCallback((data: IndicatorSourceData) => {
 
 
     setFormData((prev) => ({
@@ -91,7 +91,7 @@ export default function AddIndicatorForm() {
       thematicAreasOrPillar: data.thematicAreasOrPillar || "",
       statement: data.statement || "",
     }));
-  };
+  }, []);
 
   // Handle general form field changes
   const handleInputChange = (

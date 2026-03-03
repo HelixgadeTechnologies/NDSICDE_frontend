@@ -19,6 +19,7 @@ import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
+import { formatDate } from "@/utils/dates-format-utility";
 
 type SubActivity = {
   id: number;
@@ -472,12 +473,12 @@ export default function EditProjectActivity({
         <div className="flex items-center gap-2">
           <DateInput
             label="Activity Start Date"
-            value={formData.startDate}
+            value={formatDate(formData.startDate, "custom")}
             onChange={(value) => handleDateChange("startDate", value)}
           />
           <DateInput
             label="Activity End Date"
-            value={formData.endDate}
+            value={formatDate(formData.endDate, "custom")}
             onChange={(value) => handleDateChange("endDate", value)}
           />
         </div>
@@ -558,7 +559,7 @@ export default function EditProjectActivity({
                       ? "Planned Delivery Date (This date must be within the linked activity start and end date)"
                       : `Delivery Date ${index + 1}`
                   }
-                  value={subActivity.deliveryDate}
+                  value={formatDate(subActivity.deliveryDate, "custom")}
                   onChange={(value) =>
                     updateSubActivity(subActivity.id, "deliveryDate", value)
                   }

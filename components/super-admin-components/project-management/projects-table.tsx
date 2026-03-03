@@ -154,13 +154,6 @@ export default function ProjectsTable() {
             <div></div>
           </div>
         </section>
-      ) : filteredData.length === 0 ? (
-        <div className="text-center py-10">
-          <Heading
-            heading="No projects found"
-            subtitle={query ? "Try a different search term." : "If you think this is a mistake, please refresh the page or check back later."}
-          />
-        </div>
       ) : (
         <Table
           tableHead={head}

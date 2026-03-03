@@ -200,6 +200,7 @@ export default function ProjectImpact() {
         onClose={() => setAddProjectImpact(false)}
         onSuccess={fetchImpact}
         mode="create"
+        initialData={selectedProjectImpact ?? undefined}
       />
 
       {selectedProjectImpact && (

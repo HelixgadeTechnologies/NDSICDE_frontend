@@ -73,6 +73,27 @@ export default function ProjectActivity() {
   const deleteActivity = async (activityId: string) => {
     setIsDeleting(true);
     try {
+      // Check if there are any reports attached to this activity
+      const reportsResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity-reports`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      const reports = reportsResponse.data.data || [];
+      const hasReport = reports.some((report: any) => report.activityId === activityId);
+      
+      if (hasReport) {
+        toast.error("You cannot delete this activity without deleting its corresponding report first.");
+        setIsDeleting(false);
+        setRemoveActivity(false);
+        return;
+      }
+
       const res = await axios.delete(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity/${activityId}`,
         {
@@ -121,8 +142,8 @@ export default function ProjectActivity() {
                 <td className="px-6">{row.activityStatement}</td>
                 <td className="px-6">{row.subActivity}</td>
                 <td className="px-6">{row.activityTotalBudget}</td>
-                <td className="px-6">{formatDate(row.startDate, "short")}</td>
-                <td className="px-6">{formatDate(row.endDate, "short")}</td>
+                <td className="px-6">{formatDate(row.startDate, "date-only")}</td>
+                <td className="px-6">{formatDate(row.endDate, "date-only")}</td>
                 <td className="px-6">{row.responsiblePerson}</td>
                 <td className="px-6 relative">
                   <Icon

@@ -40,8 +40,9 @@ export default function FinancialRequestModal() {
   ];
 
   const { retirementId } = useParams();
-  const { retirements, fetchRetirements } = useRequests();
+  const { retirements, fetchRetirements, requests } = useRequests();
   const [retirement, setRetirement] = useState<RetirementRequestType | null>(null);
+  const [requestDetails, setRequestDetails] = useState<any | null>(null);
   const [outputDetails, setOutputDetails] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,7 +60,22 @@ export default function FinancialRequestModal() {
             retirementDetails = fetched.find((r) => r.retirementId === retirementId);
         }
 
-        if (retirementDetails) setRetirement(retirementDetails || null);
+        if (retirementDetails) {
+            setRetirement(retirementDetails || null);
+            
+            let reqDetails = requests.find((r) => r.requestId === retirementDetails!.requestId);
+            if (!reqDetails) {
+                try {
+                  const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${retirementDetails.requestId}`);
+                  reqDetails = res.data.data;
+                } catch (e) {
+                  console.error("Failed to load associated request details", e);
+                }
+            }
+            if (reqDetails) {
+                setRequestDetails(reqDetails);
+            }
+        }
       } catch (error) {
         console.error("Error finding retirement specifics:", error);
       } finally {
@@ -68,18 +84,19 @@ export default function FinancialRequestModal() {
     };
     
     loadRetirement();
-  }, [retirementId, retirements, fetchRetirements]);
+  }, [retirementId, retirements, fetchRetirements, requests]);
 
   useEffect(() => {
     const fetchOutput = async () => {
-      if (!retirement?.outputId) {
+      const targetOutputId = requestDetails?.outputId || retirement?.outputId;
+      if (!targetOutputId) {
         setIsLoading(false);
         return;
       }
 
       try {
         const res = await axios.get(
-           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${retirement.outputId}`,
+           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${targetOutputId}`,
         );
         setOutputDetails(res.data.data);
       } catch (error) {
@@ -128,7 +145,7 @@ export default function FinancialRequestModal() {
               <div>
                 <Heading
                   heading="Financial Retirement"
-                  subtitle={`${retirement.requestActivityTitle} - Submitted on ${new Date(retirement.createAt).toLocaleString()}`}
+                  subtitle={`Submitted on ${new Date(retirement.createAt).toLocaleString()}`}
                 />
               </div>
               <div className="w-50">
@@ -154,7 +171,7 @@ export default function FinancialRequestModal() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InfoItem
                     label="Submitted by"
-                    value={retirement.requestStaff || "N/A"}
+                    value={requestDetails?.staff || "N/A"}
                     icon={<User className="w-4 h-4" />}
                   />
                   <InfoItem
@@ -164,22 +181,22 @@ export default function FinancialRequestModal() {
                   />
                   <InfoItem
                     label="Activity Title"
-                    value={retirement.requestActivityTitle || "N/A"}
+                    value={requestDetails?.activityTitle || "N/A"}
                     icon={<ActivityIcon className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity Location(s)"
-                    value={retirement.activityLocation || "N/A"}
+                    value={requestDetails?.activityLocation || "N/A"}
                     icon={<Navigation className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity Start Date"
-                    value={retirement.activityStartDate ? new Date(retirement.activityStartDate).toLocaleDateString() : "N/A"}
+                    value={requestDetails?.activityStartDate ? new Date(requestDetails.activityStartDate).toLocaleDateString() : retirement.activityStartDate ? new Date(retirement.activityStartDate).toLocaleDateString() : "N/A"}
                     icon={<Calendar className="w-4 h-4" />}
                   />
                   <InfoItem
                     label="Activity End Date"
-                    value={retirement.activityEndDate ? new Date(retirement.activityEndDate).toLocaleDateString() : "N/A"}
+                    value={requestDetails?.activityEndDate ? new Date(requestDetails.activityEndDate).toLocaleDateString() : retirement.activityEndDate ? new Date(retirement.activityEndDate).toLocaleDateString() : "N/A"}
                     icon={<Calendar className="w-4 h-4" />}
                   />
                 </div>
@@ -187,7 +204,7 @@ export default function FinancialRequestModal() {
                 <div className="mt-6">
                   <TitleAndContent
                     title="Activity Purpose/Description"
-                    content={retirement.activityPurposeDescription || "N/A"}
+                    content={requestDetails?.activityPurposeDescription || retirement.activityPurposeDescription || "N/A"}
                   />
                 </div>
               </div>
@@ -227,9 +244,9 @@ export default function FinancialRequestModal() {
               )}
             />
             <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-              <p>Total Activity Cost (N): 0</p>
-              <p>Amount to reimburse to NDSICDE (N): 0</p>
-              <p>Amount to reimburse to Staff (N): 0</p>
+              <p>Total Activity Cost (₦): {Number(retirement.actualCost || 0).toLocaleString()}</p>
+              <p>Amount to reimburse to NDSICDE (₦): 0</p>
+              <p>Amount to reimburse to Staff (₦): 0</p>
             </div>
           </CardComponent>
         </div>

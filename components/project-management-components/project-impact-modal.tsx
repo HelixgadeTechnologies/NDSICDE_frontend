@@ -80,6 +80,8 @@ export default function ProjectImpactModal({
         resetForm();
         hasInitializedRef.current = true;
       }
+    } else if (!isOpen) {
+      hasInitializedRef.current = false;
     }
   }, [mode, initialData, isOpen]);
 

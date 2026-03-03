@@ -15,6 +15,7 @@ import TextInput from "@/ui/form/text-input";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
+import DeleteModal from "@/ui/generic-delete-modal";
 
 type LogicalFramework = {
   logicalFrameworkId: string;
@@ -522,58 +523,14 @@ export default function ProjectLogicalFramework() {
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal
+      <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteModalClose}
-        maxWidth="500px">
-        <div className="space-y-6">
-          {/* Warning Icon */}
-          <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-              <Icon
-                icon="heroicons:exclamation-triangle"
-                className="w-8 h-8 text-red-600"
-              />
-            </div>
-          </div>
-
-          {/* Title */}
-          <Heading
-            heading="Delete Framework?"
-            className="text-center text-gray-900"
-          />
-
-          {/* Message */}
-          <div className="text-center space-y-2">
-            <p className="text-gray-700">
-              Are you sure you want to delete{" "}
-              <strong className="text-gray-900">
-                "{frameworkToDelete?.name}"
-              </strong>
-              ?
-            </p>
-            <p className="text-sm text-red-600 font-medium">
-              This action cannot be undone.
-            </p>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-4 pt-2">
-            <Button
-              content="Cancel"
-              onClick={handleDeleteModalClose}
-              isSecondary
-              // isDisabled={isDeleting}
-            />
-            <Button
-              content={isDeleting ? "Deleting..." : "Delete Framework"}
-              onClick={handleDeleteFramework}
-              isDisabled={isDeleting}
-              icon={isDeleting ? "eos-icons:loading" : "pixelarticons:trash"}
-            />
-          </div>
-        </div>
-      </Modal>
+        onDelete={handleDeleteFramework}
+        heading="Delete Framework?"
+        subtitle="Are you sure you want to delete this framework?"
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
