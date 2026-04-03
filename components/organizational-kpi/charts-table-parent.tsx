@@ -149,7 +149,7 @@ export default function ChartsAndTableParent() {
     <div className="space-y-5">
       {/* Filter Section */}
       <CardComponent fitWidth>
-        <div className="flex flex-grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10">
+        <div className="flex grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10">
           <DropDown
             label="Thematic Area"
             value={""}

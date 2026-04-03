@@ -14,6 +14,7 @@ import Link from "next/link";
 import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useParams } from "next/navigation";
 
 export default function ProjectOutput() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -21,6 +22,8 @@ export default function ProjectOutput() {
   const [isLoading, setIsLoading] = useState(false);
   const token = getToken();
   const [isDeleting, setIsDeleting] = useState(false);
+  const params = useParams();
+  const projectId = (params?.id as string) || "";
 
   const head = [
     "Project Impact Statement",
@@ -167,17 +170,13 @@ export default function ProjectOutput() {
                             Remove
                           </li>
                           <Link
-                            href={
-                              "/projects/1/project-management/output/indicator/add"
-                            }
+                            href={`/projects/${projectId}/project-management/output/indicator/add?resultType=output&outputId=${row.outputId}`}
                             className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                             <Icon icon={"si:add-fill"} height={20} width={20} />
                             Add Indicator
                           </Link>
                           <Link
-                            href={
-                              "/projects/1/project-management/output/indicator"
-                            }
+                            href={`/projects/${projectId}/project-management/output/indicator?resultType=output&outputId=${row.outputId}`}
                             className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                             <Icon
                               icon={"hugeicons:view"}

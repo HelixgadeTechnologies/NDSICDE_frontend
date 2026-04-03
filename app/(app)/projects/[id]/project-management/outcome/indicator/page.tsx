@@ -6,9 +6,12 @@ import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function ImpactIndicator() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const resultType = searchParams.get("resultType") || "outcome";
 
   const head = [
     "Indicator Statement",
@@ -96,9 +99,7 @@ export default function ImpactIndicator() {
                         Remove
                       </li>
                       <Link
-                        href={
-                          "/projects/1/project-management/outcome/indicator/actual-value/report"
-                        }
+                        href={`/projects/1/project-management/outcome/indicator/actual-value/report?resultType=${resultType}`}
                         className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                         <Icon icon={"si:add-fill"} height={20} width={20} />
                         Report Actual Value

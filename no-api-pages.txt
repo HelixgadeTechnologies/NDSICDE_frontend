@@ -1,0 +1,28 @@
+PAGES WITHOUT API CALLS:
+
+Page: app/page.tsx
+Imports Components: None directly
+
+Page: app/(app)/projects/[id]/project-management/output/indicator/page.tsx
+Imports Components: @/ui/card-wrapper, @/ui/table
+
+Page: app/(app)/projects/[id]/project-management/output/indicator/actual-value/view/page.tsx
+Imports Components: @/ui/card-wrapper, @/ui/form/button, @/ui/table
+
+Page: app/(app)/projects/[id]/project-management/outcome/indicator/page.tsx
+Imports Components: @/ui/card-wrapper, @/ui/table
+
+Page: app/(app)/projects/[id]/project-management/outcome/indicator/actual-value/view/page.tsx
+Imports Components: @/ui/card-wrapper, @/ui/form/button, @/ui/table
+
+Page: app/(app)/projects/[id]/project-management/impact/indicator/page.tsx
+Imports Components: @/ui/card-wrapper, @/ui/table
+
+Page: app/(app)/projects/[id]/project-management/impact/indicator/[impactId]/actual-value/view/page.tsx
+Imports Components: @/ui/card-wrapper, @/ui/form/button, @/ui/table
+
+Page: app/(app)/projects/[id]/financial-dashboard/page.tsx
+Imports Components: @/components/team-member-components/financial-dashboard, @/ui/dashboard-stat-card
+
+Page: app/(app)/organizational-kpi/page.tsx
+Imports Components: @/components/organizational-kpi/charts-table-parent, @/ui/dashboard-stat-card

@@ -12,25 +12,22 @@ import RadioInput from "@/ui/form/radio";
 import TagInput from "@/ui/form/tag-input";
 import Button from "@/ui/form/button";
 import { indicatorApi } from "@/lib/api/indicatorApi";
-import { IndicatorFormData } from "@/types/indicator";
+import { IndicatorFormData, IndicatorDisaggregationItem } from "@/types/indicator";
 import {
   fetchResultTypes,
-  transformResultTypesToOptions,
   ResultType,
 } from "@/lib/api/result-types";
 import { toast } from "react-toastify";
 
-export default function AddIndicatorForm() {
+export default function AddIndicatorForm({ resultType = "" }: { resultType?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
-  const [resultTypeOptions, setResultTypeOptions] = useState<
-    Array<{ label: string; value: string }>
-  >([]);
 
   const [formData, setFormData] = useState<IndicatorFormData>({
     indicatorId: "",
     indicatorSource: "",
+    orgKpiId: "",
     thematicAreasOrPillar: "",
     statement: "",
     linkKpiToSdnOrgKpi: "",
@@ -38,7 +35,6 @@ export default function AddIndicatorForm() {
     specificArea: "",
     unitOfMeasure: "",
     itemInMeasure: "",
-    disaggregationId: "",
     baseLineDate: "",
     cumulativeValue: "",
     baselineNarrative: "",
@@ -49,9 +45,10 @@ export default function AddIndicatorForm() {
     responsiblePersons: [],
     result: "",
     resultTypeId: "",
+    IndicatorDisaggregation: [],
   });
 
-  // Fetch result types on component mount
+  // Fetch result types and auto-match against the resultType prop from the URL
   useEffect(() => {
     const loadResultTypes = async () => {
       setIsLoadingResults(true);
@@ -59,12 +56,19 @@ export default function AddIndicatorForm() {
         const results = await fetchResultTypes();
         setResultTypes(results);
 
-        // Transform to dropdown options
-        const options = transformResultTypesToOptions(results);
-        setResultTypeOptions(options);
+        // Match resultType prop (e.g. "impact", "outcome", "output") against resultName (case-insensitive)
+        const matched = results.find(
+          (r) => r.resultName.toLowerCase() === resultType.toLowerCase()
+        );
 
-        // Optionally preselect the first result type if none is selected
-        if (results.length > 0 && !formData.resultTypeId) {
+        if (matched) {
+          setFormData((prev) => ({
+            ...prev,
+            result: matched.resultName,
+            resultTypeId: matched.resultTypeId,
+          }));
+        } else if (results.length > 0) {
+          // Fallback: use first result type if no match found
           setFormData((prev) => ({
             ...prev,
             result: results[0].resultName,
@@ -79,12 +83,10 @@ export default function AddIndicatorForm() {
     };
 
     loadResultTypes();
-  }, []);
+  }, [resultType]);
 
   // Handle indicator source change
   const handleIndicatorSourceChange = useCallback((data: IndicatorSourceData) => {
-
-
     setFormData((prev) => ({
       ...prev,
       indicatorSource: data.indicatorSource,
@@ -113,28 +115,28 @@ export default function AddIndicatorForm() {
       }));
     };
 
-  // Handle result type selection
-  const handleResultTypeChange = (resultTypeId: string) => {
-    // Find the selected result type
-    const selectedResultType = resultTypes.find(
-      (type) => type.resultTypeId === resultTypeId,
-    );
 
-    if (selectedResultType) {
+  // Handle disaggregation change — build IndicatorDisaggregation array from checked values
+  const handleDisaggregationChange = (activeValuesJson: string) => {
+    try {
+      const activeValues: Record<string, string> = JSON.parse(activeValuesJson);
+      const disaggregationItems: IndicatorDisaggregationItem[] = Object.entries(activeValues).map(
+        ([type, category]) => ({
+          indicatorDisaggregationId: "",
+          indicatorId: formData.indicatorId || "",
+          type: type.toLowerCase(),
+          category: category || "",
+          target: 0,
+        })
+      );
       setFormData((prev) => ({
         ...prev,
-        result: selectedResultType.resultName,
-        resultTypeId: selectedResultType.resultTypeId,
+        IndicatorDisaggregation: disaggregationItems,
       }));
+    } catch {
+      // If parsing fails (e.g. empty string), clear the array
+      setFormData((prev) => ({ ...prev, IndicatorDisaggregation: [] }));
     }
-  };
-
-  // Handle disaggregation change
-  const handleDisaggregationChange = (id: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      disaggregationId: id,
-    }));
   };
 
   // Prepare payload for API
@@ -158,6 +160,7 @@ export default function AddIndicatorForm() {
       data: {
         indicatorId: formData.indicatorId,
         indicatorSource: formData.indicatorSource,
+        orgKpiId: formData.orgKpiId,
         thematicAreasOrPillar: formData.thematicAreasOrPillar,
         statement: formData.statement,
         linkKpiToSdnOrgKpi: formData.linkKpiToSdnOrgKpi,
@@ -165,7 +168,6 @@ export default function AddIndicatorForm() {
         specificArea: formData.specificArea,
         unitOfMeasure: formData.unitOfMeasure,
         itemInMeasure: formData.itemInMeasure,
-        disaggregationId: "88hg-9987-iu67",
         baseLineDate: baseLineDate,
         cumulativeValue: cumulativeValue,
         baselineNarrative: formData.baselineNarrative,
@@ -176,6 +178,7 @@ export default function AddIndicatorForm() {
         responsiblePersons: formData.responsiblePersons.join(", "),
         result: formData.result,
         resultTypeId: formData.resultTypeId,
+        IndicatorDisaggregation: formData.IndicatorDisaggregation,
       },
     };
 
@@ -188,19 +191,12 @@ export default function AddIndicatorForm() {
     setIsSubmitting(true);
 
     try {
-      // Validate required fields
-      if (!formData.resultTypeId) {
-        toast.error("Please select a result type");
-        setIsSubmitting(false);
-        return;
-      }
-
       const payload = preparePayload();
 
+      // Log the payload so you can verify the data before it hits the API
+      console.log("[AddIndicatorForm] Submitting payload:", JSON.stringify(payload, null, 2));
 
       const response = await indicatorApi.createIndicator(payload);
-
-
       // Reset form or show success message
       toast.success("Indicator added successfully!");
 
@@ -208,6 +204,7 @@ export default function AddIndicatorForm() {
       setFormData({
         indicatorId: "",
         indicatorSource: "",
+        orgKpiId: "",
         thematicAreasOrPillar: "",
         statement: "",
         linkKpiToSdnOrgKpi: "",
@@ -215,7 +212,6 @@ export default function AddIndicatorForm() {
         specificArea: "",
         unitOfMeasure: "",
         itemInMeasure: "",
-        disaggregationId: "",
         baseLineDate: "",
         cumulativeValue: "",
         baselineNarrative: "",
@@ -226,9 +222,10 @@ export default function AddIndicatorForm() {
         responsiblePersons: [],
         result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
+        IndicatorDisaggregation: [],
       });
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("[AddIndicatorForm] Error submitting form:", error);
       toast.error("Failed to add indicator. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -236,16 +233,12 @@ export default function AddIndicatorForm() {
   };
 
   // Handle cancel
-  const handleCancel = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to cancel? All changes will be lost.",
-      )
-    ) {
+  const handleCancel = () => {  
       // Reset form but keep the first result type selected if available
       setFormData({
         indicatorId: "",
         indicatorSource: "",
+        orgKpiId: "",
         thematicAreasOrPillar: "",
         statement: "",
         linkKpiToSdnOrgKpi: "",
@@ -253,7 +246,6 @@ export default function AddIndicatorForm() {
         specificArea: "",
         unitOfMeasure: "",
         itemInMeasure: "",
-        disaggregationId: "",
         baseLineDate: "",
         cumulativeValue: "",
         baselineNarrative: "",
@@ -264,9 +256,8 @@ export default function AddIndicatorForm() {
         responsiblePersons: [],
         result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
+        IndicatorDisaggregation: [],
       });
-
-    }
   };
 
   return (
@@ -279,27 +270,6 @@ export default function AddIndicatorForm() {
         thematicAreaOptions={[]}
       />
 
-      {/* result type dropdown - ADDED */}
-      <div className="space-y-1">
-        <DropDown
-          label="Result Type"
-          value={formData.resultTypeId}
-          name="resultTypeId"
-          placeholder={
-            isLoadingResults
-              ? "Loading result types..."
-              : "Select a result type"
-          }
-          onChange={handleResultTypeChange}
-          options={resultTypeOptions}
-          isBigger
-        />
-        {formData.result && (
-          <p className="text-sm text-gray-500 mt-1">
-            Selected: {formData.result}
-          </p>
-        )}
-      </div>
 
       {/* link to indicator sdn */}
       <DropDown

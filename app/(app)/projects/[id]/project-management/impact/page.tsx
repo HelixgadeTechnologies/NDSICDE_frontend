@@ -168,13 +168,13 @@ export default function ProjectImpact() {
                             Remove
                           </li>
                           <Link
-                            href={`/projects/${projectId}/project-management/impact/indicator/${row.impactId}/add`}
+                            href={`/projects/${projectId}/project-management/impact/indicator/${row.impactId}/add?resultType=impact`}
                             className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                             <Icon icon={"si:add-fill"} height={20} width={20} />
                             Add Indicator
                           </Link>
                           <Link
-                            href={`/projects/${projectId}/project-management/impact/${row.impactId}/indicator`}
+                            href={`/projects/${projectId}/project-management/impact/${row.impactId}/indicator?resultType=impact`}
                             className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                             <Icon
                               icon={"hugeicons:view"}

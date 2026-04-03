@@ -4,9 +4,18 @@ export type Target = {
   targetNarrative: string;
 };
 
+export type IndicatorDisaggregationItem = {
+  indicatorDisaggregationId: string;
+  indicatorId: string;
+  type: string;
+  category: string;
+  target: number;
+};
+
 export type IndicatorFormData = {
   indicatorId: string;
   indicatorSource: string;
+  orgKpiId: string;
   thematicAreasOrPillar: string;
   statement: string;
   linkKpiToSdnOrgKpi: string;
@@ -14,7 +23,6 @@ export type IndicatorFormData = {
   specificArea: string;
   unitOfMeasure: string;
   itemInMeasure: string;
-  disaggregationId: string;
   baseLineDate: string;
   cumulativeValue: string;
   baselineNarrative: string;
@@ -25,6 +33,7 @@ export type IndicatorFormData = {
   responsiblePersons: string[];
   result: string;
   resultTypeId: string;
+  IndicatorDisaggregation: IndicatorDisaggregationItem[];
 };
 
 export type IndicatorPayload = {
@@ -32,6 +41,7 @@ export type IndicatorPayload = {
   data: {
     indicatorId: string;
     indicatorSource: string;
+    orgKpiId: string;
     thematicAreasOrPillar: string;
     statement: string;
     linkKpiToSdnOrgKpi: string;
@@ -39,7 +49,6 @@ export type IndicatorPayload = {
     specificArea: string;
     unitOfMeasure: string;
     itemInMeasure: string;
-    disaggregationId: string;
     baseLineDate: string;
     cumulativeValue: number;
     baselineNarrative: string;
@@ -50,6 +59,7 @@ export type IndicatorPayload = {
     responsiblePersons: string;
     result: string;
     resultTypeId: string;
+    IndicatorDisaggregation: IndicatorDisaggregationItem[];
   };
 };
 
