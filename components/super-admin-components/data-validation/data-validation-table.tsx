@@ -72,7 +72,7 @@ export default function DataValidationTable({
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [startDate, endDate]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [details, setDetails] = useState<ProjectRequestType | undefined>(

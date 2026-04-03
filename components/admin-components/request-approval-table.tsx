@@ -158,6 +158,9 @@ function ActivityFinancialRetirement() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [project, setProject] = useState("");
+  const [journalId, setJournalId] = useState("");
+  const [dates, setDates] = useState({ startDate: "", endDate: "" });
+  const { projectOptions } = useProjects();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -171,10 +174,13 @@ function ActivityFinancialRetirement() {
               search: search || undefined,
               status: status === "All" ? undefined : status || undefined,
               projectId: project || undefined,
+              journalId: journalId || undefined,
+              startDate: dates.startDate ? convertDateToISO8601(dates.startDate) : undefined,
+              endDate: dates.endDate ? convertDateToISO8601(dates.endDate) : undefined,
             },
           },
         );
-        setData(res.data?.data);
+        setData(res.data?.data || []);
         console.log(res.data.data);
       } catch (error) {
         console.error("Failed to fetch retirements", error);
@@ -188,7 +194,7 @@ function ActivityFinancialRetirement() {
     }, 500);
 
     return () => clearTimeout(debounceId);
-  }, [search, status, project]);
+  }, [search, status, project, journalId, dates]);
 
   return (
     <div className="space-y-5">
@@ -218,15 +224,18 @@ function ActivityFinancialRetirement() {
           placeholder="All Projects"
           label="Project"
           onChange={(e: any) => setProject(e.target.value)}
-          options={[]} // Add project options if available
+          options={projectOptions} 
         />
         <SearchInput
-          value=""
+          value={journalId}
           name="journalId"
           placeholder="All Journal IDs"
-          onChange={() => {}}
+          onChange={(e: any) => setJournalId(e.target.value)}
         />
-        <DateRangePicker label="Date" />
+        <DateRangePicker 
+          label="Date"
+          onChange={(dateRange) => setDates({ startDate: dateRange.startDate || "", endDate: dateRange.endDate || "" })} 
+        />
       </div>
      {loading ? (
       <div className="dots my-20 mx-auto">

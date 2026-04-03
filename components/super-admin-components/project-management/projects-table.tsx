@@ -41,6 +41,7 @@ export default function ProjectsTable() {
   const [filters, setFilters] = useState({
     status: "",
     year: "",
+    objective: "",
   });
 
   // Apply filters whenever query or filters change
@@ -71,8 +72,27 @@ export default function ProjectsTable() {
       result = result.filter((item) => item.status === filters.status);
     }
 
+    // Apply year filter
+    if (filters.year) {
+      result = result.filter((item) => 
+        item.startDate?.startsWith(filters.year) || item.endDate?.startsWith(filters.year)
+      );
+    }
+
+    // Apply objective filter
+    if (filters.objective) {
+      result = result.filter((item) => item.strategicObjectiveStatement === filters.objective);
+    }
+
     setFilteredData(result);
   }, [query, filters, data]);
+
+  // Dynamically generate objective options based on current projects data
+  const objectiveOptions = [
+    { label: "All Objectives", value: "" },
+    ...Array.from(new Set((data as unknown as ProjectApiResponse[])?.map(p => p.strategicObjectiveStatement).filter(Boolean)))
+      .map(o => ({ label: o as string, value: o as string }))
+  ];
 
   const head = [
     "Project Name",
@@ -124,22 +144,22 @@ export default function ProjectsTable() {
             name="status"
             value={filters.status}
             placeholder="All Status"
-            onChange={() => {}}
+            onChange={(val: string) => setFilters(prev => ({...prev, status: val}))}
             options={statusOptions}
             label="Status"
           />
           <DropDown
             name="strategetic-objectives"
-            value={filters.status}
+            value={filters.objective}
             placeholder="All Objective"
-            onChange={() => {}}
-            options={[]}
+            onChange={(val: string) => setFilters(prev => ({...prev, objective: val}))}
+            options={objectiveOptions}
             label="Strategic Objectives"
           />
           <DropDown
             name="year"
             value={filters.year}
-            onChange={() => {}}
+            onChange={(val: string) => setFilters(prev => ({...prev, year: val}))}
             options={year_options}
             label="Year"
           />

@@ -26,7 +26,7 @@ type KPI = {
   updateAt: string;
 };
 
-export default function KPITable() {
+export default function KPITable({ searchQuery = "", typeFilter = "" }: { searchQuery?: string; typeFilter?: string }) {
   const head = [
     "KPI Name",
     "Type",
@@ -152,13 +152,24 @@ export default function KPITable() {
     );
   }
 
+  const filteredData = data.filter((item) => {
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch = !searchQuery || 
+      item.statement?.toLowerCase().includes(searchLower) ||
+      item.itemInMeasure?.toLowerCase().includes(searchLower);
+      
+    const matchesType = !typeFilter || item.type === typeFilter;
+    
+    return matchesSearch && matchesType;
+  });
+
   return (
     <>
       <Table
         checkbox
         idKey={"kpiId"}
         tableHead={head}
-        tableData={data}
+        tableData={filteredData}
         renderRow={(row) => (
           <>
             <td className="px-6">{row.statement}</td>

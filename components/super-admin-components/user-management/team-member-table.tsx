@@ -22,7 +22,8 @@ import { fetchRoles } from "@/lib/api/roles";
 // import { TeamMember } from "@/types/team-members";
 
 export default function TeamMembersTable() {
-  const { roleId, status, setField } = useUserManagementState();
+  const [filterRoleId, setFilterRoleId] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
   const [roleOptions, setRoleOptions] = useState<DropdownOption[]>([]);
   const { token } = useRoleStore();
 
@@ -70,14 +71,14 @@ export default function TeamMembersTable() {
       .toLowerCase()
       .includes(query.trim().toLowerCase());
 
-    // Role filter (if roleId is selected)
-    const matchesRole = !roleId || item.roleId === roleId;
+    // Role filter (if filterRoleId is selected)
+    const matchesRole = !filterRoleId || item.roleId === filterRoleId;
 
-    // Status filter (if status is selected)
-    const matchesStatus = !status || 
-      item.status.toLowerCase() === status.toLowerCase() ||
-      (status === "Active" && item.status.toLowerCase() === "active") ||
-      (status === "inactive" && item.status.toLowerCase() === "inactive");
+    // Status filter (if filterStatus is selected)
+    const matchesStatus = !filterStatus || 
+      item.status.toLowerCase() === filterStatus.toLowerCase() ||
+      (filterStatus === "Active" && item.status.toLowerCase() === "active") ||
+      (filterStatus === "inactive" && item.status.toLowerCase() === "inactive");
 
     return matchesSearch && matchesRole && matchesStatus;
   });
@@ -108,12 +109,12 @@ export default function TeamMembersTable() {
 
   // Handle role filter change
   const handleRoleFilterChange = (value: string) => {
-    setField("roleId", value);
+    setFilterRoleId(value);
   };
 
   // Handle status filter change
   const handleStatusFilterChange = (value: string) => {
-    setField("status", value);
+    setFilterStatus(value);
   };
 
   // Determine what content to render
@@ -129,7 +130,7 @@ export default function TeamMembersTable() {
     }
 
     // Has data but no search results
-    if (filteredData.length === 0 && (query.trim() !== "" || roleId || status)) {
+    if (filteredData.length === 0 && (query.trim() !== "" || filterRoleId || filterStatus)) {
       return (
         <EmptyState
           hasSearchQuery={true}
@@ -239,7 +240,7 @@ export default function TeamMembersTable() {
             </div>
             <div className="w-2/5 flex gap-4">
               <DropDown
-                value={roleId}
+                value={filterRoleId}
                 label="Role"
                 placeholder="All Role"
                 name="role"
@@ -247,7 +248,7 @@ export default function TeamMembersTable() {
                 options={roleOptions}
               />
               <DropDown
-                value={status}
+                value={filterStatus}
                 label="Status"
                 placeholder="All Status"
                 name="status"

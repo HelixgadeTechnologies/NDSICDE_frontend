@@ -106,11 +106,8 @@ export default function PendingActivityCards() {
             </div>
           </div>
         ) : pendingReports.length <= 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-center">
+          <div className="flex flex-col items-center justify-center h-16 text-center">
             <p className="text-sm text-gray-700">No pending approvals found.</p>
-            <p className="text-xs text-gray-500">
-              Check back later for updates.
-            </p>
           </div>
         ) : (
           <div className="space-y-4 my-3">

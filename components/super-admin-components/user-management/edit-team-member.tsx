@@ -7,7 +7,9 @@ import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
 import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
-import { ChangeEvent } from "react";
+import { fetchRoles } from "@/lib/api/roles";
+import { DropdownOption } from "@/types/project-management-types";
+import { ChangeEvent, useEffect, useState } from "react";
 import TagInput from "@/ui/form/tag-input";
 
 type EditProps = {
@@ -32,7 +34,59 @@ export default function EditTeamMember({
     status,
     // assignedProjects,
     setField,
+    resetForm,
   } = useUserManagementState();
+
+  useEffect(() => {
+    if (isOpen && user) {
+      setField("fullName", user.fullName || "");
+      setField("email", user.email || "");
+      setField("department", user.department || "");
+      setField("phoneNumber", user.phoneNumber || "");
+      setField("roleId", user.roleId || "");
+      setField("status", user.status || "Active");
+    }
+
+    // Cleanup when modal closes
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen, user, setField, resetForm]);
+
+  const [roleOptions, setRoleOptions] = useState<DropdownOption[]>([]);
+
+  useEffect(() => {
+    const loadRoles = async () => {
+      try {
+        const rolesData = await fetchRoles();
+        const transformedRoles = rolesData.map((role) => ({
+          label: role.roleName,
+          value: role.roleId
+        }));
+        setRoleOptions(transformedRoles);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    if (isOpen) {
+      loadRoles();
+    }
+  }, [isOpen]);
+
+  const statusOptions = [
+    { label: "Active", value: "Active" },
+    { label: "Inactive", value: "Inactive" },
+  ];
+
+  const departmentOptions = [
+    { label: "Banking", value: "Banking" },
+    { label: "Agriculture", value: "Agriculture" },
+    { label: "Finance", value: "Finance" },
+    { label: "IT support", value: "IT support" },
+    { label: "Operations", value: "Operations" },
+    { label: "Management", value: "Management" },
+  ];
 
   const options = [
     "Healthcare Initiative",
@@ -71,14 +125,14 @@ export default function EditTeamMember({
           />
           <DropDown
             label="Role"
-            options={[]}
+            options={roleOptions}
             name="role"
             value={roleId}
             onChange={(value: string) => setField("roleId", value)}
           />
           <DropDown
             label="Department"
-            options={[]}
+            options={departmentOptions}
             name="department"
             value={department}
             onChange={(value: string) => setField("department", value)}
@@ -93,7 +147,7 @@ export default function EditTeamMember({
           />
           <DropDown
             label="Status"
-            options={[]}
+            options={statusOptions}
             name="status"
             value={status}
             onChange={(value: string) => setField("status", value)}

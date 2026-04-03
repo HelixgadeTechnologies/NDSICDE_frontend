@@ -103,7 +103,7 @@ export default function ReportsTable() {
       setIsLoading(true);
       try {
         // Build the URL with filters
-        let url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/indicator-reports?`;
+        let url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/managementAndStaff/indicator-reports`;
 
         // Add filters only if they have values
         if (searchTerm) url += `search=${encodeURIComponent(searchTerm)}&`;
@@ -137,6 +137,7 @@ export default function ReportsTable() {
 
     fetchReports();
   }, [searchTerm, statusFilter, resultTypeFilter, currentPage]);
+  console.log(reportsData)
 
   // Status options
   const statusOptions = [
@@ -213,7 +214,7 @@ export default function ReportsTable() {
                   <td className="px-6">{formatDate(row.dateGenerated)}</td>
                   <td
                     className={`px-6 ${
-                      row.status === "APPROVED"
+                      row.status === "APPROVE"
                         ? "text-green-500"
                         : row.status === "PENDING"
                           ? "text-yellow-500"

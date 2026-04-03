@@ -14,6 +14,8 @@ export default function StrategicObjectivesAndKPIToggle() {
     { tabName: "Key Performance Indicators", id: 2 },
   ];
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
 
   return (
     <CardComponent>
@@ -27,17 +29,29 @@ export default function StrategicObjectivesAndKPIToggle() {
           />
         </div>
         <div className="w-2/5 flex gap-2 items-center">
-          <DropDown name="" value="" onChange={() => {}} options={[]} />
-          <DropDown name="" value="" onChange={() => {}} options={[]} />
+          <DropDown 
+            name="status" 
+            placeholder="All Status"
+            value={statusFilter} 
+            onChange={(val: string) => setStatusFilter(val)} 
+            options={[{label: "All Status", value: ""}, {label: "Active", value: "Active"}, {label: "Inactive", value: "Inactive"}]} 
+          />
+          <DropDown 
+            name="type" 
+            placeholder="All Types"
+            value={typeFilter} 
+            onChange={(val: string) => setTypeFilter(val)} 
+            options={[{label: "All Types", value: ""}, {label: "Quantitative", value: "Quantitative"}, {label: "Qualitative", value: "Qualitative"}]} 
+          />
         </div>
       </div>
       <TabComponent
         data={tabs}
         renderContent={(tabId) => {
           if (tabId === 1) {
-            return <SOTable />;
+            return <SOTable searchQuery={query} statusFilter={statusFilter} />;
           } else {
-            return <KPITable />;
+            return <KPITable searchQuery={query} typeFilter={typeFilter} />;
           }
         }}
       />

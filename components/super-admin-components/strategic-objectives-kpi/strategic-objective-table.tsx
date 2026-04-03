@@ -24,7 +24,7 @@ type ExpectedData = {
   updateAt: string;
 };
 
-export default function SOTable() {
+export default function SOTable({ searchQuery = "", statusFilter = "" }: { searchQuery?: string; statusFilter?: string }) {
   const head = ["Objective Name", "Linked KPIs", "Status", "Actions"];
   const [data, setData] = useState<ExpectedData[]>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -197,13 +197,24 @@ export default function SOTable() {
     );
   }
 
+  const filteredData = data.filter((item) => {
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch = !searchQuery || 
+      item.statement?.toLowerCase().includes(searchLower) ||
+      item.thematicAreas?.toLowerCase().includes(searchLower);
+      
+    const matchesStatus = !statusFilter || item.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <section>
       <Table
         checkbox
         idKey="strategicObjectiveId"
         tableHead={head}
-        tableData={data}
+        tableData={filteredData}
         renderRow={(row) => (
           <>
             <td className="px-6 py-4 capitalize max-w-125">{row.statement || "N/A"}</td>
