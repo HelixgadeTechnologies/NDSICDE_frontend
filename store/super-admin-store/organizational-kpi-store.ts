@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 type OrganizationalKPIState = {
+    allThematicArea: string;
     allStrategicObjective: string;
     resultLevel: string;
     indicators: string;
@@ -11,6 +12,7 @@ type OrganizationalKPIState = {
 }
 
 const defaultFormState: Omit<OrganizationalKPIState, "setField" | "resetForm"> = {
+    allThematicArea: "",
     allStrategicObjective: "",
     resultLevel: "",
     indicators: "",

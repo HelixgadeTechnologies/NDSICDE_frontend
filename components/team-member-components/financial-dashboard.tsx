@@ -8,13 +8,18 @@ import ImplementationTimeAnalysisComponent from "./ita-component";
 import CPIComponent from "./cpi-component";
 import SPIComponnet from "./spi-component";
 import BurnRateComponent from "./burn-rate-component";
+import { ProjectFinancialDashboardResponse } from "@/types/project-financial-dashboard";
 
-export default function ActivityOverview() {
+export default function ActivityOverview({
+  statData,
+}: {
+  statData?: ProjectFinancialDashboardResponse | null;
+}) {
   return (
     <>
 
       {/* implementation time analysis */}
-      <ImplementationTimeAnalysisComponent />
+      <ImplementationTimeAnalysisComponent statData={statData} />
 
       {/* burn rate */}
       <CardComponent>
@@ -45,12 +50,12 @@ export default function ActivityOverview() {
           </div>
         </div>
         {/* burn rate*/}
-       <BurnRateComponent/>
+       <BurnRateComponent statData={statData} />
 
       </CardComponent>
       {/* cpi and spi component */}
-      <CPIComponent />
-      <SPIComponnet />
+      <CPIComponent statData={statData} />
+      <SPIComponnet statData={statData} />
     </>
   );
 }

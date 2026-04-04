@@ -11,6 +11,7 @@ import {
   Bar,
   Cell,
 } from "recharts";
+import EmptyChartState from "./empty-chart-state";
 
 type BarChartProps = {
   data: Record<string, unknown>[];
@@ -40,19 +41,11 @@ export default function BarChartComponent({
   isLoading = false,
 }: BarChartProps) {
   if (isLoading) {
-    return (
-      <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">
-        Loading chart...
-      </div>
-    );
+    return <EmptyChartState title="Loading chart..." subtitle="Please wait while we fetch the latest data." />;
   }
 
   if (!data || data.length === 0) {
-    return (
-      <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">
-        No data available
-      </div>
-    );
+    return <EmptyChartState />;
   }
 
   return (

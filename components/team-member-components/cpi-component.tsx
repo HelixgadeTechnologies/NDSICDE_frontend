@@ -10,17 +10,12 @@ import { useState } from "react";
 
 const colorsCpi = ["#F44336", "#FBC02D", "#0047AB", "#22C55E"];
 
-function CPIChart() {
-  const data = [
-    { name: "Project 1", value: 80 },
-    { name: "Project 2", value: 90 },
-    { name: "Project 3", value: 80 },
-    { name: "Project 4", value: 50 },
-    { name: "Project 5", value: 80 },
-    { name: "Project 6", value: 80 },
-    { name: "Project 7", value: 90 },
-    { name: "Project 8", value: 50 },
-  ];
+function CPIChart({ cpiData }: { cpiData?: ProjectFinancialDashboardResponse["ACTIVITY_FINANCIAL_DATA"] }) {
+  const data = cpiData?.map((item) => ({
+    name: item.activityStatement || item.outputStatement || "Unknown",
+    value: item.costPerformanceIndex || 0,
+  })) || [];
+
 
   return (
     <div className="h-[300px] mt-5">
@@ -29,50 +24,31 @@ function CPIChart() {
         isSingleBar={true}
         colors={colorsCpi}
         xKey="name"
-        labels={["Under Budget", "As Planned", "No Spending", "Over Budget"]}
+        labels={["CPI Values"]}
       />
     </div>
   );
 }
 
-function CPITable() {
+function CPITable({ cpiData }: { cpiData?: ProjectFinancialDashboardResponse["ACTIVITY_FINANCIAL_DATA"] }) {
   const head = [
-    "Under Budget",
-    "As Planned",
-    "No Spending",
-    "Over Budget",
+    "Description",
+    "Cost Variance",
+    "CPI",
     "Status",
-  ];
-
-  const data = [
-    {
-      underBudget: 45,
-      asPlanned: 30,
-      noSpending: 12,
-      overBudget: 0,
-      status: "Due to Start",
-    },
-    {
-      underBudget: 45,
-      asPlanned: 30,
-      noSpending: 12,
-      overBudget: 0,
-      status: "Due to Start",
-    },
   ];
 
   return (
     <div className="mt-5">
       <Table
         tableHead={head}
-        tableData={data}
-        renderRow={(row) => (
+        tableData={cpiData}
+        renderRow={(row: any) => (
           <>
-            <td className="px-6">{row.underBudget}</td>
-            <td className="px-6">{row.asPlanned}</td>
-            <td className="px-6">{row.noSpending}</td>
-            <td className="px-6">{row.overBudget}</td>
-            <td className="px-6">{row.status}</td>
+            <td className="px-6">{row.activityStatement || row.outputStatement || "-"}</td>
+            <td className="px-6">{row.costVariance ?? "-"}</td>
+            <td className="px-6">{row.costPerformanceIndex ?? "-"}</td>
+            <td className="px-6">{row.costPerformanceStatus || "-"}</td>
           </>
         )}
       />
@@ -80,7 +56,13 @@ function CPITable() {
   );
 }
 
-export default function CPIComponent() {
+import { ProjectFinancialDashboardResponse } from "@/types/project-financial-dashboard";
+
+export default function CPIComponent({
+  statData,
+}: {
+  statData?: ProjectFinancialDashboardResponse | null;
+}) {
   const [levels, setLevels] = useState("");
   return (
     <CardComponent>
@@ -111,9 +93,9 @@ export default function CPIComponent() {
           ]}
           renderContent={(rowId) => {
             if (rowId === 1) {
-              return <CPIChart />;
+              return <CPIChart cpiData={statData?.ACTIVITY_FINANCIAL_DATA} />;
             } else {
-              return <CPITable />;
+              return <CPITable cpiData={statData?.ACTIVITY_FINANCIAL_DATA} />;
             }
           }}
         />

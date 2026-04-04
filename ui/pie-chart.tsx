@@ -3,8 +3,8 @@ import {
   Pie,
   PieChart,
   ResponsiveContainer,
-  // Tooltip,
 } from "recharts";
+import EmptyChartState from "./empty-chart-state";
 
 type P = {
   name: string;
@@ -23,19 +23,11 @@ export default function PieChartComponent({
   isLoading = false,
 }: PieChartProps) {
   if (isLoading) {
-    return (
-      <div className="h-[350px] w-full flex items-center justify-center text-sm text-gray-400">
-        Loading chart...
-      </div>
-    );
+    return <EmptyChartState height={350} title="Loading visualization..." subtitle="We're preparing your activity breakdown." />;
   }
 
   if (!data || data.length === 0) {
-    return (
-      <div className="h-[350px] w-full flex items-center justify-center text-sm text-gray-400">
-        No data available
-      </div>
-    );
+    return <EmptyChartState height={350} title="No category data" subtitle="There is no categorical data to display for this period." />;
   }
 
   return (

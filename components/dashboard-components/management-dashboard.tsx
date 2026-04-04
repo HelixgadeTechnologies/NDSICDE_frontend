@@ -5,7 +5,7 @@ import ProjectsTable from "../super-admin-components/project-management/projects
 import CardComponent from "@/ui/card-wrapper";
 import Heading from "@/ui/text-heading";
 import LineChartComponent from "@/ui/line-chart";
-import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import PieChartComponent from "@/ui/pie-chart";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DropDown from "@/ui/form/select-dropdown";
@@ -247,22 +247,13 @@ export default function ManagementAndStaffDashboard() {
               </div>
             </div>
             <div className="h-112.5">
-              {isLoadingKpi ? (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  Loading KPI data...
-                </div>
-              ) : kpiChartData.length > 0 ? (
-                <LineChartComponent
-                  lines={kpiLines}
-                  data={kpiChartData}
-                  legend
-                  xKey="name"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  No KPI data available for {selectedYear}
-                </div>
-              )}
+              <LineChartComponent
+                lines={kpiLines}
+                data={kpiChartData}
+                legend
+                xKey="name"
+                isLoading={isLoadingKpi}
+              />
             </div>
           </CardComponent>
         </div>
@@ -273,53 +264,11 @@ export default function ManagementAndStaffDashboard() {
               subtitle="Spent vs Remaining"
               className="text-center"
             />
-            {isLoadingBudget ? (
-              <div className="flex items-center justify-center h-35 text-gray-500">
-                Loading budget data...
-              </div>
-            ) : budgetChartData.length > 0 ? (
-              <div className="flex items-center justify-between">
-                <div className="h-35 w-[50%]">
-                  <ResponsiveContainer>
-                    <PieChart>
-                      <Pie data={budgetChartData}>
-                        {budgetChartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${entry.name}`}
-                            fill={BU[index % BU.length]}
-                          />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-4 w-[50%]">
-                  {budgetUtilization.map((item, i) => (
-                    <div key={i} className="w-full space-y-1">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1">
-                          <span
-                            className="h-2 w-2 rounded-full"
-                            style={{
-                              backgroundColor: BU[i % BU.length],
-                            }}></span>
-                          <span className="text-sm text-gray-500">
-                            {item.label}
-                          </span>
-                        </div>
-                        <p className="font-medium text-gray-900 text-sm">
-                          {item.percentage}%
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-35 text-gray-500">
-                No budget data available
-              </div>
-            )}
+            <PieChartComponent 
+              data={budgetChartData} 
+              colors={BU} 
+              isLoading={isLoadingBudget} 
+            />
           </CardComponent>
           <CardComponent>
             <Heading
@@ -327,51 +276,11 @@ export default function ManagementAndStaffDashboard() {
               subtitle="Distribution by status"
               className="text-center"
             />
-            {isLoadingProjectStatus ? (
-              <div className="flex items-center justify-center h-35 text-gray-500">
-                Loading project status...
-              </div>
-            ) : projectStatusChartData.length > 0 ? (
-              <div className="flex items-center justify-between">
-                <div className="h-35 w-[50%]">
-                  <ResponsiveContainer>
-                    <PieChart>
-                      <Pie data={projectStatusChartData}>
-                        {projectStatusChartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${entry.name}`}
-                            fill={getProjectStatusColor(entry.name, index)}
-                          />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-4 w-[50%]">
-                  {projectStatus.map((item, i) => (
-                    <div
-                      key={i}
-                      className="w-full flex justify-between items-center">
-                      <div className="flex items-center gap-1">
-                        <span
-                          className="h-2 w-2 rounded-full"
-                          style={{
-                            backgroundColor: getProjectStatusColor(item.label, i),
-                          }}></span>
-                        <span className="text-sm text-gray-500">{item.label}</span>
-                      </div>
-                      <p className="font-medium text-gray-900 text-sm">
-                        {item.percentage}%
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center h-35 text-gray-500">
-                No project status data available
-              </div>
-            )}
+            <PieChartComponent 
+              data={projectStatusChartData} 
+              colors={projectStatusChartData.map((item, index) => getProjectStatusColor(item.name, index))} 
+              isLoading={isLoadingProjectStatus} 
+            />
           </CardComponent>
         </div>
       </section>

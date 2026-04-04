@@ -2,21 +2,25 @@
 
 import ChartsAndTableParent from "@/components/organizational-kpi/charts-table-parent";
 import DashboardStat from "@/ui/dashboard-stat-card";
-import { OrgKpiResponse } from "@/lib/api/org-kpi";
+import { OrgKpiResponse } from "@/types/org-kpi";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function OrganizationalKPI() {
   const [statData, setStatData] = useState<OrgKpiResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchOrgKpi = async () => {
      try {
+      setLoading(true); 
       const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/org_kpi_dashboard`);
       setStatData(res.data.data);
      } catch (error) {
       console.log(error);
-     }
+     } finally {
+      setLoading(false);
+       }
     }
     fetchOrgKpi();
   }, [])
@@ -42,9 +46,16 @@ export default function OrganizationalKPI() {
   return (
     <section>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 my-5">
-        <DashboardStat data={dashboardData} bigger />
+        {loading ?
+        <>
+        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
+        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
+        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
+        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
+        </> : <DashboardStat data={dashboardData} bigger />
+        }
       </div>
-      <ChartsAndTableParent />
+      <ChartsAndTableParent statData={statData} />
     </section>
   );
 }

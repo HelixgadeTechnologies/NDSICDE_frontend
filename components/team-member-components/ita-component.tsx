@@ -5,21 +5,20 @@ import LineChartComponent from "@/ui/line-chart";
 import TabComponent from "@/ui/tab-component";
 import Table from "@/ui/table";
 import Heading from "@/ui/text-heading";
+import { ProjectFinancialDashboardResponse } from "@/types/project-financial-dashboard";
 
-function ITAChart() {
+function ITAChart({ chartData }: { chartData?: ProjectFinancialDashboardResponse["IMPLEMENTATION_TIME_ANALYSIS"]["chart"] }) {
   const lines = [
     { key: "actual", label: "Actual", color: "#003B99" },
     { key: "planned", label: "Planned", color: "#EF4444" },
   ];
 
-  const data = [
-    { name: "Task 1", actual: 45, planned: 55 },
-    { name: "Task 2", actual: 75, planned: 60 },
-    { name: "Task 3", actual: 30, planned: 15 },
-    { name: "Task 4", actual: 50, planned: 80 },
-    { name: "Task 5", actual: 40, planned: 30 },
-    { name: "Task 6", actual: 78, planned: 60 },
-  ];
+  const data = chartData?.map((item) => ({
+    name: item.outputId ? `${item.outputStatement}` : item.outputStatement || "Unknown",
+    actual: item.totalActualDays || 0,
+    planned: item.totalPlannedDays || 0,
+  })) || [];
+
 
   return (
     <div className="h-[260px] mt-4 mr-4">
@@ -28,7 +27,7 @@ function ITAChart() {
   );
 }
 
-function ITATable() {
+function ITATable({ tableData }: { tableData?: ProjectFinancialDashboardResponse["IMPLEMENTATION_TIME_ANALYSIS"]["table"] }) {
   const head = [
     "Activity Description",
     "Total Activity Planned Days",
@@ -40,44 +39,25 @@ function ITATable() {
     "Cost Variance",
   ];
 
-  const data = [
-    {
-      activityDescription: "Activity Description",
-      totalActivityPlannedDays: 65,
-      totalActivitySpentDays: 40,
-      daysSpent: 32,
-      earnedValue: 10,
-      plannedValue: 78,
-      status: "Due to Start",
-      costVariance: 20,
-    },
-    {
-      activityDescription: "Activity Description",
-      totalActivityPlannedDays: 65,
-      totalActivitySpentDays: 40,
-      daysSpent: 32,
-      earnedValue: 10,
-      plannedValue: 78,
-      status: "Due to Start",
-      costVariance: 20,
-    },
-  ];
+  if (!tableData || tableData.length === 0) return <div className="text-center py-10 text-gray-500">No data available</div>;
 
   return (
     <div className="mt-5">
       <Table
         tableHead={head}
-        tableData={data}
-        renderRow={(row) => (
+        tableData={tableData}
+        checkbox
+        idKey="activityId"
+        renderRow={(row: any) => (
           <>
-            <td className="px-6">{row.activityDescription}</td>
-            <td className="px-6">{row.totalActivityPlannedDays}</td>
-            <td className="px-6">{row.totalActivitySpentDays}</td>
-            <td className="px-6">{row.daysSpent}</td>
-            <td className="px-6">{row.earnedValue}</td>
-            <td className="px-6">{row.plannedValue}</td>
-            <td className="px-6">{row.status}</td>
-            <td className="px-6">{row.costVariance}</td>
+            <td className="px-6" title={row.activityDescription}>{row.activityDescription ?? "-"}</td>
+            <td className="px-6">{row.totalPlannedDays ?? "-"}</td>
+            <td className="px-6">{row.totalActivitySpentDays ?? "-"}</td>
+            <td className="px-6">{row.percentageDaysSpent ?? 0}%</td>
+            <td className="px-6">{row.earnedValue ?? "-"}</td>
+            <td className="px-6">{row.plannedValue ?? "-"}</td>
+            <td className="px-6">{row.status ?? "-"}</td>
+            <td className="px-6">{row.costVariance ?? "-"}</td>
           </>
         )}
       />
@@ -85,7 +65,13 @@ function ITATable() {
   );
 }
 
-export default function ImplementationTimeAnalysisComponent() {
+export default function ImplementationTimeAnalysisComponent({
+  statData,
+}: {
+  statData?: ProjectFinancialDashboardResponse | null;
+}) {
+  const itaData = statData?.IMPLEMENTATION_TIME_ANALYSIS;
+
   return (
     <div className="space-y-4">
       <TabComponent
@@ -101,7 +87,7 @@ export default function ImplementationTimeAnalysisComponent() {
                   heading="Implementation Time Analysis"
                   subtitle="Planned vs. actual timeline for project activities"
                 />
-                <ITAChart />
+                <ITAChart chartData={itaData?.chart} />
               </CardComponent>
             );
           } else {
@@ -111,7 +97,7 @@ export default function ImplementationTimeAnalysisComponent() {
                   heading="Implementation Time Analysis"
                   subtitle="Planned vs. actual timeline for project activities"
                 />
-                <ITATable />
+                <ITATable tableData={itaData?.table} />
               </CardComponent>
             );
           }

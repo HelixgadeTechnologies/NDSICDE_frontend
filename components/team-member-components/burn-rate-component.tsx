@@ -4,64 +4,56 @@ import LineChartComponent from "@/ui/line-chart";
 import TabComponent from "@/ui/tab-component";
 import Table from "@/ui/table";
 
-function BurnRateChart() {
-  const burnRate = [
-    { normal: 60, name: "Target 1" },
-    { normal: 70, name: "Target 2" },
-    { normal: 50, name: "Target 3" },
-    { normal: 85, name: "Target 4" },
-    { normal: 55, name: "Target 5" },
-    { normal: 70, name: "Target 6" },
-  ];
+function BurnRateChart({ burnData }: { burnData?: ProjectFinancialDashboardResponse["BURN_RATE"] }) {
+  const burnRate = burnData?.map((item) => ({
+    normal: item.burnRate || 0,
+    name: item.outputStatement || item.outputId || "Unknown",
+  })) || [];
+
 
   return (
     <div className="h-[260px] mt-5">
       <LineChartComponent
         data={burnRate}
-        lines={[{ key: "normal", label: "Normal", color: "#D2091E" }]}
+        lines={[{ key: "normal", label: "Burn Rate", color: "#D2091E" }]}
         xKey="name"
       />
     </div>
   );
 }
 
-function BurnRateTable () {
-    const head = ["Target", "Output", "Activity", "Status"];
-    const data = [
-        {
-            id: "1",
-            target: "Target 1",
-            output: "Output 1",
-            activity: "Activity 1",
-            status: "Completed",
-        },
-        {
-            id: "2",
-            target: "Target 1",
-            output: "Output 1",
-            activity: "Activity 1",
-            status: "Completed",
-        },
-    ];
+function BurnRateTable({ burnData }: { burnData?: ProjectFinancialDashboardResponse["BURN_RATE"] }) {
+    const head = ["Output ID", "Output Statement", "Actual Cost", "Budget", "Burn Rate"];
+    if (!burnData || burnData.length === 0) return <div className="text-center py-10 text-gray-500">No data available</div>;
+
     return (
-        <Table
-        tableHead={head}
-        tableData={data}
-        checkbox
-        idKey={"id"}
-        renderRow={(row) => (
-            <>
-            <td className="px-6">{row.target}</td>
-            <td className="px-6">{row.activity}</td>
-            <td className="px-6">{row.output}</td>
-            <td className="px-6">{row.status}</td>
-            </>
-        )}
-        />
+        <div className="mt-5">
+          <Table
+          tableHead={head}
+          tableData={burnData}
+          checkbox
+          idKey={"outputId"}
+          renderRow={(row: any) => (
+              <>
+              <td className="px-6 truncate uppercase">{row.outputId ? `${row.outputId.substring(0, 4)}...` : "-"}</td>
+              <td className="px-6">{row.outputStatement ?? "-"}</td>
+              <td className="px-6">{row.sumActualCost ?? "-"}</td>
+              <td className="px-6">{row.sumBudget ?? "-"}</td>
+              <td className="px-6">{row.burnRate ?? 0}%</td>
+              </>
+          )}
+          />
+        </div>
     )
 }
 
-export default function BurnRateComponent() {
+import { ProjectFinancialDashboardResponse } from "@/types/project-financial-dashboard";
+
+export default function BurnRateComponent({
+  statData,
+}: {
+  statData?: ProjectFinancialDashboardResponse | null;
+}) {
   return (
     <div className="mt-6">
         <TabComponent
@@ -71,9 +63,9 @@ export default function BurnRateComponent() {
           ]}
           renderContent={(rowId) => {
             if (rowId === 1) {
-              return <BurnRateChart />;
+              return <BurnRateChart burnData={statData?.BURN_RATE} />;
             } else {
-              return <BurnRateTable/>;
+              return <BurnRateTable burnData={statData?.BURN_RATE} />;
             }
           }}
         />

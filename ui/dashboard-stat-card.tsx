@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 
 interface List {
   title: string;
-  count: string;
+  count: number | string | undefined;
 }
 
 interface StatType {

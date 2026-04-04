@@ -10,17 +10,13 @@ import { useState } from "react";
 
 const colorsSpi = ["#0047AB", "#F44336", "#FBC02D"];
 
-function SPIChart() {
-  const data = [
-    { name: "Project 1", value: 80 },
-    { name: "Project 2", value: 90 },
-    { name: "Project 3", value: 80 },
-    { name: "Project 4", value: 50 },
-    { name: "Project 5", value: 80 },
-    { name: "Project 6", value: 80 },
-    { name: "Project 7", value: 90 },
-    { name: "Project 8", value: 50 },
-  ];
+function SPIChart({ spiData }: { spiData?: ProjectFinancialDashboardResponse["ACTIVITY_FINANCIAL_DATA"] }) {
+  const data = spiData?.map((item) => ({
+    name: item.activityStatement || item.outputStatement || "Unknown",
+    value: item.schedulePerformanceIndex || 0,
+  })) || [];
+
+
   return (
     <div className="h-[300px] mt-5">
       <BarChartComponent
@@ -28,50 +24,33 @@ function SPIChart() {
         isSingleBar={true}
         colors={colorsSpi}
         xKey="name"
-        labels={["Behind Schedule", "Ahead of Schedule", "On Schedule"]}
+        labels={["SPI Values"]}
       />
     </div>
   );
 }
 
-function SPITable() {
+function SPITable({ spiData }: { spiData?: ProjectFinancialDashboardResponse["ACTIVITY_FINANCIAL_DATA"] }) {
   const head = [
     "Description",
-    "Behind Schedule",
-    "Ahead of Schedule",
-    "On Schedule",
+    "Schedule Variance",
+    "SPI",
     "Status",
   ];
 
-  const data = [
-    {
-      description: "---",
-      behindSchedule: 30,
-      aheadOfSchedule: 12,
-      onSchedule: 0,
-      status: "Due to Start",
-    },
-    {
-      description: "---",
-      behindSchedule: 30,
-      aheadOfSchedule: 12,
-      onSchedule: 0,
-      status: "Due to Start",
-    },
-  ];
+  if (!spiData || spiData.length === 0) return <div className="text-center py-10 text-gray-500">No data available</div>;
 
   return (
     <div className="mt-5">
       <Table
         tableHead={head}
-        tableData={data}
-        renderRow={(row) => (
+        tableData={spiData}
+        renderRow={(row: any) => (
           <>
-            <td className="px-6">{row.description}</td>
-            <td className="px-6">{row.behindSchedule}</td>
-            <td className="px-6">{row.aheadOfSchedule}</td>
-            <td className="px-6">{row.onSchedule}</td>
-            <td className="px-6">{row.status}</td>
+            <td className="px-6">{row.activityStatement || row.outputStatement || "-"}</td>
+            <td className="px-6">{row.scheduleVariance ?? "-"}</td>
+            <td className="px-6">{row.schedulePerformanceIndex ?? "-"}</td>
+            <td className="px-6">{row.schedulePerformanceStatus || "-"}</td>
           </>
         )}
       />
@@ -79,7 +58,13 @@ function SPITable() {
   );
 }
 
-export default function SPIComponnet() {
+import { ProjectFinancialDashboardResponse } from "@/types/project-financial-dashboard";
+
+export default function SPIComponnet({
+  statData,
+}: {
+  statData?: ProjectFinancialDashboardResponse | null;
+}) {
   const [levels, setLevels] = useState("");
   return (
     <CardComponent>
@@ -110,9 +95,9 @@ export default function SPIComponnet() {
           ]}
           renderContent={(rowId) => {
             if (rowId === 1) {
-              return <SPIChart />;
+              return <SPIChart spiData={statData?.ACTIVITY_FINANCIAL_DATA} />;
             } else {
-              return <SPITable />;
+              return <SPITable spiData={statData?.ACTIVITY_FINANCIAL_DATA} />;
             }
           }}
         />

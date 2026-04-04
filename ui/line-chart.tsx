@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import EmptyChartState from "./empty-chart-state";
 
 type LineConfig = {
   key: string;
@@ -35,19 +36,11 @@ export default function LineChartComponent({
   isLoading = false,
 }: LineChartProps) {
   if (isLoading) {
-    return (
-      <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">
-        Loading chart...
-      </div>
-    );
+    return <EmptyChartState title="Loading chart..." subtitle="Please wait while we fetch the latest trends." />;
   }
 
   if (!data || data.length === 0) {
-    return (
-      <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">
-        No data available
-      </div>
-    );
+    return <EmptyChartState />;
   }
 
   return (

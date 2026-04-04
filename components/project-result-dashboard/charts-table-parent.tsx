@@ -9,97 +9,33 @@ import Heading from "@/ui/text-heading";
 import LineChartComponent from "@/ui/line-chart";
 import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
-import { useOrgKPIFormState } from "@/store/super-admin-store/organizational-kpi-store";
-import { OrgKpiResponse } from "@/types/org-kpi";
+import { ProjectResultResponse } from "@/types/project-result-dashboard";
 import EmptyChartState from "@/ui/empty-chart-state";
 
-// Dynamic indicator options moved to component scope
-
-const monthLabels = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-function generateChartData(indicator: string, year: number) {
-  let baseMin = 80,
-    baseMax = 120,
-    targetMin = 110,
-    targetMax = 160,
-    actualMin = 90,
-    actualMax = 150;
-
-  switch (indicator) {
-    case "project_completion":
-      baseMin = 70;
-      baseMax = 120;
-      targetMin = 100;
-      targetMax = 160;
-      actualMin = 80;
-      actualMax = 150;
-      break;
-
-    case "budget_utilization":
-      baseMin = 60;
-      baseMax = 90;
-      targetMin = 90;
-      targetMax = 110;
-      actualMin = 70;
-      actualMax = 100;
-      break;
-
-    case "stakeholder_satisfaction":
-      baseMin = 50;
-      baseMax = 100;
-      targetMin = 80;
-      targetMax = 130;
-      actualMin = 60;
-      actualMax = 120;
-      break;
-
-    case "training_participation":
-      baseMin = 40;
-      baseMax = 80;
-      targetMin = 70;
-      targetMax = 130;
-      actualMin = 50;
-      actualMax = 110;
-      break;
-
-    case "community_engagement":
-      baseMin = 30;
-      baseMax = 100;
-      targetMin = 60;
-      targetMax = 140;
-      actualMin = 40;
-      actualMax = 120;
-      break;
-  }
-
-  // Generate data for each month
-  return monthLabels.map((month) => ({
-    name: month,
-    baseline: Math.floor(Math.random() * (baseMax - baseMin + 1)) + baseMin,
-    target: Math.floor(Math.random() * (targetMax - targetMin + 1)) + targetMin,
-    actual: Math.floor(Math.random() * (actualMax - actualMin + 1)) + actualMin,
-    year,
-  }));
-}
-
-export default function ChartsAndTableParent({
-  statData,
+export default function ProjectKpiChartsTableParent({
+  data: statData,
 }: {
-  statData?: OrgKpiResponse | null;
+  data: ProjectResultResponse;
 }) {
+  // Local filter states
+  const [filters, setFilters] = useState({
+    allThematicArea: "",
+    resultLevel: "",
+    indicators: "",
+    disaggregation: "",
+  });
+
+  const setField = (field: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const {
+    allThematicArea,
+    resultLevel,
+    indicators,
+    disaggregation,
+  } = filters;
+
   // Tabs
   const tabs = [
     { tabName: "Charts", id: 1 },
@@ -107,22 +43,13 @@ export default function ChartsAndTableParent({
   ];
 
   // Lower line chart data
-  const data = statData?.PROJECT_INDICATOR_PERFORMANCE?.kpis?.map((kpi) => ({
-    code: kpi.code,
-    value: kpi.performance,
-  })) || [];
+  const kpiPerformanceData =
+    statData?.PROJECT_INDICATOR_PERFORMANCE?.indicators?.map((item) => ({
+      code: item.code,
+      value: item.performance,
+    })) || [];
 
   const lines = [{ key: "value", label: "Performance", color: "#003B99" }];
-
-  // Store state
-  const {
-    allThematicArea,
-    allStrategicObjective,
-    indicators,
-    resultLevel,
-    disaggregation,
-    setField,
-  } = useOrgKPIFormState();
 
   // Filter Options & Extracted Logic
   const allData = statData?.KPI_TABLE_DATA || [];
@@ -132,39 +59,29 @@ export default function ChartsAndTableParent({
     return unique.map((val) => ({ label: val, value: val }));
   }, [allData]);
 
-  const strategicObjectiveOptions = useMemo(() => {
-    let filtered = allData;
-    if (allThematicArea) filtered = filtered.filter((d) => d.thematicArea === allThematicArea);
-    const unique = Array.from(new Set(filtered.map((d) => d.strategicObjective).filter(Boolean)));
-    return unique.map((val) => ({ label: val, value: val }));
-  }, [allData, allThematicArea]);
-
   const resultLevelOptions = useMemo(() => {
     let filtered = allData;
     if (allThematicArea) filtered = filtered.filter((d) => d.thematicArea === allThematicArea);
-    if (allStrategicObjective) filtered = filtered.filter((d) => d.strategicObjective === allStrategicObjective);
     const unique = Array.from(new Set(filtered.map((d) => d.resultLevel).filter(Boolean)));
     return unique.map((val) => ({ label: val, value: val }));
-  }, [allData, allThematicArea, allStrategicObjective]);
+  }, [allData, allThematicArea]);
 
   const dynamicIndicatorOptions = useMemo(() => {
     let filtered = allData;
     if (allThematicArea) filtered = filtered.filter((d) => d.thematicArea === allThematicArea);
-    if (allStrategicObjective) filtered = filtered.filter((d) => d.strategicObjective === allStrategicObjective);
     if (resultLevel) filtered = filtered.filter((d) => d.resultLevel === resultLevel);
-    const unique = Array.from(new Set(filtered.map((d) => d.statement).filter(Boolean)));
+    const unique = Array.from(new Set(filtered.map((d) => d.statement || d.code).filter(Boolean)));
     return unique.map((val) => ({ label: val, value: val }));
-  }, [allData, allThematicArea, allStrategicObjective, resultLevel]);
+  }, [allData, allThematicArea, resultLevel]);
 
   // Derived filtered data for the table
   const filteredTableData = useMemo(() => {
     let data = allData;
     if (allThematicArea) data = data.filter((r) => r.thematicArea === allThematicArea);
-    if (allStrategicObjective) data = data.filter((r) => r.strategicObjective === allStrategicObjective);
     if (resultLevel) data = data.filter((r) => r.resultLevel === resultLevel);
-    if (indicators) data = data.filter((r) => r.statement === indicators);
+    if (indicators) data = data.filter((r) => r.statement === indicators || r.code === indicators);
     return data;
-  }, [allData, allThematicArea, allStrategicObjective, resultLevel, indicators]);
+  }, [allData, allThematicArea, resultLevel, indicators]);
 
   // Available years
   const availableYears = [2024, 2025];
@@ -202,15 +119,6 @@ export default function ChartsAndTableParent({
             name="allThematicArea"
             onChange={(value: string) => setField("allThematicArea", value)}
             options={thematicAreaOptions}
-          />
-
-          <DropDown
-            label="Strategic Objective"
-            value={allStrategicObjective}
-            placeholder="Strategic Objective"
-            name="allStrategicObjective"
-            onChange={(value: string) => setField("allStrategicObjective", value)}
-            options={strategicObjectiveOptions}
           />
 
           <DropDown
@@ -297,15 +205,19 @@ export default function ChartsAndTableParent({
 
         {/* Line Chart */}
         <div className="h-72 flex flex-col justify-center">
-          {data.length > 0 ? (
+          {kpiPerformanceData.length > 0 ? (
             <LineChartComponent
-              data={data}
+              data={kpiPerformanceData}
               lines={lines}
               legend={false}
               xKey="code"
             />
           ) : (
-            <EmptyChartState height={288} title="No performance data" subtitle="Indicator performance analytics will appear here once data is collected." />
+            <EmptyChartState
+              height={288}
+              title="No performance data"
+              subtitle="Indicator performance analytics will appear here once data is collected."
+            />
           )}
         </div>
       </CardComponent>

@@ -1,7 +1,7 @@
 "use client";
 
 import Table from "@/ui/table";
-import { OrgKpiResponse } from "@/types/org-kpi";
+import { ProjectResultResponse } from "@/types/project-result-dashboard";
 
 const head = [
   "Code",
@@ -16,7 +16,7 @@ const head = [
 export default function TableSection({
   data,
 }: {
-  data?: OrgKpiResponse["KPI_TABLE_DATA"];
+  data?: ProjectResultResponse["KPI_TABLE_DATA"];
 }) {
 
   return (
@@ -28,7 +28,7 @@ export default function TableSection({
           return (
             <>
               <td className="px-6 text-xs md:text-sm">{row.code || "-"}</td>
-              <td className="px-6 text-xs md:text-sm">{row.indicator ?? row.statement ?? "-"}</td>
+              <td className="px-6 text-xs md:text-sm">{row.statement ?? "-"}</td>
               <td className="px-6 text-xs md:text-sm">{row.baseline ?? "-"}</td>
               <td className="px-6 text-xs md:text-sm">{row.target ?? "-"}</td>
               <td className="px-6 text-xs md:text-sm">{row.actual ?? "-"}</td>

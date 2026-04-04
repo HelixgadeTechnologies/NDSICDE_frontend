@@ -1,19 +1,18 @@
 "use client";
 
+import { ProjectResultResponse } from "@/types/project-result-dashboard";
+import EmptyChartState from "@/ui/empty-chart-state";
 import TabComponent from "@/ui/tab-component";
 import Table from "@/ui/table";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 // chart
-function ActivityOverviewChart() {
-  const budgetUilization = [
-    { name: "Due to Start", value: 1 },
-    { name: "In Progress(Early Start)", value: 1 },
-    { name: "In Progress(Late Start)", value: 1 },
-    { name: "Future Activity", value: 1 },
-    { name: "Completed Early", value: 1 },
-    { name: "Completed Late", value: 1 },
-  ];
+function ActivityOverviewChart({data}: {data: ProjectResultResponse}) {
+  const chartData = data.ACTIVITY_OVERVIEW.map((item) => ({
+    name: item.category,
+    value: item.count,
+    percentage: item.percentage
+  }));
 
   const BUColors = [
     "#22C55E",
@@ -23,13 +22,28 @@ function ActivityOverviewChart() {
     "#98A2B3",
     "#000000",
   ];
+
+  const totalValue = chartData.reduce((acc, curr) => acc + curr.value, 0);
+
+  if (chartData.length === 0 || totalValue === 0) {
+    return <EmptyChartState title="No activity data to display" subtitle="There are currently no recorded activities for this project." />;
+  }
+
   return (
     <div className="flex items-center justify-between px-10">
       <div className="h-[300px] w-[50%]">
         <ResponsiveContainer>
           <PieChart>
-            <Pie data={budgetUilization}>
-              {budgetUilization.map((entry, index) => (
+            <Pie 
+            data={chartData}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={80}
+            paddingAngle={5}
+            dataKey="value"
+            >
+              {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${entry.name}`}
                   fill={BUColors[index % BUColors.length]}
@@ -40,7 +54,7 @@ function ActivityOverviewChart() {
         </ResponsiveContainer>
       </div>
       <div className="space-y-4 w-[50%]">
-        {budgetUilization.map((p, i) => (
+        {chartData.map((p, i) => (
           <div key={i} className="w-full flex justify-between items-center">
             <div className="flex items-center gap-1">
               <span
@@ -50,7 +64,7 @@ function ActivityOverviewChart() {
                 }}></span>
               <span className="text-sm text-gray-500">{p.name}</span>
             </div>
-            <p className="font-medium text-gray-900 text-sm">{p.value}%</p>
+            <p className="font-medium text-gray-900 text-sm">{p.percentage}%</p>
           </div>
         ))}
       </div>
@@ -59,7 +73,7 @@ function ActivityOverviewChart() {
 }
 
 // table
-function ActivityOverviewTable() {
+function ActivityOverviewTable({data}: {data: ProjectResultResponse}) {
     const head = [
         "Activity Statement",
         "Target Frequency",
@@ -68,45 +82,11 @@ function ActivityOverviewTable() {
         "Status",
     ];
 
-    const data = [
-        {
-            id: 1,
-            activityStatement: "Statement 1", 
-            targetFrequency: "Frequency 1", 
-            actualFrequency: "Frequency 1",
-            performance: "10%",
-            status: "Due to Start",
-        },
-         {
-            id: 2,
-            activityStatement: "Statement 1", 
-            targetFrequency: "Frequency 1", 
-            actualFrequency: "Frequency 1",
-            performance: "50%",
-            status: "In Progress",
-        },
-        {
-            id: 3,
-            activityStatement: "Statement 1", 
-            targetFrequency: "Frequency 1", 
-            actualFrequency: "Frequency 1",
-            performance: "50%",
-            status: "In Progress",
-        },
-        {
-            id: 4,
-            activityStatement: "Statement 1", 
-            targetFrequency: "Frequency 1", 
-            actualFrequency: "Frequency 1",
-            performance: "50%",
-            status: "In Progress",
-        },
-    ];
     return (
         <Table
         tableHead={head}
-        tableData={data}
-        idKey="id"
+        tableData={data.ACTIVITY_TABLE}
+        idKey="activityId"
         checkbox
         renderRow={(row) => (
             <>
@@ -123,7 +103,7 @@ function ActivityOverviewTable() {
     )
 }
 
-export default function ActivityOverviewComponent() {
+export default function ActivityOverviewComponent({data}: {data: ProjectResultResponse}) {
   return (
     <TabComponent
       data={[
@@ -132,9 +112,9 @@ export default function ActivityOverviewComponent() {
       ]}
       renderContent={(rowId) => {
         if (rowId === 1) {
-            return <ActivityOverviewChart/>
+            return <ActivityOverviewChart data={data}/>
         } else {
-            return <ActivityOverviewTable/>
+            return <ActivityOverviewTable data={data}/>
         }
       }}
     />
