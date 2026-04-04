@@ -1,50 +1,43 @@
+"use client";
+
 import ChartsAndTableParent from "@/components/organizational-kpi/charts-table-parent";
 import DashboardStat from "@/ui/dashboard-stat-card";
-
-export const metadata = {
-  title: "Organizational KPI - NDSICDE",
-  desrcription: "View your organization's  KPI dashboard",
-};
+import { OrgKpiResponse } from "@/lib/api/org-kpi";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function OrganizationalKPI() {
-  const dashboardData = [
-    {
-      title: "Governance",
+  const [statData, setStatData] = useState<OrgKpiResponse | null>(null);
+
+  useEffect(() => {
+    const fetchOrgKpi = async () => {
+     try {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/org_kpi_dashboard`);
+      setStatData(res.data.data);
+     } catch (error) {
+      console.log(error);
+     }
+    }
+    fetchOrgKpi();
+  }, [])
+
+  const dashboardData = statData?.THEMATIC_AREA_SUMMARY?.map((area) => {
+    let icon = "mdi:chart-box-outline";
+    const areaName = area.thematicArea.toLowerCase();
+    if (areaName.includes("security") || areaName.includes("peace")) icon = "mdi:security";
+    else if (areaName.includes("livelihood")) icon = "mdi:briefcase";
+    else if (areaName.includes("environment") || areaName.includes("climate")) icon = "mdi:leaf";
+
+    return {
+      title: area.thematicArea,
       lists: [
-        { title: "Total SOs", count: "0" },
-        { title: "Total KPIs", count: "0" },
-        { title: "Overall KPI Performance", count: "0%" },
+        { title: "Total SOs", count: String(area.totalSOs ?? 0) },
+        { title: "Total KPIs", count: String(area.totalKPIs ?? 0) },
+        { title: "Overall KPI Performance", count: `${area.overallKPIPerformance ?? 0}%` },
       ],
-      icon: "mdi:security",
-    },
-    {
-      title: "Peace & Security",
-      lists: [
-        { title: "Total SOs", count: "0" },
-        { title: "Total KPIs", count: "0" },
-        { title: "Overall KPI Performance", count: "0%" },
-      ],
-      icon: "mdi:security",
-    },
-    {
-      title: "Livelihood",
-      lists: [
-        { title: "Total SOs", count: "0" },
-        { title: "Total KPIs", count: "0" },
-        { title: "Overall KPI Performance", count: "0%" },
-      ],
-      icon: "mdi:briefcase",
-    },
-    {
-      title: "Environment & Climate Change",
-      lists: [
-        { title: "Total SOs", count: "0" },
-        { title: "Total KPIs", count: "0" },
-        { title: "Overall KPI Performance", count: "0%" },
-      ],
-      icon: "mdi:leaf",
-    },
-  ];
+      icon,
+    };
+  }) || [];
 
   return (
     <section>
