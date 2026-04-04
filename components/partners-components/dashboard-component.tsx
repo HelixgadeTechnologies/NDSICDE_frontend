@@ -139,22 +139,13 @@ export default function PartnersDashboardComponent({
               subtitle="Targets vs. Actuals over the last 6 months"
             />
             <div className="h-110">
-              {chartDataLoading ? (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  Loading KPI data...
-                </div>
-              ) : chartData.length > 0 ? (
-                <LineChartComponent
-                  data={chartData}
-                  lines={lines}
-                  xKey="month"
-                  legend
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  No KPI data available
-                </div>
-              )}
+              <LineChartComponent
+                data={chartData}
+                lines={lines}
+                xKey="month"
+                legend
+                isLoading={chartDataLoading}
+              />
             </div>
           </CardComponent>
         </div>
@@ -166,23 +157,14 @@ export default function PartnersDashboardComponent({
               className="text-center"
             />
             <div className="h-110">
-              {pieChartDataLoading ? (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  Loading Pie data...
-                </div>
-              ) : pieChartData?.length > 0 ? (
-                <PieChartComponent
-                  data={pieChartData.map((item) => ({
-                    name: item.type,
-                    value: item.percentage,
-                  }))}
-                  colors={progressTrackingColors}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  No Pie data available
-                </div>
-              )}
+              <PieChartComponent
+                data={pieChartData?.map((item) => ({
+                  name: item.type,
+                  value: item.percentage,
+                })) || []}
+                colors={progressTrackingColors}
+                isLoading={pieChartDataLoading}
+              />
             </div>
           </CardComponent>
         </div>

@@ -24,6 +24,7 @@ export default function TableSection({
       <Table
         tableHead={head}
         tableData={data}
+        idKey="indicatorId"
         renderRow={(row: any) => {
           return (
             <>

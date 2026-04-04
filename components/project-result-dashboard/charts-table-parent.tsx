@@ -13,11 +13,10 @@ import { ProjectResultResponse } from "@/types/project-result-dashboard";
 import EmptyChartState from "@/ui/empty-chart-state";
 
 export default function ProjectKpiChartsTableParent({
-  data: statData,
+  data,
 }: {
   data: ProjectResultResponse;
 }) {
-  // Local filter states
   const [filters, setFilters] = useState({
     allThematicArea: "",
     resultLevel: "",
@@ -25,91 +24,74 @@ export default function ProjectKpiChartsTableParent({
     disaggregation: "",
   });
 
+  const { allThematicArea, resultLevel, indicators, disaggregation } = filters;
+
   const setField = (field: string, value: string) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
   };
 
-  const {
-    allThematicArea,
-    resultLevel,
-    indicators,
-    disaggregation,
-  } = filters;
-
-  // Tabs
   const tabs = [
     { tabName: "Charts", id: 1 },
     { tabName: "Table", id: 2 },
   ];
 
-  // Lower line chart data
-  const kpiPerformanceData =
-    statData?.PROJECT_INDICATOR_PERFORMANCE?.indicators?.map((item) => ({
+  const kpiPerformanceData = useMemo(() => 
+    data?.PROJECT_INDICATOR_PERFORMANCE?.indicators?.map((item) => ({
       code: item.code,
       value: item.performance,
-    })) || [];
+    })) || [], [data]);
 
   const lines = [{ key: "value", label: "Performance", color: "#003B99" }];
 
-  // Filter Options & Extracted Logic
-  const allData = statData?.KPI_TABLE_DATA || [];
+  const allTableData = data?.KPI_TABLE_DATA || [];
 
   const thematicAreaOptions = useMemo(() => {
-    const unique = Array.from(new Set(allData.map((d) => d.thematicArea).filter(Boolean)));
+    const unique = Array.from(new Set(allTableData.map((d) => d.thematicArea).filter(Boolean)));
     return unique.map((val) => ({ label: val, value: val }));
-  }, [allData]);
+  }, [allTableData]);
 
   const resultLevelOptions = useMemo(() => {
-    let filtered = allData;
+    let filtered = allTableData;
     if (allThematicArea) filtered = filtered.filter((d) => d.thematicArea === allThematicArea);
     const unique = Array.from(new Set(filtered.map((d) => d.resultLevel).filter(Boolean)));
     return unique.map((val) => ({ label: val, value: val }));
-  }, [allData, allThematicArea]);
+  }, [allTableData, allThematicArea]);
 
   const dynamicIndicatorOptions = useMemo(() => {
-    let filtered = allData;
+    let filtered = allTableData;
     if (allThematicArea) filtered = filtered.filter((d) => d.thematicArea === allThematicArea);
     if (resultLevel) filtered = filtered.filter((d) => d.resultLevel === resultLevel);
     const unique = Array.from(new Set(filtered.map((d) => d.statement || d.code).filter(Boolean)));
     return unique.map((val) => ({ label: val, value: val }));
-  }, [allData, allThematicArea, resultLevel]);
+  }, [allTableData, allThematicArea, resultLevel]);
 
-  // Derived filtered data for the table
   const filteredTableData = useMemo(() => {
-    let data = allData;
-    if (allThematicArea) data = data.filter((r) => r.thematicArea === allThematicArea);
-    if (resultLevel) data = data.filter((r) => r.resultLevel === resultLevel);
-    if (indicators) data = data.filter((r) => r.statement === indicators || r.code === indicators);
-    return data;
-  }, [allData, allThematicArea, resultLevel, indicators]);
+    let result = allTableData;
+    if (allThematicArea) result = result.filter((r) => r.thematicArea === allThematicArea);
+    if (resultLevel) result = result.filter((r) => r.resultLevel === resultLevel);
+    if (indicators) result = result.filter((r) => r.statement === indicators || r.code === indicators);
+    return result;
+  }, [allTableData, allThematicArea, resultLevel, indicators]);
 
-  // Available years
-  const availableYears = [2024, 2025];
-  const [selectedYear] = useState<number>(availableYears[0]);
-
-
-  // Bars for bar chart
   const bars = [
     { key: "baseline", label: "Baseline", color: "#003B99" },
     { key: "target", label: "Target", color: "#D2091E" },
     { key: "actual", label: "Actual", color: "#22C55E" },
   ];
 
-  // Generate chart data dynamically based on indicator and year
   const chartData = useMemo(() => {
     return (
-      statData?.KPI_OVERVIEW_CHART?.monthly?.map((m) => ({
+      data?.KPI_OVERVIEW_CHART?.monthly?.map((m) => ({
         name: m.period,
-        baseline: statData.KPI_OVERVIEW_CHART.baseline || 0,
+        baseline: data?.KPI_OVERVIEW_CHART?.baseline || 0,
         target: m.target,
         actual: m.actual,
       })) || []
     );
-  }, [statData]);
+  }, [data]);
 
   return (
     <div className="space-y-5">
-      {/* Filter Section */}
       <CardComponent fitWidth>
         <div className="flex grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10 overflow-auto no-scrollbar">
           <DropDown
@@ -158,7 +140,6 @@ export default function ProjectKpiChartsTableParent({
           />
         </div>
 
-        {/* Tabs for Charts/Table */}
         <TabComponent
           width="80"
           data={tabs}
@@ -168,7 +149,7 @@ export default function ProjectKpiChartsTableParent({
                 <ChartsComponent
                   chartData={chartData}
                   bars={bars}
-                  availableYears={availableYears}
+                  availableYears={[2024, 2025, 2026]}
                 />
               );
             } else {
@@ -178,7 +159,6 @@ export default function ProjectKpiChartsTableParent({
         />
       </CardComponent>
 
-      {/* Lower KPI Performance Section */}
       <CardComponent>
         <div className="flex justify-between items-center mb-5">
           <Heading
@@ -188,7 +168,7 @@ export default function ProjectKpiChartsTableParent({
           <div className="w-[356px]">
             <CardComponent>
               <div className="flex items-center gap-1.5">
-                <span className="bg-[#003B99] h-2 w-2 rounded-full"></span>
+                <span className="bg-[#003B99] h-2 w-2 rounded-full" />
                 <p className="text-gray-500 text-xs">Performance</p>
               </div>
               <div className="flex items-center gap-2">
@@ -196,14 +176,13 @@ export default function ProjectKpiChartsTableParent({
                   Average Performance for Project:
                 </span>
                 <span className="font-semibold text-shadow-gray-900 text-2xl">
-                  {statData?.PROJECT_INDICATOR_PERFORMANCE?.averagePerformance ?? "0"}
+                  {data?.PROJECT_INDICATOR_PERFORMANCE?.averagePerformance ?? "0"}
                 </span>
               </div>
             </CardComponent>
           </div>
         </div>
 
-        {/* Line Chart */}
         <div className="h-72 flex flex-col justify-center">
           {kpiPerformanceData.length > 0 ? (
             <LineChartComponent
