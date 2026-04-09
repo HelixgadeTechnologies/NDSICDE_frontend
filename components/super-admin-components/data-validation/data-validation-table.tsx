@@ -121,8 +121,6 @@ export default function DataValidationTable({
         },
       );
 
-      toast.success(response.data.message);
-      setIsOpenModal(false);
       setNewComment("");
 
       fetchData();

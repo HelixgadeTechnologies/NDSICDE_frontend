@@ -38,9 +38,7 @@ export default function PartnersDashboardPage() {
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/kpi-report/stats?userId=${user?.id}&projectId=${projectId}`,
         );
         setStats(response.data.data);
-        toast.success("Stats fetched successfully!");
       } catch (error) {
-        console.error("Error fetching data: ", error);
       } finally {
         setLoading(false);
       }

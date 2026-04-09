@@ -148,7 +148,6 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
       setProjects(projectsData);
 
       if (showToasts) {
-        toast.success("Projects loaded successfully");
       }
 
       return projectsData;
@@ -156,7 +155,6 @@ export function ProjectsProvider({ children }: { children: React.ReactNode }) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to load projects";
 
-      setError(errorMessage);
 
       if (showToasts) {
         toast.error(`Failed to load projects: ${errorMessage}`);

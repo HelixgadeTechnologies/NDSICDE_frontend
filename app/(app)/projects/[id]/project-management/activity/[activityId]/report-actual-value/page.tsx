@@ -53,14 +53,12 @@ export default function ReportActualValue() {
           }
         }
       );
-      toast.success(response.data.message);
       
       const allReports = response.data.data || [];
       const filteredReports = activityId 
         ? allReports.filter((report: ProjectActivityReportTypes) => report.activityId === activityId)
         : allReports;
         
-      setData(filteredReports);
     } catch (error) {
       console.log(`Error fetching activity reports: ${error}`);
       toast.error("Error retrieving activity report. Please try again.");
@@ -97,8 +95,6 @@ export default function ReportActualValue() {
           },
         },
       );
-      toast.success("Project activity deleted successfully!");
-      setConfirmDeleteModal(false);
       setItemToDelete(null);
       fetchActivityReports();
     } catch (error) {

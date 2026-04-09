@@ -43,10 +43,8 @@ export default function RetirementManagersDashboard() {
         );
         if (response.data.success) {
           setStats(response.data.data);
-          toast.success(response.data.message);
         }
       } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
       } finally {
         setLoading(false);
       }

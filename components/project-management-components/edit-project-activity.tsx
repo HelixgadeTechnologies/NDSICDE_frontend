@@ -378,9 +378,7 @@ export default function EditProjectActivity({
         responses.map((r) => r.data),
       );
 
-      toast.success(
         `Project activity ${mode === "create" ? "added" : "updated"} successfully!`,
-      );
 
       // Reset and close
       resetForm();

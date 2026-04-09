@@ -198,7 +198,6 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
 
       const response = await indicatorApi.createIndicator(payload);
       // Reset form or show success message
-      toast.success("Indicator added successfully!");
 
       // Reset form (but keep result types loaded)
       setFormData({
@@ -223,7 +222,6 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
         result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
         IndicatorDisaggregation: [],
-      });
     } catch (error) {
       console.error("[AddIndicatorForm] Error submitting form:", error);
       toast.error("Failed to add indicator. Please try again.");

@@ -214,8 +214,6 @@ export default function EditActivityRequest({ isOpen, onClose, initialData, proj
           }
         }
       );
-      toast.success("Request updated successfully");
-      onClose();
     } catch (error: any) {
       console.error(error);
       toast.error(error.response?.data?.message || "An error occurred while updating.");

@@ -4,7 +4,7 @@ import CardComponent from "@/ui/card-wrapper";
 import SearchInput from "@/ui/form/search";
 import DropDown from "@/ui/form/select-dropdown";
 import Table from "@/ui/table";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
@@ -20,6 +20,8 @@ import {
 import { formatDate } from "@/utils/dates-format-utility";
 import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
+import LoadingSpinner from "@/ui/loading-spinner";
+import ActionMenu from "@/ui/action-menu";
 
 // Define the type for role from API
 interface ApiRole {
@@ -138,8 +140,6 @@ export default function ProjectTeam() {
         },
       );
       setRemoveMember(false);
-      toast.success("Project team deleted successfully!");
-      fetchProjectTeam();
     } catch (error) {
       console.error(`Error deleting team member: ${error}`);
       toast.error("An error occured. Team member was not deleted.");
@@ -189,11 +189,7 @@ export default function ProjectTeam() {
         </div>
 
         {loading ? (
-          <div className="dots mx-auto my-20">
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
+          <LoadingSpinner />
         ) : (
           <Table
             tableHead={head}
@@ -205,7 +201,6 @@ export default function ProjectTeam() {
                 <td className="px-6">{row.fullName}</td>
                 <td className="px-6">{row.email}</td>
                 <td className="px-6">{row.roleName}</td>
-                {/* might change this field to "status" */}
                 <td className="px-6">{row.projectName}</td>
                 <td className="px-6">{formatDate(row.updateAt, "time")}</td>
                 <td className="px-6 relative">
@@ -223,55 +218,25 @@ export default function ProjectTeam() {
                       }
                     />
                   </div>
-
-                  {activeRowId === row.teamMemberId && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                        <ul className="text-sm">
-                          {/* <li
-                              onClick={() => handleViewMember(row, setActiveRowId)}
-                              className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center"
-                            >
-                              <Icon
-                                icon="hugeicons:view"
-                                height={20}
-                                width={20}
-                              />
-                              View Profile
-                            </li> */}
-                          <li
-                            onClick={() =>
-                              handleEditMember(row, setActiveRowId)
-                            }
-                            className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
-                            <Icon
-                              icon="ph:pencil-simple-line"
-                              height={20}
-                              width={20}
-                            />
-                            Edit
-                          </li>
-                          <li
-                            onClick={() =>
-                              handleRemoveMember(row, setActiveRowId)
-                            }
-                            className="cursor-pointer hover:text-(--primary-light) flex gap-2 p-3 items-center">
-                            <Icon
-                              icon="pixelarticons:trash"
-                              height={20}
-                              width={20}
-                            />
-                            Remove
-                          </li>
-                        </ul>
-                      </motion.div>
-                    </AnimatePresence>
-                  )}
+                  <ActionMenu
+                    isOpen={activeRowId === row.teamMemberId}
+                    items={[
+                      {
+                        type: "button",
+                        label: "Edit",
+                        icon: "ph:pencil-simple-line",
+                        onClick: () => handleEditMember(row, setActiveRowId),
+                        className: "border-b border-gray-300",
+                      },
+                      {
+                        type: "button",
+                        label: "Remove",
+                        icon: "pixelarticons:trash",
+                        onClick: () => handleRemoveMember(row, setActiveRowId),
+                        className: "hover:text-(--primary-light)",
+                      },
+                    ]}
+                  />
                 </td>
               </>
             )}

@@ -166,8 +166,6 @@ export default function EditKPIModal({
       );
 
       if (response.status === 200 || response.status === 201) {
-        toast.success("KPI Report updated successfully!");
-        resetForm();
         onEdit();
         onClose();
       }

@@ -48,9 +48,7 @@ export default function PerformanceAnalytics() {
       try {
         const resultTypesData = await fetchResultTypes();
         setResultTypes(resultTypesData);
-        toast.success("Filters loaded successfully");
       } catch (error) {
-        console.error("Error fetching data:", error);
         toast.error("Failed to load filters");
       }
     };
@@ -84,9 +82,7 @@ export default function PerformanceAnalytics() {
 
         if (response.data.success) {
           setApiData(response.data.data);
-          toast.success(
             response.data.message || "Performance data loaded successfully",
-          );
         } else {
           toast.error("Failed to fetch performance data");
         }

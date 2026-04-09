@@ -202,7 +202,6 @@ export default function AddActivityReport() {
       );
 
       if (response.data.success) {
-        toast.success("Activity report added successfully!");
         // Reset form or redirect
         setFormData({
           percentageCompletion: 0,
@@ -210,7 +209,6 @@ export default function AddActivityReport() {
           actualEndDate: "",
           actualCost: 0,
           actualNarrative: "",
-        });
         window.history.back();
       } else {
         toast.error(response.data.message || "Failed to add activity report");

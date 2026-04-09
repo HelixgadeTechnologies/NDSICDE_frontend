@@ -85,7 +85,6 @@ export default function AddKPIModal({
 
       if (response.status === 200 || response.status === 201) {
 
-        toast.success("KPI added successfully!");
 
         // Reset form
         setFormData({
@@ -98,7 +97,6 @@ export default function AddKPIModal({
           disaggregation: "",
           baseLine: "",
           target: "",
-        });
 
         // Call onSuccess to refresh the table
         if (onSuccess) {

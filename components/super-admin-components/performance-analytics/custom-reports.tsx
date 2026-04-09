@@ -90,8 +90,6 @@ export default function CustomReports() {
           },
         },
       );
-      toast.success("Report generated successfully");
-      resetForm();
       handleFetchReports();
     } catch (error: any) {
       console.error("Error generating report:", error);

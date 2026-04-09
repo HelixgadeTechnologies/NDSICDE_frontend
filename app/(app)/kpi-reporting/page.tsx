@@ -85,10 +85,8 @@ export default function AssignedKPITable() {
           },
         },
       );
-      toast.success("KPI Report deleted successfully");
       setData((prev) =>
         prev.filter((item) => item.kpiReportId !== kpiToDelete),
-      );
       setActiveRowId(null);
       setDeleteModal(false);
       setKpiToDelete(null);

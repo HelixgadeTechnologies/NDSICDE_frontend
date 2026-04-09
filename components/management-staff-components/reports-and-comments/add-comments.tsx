@@ -42,8 +42,6 @@ export default function AddComment({
           },
         },
       );
-      toast.success("Comment added successfully");
-      onClose();
     } catch (error: any) {
       console.error("Error submitting comment:", error);
       toast.error("Failed to submit comment", error.message);

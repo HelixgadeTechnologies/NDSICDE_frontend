@@ -132,9 +132,7 @@ export default function AddProjectRequestRetirement({
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement`, payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Retirement request created successfully!");
       if (projectId) {
-          router.push(`/projects/${projectId}/project-management/request`);
       }
       onClose();
     } catch (error) {

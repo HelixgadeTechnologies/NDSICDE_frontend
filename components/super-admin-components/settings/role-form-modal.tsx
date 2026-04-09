@@ -176,7 +176,6 @@ export default function RoleFormModal({
             ? "Role created successfully!"
             : "Role updated successfully!";
 
-        toast.success(successMessage);
 
         // Reset form for create mode only
         if (mode === "create") {
@@ -188,7 +187,6 @@ export default function RoleFormModal({
             edit: false,
             delete: false,
             fullAccess: false,
-          });
         }
 
         // Close modal

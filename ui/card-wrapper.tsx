@@ -15,8 +15,11 @@ export default function CardComponent({
     className = "",
 }: CardProps) {
   return (
-    <div className={`rounded-lg bg-white px-3 md:px-6 py-[35px] shadow-md border border-gray-200 ${className}`} style={{height: height, width: fitWidth ? 'w-fit' : 'w-full'}}>
-        { children }
+    <div
+      className={`rounded-lg bg-white px-3 md:px-6 py-[35px] shadow-md border border-gray-200 w-full ${fitWidth ? "w-fit" : "w-full"} ${className}`}
+      style={{ height }}
+    >
+      {children}
     </div>
   );
 }

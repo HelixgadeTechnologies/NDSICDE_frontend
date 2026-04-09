@@ -121,11 +121,9 @@ export default function EditKPIModal({
 
       if (response.status === 200 || response.status === 201) {
 
-        toast.success("KPI updated successfully!");
 
         // Call onSuccess to refresh the table
         if (onSuccess) {
-          onSuccess();
         }
 
         // Close modal

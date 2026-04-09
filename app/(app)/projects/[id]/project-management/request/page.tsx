@@ -19,6 +19,7 @@ import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 import { RetirementRequestType } from "@/types/retirement-request";
+import LoadingSpinner from "@/ui/loading-spinner";
 
 export default function ProjectRequest() {
   const tabs = [
@@ -126,9 +127,7 @@ export default function ProjectRequest() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/requests`,
       );
       setData(res.data.data);
-      toast.success(res.data.message);
     } catch (error) {
-      console.error("Error Fetching requests");
       toast.error("Error retrieving requests. Please try again.");
     } finally {
       setIsLoading(false);
@@ -173,8 +172,6 @@ export default function ProjectRequest() {
           },
         },
       );
-      toast.success("Project request deleted successfully!");
-      setRemoveRequest(false);
       fetchRequests();
     } catch (error) {
       console.error(`Error deleting request: ${error}`);
@@ -237,11 +234,7 @@ export default function ProjectRequest() {
 
         {activeTab === 1 && (
           isLoading ? (
-            <div className="dots my-20 mx-auto">
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
+            <LoadingSpinner />
           ) : (
           <Table
             tableHead={head}
@@ -346,11 +339,7 @@ export default function ProjectRequest() {
 
         {activeTab === 2 && (
           isLoadingRetirements ? (
-            <div className="dots my-20 mx-auto">
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
+            <LoadingSpinner />
           ) : (
             <div className="space-y-5 mt-4">
               <Table

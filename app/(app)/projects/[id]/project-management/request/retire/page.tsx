@@ -118,7 +118,6 @@ export default function ProjectRequestRetirementPage() {
     setIsDeleting(true);
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/${retirementId}`);
-      toast.success("Retirement deleted successfully");
       setRequestRetirements((prev) =>
         prev.filter((r) => r.retirementId !== retirementId)
       );

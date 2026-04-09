@@ -198,9 +198,7 @@ export default function ProjectImpactModal({
         },
       );
 
-      toast.success(
         `Project impact ${mode === "create" ? "added" : "updated"} successfully!`,
-      );
 
       // Close modal and show success
       onClose();

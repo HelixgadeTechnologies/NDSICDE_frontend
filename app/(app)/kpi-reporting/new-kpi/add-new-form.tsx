@@ -99,8 +99,6 @@ export default function AddNewKPIForm() {
       );
 
       if (response.status === 200 || response.status === 201) {
-        toast.success("KPI Report created successfully!");
-        resetForm();
         router.push("/kpi-reporting");
       }
     } catch (error: any) {

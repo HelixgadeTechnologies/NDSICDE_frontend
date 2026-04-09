@@ -29,9 +29,7 @@ export default function AccessControl() {
     try {
       const rolesData = await fetchRoles();
       setRoles(rolesData);
-      toast.success("Roles loaded successfully");
     } catch (error) {
-      console.error("Error fetching roles:", error);
       toast.error("Failed to load roles. Please try again.");
     } finally {
       setIsLoadingRoles(false);

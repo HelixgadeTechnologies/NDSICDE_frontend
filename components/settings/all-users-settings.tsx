@@ -98,9 +98,7 @@ export default function GeneralSettings() {
           },
         },
       );
-      toast.success(res.data.message || "Password updated successfully");
     } catch (error) {
-      console.error("Error updating password: ", error);
       toast.error('Error updating password')
     } finally {
       setIsLoading(false);
@@ -144,8 +142,6 @@ export default function GeneralSettings() {
           }
         }
       )
-      toast.success(res.data.message || "Details updated successfully");
-      setOpenModal(false);
       setField("name", "");
       setField("email", "");
       setField("phoneNumber", "");
@@ -187,8 +183,6 @@ export default function GeneralSettings() {
           }
         }
       );
-      toast.success(res.data.message || "Relogin to see picture updated");
-      setSelectedFile(null);
       setPreviewUrl(null);
     } catch (error) {
       console.error("Error updating profile picture: ", error);

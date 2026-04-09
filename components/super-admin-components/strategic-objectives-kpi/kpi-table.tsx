@@ -100,10 +100,8 @@ export default function KPITable({ searchQuery = "", typeFilter = "" }: { search
           },
         },
       );
-      toast.success("Deleted successfully!");
 
       // Refresh the table data
-      await fetchData();
     } catch (error) {
       console.error(`Error ${error}`);
       toast.error("An error occurred. Please try again");

@@ -35,9 +35,7 @@ export default function FinancialReporting() {
         );
         setSummaryData(response.data.data);
         console.log(response.data.data);
-        toast.success(response.data.message);
       } catch (error) {
-        console.error("Error fetching summary data:", error);
       } finally {
         setLoading(false);
       }

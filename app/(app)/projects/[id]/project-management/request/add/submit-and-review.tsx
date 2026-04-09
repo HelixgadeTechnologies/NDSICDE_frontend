@@ -71,8 +71,6 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           }
         }
       );
-      toast.success("Request created successfully");
-      onSubmit();
       setTimeout(() => {
         router.push(`/projects/${projectId}/project-management/request`);
       }, 2500);

@@ -136,8 +136,6 @@ export default function ProjectLogicalFramework() {
         },
       );
       console.log(response.data);
-      toast.success("Framework deleted successfully!");
-      setIsDeleteModalOpen(false);
       setFrameworkToDelete(null);
       fetchLogicalFrameworks();
     } catch (error) {
@@ -214,7 +212,6 @@ export default function ProjectLogicalFramework() {
       );
 
       console.log("Response:", response.data);
-      toast.success("Logical framework uploaded successfully!");
 
       // Reset form
       setFormData({

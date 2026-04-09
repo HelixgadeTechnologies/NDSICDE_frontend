@@ -126,8 +126,6 @@ export default function ProjectPartner() {
         },
       );
 
-      toast.success("Project partner deleted successfully!");
-      fetchProjectPartners();
       setRemovePartner(false);
     } catch (error) {
       console.error("Error deleting partner:", error);

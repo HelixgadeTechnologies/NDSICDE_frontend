@@ -165,9 +165,7 @@ export default function ProjectTeamModal({
       });
 
 
-      toast.success(
         `Team member ${mode === "create" ? "added" : "updated"} successfully!`,
-      );
 
       onClose();
       setSuccessModal(true);

@@ -5,7 +5,6 @@ import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ProjectActivityTypes } from "@/types/project-management-types";
 import { useEntityModal } from "@/utils/project-management-utility";
 import Link from "next/link";
@@ -16,6 +15,8 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { formatDate } from "@/utils/dates-format-utility";
+import LoadingSpinner from "@/ui/loading-spinner";
+import ActionMenu from "@/ui/action-menu";
 
 export default function ProjectActivity() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -103,8 +104,6 @@ export default function ProjectActivity() {
           },
         },
       );
-      toast.success("Project activity deleted successfully!");
-      setRemoveActivity(false);
       fetchActivities();
     } catch (error) {
       console.error(`Error deleting activity: ${error}`);
@@ -126,11 +125,7 @@ export default function ProjectActivity() {
 
       <CardComponent>
         {isLoading ? (
-          <div className="dots my-20 mx-auto">
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
+          <LoadingSpinner />
         ) : (
           <Table
             tableHead={head}
@@ -158,60 +153,36 @@ export default function ProjectActivity() {
                       )
                     }
                   />
-
-                  {activeRowId === row.activityId && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                        <ul className="text-sm">
-                          <li
-                            onClick={() =>
-                              handleEditActivity(row, setActiveRowId)
-                            }
-                            className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"ph:pencil-simple-line"}
-                              height={20}
-                              width={20}
-                            />
-                            Edit
-                          </li>
-                          <li
-                            onClick={() =>
-                              handleRemoveActivity(row, setActiveRowId)
-                            }
-                            className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"pixelarticons:trash"}
-                              height={20}
-                              width={20}
-                            />
-                            Remove
-                          </li>
-                          <Link
-                            href={`/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value/add`}
-                            className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                            <Icon icon={"si:add-fill"} height={20} width={20} />
-                            Report Actual Value
-                          </Link>
-                          <Link
-                            href={`/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value`}
-                            className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"hugeicons:view"}
-                              height={20}
-                              width={20}
-                            />
-                            View Actual Value
-                          </Link>
-                        </ul>
-                      </motion.div>
-                    </AnimatePresence>
-                  )}
+                  <ActionMenu
+                    isOpen={activeRowId === row.activityId}
+                    items={[
+                      {
+                        type: "button",
+                        label: "Edit",
+                        icon: "ph:pencil-simple-line",
+                        onClick: () => handleEditActivity(row, setActiveRowId),
+                      },
+                      {
+                        type: "button",
+                        label: "Remove",
+                        icon: "pixelarticons:trash",
+                        onClick: () => handleRemoveActivity(row, setActiveRowId),
+                        className: "hover:text-(--primary-light) border-y border-gray-300",
+                      },
+                      {
+                        type: "link",
+                        label: "Report Actual Value",
+                        icon: "si:add-fill",
+                        href: `/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value/add`,
+                      },
+                      {
+                        type: "link",
+                        label: "View Actual Value",
+                        icon: "hugeicons:view",
+                        href: `/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value`,
+                      },
+                    ]}
+                  />
                 </td>
               </>
             )}
