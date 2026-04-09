@@ -4,6 +4,7 @@ import DashboardStat from "@/ui/dashboard-stat-card";
 import DataValidationTable from "@/components/super-admin-components/data-validation/data-validation-table";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import CardComponent from "@/ui/card-wrapper";
 import DateRangePicker from "@/ui/form/date-range";
 import { format } from "date-fns";
 
@@ -19,7 +20,15 @@ type Stats = {
   rejectionRate: number;
 }
 
+import { AnimatePresence, motion } from "framer-motion";
+
 export default function DataValidation() {
+  const tabs = [
+    { tabName: "Activity Financial Request", id: 1 },
+    { tabName: "Activity Financial Retirement", id: 2 },
+  ];
+  const [activeTab, setActiveTab] = useState(1);
+
   const [isLoadingStats, setIsLoadingStats] = useState<boolean>(false);
   const [stats, setStats] = useState<Stats>({
     totalSubmissions: 0,
@@ -56,7 +65,7 @@ export default function DataValidation() {
   // Fetch stats whenever dates change
   useEffect(() => {
     fetchStats(selectedDates.startDate, selectedDates.endDate);
-  }, [selectedDates.startDate, selectedDates.endDate]);
+  }, [selectedDates.startDate, selectedDates.endDate, activeTab]);
 
   // Function to fetch statistics from the API
   const fetchStats = async (startDate: string, endDate: string) => {
@@ -81,7 +90,7 @@ export default function DataValidation() {
       const encodedEndDate = encodeURIComponent(endDateObj.toISOString());
 
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/data-validation/stats?startDate=${encodedStartDate}&endDate=${encodedEndDate}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/data-validation/stats?startDate=${encodedStartDate}&endDate=${encodedEndDate}&type=${activeTab === 1 ? 'request' : 'retirement'}`
       );
       setStats(res.data.data);
     } catch (error) {
@@ -144,10 +153,51 @@ export default function DataValidation() {
       <div className="absolute -top-16 right-5">
         <DateRangePicker onChange={handleDateRangeChange} />
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
         <DashboardStat data={dashboardData} />
       </div>
-      <DataValidationTable startDate={selectedDates.startDate} endDate={selectedDates.endDate} />
+
+      <CardComponent>
+        {/* Tab switcher replicated from admin */}
+        <div
+          className={`w-full relative h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg mb-4`}>
+          {tabs.map((d) => {
+            const isActive = activeTab === d.id;
+            return (
+              <div
+                key={d.id}
+                onClick={() => setActiveTab(d.id)}
+                className="relative z-10">
+                {isActive && (
+                  <motion.div
+                    layoutId="tab"
+                    className="absolute inset-0 z-0 bg-white rounded-lg"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <div
+                  className={`relative z-10 px-3 md:px-6 h-10 flex items-center justify-center font-bold text-xs md:text-sm cursor-pointer whitespace-nowrap ${
+                    isActive ? "text-[#242424]" : "text-[#7A7A7A]"
+                  }`}>
+                  {d.tabName}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}>
+            <DataValidationTable startDate={selectedDates.startDate} endDate={selectedDates.endDate} activeTab={activeTab} />
+          </motion.div>
+        </AnimatePresence>
+      </CardComponent>
     </section>
   );
 }

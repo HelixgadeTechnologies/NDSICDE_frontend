@@ -117,9 +117,9 @@ export default function ProjectImpact() {
             idKey={"impactId"}
             renderRow={(row) => (
               <>
-                <td className="px-6">{row.statement}</td>
-                <td className="px-6">{row.thematicArea}</td>
-                <td className="px-6">{row.responsiblePerson}</td>
+                <td className="px-6 capitalize">{row.statement}</td>
+                <td className="px-6 capitalize">{row.thematicArea}</td>
+                <td className="px-6 capitalize">{row.responsiblePerson}</td>
                 <td className="px-6 relative">
                   <Icon
                     icon={"uiw:more"}

@@ -25,12 +25,12 @@ export const activity_financial_request = [
   ];
 
   export const activity_financial_retirement = [
-    {
-      title: "Total Request",
-      value: "0",
-      icon: "mdi:chart-box-outline",
-     percentage: 10,
-    },
+    // {
+    //   title: "Total Request",
+    //   value: "0",
+    //   icon: "mdi:chart-box-outline",
+    //  percentage: 10,
+    // },
     {
       title: "Total Retired",
       value: "0",

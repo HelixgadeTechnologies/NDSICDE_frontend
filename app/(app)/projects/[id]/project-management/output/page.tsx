@@ -118,10 +118,10 @@ export default function ProjectOutput() {
             idKey={"outputId"}
             renderRow={(row) => (
               <>
-                <td className="px-6">{row.outputStatement}</td>
-                <td className="px-6">{row.outcomeStatement}</td>
-                <td className="px-6">{row.thematicAreas}</td>
-                <td className="px-6">{row.responsiblePerson}</td>
+                <td className="px-6 capitalize">{row.outputStatement}</td>
+                <td className="px-6 capitalize">{row.outcomeStatement}</td>
+                <td className="px-6 capitalize">{row.thematicAreas}</td>
+                <td className="px-6 capitalize">{row.responsiblePerson}</td>
                 <td className="px-6 relative">
                   <Icon
                     icon={"uiw:more"}

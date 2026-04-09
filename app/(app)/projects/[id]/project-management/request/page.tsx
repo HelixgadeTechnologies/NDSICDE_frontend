@@ -18,9 +18,18 @@ import { getToken } from "@/lib/api/credentials";
 import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
+import { RetirementRequestType } from "@/types/retirement-request";
 
 export default function ProjectRequest() {
+  const tabs = [
+    { tabName: "Activity Financial Request", id: 1 },
+    { tabName: "Activity Financial Retirement", id: 2 },
+  ];
+  const [activeTab, setActiveTab] = useState(1);
+
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [retirementData, setRetirementData] = useState<RetirementRequestType[]>([]);
+  const [isLoadingRetirements, setIsLoadingRetirements] = useState(false);
   const [data, setData] = useState<ProjectRequestType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [viewRequestOpen, setViewRequestOpen] = useState(false);
@@ -42,33 +51,62 @@ export default function ProjectRequest() {
     "Actions",
   ];
 
-  const dashboardData = [
+  const retirementHead = [
+    "Activity Line Description",
+    "Quantity",
+    "Frequency",
+    "Unit Cost (₦)",
+    "Total Budget (₦)",
+    "Actual Cost (₦)",
+  ];
+
+  const requestStats = [
     {
       title: "Total Requests",
-      value: 0,
-      icon: "fluent:target-24-filled",
+      value: data.length,
+      icon: "mdi:chart-box-outline",
     },
     {
-      title: "Total Approved",
-      value: 0,
-      icon: "fluent:target-24-filled",
+      title: "Approved Requests",
+      value: data.filter((r) => r.status === "Approved").length,
+      icon: "mdi:check-circle-outline",
+    },
+    {
+      title: "Pending Requests",
+      value: data.filter((r) => r.status === "Pending").length,
+      icon: "mdi:clock-outline",
+    },
+    {
+      title: "Rejected Requests",
+      value: data.filter((r) => r.status === "Rejected").length,
+      icon: "mdi:close-circle-outline",
+    },
+  ];
+
+  const retirementStats = [
+    {
+      title: "Total Retired",
+      value: retirementData.filter((r) => r.retirementStatus === "Approved").length,
+      icon: "mdi:check-circle-outline",
     },
     {
       title: "Total Rejected",
-      value: 0,
-      icon: "fluent:target-24-filled",
+      value: retirementData.filter((r) => r.retirementStatus === "Rejected").length,
+      icon: "mdi:close-circle-outline",
     },
     {
-      title: "Total Pending",
-      value: 0,
-      icon: "fluent:target-24-filled",
+      title: "Total Under Review",
+      value: retirementData.filter((r) => r.retirementStatus === "Pending").length,
+      icon: "mdi:clock-outline",
     },
     {
-      title: "Total Retired",
-      value: 0,
-      icon: "fluent:target-24-filled",
+      title: "Total Retirements",
+      value: retirementData.length,
+      icon: "mdi:chart-box-outline",
     },
   ];
+
+  const dashboardData = activeTab === 1 ? requestStats : retirementStats;
 
   // state for modals - edit and remove
   const {
@@ -97,9 +135,29 @@ export default function ProjectRequest() {
     }
   };
 
+  const fetchRetirements = async () => {
+    setIsLoadingRetirements(true);
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirements`,
+        {
+          params: {
+            projectId: projectId,
+          },
+        }
+      );
+      setRetirementData(res.data?.data || []);
+    } catch (error) {
+      console.error("Error Fetching retirements", error);
+    } finally {
+      setIsLoadingRetirements(false);
+    }
+  };
+
   // automatically fetch requests
   useEffect(() => {
     fetchRequests();
+    fetchRetirements();
   }, []);
 
   // delete request
@@ -136,18 +194,55 @@ export default function ProjectRequest() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <DashboardStat data={dashboardData} icon="basil:plus-solid" />
       </div>
 
       <CardComponent fitWidth={true}>
-        {isLoading ? (
-          <div className="dots my-20 mx-auto">
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-        ) : (
+        {/* Tab switcher replicated from admin */}
+        <div
+          className={`w-full relative h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg mb-4`}>
+          {tabs.map((d) => {
+            const isActive = activeTab === d.id;
+            return (
+              <div
+                key={d.id}
+                onClick={() => setActiveTab(d.id)}
+                className="relative z-10">
+                {isActive && (
+                  <motion.div
+                    layoutId="tab"
+                    className="absolute inset-0 z-0 bg-white rounded-lg"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+                <div
+                  className={`relative z-10 px-3 md:px-6 h-10 flex items-center justify-center font-bold text-xs md:text-sm cursor-pointer whitespace-nowrap ${
+                    isActive ? "text-[#242424]" : "text-[#7A7A7A]"
+                  }`}>
+                  {d.tabName}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}>
+
+        {activeTab === 1 && (
+          isLoading ? (
+            <div className="dots my-20 mx-auto">
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          ) : (
           <Table
             tableHead={head}
             tableData={data}
@@ -247,7 +342,43 @@ export default function ProjectRequest() {
               </>
             )}
           />
+        ))}
+
+        {activeTab === 2 && (
+          isLoadingRetirements ? (
+            <div className="dots my-20 mx-auto">
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          ) : (
+            <div className="space-y-5 mt-4">
+              <Table
+                tableHead={retirementHead}
+                tableData={retirementData}
+                checkbox
+                idKey={"retirementId"}
+                renderRow={(row) => (
+                  <>
+                    <td className="px-6">{row.activityLineDescription || "N/A"}</td>
+                    <td className="px-6">{row.quantity || "0"}</td>
+                    <td className="px-6">{row.frequency || "0"}</td>
+                    <td className="px-6">{row.unitCost || "0"}</td>
+                    <td className="px-6">{row.totalBudget || "0"}</td>
+                    <td className="px-6">{row.actualCost || "0"}</td>
+                  </>
+                )}
+              />
+              <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
+                <p>Total Activity Cost (₦): {retirementData.reduce((acc, curr) => acc + (curr.actualCost || 0), 0).toLocaleString()}</p>
+                <p>Amount to reimburse to NDSICDE (₦): 0</p>
+                <p>Amount to reimburse to Staff (₦): 0</p>
+              </div>
+            </div>
+          )
         )}
+        </motion.div>
+        </AnimatePresence>
       </CardComponent>
 
       {selectedRequest && (

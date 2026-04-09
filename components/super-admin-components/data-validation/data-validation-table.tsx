@@ -21,11 +21,13 @@ import { toast } from "react-toastify";
 type DataValidationTableProps = {
   startDate: string;
   endDate: string;
+  activeTab: number;
 };
 
 export default function DataValidationTable({
   startDate,
   endDate,
+  activeTab,
 }: DataValidationTableProps) {
   const head = [
     "Submission Name/Type",
@@ -48,6 +50,7 @@ export default function DataValidationTable({
     const payload = {
       startDate: startDate,
       endDate: endDate,
+      type: activeTab === 1 ? "request" : "retirement",
     };
 
     try {
@@ -72,7 +75,7 @@ export default function DataValidationTable({
 
   useEffect(() => {
     fetchData();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, activeTab]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [details, setDetails] = useState<ProjectRequestType | undefined>(
@@ -138,7 +141,6 @@ export default function DataValidationTable({
 
   return (
     <>
-      <CardComponent>
         {isLoading ? (
           <div className="dots my-20 mx-auto">
             <div></div>
@@ -181,7 +183,6 @@ export default function DataValidationTable({
             )}
           />
         )}
-      </CardComponent>
 
       {/* details */}
       <Modal

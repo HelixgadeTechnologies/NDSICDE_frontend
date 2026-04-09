@@ -301,7 +301,7 @@ export default function ProjectLogicalFramework() {
             idKey={"logicalFrameworkId"}
             renderRow={(row) => (
               <>
-                <td className="px-6">{row.documentName}</td>
+                <td className="px-6 capitalize">{row.documentName}</td>
                 <td className="px-6">
                   {formatDate(row.createAt, "date-only") || "N/A"}
                 </td>
@@ -442,7 +442,7 @@ export default function ProjectLogicalFramework() {
                 <label className="text-sm font-medium text-gray-600">
                   Document Name
                 </label>
-                <p className="text-base text-gray-900 mt-1">
+                <p className="text-base text-gray-900 mt-1 capitalize">
                   {selectedFramework.documentName}
                 </p>
               </div>
@@ -453,7 +453,7 @@ export default function ProjectLogicalFramework() {
                   <label className="text-sm font-medium text-gray-600">
                     Project Name
                   </label>
-                  <p className="text-base text-gray-900 mt-1">
+                  <p className="text-base text-gray-900 mt-1 capitalize">
                     {selectedFramework.projectName}
                   </p>
                 </div>
@@ -476,7 +476,7 @@ export default function ProjectLogicalFramework() {
                     <label className="text-sm font-medium text-gray-600">
                       Last Updated
                     </label>
-                    <p className="text-base text-gray-900 mt-1">
+                    <p className="text-base text-gray-900 mt-1 capitalize">
                       {formatDate(selectedFramework.updateAt, "relative")}
                     </p>
                   </div>
