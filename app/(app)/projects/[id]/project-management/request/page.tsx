@@ -155,13 +155,13 @@ export default function ProjectRequest() {
             idKey={"requestId"}
             renderRow={(row) => (
               <>
-                <td className="px-6 w-37.5">
+                <td className="px-6 w-37.5 capitalize">
                   {row.activityPurposeDescription}
                 </td>
                 {/* budget total previously */}
                 <td className="px-6">{row.total}</td>
-                <td className="px-6">{row.activityLocation}</td>
-                <td className="px-6">{row.staff}</td>
+                <td className="px-6 capitalize">{row.activityLocation}</td>
+                <td className="px-6 capitalize">{row.staff}</td>
                 <td
                   className={`px-6 ${
                     row.status === "Active" ? "text-green-500" :
