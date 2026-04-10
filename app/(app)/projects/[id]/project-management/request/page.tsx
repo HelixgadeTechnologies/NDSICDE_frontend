@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 import { RetirementRequestType } from "@/types/retirement-request";
 import LoadingSpinner from "@/ui/loading-spinner";
+import { toSentenceCase } from "@/utils/ui-utility";
 
 export default function ProjectRequest() {
   const tabs = [
@@ -243,13 +244,13 @@ export default function ProjectRequest() {
             idKey={"requestId"}
             renderRow={(row) => (
               <>
-                <td className="px-6 w-37.5 capitalize">
-                  {row.activityPurposeDescription}
+                <td className="px-6 w-37.5">
+                  {toSentenceCase(row.activityPurposeDescription ?? "")}
                 </td>
                 {/* budget total previously */}
                 <td className="px-6">{row.total}</td>
-                <td className="px-6 capitalize">{row.activityLocation}</td>
-                <td className="px-6 capitalize">{row.staff}</td>
+                <td className="px-6">{toSentenceCase(row.activityLocation ?? "")}</td>
+                <td className="px-6">{toSentenceCase(row.staff ?? "")}</td>
                 <td
                   className={`px-6 ${
                     row.status === "Active" ? "text-green-500" :

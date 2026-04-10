@@ -13,6 +13,7 @@ import LineChartComponent from "@/ui/line-chart";
 import Table from "@/ui/table";
 import { progressTrackingColors, progressTracking } from "@/lib/config/charts";
 import { formatDate } from "@/utils/dates-format-utility";
+import { toSentenceCase } from "@/utils/ui-utility";
 
 type ChartData = {
   month: string;
@@ -210,14 +211,14 @@ export default function PartnersDashboardComponent({
                 <td className="px-6">{row.kpiName || "N/A"}</td>
                 <td className="px-6">{formatDate(row.createdAt)}</td>
                 <td
-                  className={`px-6 capitalize ${
+                  className={`px-6 ${
                     (row.status || "").toLowerCase() === "approved"
                       ? "text-green-500"
                       : (row.status || "").toLowerCase() === "pending"
                         ? "text-yellow-500"
                         : "text-red-500"
                   }`}>
-                  {row.status || "N/A"}
+                  {toSentenceCase(row.status ?? "N/A")}
                 </td>
                 {/* <td className="pl-10 relative">
                   <Icon

@@ -5,6 +5,7 @@ import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
+import { toSentenceCase } from "@/utils/ui-utility";
 
 type ViewKPIModalProps = {
   isOpen: boolean;
@@ -83,7 +84,7 @@ export default function ViewKPIModal({ isOpen, onClose, kpiId }: ViewKPIModalPro
               </div>
               <div className="border border-gray-100 p-4 rounded-md">
                 <span className="text-gray-500 text-sm">Status</span>
-                <p className="font-medium capitalize">{data.status || "N/A"}</p>
+                <p className="font-medium">{toSentenceCase(data.status ?? "N/A")}</p>
               </div>
             </div>
             

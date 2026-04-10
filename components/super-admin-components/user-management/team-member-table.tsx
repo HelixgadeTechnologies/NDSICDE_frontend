@@ -19,6 +19,7 @@ import { formatDate } from "@/utils/dates-format-utility";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { DropdownOption } from "@/types/project-management-types";
 import { fetchRoles } from "@/lib/api/roles";
+import { toSentenceCase } from "@/utils/ui-utility";
 // import { TeamMember } from "@/types/team-members";
 
 export default function TeamMembersTable() {
@@ -158,9 +159,9 @@ export default function TeamMembersTable() {
                   ? "text-green-500"
                   : "text-red-500"
               }`}>
-              <span className="capitalize">{row.status}</span>
+              <span>{toSentenceCase(row.status ?? "")}</span>
             </td>
-            <td className="px-6">{formatDate(row.loginLast, "short")}</td>
+            <td className="px-6">{formatDate(row.loginLast, "time")}</td>
             <td className="px-6">{row.department}</td>
             <td className="px-6 relative">
               <div className="flex justify-center items-center">

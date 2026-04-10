@@ -17,3 +17,9 @@ export const typeChecker = (row: { status: string }) => {
       return "text-green-500 px-6";
     }
   };
+
+  export const toSentenceCase = (str: string) => {
+  return str
+    .toLowerCase()
+    .replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
+}

@@ -97,6 +97,7 @@ export default function AddKPIModal({
           disaggregation: "",
           baseLine: "",
           target: "",
+        });
 
         // Call onSuccess to refresh the table
         if (onSuccess) {

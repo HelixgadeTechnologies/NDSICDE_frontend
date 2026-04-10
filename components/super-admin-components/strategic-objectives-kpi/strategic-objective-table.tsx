@@ -12,6 +12,7 @@ import DeleteModal from "@/ui/generic-delete-modal";
 import LinkedKPIsModal from "./linked-kpis-modal";
 import { useStrategicObjectivesAndKPIsState } from "@/store/super-admin-store/strategic-objectives-kpi-store";
 import AddStrategicObjectiveModal from "./add-strategic-objective";
+import { toSentenceCase } from "@/utils/ui-utility";
 
 type ExpectedData = {
   createAt: string;
@@ -217,7 +218,7 @@ export default function SOTable({ searchQuery = "", statusFilter = "" }: { searc
         tableData={filteredData}
         renderRow={(row) => (
           <>
-            <td className="px-6 py-4 capitalize max-w-125">{row.statement || "N/A"}</td>
+            <td className="px-6 py-4 max-w-125">{toSentenceCase(row.statement ?? "N/A")}</td>
             <td
               onClick={() => handleViewLinkedKPIs(row.strategicObjectiveId)}
               className="px-6 py-4 hover:cursor-pointer hover:underline hover:text-(--primary)">
@@ -225,14 +226,14 @@ export default function SOTable({ searchQuery = "", statusFilter = "" }: { searc
             </td>
             <td className="px-6 py-4">
               <span
-                className={`px-2 py-1 rounded-full text-xs capitalize ${
+                className={`px-2 py-1 rounded-full text-xs ${
                   row.status === "Active"
                     ? "text-green-500"
                     : row.status === "Inactive"
                       ? "text-red-500"
                       : "text-yellow-500"
                 }`}>
-                {row.status || "Unknown"}
+                {toSentenceCase(row.status ?? "Unknown")}
               </span>
             </td>
             <td className="px-6 py-4 relative">

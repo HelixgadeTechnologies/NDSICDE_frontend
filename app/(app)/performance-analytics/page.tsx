@@ -82,7 +82,7 @@ export default function PerformanceAnalytics() {
 
         if (response.data.success) {
           setApiData(response.data.data);
-            response.data.message || "Performance data loaded successfully",
+          toast.success(response.data.message || "Performance data loaded successfully");
         } else {
           toast.error("Failed to fetch performance data");
         }

@@ -17,6 +17,7 @@ import {
   transformResultTypesToOptions,
 } from "@/lib/api/result-types";
 import { formatDate } from "@/utils/dates-format-utility";
+import { toSentenceCase } from "@/utils/ui-utility";
 
 // Types for dropdown options
 type DropdownOption = {
@@ -219,8 +220,8 @@ export default function ReportsTable() {
                         : row.status === "PENDING"
                           ? "text-yellow-500"
                           : "text-red-500"
-                    } capitalize`}>
-                    {row.status}
+                    }`}>
+                    {toSentenceCase(row.status ?? "")}
                   </td>
                   <td
                     className={`px-6 ${

@@ -124,6 +124,7 @@ export default function EditKPIModal({
 
         // Call onSuccess to refresh the table
         if (onSuccess) {
+          onSuccess();
         }
 
         // Close modal

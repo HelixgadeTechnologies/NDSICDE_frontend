@@ -15,6 +15,7 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
+import { toSentenceCase } from "@/utils/ui-utility";
 
 export default function ProjectOutcome() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -112,11 +113,11 @@ export default function ProjectOutcome() {
             idKey={"outcomeId"}
             renderRow={(row) => (
               <>
-                <td className="px-6 capitalize">{row.outcomeStatement}</td>
-                <td className="px-6 capitalize">{row.outcomeType}</td>
-                <td className="px-6 capitalize">{row.impactStatement}</td>
-                <td className="px-6 capitalize">{row.thematicAreas}</td>
-                <td className="px-6 capitalize">{row.responsiblePerson}</td>
+                <td className="px-6">{toSentenceCase(row.outcomeStatement ?? "")}</td>
+                <td className="px-6">{toSentenceCase(row.outcomeType ?? "")}</td>
+                <td className="px-6">{toSentenceCase(row.impactStatement ?? "")}</td>
+                <td className="px-6">{toSentenceCase(row.thematicAreas ?? "")}</td>
+                <td className="px-6">{toSentenceCase(row.responsiblePerson ?? "")}</td>
                 <td className="px-6 relative">
                   <Icon
                     icon={"uiw:more"}
