@@ -1,7 +1,7 @@
 "use client";
 
 import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
@@ -18,11 +18,52 @@ type AddProps = {
   onClose: () => void;
 };
 
+const ALL_LABEL = "All";
+
 export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [layerOfApproval, setLayerOfApproval] = useState<string>("");
-  const { projectOptions } = useProjects();
+  // Tags shown in the UI — either ["All"] or one/more project names
+  const [selectedProjectTags, setSelectedProjectTags] = useState<string[]>([]);
+  const { projects, projectOptions } = useProjects();
+
+  // name-to-id lookup map
+  const projectNameToId = useMemo(
+    () => new Map(projects.map((p) => [p.projectName, p.projectId])),
+    [projects]
+  );
+
+  // Options exposed to TagInput: "All" first, then every project name
+  const tagOptions = useMemo(
+    () => [ALL_LABEL, ...projectOptions.map((o) => o.label)],
+    [projectOptions]
+  );
+
+  /** Comma-separated IDs derived from the selected tags */
+  const assignedProjectIdString = useMemo(() => {
+    if (selectedProjectTags.includes(ALL_LABEL)) {
+      return projects.map((p) => p.projectId).join(",");
+    }
+    return selectedProjectTags
+      .map((name) => projectNameToId.get(name) ?? "")
+      .filter(Boolean)
+      .join(",");
+  }, [selectedProjectTags, projects, projectNameToId]);
+
+  const handleProjectTagChange = (tags: string[]) => {
+    const lastAdded = tags[tags.length - 1];
+    // If "All" was just added, keep only "All"
+    if (lastAdded === ALL_LABEL) {
+      setSelectedProjectTags([ALL_LABEL]);
+      return;
+    }
+    // If the user is removing "All", just update normally
+    // Don't allow adding individual projects when "All" is already selected
+    if (selectedProjectTags.includes(ALL_LABEL) && tags.length > 1) {
+      return;
+    }
+    setSelectedProjectTags(tags.filter((t) => t !== ALL_LABEL));
+  };
 
   const {
     fullName,
@@ -64,7 +105,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         department,
         phoneNumber,
         status,
-        assignedProjectId: assignedProjects[0] || "",
+        assignedProjectId: assignedProjectIdString,
       };
 
       const response = await createUser(userData, token);
@@ -139,12 +180,20 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             onChange={(value: string) => setField("status", value)}
           />
           <div className="col-span-2">
-            <DropDown
+            <TagInput
               label="Assigned Projects"
-              options={projectOptions}
-              name="assignedProjects"
-              value={assignedProjects[0] || ""}
-              onChange={(value: string) => setField("assignedProjects", [value])}
+              placeholder={
+                selectedProjectTags.includes(ALL_LABEL)
+                  ? "All projects selected"
+                  : "Select projects…"
+              }
+              value={selectedProjectTags}
+              options={
+                selectedProjectTags.includes(ALL_LABEL)
+                  ? [] // lock further selection when "All" is chosen
+                  : tagOptions
+              }
+              onChange={handleProjectTagChange}
             />
           </div>
         </div>

@@ -86,10 +86,10 @@ export default function ResultDashboard() {
       title: "Overall Performance",
       icon: "material-symbols:target",
       lists: [
-        {title: "Impacts", count: resultDashboardData.RESULT_SUMMARY.overallPerformance.impacts},
-        {title: "Outcomes", count: resultDashboardData.RESULT_SUMMARY.overallPerformance.outcomes},
-        {title: "Outputs", count: resultDashboardData.RESULT_SUMMARY.overallPerformance.outputs},
-        {title: "Total Activity", count: resultDashboardData.RESULT_SUMMARY.overallPerformance.totalActivity},
+        {title: "Impacts", count: `${resultDashboardData.RESULT_SUMMARY.overallPerformance.impacts}%`},
+        {title: "Outcomes", count: `${resultDashboardData.RESULT_SUMMARY.overallPerformance.outcomes}%`},
+        {title: "Outputs", count: `${resultDashboardData.RESULT_SUMMARY.overallPerformance.outputs}%`},
+        {title: "Total Activity", count: `${resultDashboardData.RESULT_SUMMARY.overallPerformance.totalActivity}%`},
       ],
     },
   ];
