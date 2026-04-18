@@ -25,7 +25,7 @@ type ExpectedData = {
   updateAt: string;
 };
 
-export default function SOTable({ searchQuery = "", statusFilter = "" }: { searchQuery?: string; statusFilter?: string }) {
+export default function SOTable({ searchQuery = "", statusFilter = "", onViewLinkedKPIs }: { searchQuery?: string; statusFilter?: string, onViewLinkedKPIs?: (id: string) => void }) {
   const head = ["Objective Name", "Linked KPIs", "Status", "Actions"];
   const [data, setData] = useState<ExpectedData[]>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -138,8 +138,13 @@ export default function SOTable({ searchQuery = "", statusFilter = "" }: { searc
 
   // Handle opening linked KPIs modal
   const handleViewLinkedKPIs = (objectiveId: string) => {
-    setSelectedObjectiveForKPIs(objectiveId);
-    setOpenLinkedKPI(true);
+    if (onViewLinkedKPIs) {
+      onViewLinkedKPIs(objectiveId);
+    } else {
+      setSelectedObjectiveForKPIs(objectiveId);
+      setOpenLinkedKPI(true);
+    }
+    setActiveRowId(null);
   };
 
   // Get strategic objectives data
@@ -265,7 +270,7 @@ export default function SOTable({ searchQuery = "", statusFilter = "" }: { searc
                           height={20}
                           width={20}
                         />
-                        Add Organizational KPI
+                        Add Org KPI
                       </li>
                       <li
                         onClick={() => handleViewLinkedKPIs(row.strategicObjectiveId)}

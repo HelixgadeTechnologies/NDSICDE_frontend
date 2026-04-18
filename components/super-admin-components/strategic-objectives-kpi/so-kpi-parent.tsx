@@ -16,6 +16,20 @@ export default function StrategicObjectivesAndKPIToggle() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [activeTab, setActiveTab] = useState(1);
+  const [soFilterId, setSoFilterId] = useState("");
+
+  const handleTabChange = (index: number) => {
+    setActiveTab(index);
+    if (index === 2) {
+      setSoFilterId("");
+    }
+  };
+
+  const handleViewLinkedKPIs = (soId: string) => {
+    setSoFilterId(soId);
+    setActiveTab(2);
+  };
 
   return (
     <CardComponent>
@@ -47,11 +61,13 @@ export default function StrategicObjectivesAndKPIToggle() {
       </div>
       <TabComponent
         data={tabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
         renderContent={(tabId) => {
           if (tabId === 1) {
-            return <SOTable searchQuery={query} statusFilter={statusFilter} />;
+            return <SOTable searchQuery={query} statusFilter={statusFilter} onViewLinkedKPIs={handleViewLinkedKPIs} />;
           } else {
-            return <KPITable searchQuery={query} typeFilter={typeFilter} />;
+            return <KPITable searchQuery={query} typeFilter={typeFilter} soFilterId={soFilterId} />;
           }
         }}
       />

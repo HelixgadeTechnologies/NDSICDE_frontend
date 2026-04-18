@@ -27,7 +27,7 @@ type KPI = {
   updateAt: string;
 };
 
-export default function KPITable({ searchQuery = "", typeFilter = "" }: { searchQuery?: string; typeFilter?: string }) {
+export default function KPITable({ searchQuery = "", typeFilter = "", soFilterId = "" }: { searchQuery?: string; typeFilter?: string; soFilterId?: string }) {
   const head = [
     "KPI Name",
     "Type",
@@ -158,8 +158,9 @@ export default function KPITable({ searchQuery = "", typeFilter = "" }: { search
       item.itemInMeasure?.toLowerCase().includes(searchLower);
       
     const matchesType = !typeFilter || item.type === typeFilter;
+    const matchesSoId = !soFilterId || item.strategicObjectiveId === soFilterId;
     
-    return matchesSearch && matchesType;
+    return matchesSearch && matchesType && matchesSoId;
   });
 
   return (

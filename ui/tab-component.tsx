@@ -12,20 +12,26 @@ type TabProps = {
   data: Array<TabType>;
   renderContent?: (activeTabId: number) => React.ReactNode;
   width?: string;
-//   onTabChange?: (tabId: number) => void;
+  activeTab?: number;
+  onTabChange?: (tabId: number) => void;
 };
 
 export default function TabComponent({ 
     data,
     renderContent,
     width,
-    // onTabChange,
+    activeTab: externalActiveTab,
+    onTabChange,
  }: TabProps) {
 
-  const [activeTab, setActiveTab] = useState(1);
+  const [internalActiveTab, setInternalActiveTab] = useState(1);
+  const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalActiveTab;
+  
   const handleTabChange = (index: number) => {
-    setActiveTab(index);
-    // onTabChange?.(index);
+    if (externalActiveTab === undefined) {
+      setInternalActiveTab(index);
+    }
+    onTabChange?.(index);
   }
 
   return (

@@ -1,6 +1,29 @@
 import { useState, useCallback } from "react";
 import { UserDetails } from "@/types/team-members";
 
+export const TEAM_DESIGNATIONS = [
+  { label: "Country Director", value: "Country Director" },
+  { label: "Program Manager", value: "Program Manager" },
+  { label: "Assistant Program Manager", value: "Assistant Program Manager" },
+  { label: "Finance Manager", value: "Finance Manager" },
+  { label: "Admin Manager", value: "Admin Manager" },
+  { label: "Head, MEAL", value: "Head, MEAL" },
+  { label: "Senior Finance Officer", value: "Senior Finance Officer" },
+  { label: "Project Manager", value: "Project Manager" },
+  { label: "Senior Project Officer", value: "Senior Project Officer" },
+  { label: "Senior MEAL Officer", value: "Senior MEAL Officer" },
+  { label: "MEAL Officer", value: "MEAL Officer" },
+  { label: "Project Officer", value: "Project Officer" },
+  { label: "Finance Officer", value: "Finance Officer" },
+  { label: "Admin Officer", value: "Admin Officer" },
+  { label: "Security Officer", value: "Security Officer" },
+  { label: "MEAL Assistant", value: "MEAL Assistant" },
+  { label: "Project Assistant", value: "Project Assistant" },
+  { label: "Finance Assistant", value: "Finance Assistant" },
+  { label: "Admin Assistant", value: "Admin Assistant" },
+  { label: "Transport Officer", value: "Transport Officer" },
+];
+
 export interface TeamMemberModalStates {
   editTeamMember: boolean;
   viewTeamMember: boolean;

@@ -10,8 +10,8 @@ import Button from "@/ui/form/button";
 import TagInput from "@/ui/form/tag-input";
 import { useRoleStore } from "@/store/role-store";
 import { createUser } from "@/lib/api/user-management";
-import { getRoleOptions, RoleOption } from "@/lib/api/settings";
 import { useProjects } from "@/context/ProjectsContext";
+import { TEAM_DESIGNATIONS } from "@/utils/team-member-utility";
 
 type AddProps = {
   isOpen: boolean;
@@ -21,8 +21,6 @@ type AddProps = {
 export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [roles, setRoles] = useState<RoleOption[]>([]);
-  const [isFetchingRoles, setIsFetchingRoles] = useState(false);
   const [layerOfApproval, setLayerOfApproval] = useState<string>("");
   const { projectOptions } = useProjects();
 
@@ -45,47 +43,6 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     { label: "Programs", value: "Programs" },
   ];
 
-  const layerOptions = [
-    { label: "Project Manager (Layer 1)", value: "project-manager" },
-    { label: "Finance Team Member (Layer 2)", value: "finance-team" },
-    { label: "Finance Manager (Layer 3)", value: "finance manager" },
-    { label: "Country Director (Layer 4)", value: "country-director" },
-    { label: "All layers", value: "all-layers" },
-  ];
-
-  // Check if selected role is "RETIREMENT MANAGER"
-  const selectedRole = roles.find((role) => role.value === roleId);
-  const isRetirementManager =
-    selectedRole?.label?.toUpperCase() === "RETIREMENT MANAGER";
-
-  // Fetch roles from API
-  useEffect(() => {
-    const fetchRoles = async () => {
-      if (!token) return;
-
-      setIsFetchingRoles(true);
-      try {
-        const roleOptions = await getRoleOptions(token);
-        setRoles(roleOptions);
-      } catch (error) {
-        console.error("Failed to fetch roles:", error);
-        setError("Failed to load roles");
-      } finally {
-        setIsFetchingRoles(false);
-      }
-    };
-
-    if (isOpen) {
-      fetchRoles();
-    }
-  }, [token, isOpen]);
-
-  // Reset layer of approval when role changes and it's not retirement manager
-  useEffect(() => {
-    if (!isRetirementManager) {
-      setLayerOfApproval("");
-    }
-  }, [isRetirementManager]);
 
   const addUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +65,6 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         phoneNumber,
         status,
         assignedProjectId: assignedProjects[0] || "",
-        ...(isRetirementManager && layerOfApproval && { layerOfApproval }),
       };
 
       const response = await createUser(userData, token);
@@ -157,11 +113,10 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
 
           <DropDown
             label="Designation"
-            options={roles}
+            options={TEAM_DESIGNATIONS}
             name="roleId"
             value={roleId}
-            placeholder={isFetchingRoles ? "Loading roles..." : "Select role"}
-            isDisabled={isFetchingRoles}
+            placeholder="Select designation"
             onChange={(value: string) => setField("roleId", value)}
           />
 
@@ -183,19 +138,6 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             value={status}
             onChange={(value: string) => setField("status", value)}
           />
-          {/* Conditional Layer of Approval dropdown */}
-          {isRetirementManager && (
-            <div className="col-span-2">
-              <DropDown
-                label="Layer of Approval"
-                options={layerOptions}
-                name="layerOfApproval"
-                value={layerOfApproval}
-                placeholder="Select layer"
-                onChange={(value: string) => setLayerOfApproval(value)}
-              />
-            </div>
-          )}
           <div className="col-span-2">
             <DropDown
               label="Assigned Projects"
@@ -210,7 +152,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         <Button
           content="Save Changes"
           isLoading={isLoading}
-          isDisabled={isLoading || isFetchingRoles}
+          isDisabled={isLoading}
         />
       </form>
     </Modal>
