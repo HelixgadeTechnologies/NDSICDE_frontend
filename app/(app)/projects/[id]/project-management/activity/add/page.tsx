@@ -289,10 +289,6 @@ export default function AddProjectActivity() {
         responses.map((r) => r.data),
       );
 
-      toast.success(
-        `Project activity${subActivities.length > 1 ? " and sub-activities" : ""} added successfully!`,
-      );
-
       // Redirect back or to activities list
       router.back();
     } catch (error: any) {

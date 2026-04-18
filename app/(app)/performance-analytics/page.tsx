@@ -82,13 +82,8 @@ export default function PerformanceAnalytics() {
 
         if (response.data.success) {
           setApiData(response.data.data);
-          toast.success(response.data.message || "Performance data loaded successfully");
-        } else {
-          toast.error("Failed to fetch performance data");
         }
       } catch (error) {
-        console.error("Error fetching performance analytics:", error);
-        toast.error("An error occurred while fetching data");
         setApiData(null);
       } finally {
         setLoading(false);

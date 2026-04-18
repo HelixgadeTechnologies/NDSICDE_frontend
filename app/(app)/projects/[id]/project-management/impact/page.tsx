@@ -54,11 +54,9 @@ export default function ProjectImpact() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impacts`,
       );
-      toast.success(response.data.message);
       setData(response.data.data);
     } catch (error) {
       console.log(`Error fetching impacts: ${error}`);
-      toast.error("Error retrieving impacts. Please try again.");
     } finally {
       setIsLoading(false);
     }

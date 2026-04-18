@@ -55,11 +55,9 @@ export default function ProjectOutput() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs`,
       );
-      toast.success(res.data.message);
       setData(res.data.data);
     } catch (error) {
       console.error(`Error fetching outputs: ${error}`);
-      toast.error("Error retrieving outputs. Please try again.");
     } finally {
       setIsLoading(false);
     }

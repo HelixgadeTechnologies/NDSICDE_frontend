@@ -55,11 +55,8 @@ export default function ProjectActivity() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities`,
       );
-      toast.success(response.data.message);
       setData(response.data.data);
     } catch (error) {
-      console.log(`Error fetching activities: ${error}`);
-      toast.error("Error retrieving activities. Please try again.");
     } finally {
       setIsLoading(false);
     }

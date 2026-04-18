@@ -56,11 +56,9 @@ export default function ProjectOutcome() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outcomes`,
       );
-      toast.success(response.data.message);
       setData(response.data.data);
     } catch (error) {
       console.error(`Error fetching outcome: ${error}`);
-      toast.error("Error retrieving outcomes. Please try again");
     } finally {
       setIsLoading(false);
     }
