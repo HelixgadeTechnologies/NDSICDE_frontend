@@ -20,12 +20,14 @@ export type RequestFormData = {
   activityPurposeDescription: string;
   activityStartDate: string;
   activityEndDate: string;
-  activityLineDescription: string;
-  quantity: string;
-  frequency: string;
-  unitCost: string;
+  budgetLineItems: {
+    activityLineDescription: string;
+    quantity: string;
+    frequency: string;
+    unitCost: string;
+    total: string;
+  }[];
   budgetCode: string; // fallback if needed
-  total: string;
   modeOfTransport: string;
   driverName: string;
   driversPhoneNumber: string;
@@ -53,12 +55,16 @@ export default function FormParent() {
     activityPurposeDescription: "",
     activityStartDate: "",
     activityEndDate: "",
-    activityLineDescription: "",
-    quantity: "",
-    frequency: "",
-    unitCost: "",
+    budgetLineItems: [
+      {
+        activityLineDescription: "",
+        quantity: "",
+        frequency: "",
+        unitCost: "",
+        total: "",
+      }
+    ],
     budgetCode: "",
-    total: "",
     modeOfTransport: "Road",
     driverName: "",
     driversPhoneNumber: "",

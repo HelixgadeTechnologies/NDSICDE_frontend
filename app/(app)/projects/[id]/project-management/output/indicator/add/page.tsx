@@ -4,7 +4,7 @@ import Heading from "@/ui/text-heading";
 import AddIndicatorForm from "@/components/team-member-components/add-indicator-form";
 import { useSearchParams } from "next/navigation";
 
-export default function AddImpactIndicator() {
+export default function AddOutputIndicator() {
   const searchParams = useSearchParams();
   const resultType = searchParams.get("resultType") || "output";
 

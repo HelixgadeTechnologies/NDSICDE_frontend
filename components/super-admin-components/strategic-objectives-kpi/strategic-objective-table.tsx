@@ -220,8 +220,7 @@ export default function SOTable({ searchQuery = "", statusFilter = "" }: { searc
           <>
             <td className="px-6 py-4 max-w-125">{toSentenceCase(row.statement ?? "N/A")}</td>
             <td
-              onClick={() => handleViewLinkedKPIs(row.strategicObjectiveId)}
-              className="px-6 py-4 hover:cursor-pointer hover:underline hover:text-(--primary)">
+              className="px-6 py-4">
               {row.linkedKpi !== undefined ? row.linkedKpi : 0}
             </td>
             <td className="px-6 py-4">
@@ -267,6 +266,16 @@ export default function SOTable({ searchQuery = "", statusFilter = "" }: { searc
                           width={20}
                         />
                         Add Organizational KPI
+                      </li>
+                      <li
+                        onClick={() => handleViewLinkedKPIs(row.strategicObjectiveId)}
+                        className="cursor-pointer hover:bg-gray-50 flex gap-2 border-y border-gray-200 p-3 items-center">
+                        <Icon
+                          icon="hugeicons:view"
+                          height={20}
+                          width={20}
+                        />
+                        View Linked KPIs
                       </li>
                       <li
                         onClick={() => handleEditClick(row)}

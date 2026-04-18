@@ -41,12 +41,14 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           activityPurposeDescription: formData.activityPurposeDescription,
           activityStartDate: formData.activityStartDate ? new Date(formData.activityStartDate).toISOString() : new Date().toISOString(),
           activityEndDate: formData.activityEndDate ? new Date(formData.activityEndDate).toISOString() : new Date().toISOString(),
-          activityLineDescription: formData.activityLineDescription,
-          quantity: Number(formData.quantity) || 0,
-          frequency: Number(formData.frequency) || 0,
-          unitCost: Number(formData.unitCost) || 0,
+          budgetLineItems: formData.budgetLineItems?.map(item => ({
+            activityLineDescription: item.activityLineDescription,
+            quantity: Number(item.quantity) || 0,
+            frequency: Number(item.frequency) || 0,
+            unitCost: Number(item.unitCost) || 0,
+            total: Number(item.total) || 0,
+          })),
           budgetCode: Number(formData.budgetCode) || 0,
-          total: Number(formData.total) || 0,
           modeOfTransport: formData.modeOfTransport,
           driverName: formData.driverName,
           driversPhoneNumber: formData.driversPhoneNumber,
@@ -84,15 +86,13 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
 
   const head = ["Activity Line Item Description","Quantity", "Frequency", "Unit Cost", "Total (₦)"];
 
-  const data = [
-    {
-      description: formData.activityLineDescription || "N/A",
-      quantity: Number(formData.quantity) || 0,
-      frequency: Number(formData.frequency) || 0,
-      unit_cost: Number(formData.unitCost) || 0,
-      total: Number(formData.total) || 0,
-    }
-  ];
+  const data = formData.budgetLineItems?.map(item => ({
+    description: item.activityLineDescription || "N/A",
+    quantity: Number(item.quantity) || 0,
+    frequency: Number(item.frequency) || 0,
+    unit_cost: Number(item.unitCost) || 0,
+    total: Number(item.total) || 0,
+  })) || [];
 
   return (
     <section>
@@ -141,16 +141,24 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
               tableData={data}
               renderRow={(row) => (
                 <>
-                  <td className="px-6">
+                  <td className="px-6 py-2">
                     <p className="w-4/5 truncate">{row.description}</p>
                   </td>
-                  <td className="px-6">{row.quantity}</td>
-                  <td className="px-6">{row.frequency}</td>
-                  <td className="px-6">{row.unit_cost}</td>
-                  <td className="px-6">{row.total}</td>
+                  <td className="px-6 py-2">{row.quantity}</td>
+                  <td className="px-6 py-2">{row.frequency}</td>
+                  <td className="px-6 py-2">{row.unit_cost}</td>
+                  <td className="px-6 py-2">{row.total}</td>
                 </>
               )}
             />
+            <div className="flex justify-end pt-2">
+              <div className="text-right">
+                <span className="text-sm text-gray-500 mr-3">Overall Total:</span>
+                <span className="text-lg font-bold text-gray-900">
+                  ₦ {formData.budgetLineItems?.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0).toFixed(2) || "0.00"}
+                </span>
+              </div>
+            </div>
           </div>
 
           <Heading heading="Journey Management" />

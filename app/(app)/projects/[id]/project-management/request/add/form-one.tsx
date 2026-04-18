@@ -11,6 +11,7 @@ import { RequestFormData } from "./page";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
+import { Icon } from "@iconify/react";
 
 type FormOneProps = {
   onNext: () => void;
@@ -52,14 +53,43 @@ export default function FormOne({ onNext, formData, updateFormData }: FormOnePro
 
   const handleNext = () => {
     // Basic validation
-    if (!formData.staff || !formData.activityTitle || !formData.activityPurposeDescription || !formData.activityStartDate || !formData.activityEndDate || !formData.activityLineDescription) {
+    if (!formData.staff || !formData.activityTitle || !formData.activityPurposeDescription || !formData.activityStartDate || !formData.activityEndDate || !formData.budgetLineItems?.[0]?.activityLineDescription) {
       toast.error("Please fill in all required fields.");
       return;
     }
     onNext();
   };
 
-  const total = (parseFloat(formData.quantity) || 0) * (parseFloat(formData.frequency) || 0) * (parseFloat(formData.unitCost) || 0);
+  const handleAddLineItem = () => {
+    updateFormData({
+      budgetLineItems: [
+        ...(formData.budgetLineItems || []),
+        { activityLineDescription: "", quantity: "", frequency: "", unitCost: "", total: "0" }
+      ]
+    });
+  };
+
+  const handleRemoveLineItem = (index: number) => {
+    const newItems = formData.budgetLineItems.filter((_, i) => i !== index);
+    updateFormData({ budgetLineItems: newItems });
+  };
+
+  const updateLineItem = (index: number, field: keyof typeof formData.budgetLineItems[0], value: string) => {
+    const newItems = [...formData.budgetLineItems];
+    newItems[index] = { ...newItems[index], [field]: value };
+    
+    // Auto-calculate total
+    if (['quantity', 'frequency', 'unitCost'].includes(field)) {
+      const qty = parseFloat(newItems[index].quantity) || 0;
+      const freq = parseFloat(newItems[index].frequency) || 0;
+      const cost = parseFloat(newItems[index].unitCost) || 0;
+      newItems[index].total = (qty * freq * cost).toString();
+    }
+    
+    updateFormData({ budgetLineItems: newItems });
+  };
+
+  const totalSum = formData.budgetLineItems?.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0) || 0;
 
   return (
     <section>
@@ -116,59 +146,88 @@ export default function FormOne({ onNext, formData, updateFormData }: FormOnePro
         </div>
 
         {/* Budget Line Items */}
-        <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Budget Line Items
-          </label>
-          <div className="flex items-end gap-2">
-            <div className="flex-1">
-              <TextInput
-                label="Activity Description"
-                name="activityLineDescription"
-                value={formData.activityLineDescription}
-                onChange={(e) => updateFormData({ activityLineDescription: e.target.value })}
-                placeholder="Description"
-              />
+        <div className="space-y-4">
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Budget Line Items
+            </label>
+            <button
+              type="button"
+              onClick={handleAddLineItem}
+              className="text-sm flex items-center gap-1 text-[#D2091E] font-medium hover:text-[#a00014] transition-colors"
+            >
+              <Icon icon="mdi:plus" className="text-lg" /> Add Row
+            </button>
+          </div>
+          
+          {formData.budgetLineItems?.map((item, index) => (
+            <div key={index} className="flex gap-2 items-start relative w-full">
+              <div className="flex-1">
+                <TextInput
+                  label={index === 0 ? "Activity Description" : ""}
+                  name={`activityLineDescription-${index}`}
+                  value={item.activityLineDescription}
+                  onChange={(e) => updateLineItem(index, 'activityLineDescription', e.target.value)}
+                  placeholder="Description"
+                />
+              </div>
+              
+              <div className="w-24">
+                <TextInput
+                  label={index === 0 ? "Quantity" : ""}
+                  name={`quantity-${index}`}
+                  value={item.quantity}
+                  onChange={(e) => updateLineItem(index, 'quantity', e.target.value)}
+                  placeholder="Qty"
+                />
+              </div>
+              
+              <div className="w-28">
+                <TextInput
+                  label={index === 0 ? "Frequency" : ""}
+                  name={`frequency-${index}`}
+                  value={item.frequency}
+                  onChange={(e) => updateLineItem(index, 'frequency', e.target.value)}
+                  placeholder="Freq"
+                />
+              </div>
+              
+              <div className="w-32">
+                <TextInput
+                  label={index === 0 ? "Unit Cost (₦)" : ""}
+                  name={`unitCost-${index}`}
+                  value={item.unitCost}
+                  onChange={(e) => updateLineItem(index, 'unitCost', e.target.value)}
+                  placeholder="Unit Cost"
+                />
+              </div>
+              
+              <div className="w-32">
+                <TextInput
+                  label={index === 0 ? "Total" : ""}
+                  name={`total-${index}`}
+                  value={Number(item.total || 0).toFixed(2)}
+                  onChange={() => {}}
+                  placeholder="0.00"
+                />
+              </div>
+
+              {formData.budgetLineItems.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveLineItem(index)}
+                  className={`text-red-500 hover:text-red-700 transition-colors ${index === 0 ? "mt-[34px]" : "mt-3"}`}
+                >
+                  <Icon icon="mdi:close-circle" className="text-xl" />
+                </button>
+              )}
             </div>
-            
-            <div className="w-24">
-              <TextInput
-                label="Quantity"
-                name="quantity"
-                value={formData.quantity}
-                onChange={(e) => updateFormData({ quantity: e.target.value, total: ((parseFloat(e.target.value) || 0) * (parseFloat(formData.frequency) || 0) * (parseFloat(formData.unitCost) || 0)).toString() })}
-                placeholder="Qty"
-              />
-            </div>
-            
-            <div className="w-28">
-              <TextInput
-                label="Frequency"
-                name="frequency"
-                value={formData.frequency}
-                onChange={(e) => updateFormData({ frequency: e.target.value, total: ((parseFloat(formData.quantity) || 0) * (parseFloat(e.target.value) || 0) * (parseFloat(formData.unitCost) || 0)).toString() })}
-                placeholder="Freq"
-              />
-            </div>
-            
-            <div className="w-32">
-              <TextInput
-                label="Unit Cost (₦)"
-                name="unitCost"
-                value={formData.unitCost}
-                onChange={(e) => updateFormData({ unitCost: e.target.value, total: ((parseFloat(formData.quantity) || 0) * (parseFloat(formData.frequency) || 0) * (parseFloat(e.target.value) || 0)).toString() })}
-                placeholder="Unit Cost"
-              />
-            </div>
-            
-            <div className="w-32">
-              <TextInput
-                label="Total (Qty*Frq*Unit)"
-                name="Total"
-                value={total.toFixed(2)}
-                onChange={() => {}}
-                placeholder="0.00"
-              />
+          ))}
+          
+          <div className="flex justify-end pt-2">
+            <div className="text-right pt-2 w-[280px]">
+              <span className="text-sm text-gray-500 mr-4">Total Amount:</span>
+              <span className="text-lg font-bold text-gray-900">₦ {totalSum.toFixed(2)}</span>
             </div>
           </div>
         </div>

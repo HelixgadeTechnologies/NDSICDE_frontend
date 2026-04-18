@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import IndicatorSourceSelector, {
   IndicatorSourceData,
 } from "../../ui/indicator-source-selector";
@@ -13,13 +14,12 @@ import TagInput from "@/ui/form/tag-input";
 import Button from "@/ui/form/button";
 import { indicatorApi } from "@/lib/api/indicatorApi";
 import { IndicatorFormData, IndicatorDisaggregationItem } from "@/types/indicator";
-import {
-  fetchResultTypes,
-  ResultType,
-} from "@/lib/api/result-types";
+import { fetchResultTypes, ResultType } from "@/lib/api/result-types";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function AddIndicatorForm({ resultType = "" }: { resultType?: string }) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
@@ -193,9 +193,7 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
     try {
       const payload = preparePayload();
 
-      // Log the payload so you can verify the data before it hits the API
-      console.log("[AddIndicatorForm] Submitting payload:", JSON.stringify(payload, null, 2));
-
+      console.log("[AddIndicatorForm] Payload:", payload);
       const response = await indicatorApi.createIndicator(payload);
       // Reset form or show success message
 
@@ -222,9 +220,17 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
         result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
         IndicatorDisaggregation: [],
-    } catch (error) {
-      console.error("[AddIndicatorForm] Error submitting form:", error);
-      toast.error("Failed to add indicator. Please try again.");
+      });
+
+      toast.success("Indicator added successfully!");
+      router.back();
+    } catch (error: any) {
+      const message =
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || error.message
+          : error?.message || "Failed to add indicator. Please try again.";
+      console.error("[AddIndicatorForm] Error:", error);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
