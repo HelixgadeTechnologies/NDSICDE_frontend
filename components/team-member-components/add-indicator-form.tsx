@@ -17,12 +17,24 @@ import { IndicatorFormData, IndicatorDisaggregationItem } from "@/types/indicato
 import { fetchResultTypes, ResultType } from "@/lib/api/result-types";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 
-export default function AddIndicatorForm({ resultType = "" }: { resultType?: string }) {
+export default function AddIndicatorForm({
+  resultType = "",
+  resultId = "",
+}: {
+  resultType?: string;
+  resultId?: string;
+}) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
   const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
+
+  // Strategic objectives from global context — fetched once for the whole app
+  // KPIs fetched locally from the all-kpis endpoint
+  const [kpiOptions, setKpiOptions] = useState<{ label: string; value: string }[]>([]);
+  const [isLoadingKpis, setIsLoadingKpis] = useState(false);
 
   const [formData, setFormData] = useState<IndicatorFormData>({
     indicatorId: "",
@@ -43,7 +55,7 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
     targetNarrative: "",
     targetType: "cumulative",
     responsiblePersons: [],
-    result: "",
+    result: resultId,
     resultTypeId: "",
     IndicatorDisaggregation: [],
   });
@@ -64,14 +76,15 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
         if (matched) {
           setFormData((prev) => ({
             ...prev,
-            result: matched.resultName,
+            // resultId from URL is the actual entity ID; resultTypeId comes from the matched result type
+            result: resultId || prev.result,
             resultTypeId: matched.resultTypeId,
           }));
         } else if (results.length > 0) {
           // Fallback: use first result type if no match found
           setFormData((prev) => ({
             ...prev,
-            result: results[0].resultName,
+            result: resultId || prev.result,
             resultTypeId: results[0].resultTypeId,
           }));
         }
@@ -83,7 +96,28 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
     };
 
     loadResultTypes();
-  }, [resultType]);
+  }, [resultType, resultId]);
+
+  // Fetch all org KPIs for the "Link to SDN Org KPIs" dropdown
+  useEffect(() => {
+    const loadKpis = async () => {
+      setIsLoadingKpis(true);
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/kpis`
+        );
+        const kpis: { kpiId: string; statement: string }[] = res.data.data ?? [];
+        setKpiOptions(
+          kpis.map((k) => ({ label: k.statement, value: k.kpiId }))
+        );
+      } catch (err) {
+        console.error("[AddIndicatorForm] Failed to load KPIs:", err);
+      } finally {
+        setIsLoadingKpis(false);
+      }
+    };
+    loadKpis();
+  }, []);
 
   // Handle indicator source change
   const handleIndicatorSourceChange = useCallback((data: IndicatorSourceData) => {
@@ -176,7 +210,8 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
         targetNarrative: formData.targetNarrative,
         targetType: formData.targetType,
         responsiblePersons: formData.responsiblePersons.join(", "),
-        result: formData.result,
+        // `result` is the actual entity ID (impactId / outcomeId / outputId) from the URL
+        result: resultId || formData.result,
         resultTypeId: formData.resultTypeId,
         IndicatorDisaggregation: formData.IndicatorDisaggregation,
       },
@@ -192,8 +227,8 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
 
     try {
       const payload = preparePayload();
+      console.log(payload);
 
-      console.log("[AddIndicatorForm] Payload:", payload);
       const response = await indicatorApi.createIndicator(payload);
       // Reset form or show success message
 
@@ -271,18 +306,18 @@ export default function AddIndicatorForm({ resultType = "" }: { resultType?: str
       {/* indicator source */}
       <IndicatorSourceSelector
         onChange={handleIndicatorSourceChange}
-        thematicAreaOptions={[]}
+        thematicAreaOptions={THEMATIC_AREAS_OPTIONS}
       />
 
 
-      {/* link to indicator sdn */}
+      {/* link to indicator sdn / org KPIs */}
       <DropDown
         label="Link Indicator to SDN Org KPIs (Optional)"
         value={formData.linkKpiToSdnOrgKpi}
         name="linkKpiToSdnOrgKpi"
-        placeholder="---"
+        placeholder={isLoadingKpis ? "Loading KPIs..." : "Select a KPI"}
         onChange={handleDropdownChange("linkKpiToSdnOrgKpi")}
-        options={[{ label: "KPI-001", value: "KPI-001" }]}
+        options={kpiOptions}
         isBigger
       />
 

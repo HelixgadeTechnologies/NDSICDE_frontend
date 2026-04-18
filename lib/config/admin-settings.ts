@@ -70,3 +70,8 @@ export const THEMATIC_AREAS = [
   "Cross-Cutting",
   "Organizational Transformation",
 ];
+
+export const THEMATIC_AREAS_OPTIONS = THEMATIC_AREAS.map((area) => ({
+  label: area,
+  value: area,
+}));

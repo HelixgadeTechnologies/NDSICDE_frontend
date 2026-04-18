@@ -5,6 +5,7 @@ import "./globals.css";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { ProjectsProvider } from "@/context/ProjectsContext";
 import { RequestsProvider } from "@/context/RequestsContext";
+import { StrategicObjectivesProvider } from "@/context/StrategicObjectivesContext";
 
 
 const geistSans = Geist({
@@ -43,11 +44,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${inter.className} antialiased`}
       >
         <ProjectsProvider>
-          <RequestsProvider>
-            <SidebarProvider>
-              {children}
-            </SidebarProvider>
-          </RequestsProvider>
+          <StrategicObjectivesProvider>
+            <RequestsProvider>
+              <SidebarProvider>
+                {children}
+              </SidebarProvider>
+            </RequestsProvider>
+          </StrategicObjectivesProvider>
         </ProjectsProvider>
       </body>
     </html>

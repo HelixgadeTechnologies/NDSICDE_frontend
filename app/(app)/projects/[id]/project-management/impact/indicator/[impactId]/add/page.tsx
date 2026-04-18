@@ -1,17 +1,29 @@
 "use client";
 
-import Heading from "@/ui/text-heading";
-import AddIndicatorForm from "@/components/team-member-components/add-indicator-form";
-import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 
-export default function AddImpactIndicator() {
+/**
+ * Legacy redirect: impact/indicator/[impactId]/add
+ * → /projects/[id]/project-management/indicator?resultType=impact&resultId=[impactId]&mode=add
+ */
+export default function AddImpactIndicatorRedirect() {
+  const router = useRouter();
+  const params = useParams();
   const searchParams = useSearchParams();
-  const resultType = searchParams.get("resultType") || "impact";
 
-  return (
-    <div className="border border-[#E4E7EC] pt-8 px-6 pb-6 rounded-[10px] bg-white w-156">
-      <Heading heading="Add Impact Indicator" className="text-center" />
-      <AddIndicatorForm resultType={resultType} />
-    </div>
-  );
+  const projectId = (params?.id as string) || "";
+  const impactId = (params?.impactId as string) || "";
+  // Preserve any extra search params that may have been passed
+  const extra = searchParams.toString()
+    ? `&${searchParams.toString()}`
+    : "";
+
+  useEffect(() => {
+    router.replace(
+      `/projects/${projectId}/project-management/indicator?resultType=impact&resultId=${impactId}&mode=add${extra}`
+    );
+  }, [router, projectId, impactId, extra]);
+
+  return null;
 }

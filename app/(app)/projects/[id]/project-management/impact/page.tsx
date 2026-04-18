@@ -148,14 +148,14 @@ export default function ProjectImpact() {
                         type: "link",
                         label: "Add Indicator",
                         icon: "si:add-fill",
-                        href: `/projects/${projectId}/project-management/impact/indicator/${row.impactId}/add?resultType=impact`,
+                        href: `/projects/${projectId}/project-management/indicator?resultType=impact&resultId=${row.impactId}&mode=add`,
                         className: "border-b border-gray-300",
                       },
                       {
                         type: "link",
                         label: "View Indicator",
                         icon: "hugeicons:view",
-                        href: `/projects/${projectId}/project-management/impact/${row.impactId}/indicator?resultType=impact`,
+                        href: `/projects/${projectId}/project-management/indicator?resultType=impact&resultId=${row.impactId}&mode=view`,
                         className: "border-b border-gray-300",
                       },
                     ]}

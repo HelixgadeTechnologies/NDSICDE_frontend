@@ -150,14 +150,14 @@ export default function ProjectOutput() {
                         type: "link",
                         label: "Add Indicator",
                         icon: "si:add-fill",
-                        href: `/projects/${projectId}/project-management/output/indicator/add?resultType=output&outputId=${row.outputId}`,
+                        href: `/projects/${projectId}/project-management/indicator?resultType=output&resultId=${row.outputId}&mode=add`,
                         className: "border-b border-gray-300",
                       },
                       {
                         type: "link",
                         label: "View Indicator",
                         icon: "hugeicons:view",
-                        href: `/projects/${projectId}/project-management/output/indicator?resultType=output&outputId=${row.outputId}`,
+                        href: `/projects/${projectId}/project-management/indicator?resultType=output&resultId=${row.outputId}&mode=view`,
                         className: "border-b border-gray-300",
                       },
                     ]}

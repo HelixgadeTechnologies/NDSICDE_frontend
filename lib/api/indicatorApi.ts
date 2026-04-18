@@ -17,6 +17,7 @@ export const indicatorApi = {
         },
       },
     );
+    console.log(response);
 
     return response.data;
   },

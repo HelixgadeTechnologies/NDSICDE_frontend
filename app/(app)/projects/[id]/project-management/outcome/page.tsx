@@ -151,14 +151,14 @@ export default function ProjectOutcome() {
                         type: "link",
                         label: "Add Indicator",
                         icon: "si:add-fill",
-                        href: `/projects/${projectId}/project-management/outcome/indicator/add?resultType=outcome&outcomeId=${row.outcomeId}`,
+                        href: `/projects/${projectId}/project-management/indicator?resultType=outcome&resultId=${row.outcomeId}&mode=add`,
                         className: "border-b border-gray-300",
                       },
                       {
                         type: "link",
                         label: "View Indicator",
                         icon: "hugeicons:view",
-                        href: `/projects/${projectId}/project-management/outcome/indicator?resultType=outcome&outcomeId=${row.outcomeId}`,
+                        href: `/projects/${projectId}/project-management/indicator?resultType=outcome&resultId=${row.outcomeId}&mode=view`,
                         className: "border-b border-gray-300",
                       },
                     ]}
