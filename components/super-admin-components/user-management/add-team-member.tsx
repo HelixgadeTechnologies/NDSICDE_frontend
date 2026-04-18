@@ -11,7 +11,7 @@ import TagInput from "@/ui/form/tag-input";
 import { useRoleStore } from "@/store/role-store";
 import { createUser } from "@/lib/api/user-management";
 import { useProjects } from "@/context/ProjectsContext";
-import { TEAM_DESIGNATIONS } from "@/utils/team-member-utility";
+import { ACTIVITY_KPI_APPROVAL_ROLE, RR_APPROVAL_ROLE, TEAM_DESIGNATIONS } from "@/utils/team-member-utility";
 
 type AddProps = {
   isOpen: boolean;
@@ -73,6 +73,8 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     roleId,
     status,
     assignedProjects,
+    requestRetirementApprovalRole,
+    activityKpiApprovalRole,
     setField,
   } = useUserManagementState();
   const { token } = useRoleStore();
@@ -106,6 +108,8 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         phoneNumber,
         status,
         assignedProjectId: assignedProjectIdString,
+        requestRetirementApprovalRole,
+        activityKpiApprovalRole,
       };
 
       const response = await createUser(userData, token);
@@ -127,7 +131,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         subtitle="Fill in the details to add a new team member"
       />
       <form onSubmit={addUser}>
-        <div className="grid grid-cols-2 my-4 gap-4">
+        <div className="grid grid-cols-2 my-4 gap-5">
           <TextInput
             value={fullName}
             label="Full Name"
@@ -160,6 +164,21 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             placeholder="Select designation"
             onChange={(value: string) => setField("roleId", value)}
           />
+          <DropDown
+          label="Request and Retirement Approval Role"
+          options={RR_APPROVAL_ROLE}
+          name="requestRetirementApprovalRole"
+          value={requestRetirementApprovalRole}
+          onChange={(value: string) => setField("requestRetirementApprovalRole", value)}
+          />
+          <DropDown
+          label="Activity & KPI Report Approval"
+          options={ACTIVITY_KPI_APPROVAL_ROLE}
+          name="activityKpiApprovalRole"
+          value={activityKpiApprovalRole}
+          onChange={(value: string) => setField("activityKpiApprovalRole", value)}
+          />
+
 
           <TextInput
             value={phoneNumber}

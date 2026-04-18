@@ -4,6 +4,7 @@ import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import DateInput from "@/ui/form/date-input";
 import Button from "@/ui/form/button";
+import TagInput from "@/ui/form/tag-input";
 import Heading from "@/ui/text-heading";
 import TextareaInput from "@/ui/form/textarea";
 import { toast } from "react-toastify";
@@ -12,6 +13,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import { Icon } from "@iconify/react";
+import naija from "naija-state-local-government";
 
 type FormOneProps = {
   onNext: () => void;
@@ -21,6 +23,8 @@ type FormOneProps = {
 
 export default function FormOne({ onNext, formData, updateFormData }: FormOneProps) {
   const [outputsOptions, setOutputsOptions] = useState<{ label: string; value: string }[]>([]);
+  const [activitiesOptions, setActivitiesOptions] = useState<{ label: string; value: string }[]>([]);
+  const [isLoadingActivities, setIsLoadingActivities] = useState(false);
 
   useEffect(() => {
     const fetchOutputs = async () => {
@@ -44,11 +48,66 @@ export default function FormOne({ onNext, formData, updateFormData }: FormOnePro
         console.error("Error fetching outputs:", error);
       }
     };
+
+    const fetchActivities = async () => {
+      setIsLoadingActivities(true);
+      try {
+        const token = getToken();
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        let activitiesData = [];
+        if (Array.isArray(response.data)) {
+          activitiesData = response.data;
+        } else if (response.data?.data && Array.isArray(response.data.data)) {
+          activitiesData = response.data.data;
+        } else if (response.data?.data) {
+          activitiesData = [response.data.data];
+        }
+
+        const transformedOptions = activitiesData
+          .map((act: any) => {
+            const statement = act.activityStatement;
+            if (!statement) return null;
+            return {
+              label: statement,
+              value: statement,
+            };
+          })
+          .filter((option: any) => option !== null);
+
+        // Remove duplicates
+        const uniqueOptions = Array.from(
+          new Map(transformedOptions.map((item: any) => [item.value, item])).values()
+        ) as { label: string; value: string }[];
+
+        setActivitiesOptions(uniqueOptions);
+      } catch (error) {
+        console.error("Error fetching activities:", error);
+      } finally {
+        setIsLoadingActivities(false);
+      }
+    };
+
     fetchOutputs();
+    fetchActivities();
   }, []);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+  };
+
+  const handleBudgetCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (/^[0-9.]*$/.test(value)) {
+      updateFormData({ activityBudgetCode: value });
+    }
   };
 
   const handleNext = () => {
@@ -108,23 +167,27 @@ export default function FormOne({ onNext, formData, updateFormData }: FormOnePro
           onChange={(value) => updateFormData({ outputId: value })}
           options={outputsOptions}
         />
-        <TextInput
+        <DropDown
           label="Activity Title"
           name="activityTitle"
           value={formData.activityTitle}
-          onChange={(e) => updateFormData({ activityTitle: e.target.value })}
+          placeholder={isLoadingActivities ? "Loading activities..." : "Select an activity title"}
+          onChange={(value) => updateFormData({ activityTitle: value })}
+          options={activitiesOptions}
         />
         <TextInput
           label="Activity Budget Code"
           name="activityBudgetCode"
           value={formData.activityBudgetCode}
-          onChange={(e) => updateFormData({ activityBudgetCode: e.target.value })}
+          onChange={handleBudgetCodeChange}
+          placeholder="Enter budget code (numbers and periods only)"
         />
-        <TextInput
+        <TagInput
           label="Activity Location(s)"
-          name="activityLocation"
-          value={formData.activityLocation}
-          onChange={(e) => updateFormData({ activityLocation: e.target.value })}
+          value={formData.activityLocation ? formData.activityLocation.split(",").map(s => s.trim()).filter(Boolean) : []}
+          onChange={(tags) => updateFormData({ activityLocation: tags.join(", ") })}
+          options={naija.states()}
+          placeholder="Select states and press Enter"
         />
         <TextareaInput
           label="Activity Purpose/Description"

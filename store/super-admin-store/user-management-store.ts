@@ -8,6 +8,8 @@ interface UserManagementState {
   roleId: string;
   status: string;
   assignedProjects: string[];
+  requestRetirementApprovalRole: string;
+  activityKpiApprovalRole: string;
   
   // Actions
   setField: <K extends keyof UserManagementState>(
@@ -25,6 +27,8 @@ const initialState = {
   roleId: '',
   status: 'Active',
   assignedProjects: [],
+  requestRetirementApprovalRole: '',
+  activityKpiApprovalRole: '',
 };
 
 export const useUserManagementState = create<UserManagementState>((set) => ({

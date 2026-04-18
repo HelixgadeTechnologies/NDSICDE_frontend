@@ -24,6 +24,20 @@ export const TEAM_DESIGNATIONS = [
   { label: "Transport Officer", value: "Transport Officer" },
 ];
 
+export const RR_APPROVAL_ROLE = [
+  {label:" Layer 1 (PM, SPO, MEAL-Head)", value:"layer 1"},
+  {label:" Layer 2 (Security Officer)", value:"layer 2"},
+  {label:" Layer 3 (Project Finance Officer)", value:"layer 3"},
+  {label:" Layer 4 (Finance Manager)", value:"layer 4"},
+  {label:" Layer 5 ( Country Director)", value:"layer 5"},
+  {label:" None", value:"none"}
+]
+
+export const ACTIVITY_KPI_APPROVAL_ROLE = [
+ {label:"No access", value:"no access"},
+ {label:"Grant access", value:"grant access"}
+]
+
 export interface TeamMemberModalStates {
   editTeamMember: boolean;
   viewTeamMember: boolean;
