@@ -209,6 +209,7 @@ export default function AddActivityReport() {
           actualEndDate: "",
           actualCost: 0,
           actualNarrative: "",
+        });
         window.history.back();
       } else {
         toast.error(response.data.message || "Failed to add activity report");

@@ -187,7 +187,10 @@ export default function RoleFormModal({
             edit: false,
             delete: false,
             fullAccess: false,
+          });
         }
+
+        toast.success(successMessage);
 
         // Close modal
         onClose();

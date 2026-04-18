@@ -210,7 +210,7 @@ export default function ProjectPartnerModal({
       );
 
 
-        `Project partner ${mode === "create" ? "added" : "updated"} successfully!`,
+      toast.success(`Project partner ${mode === "create" ? "added" : "updated"} successfully!`);
 
       // Reset form and close modal
       setFormData({

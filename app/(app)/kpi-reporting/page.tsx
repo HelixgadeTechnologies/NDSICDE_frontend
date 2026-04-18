@@ -86,7 +86,8 @@ export default function AssignedKPITable() {
         },
       );
       setData((prev) =>
-        prev.filter((item) => item.kpiReportId !== kpiToDelete),
+        prev.filter((item) => item.kpiReportId !== kpiToDelete)
+      );
       setActiveRowId(null);
       setDeleteModal(false);
       setKpiToDelete(null);

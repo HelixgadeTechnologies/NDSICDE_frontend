@@ -264,7 +264,7 @@ export default function ProjectOutputModal({
       );
 
 
-        `Project output ${mode === "create" ? "added" : "updated"} successfully!`,
+      toast.success(`Project output ${mode === "create" ? "added" : "updated"} successfully!`);
 
       // Reset and close
       resetForm();
