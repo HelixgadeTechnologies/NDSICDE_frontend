@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import CardComponent from "@/ui/card-wrapper";
 import TabComponent from "@/ui/tab-component";
 import TableSection from "./table-section";
@@ -12,6 +12,9 @@ import DateRangePicker from "@/ui/form/date-range";
 import { useOrgKPIFormState } from "@/store/super-admin-store/organizational-kpi-store";
 import { OrgKpiResponse } from "@/types/org-kpi";
 import EmptyChartState from "@/ui/empty-chart-state";
+import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
+import { useStrategicObjectives } from "@/context/StrategicObjectivesContext";
+import { transformResultTypesToOptions, fetchResultTypes } from "@/lib/api/result-types";
 
 // Dynamic indicator options moved to component scope
 
@@ -106,6 +109,21 @@ export default function ChartsAndTableParent({
     { tabName: "Table", id: 2 },
   ];
 
+  const { soOptions } = useStrategicObjectives();
+  const [resultLevelOptions, setResultLevelOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+    const loadResultTypes = async () => {
+      try {
+        const types = await fetchResultTypes();
+        setResultLevelOptions(transformResultTypesToOptions(types));
+      } catch (error) {
+        console.error("Failed to load result types:", error);
+      }
+    };
+    loadResultTypes();
+  }, []);
+
   // Lower line chart data
   const data = statData?.PROJECT_INDICATOR_PERFORMANCE?.kpis?.map((kpi) => ({
     code: kpi.code,
@@ -127,25 +145,6 @@ export default function ChartsAndTableParent({
   // Filter Options & Extracted Logic
   const allData = statData?.KPI_TABLE_DATA || [];
 
-  const thematicAreaOptions = useMemo(() => {
-    const unique = Array.from(new Set(allData.map((d) => d.thematicArea).filter(Boolean)));
-    return unique.map((val) => ({ label: val, value: val }));
-  }, [allData]);
-
-  const strategicObjectiveOptions = useMemo(() => {
-    let filtered = allData;
-    if (allThematicArea) filtered = filtered.filter((d) => d.thematicArea === allThematicArea);
-    const unique = Array.from(new Set(filtered.map((d) => d.strategicObjective).filter(Boolean)));
-    return unique.map((val) => ({ label: val, value: val }));
-  }, [allData, allThematicArea]);
-
-  const resultLevelOptions = useMemo(() => {
-    let filtered = allData;
-    if (allThematicArea) filtered = filtered.filter((d) => d.thematicArea === allThematicArea);
-    if (allStrategicObjective) filtered = filtered.filter((d) => d.strategicObjective === allStrategicObjective);
-    const unique = Array.from(new Set(filtered.map((d) => d.resultLevel).filter(Boolean)));
-    return unique.map((val) => ({ label: val, value: val }));
-  }, [allData, allThematicArea, allStrategicObjective]);
 
   const dynamicIndicatorOptions = useMemo(() => {
     let filtered = allData;
@@ -194,14 +193,14 @@ export default function ChartsAndTableParent({
     <div className="space-y-5">
       {/* Filter Section */}
       <CardComponent fitWidth>
-        <div className="flex grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10 overflow-auto no-scrollbar">
+        <div className="flex grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10">
           <DropDown
             label="Thematic Area"
             value={allThematicArea}
             placeholder="Thematic Area"
             name="allThematicArea"
             onChange={(value: string) => setField("allThematicArea", value)}
-            options={thematicAreaOptions}
+            options={THEMATIC_AREAS_OPTIONS}
           />
 
           <DropDown
@@ -210,7 +209,7 @@ export default function ChartsAndTableParent({
             placeholder="Strategic Objective"
             name="allStrategicObjective"
             onChange={(value: string) => setField("allStrategicObjective", value)}
-            options={strategicObjectiveOptions}
+            options={soOptions}
           />
 
           <DropDown

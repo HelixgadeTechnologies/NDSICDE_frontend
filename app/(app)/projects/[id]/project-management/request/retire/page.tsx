@@ -41,6 +41,8 @@ export default function ProjectRequestRetirementPage() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openEditRetirement, setOpenEditRetirement] = useState(false);
   const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
+  
+  
   useEffect(() => {
     const loadRequest = async () => {
       setIsLoading(true);
@@ -133,14 +135,6 @@ export default function ProjectRequestRetirementPage() {
 
   return (
     <div className="mt-12 space-y-7">
-      {/* add retirement button */}
-      <div className="w-50">
-        <Button
-          content="Retire Request"
-          icon="si:add-fill"
-          onClick={() => setOpenAddRetirement(true)}
-        />
-      </div>
       {/* submission details */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -284,9 +278,15 @@ export default function ProjectRequestRetirementPage() {
         )}
       </div>
 
-      {/* <div className="w-[400px] gap-6 mt-6 flex">
-        <Button content="Retire Selected" isSecondary onClick={() => setOpenAddRetirement(true)} />
-      </div> */}
+    {/* add retirement button */}
+      <div className="flex gap-3 items-center w-100">
+        <Button content="Print Report" isSecondary onClick={() => window.print()} />
+        <Button
+          content="Retire Request"
+          icon="si:add-fill"
+          onClick={() => setOpenAddRetirement(true)}
+        />
+      </div>
 
       {openAddRetirement && <AddProjectRequestRetirement
         isOpen={openAddRetirement}

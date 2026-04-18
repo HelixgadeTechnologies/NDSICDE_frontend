@@ -153,16 +153,30 @@ export default function AddIndicatorForm({
   // Handle disaggregation change — build IndicatorDisaggregation array from checked values
   const handleDisaggregationChange = (activeValuesJson: string) => {
     try {
-      const activeValues: Record<string, string> = JSON.parse(activeValuesJson);
-      const disaggregationItems: IndicatorDisaggregationItem[] = Object.entries(activeValues).map(
-        ([type, category]) => ({
+      const parsed = JSON.parse(activeValuesJson);
+      let disaggregationItems: IndicatorDisaggregationItem[] = [];
+
+      if (Array.isArray(parsed)) {
+        disaggregationItems = parsed.map((item: any) => ({
           indicatorDisaggregationId: "",
           indicatorId: formData.indicatorId || "",
-          type: type.toLowerCase(),
-          category: category || "",
-          target: 0,
-        })
-      );
+          type: item.type.toLowerCase(),
+          category: item.category || "",
+          target: item.target || 0,
+        }));
+      } else {
+        const activeValues: Record<string, string> = parsed;
+        disaggregationItems = Object.entries(activeValues).map(
+          ([type, category]) => ({
+            indicatorDisaggregationId: "",
+            indicatorId: formData.indicatorId || "",
+            type: type.toLowerCase(),
+            category: category || "",
+            target: 0,
+          })
+        );
+      }
+
       setFormData((prev) => ({
         ...prev,
         IndicatorDisaggregation: disaggregationItems,
@@ -312,7 +326,7 @@ export default function AddIndicatorForm({
 
       {/* link to indicator sdn / org KPIs */}
       <DropDown
-        label="Link Indicator to SDN Org KPIs (Optional)"
+        label="SDN Org KPIs (Select)"
         value={formData.linkKpiToSdnOrgKpi}
         name="linkKpiToSdnOrgKpi"
         placeholder={isLoadingKpis ? "Loading KPIs..." : "Select a KPI"}
@@ -323,7 +337,7 @@ export default function AddIndicatorForm({
 
       {/* indicator definition */}
       <TextInput
-        label="Indicator Definition (Optional)"
+        label="Indicator Definition"
         value={formData.definition}
         name="definition"
         placeholder="---"
@@ -348,17 +362,24 @@ export default function AddIndicatorForm({
         name="unitOfMeasure"
         placeholder="---"
         onChange={handleDropdownChange("unitOfMeasure")}
-        options={[{ label: "Percentage", value: "Percentage" }]}
+        options={[
+          { label: "Percentage", value: "Percentage" },
+          { label: "Number", value: "Number" },
+          { label: "Percentage of ", value: "Percentage of" },
+          { label: "Percentage change", value: "Percentage change" },
+          { label: "Status", value: "Status" },
+        ]}
         isBigger
       />
 
       {/* items in measurement */}
-      <TextInput
+      <DropDown
         label="Items in Measurement"
         value={formData.itemInMeasure}
         name="itemInMeasure"
         placeholder="---"
-        onChange={(e) => handleInputChange("itemInMeasure", e.target.value)}
+        onChange={handleDropdownChange("itemInMeasure")}
+        options={[]}
         isBigger
       />
 
@@ -413,10 +434,10 @@ export default function AddIndicatorForm({
 
       {/* target section */}
       <div className="space-y-1 rounded-lg">
-        <p className="text-gray-900 text-sm font-medium mb-3">Target</p>
+        {/* <p className="text-gray-900 text-sm font-medium mb-3">Target</p> */}
 
         {/* target date */}
-        <div className="flex items-center justify-between mb-3">
+        {/* <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Target Date</p>
           <div className="w-2/3">
             <DateInput
@@ -424,10 +445,10 @@ export default function AddIndicatorForm({
               onChange={(value) => handleInputChange("targetDate", value)}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* cumulative target */}
-        <div className="flex items-center justify-between mb-3">
+        {/* <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Cumulative Target</p>
           <div className="w-2/3">
             <TextInput
@@ -439,10 +460,10 @@ export default function AddIndicatorForm({
               }
             />
           </div>
-        </div>
+        </div> */}
 
         {/* target narrative */}
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <p className="text-sm font-medium w-1/3">Target Narrative</p>
           <div className="w-2/3">
             <TextareaInput
@@ -454,7 +475,7 @@ export default function AddIndicatorForm({
               }
             />
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* target type */}
