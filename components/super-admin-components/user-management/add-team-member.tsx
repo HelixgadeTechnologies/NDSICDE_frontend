@@ -41,8 +41,8 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
 
   const departments = [
     { label: "Finance", value: "Finance" },
-    { label: "Agriculture", value: "Agriculture" },
-    { label: "Banking", value: "Banking" },
+    { label: "Admin", value: "Admin" },
+    { label: "Programs", value: "Programs" },
   ];
 
   const layerOptions = [
@@ -147,8 +147,16 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
               setField("email", e.target.value)
             }
           />
+            <DropDown
+              label="Department"
+              options={departments}
+              name="department"
+              value={department}
+              onChange={(value: string) => setField("department", value)}
+            />
+
           <DropDown
-            label="Role"
+            label="Designation"
             options={roles}
             name="roleId"
             value={roleId}
@@ -157,13 +165,6 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             onChange={(value: string) => setField("roleId", value)}
           />
 
-          <DropDown
-            label="Department"
-            options={departments}
-            name="department"
-            value={department}
-            onChange={(value: string) => setField("department", value)}
-          />
           <TextInput
             value={phoneNumber}
             label="Phone Number"

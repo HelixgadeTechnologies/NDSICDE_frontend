@@ -87,7 +87,7 @@ export default function FormParent() {
   const tabs = [
     {
       id: 1,
-      title: "Financial Request and Retirement",
+      title: "Financial Request",
       subtitle: "Fill out these details",
     },
     {

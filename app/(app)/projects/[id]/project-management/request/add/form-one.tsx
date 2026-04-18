@@ -94,7 +94,7 @@ export default function FormOne({ onNext, formData, updateFormData }: FormOnePro
   return (
     <section>
       <form className="space-y-6" onSubmit={handleFormSubmit}>
-        <Heading heading="Financial Request and Retirement" className="text-center" />
+        <Heading heading="Financial Request Form" className="text-center" />
         <TextInput 
           label="Staff" 
           name="staff" 
