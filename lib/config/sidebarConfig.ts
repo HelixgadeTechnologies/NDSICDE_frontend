@@ -59,6 +59,12 @@ const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
       icon: "carbon:result-old",
     },
     {
+      id: "activity-overview",
+      name: "Activity Overview",
+      href: `/projects/${pid}/activity-overview`,
+      icon: "fluent:calendar-ltr-20-regular",
+    },
+    {
       id: "financial-dashboard",
       name: "Financial Dashboard",
       href: `/projects/${pid}/financial-dashboard`,

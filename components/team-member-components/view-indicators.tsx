@@ -17,6 +17,7 @@ type IndicatorDisaggregation = {
 type IndicatorData = {
   indicatorId: string;
   indicatorSource: string;
+  orgKpiId: string;
   thematicAreasOrPillar: string;
   statement: string;
   linkKpiToSdnOrgKpi: string;

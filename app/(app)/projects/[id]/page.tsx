@@ -1,10 +1,7 @@
 "use client";
 
 import ProjectKpiChartsTableParent from "@/components/project-result-dashboard/charts-table-parent";
-import ActivityOverviewComponent from "@/components/team-member-components/activity-overview-chart-table";
-import CardComponent from "@/ui/card-wrapper";
 import DashboardStat from "@/ui/dashboard-stat-card";
-import Heading from "@/ui/text-heading";
 import { useState, useEffect } from "react";
 import { ProjectResultResponse } from "@/types/project-result-dashboard";
 import axios from "axios";
@@ -48,9 +45,46 @@ export default function ResultDashboard() {
     return (
       <section className="space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="h-39.5 w-full animate-pulse bg-zinc-300 rounded-lg"></div>
-          <div className="h-39.5 w-full animate-pulse bg-zinc-300 rounded-lg"></div>
-          <div className="h-39.5 w-full animate-pulse bg-zinc-300 rounded-lg"></div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-[158px] w-full rounded-lg bg-white border border-gray-200 p-4 flex flex-col justify-between">
+              <div className="flex justify-between items-center">
+                <div className="h-4 bg-gray-200 animate-pulse rounded w-1/3"></div>
+                <div className="h-5 w-5 bg-gray-200 animate-pulse rounded-full"></div>
+              </div>
+              <div className="space-y-3 mt-4 flex-1 overflow-hidden">
+                {[1, 2, 3].map((j) => (
+                  <div key={j} className="flex justify-between items-center">
+                    <div className="h-3 bg-gray-200 animate-pulse rounded w-1/4"></div>
+                    <div className="h-3 bg-gray-200 animate-pulse rounded w-8"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="w-full rounded-lg border border-gray-200 bg-white p-6 flex flex-col gap-6">
+           <div className="flex flex-col md:flex-row gap-4 mb-2 mt-4">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="h-10 bg-gray-100 animate-pulse rounded-lg w-full"></div>
+              ))}
+           </div>
+           <div className="flex gap-4">
+              <div className="h-8 bg-gray-200 animate-pulse rounded w-24"></div>
+              <div className="h-8 bg-gray-100 animate-pulse rounded w-24"></div>
+           </div>
+           <div className="h-[300px] bg-gray-50 animate-pulse rounded-lg w-full border border-gray-100"></div>
+        </div>
+
+        <div className="w-full rounded-lg border border-gray-200 bg-white p-6 flex flex-col gap-6">
+           <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
+             <div>
+                <div className="h-6 bg-gray-200 animate-pulse rounded w-64 mb-2"></div>
+                <div className="h-4 bg-gray-100 animate-pulse rounded w-48"></div>
+             </div>
+             <div className="h-24 w-full md:w-72 bg-gray-100 animate-pulse rounded-lg"></div>
+           </div>
+           <div className="h-[250px] bg-gray-50 animate-pulse rounded-lg w-full border border-gray-100 mt-4"></div>
         </div>
       </section>
     );
@@ -98,15 +132,6 @@ export default function ResultDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <DashboardStat data={dashboardData} bigger />
       </div>
-      {/* activity overview */}
-      <CardComponent>
-        <Heading
-          heading="Activity Overview"
-          subtitle="Breakdown of activities by current activities"
-          className="mb-4"
-        />
-        <ActivityOverviewComponent data={resultDashboardData} />
-      </CardComponent>
       <ProjectKpiChartsTableParent data={resultDashboardData} />
     </section>
   );
