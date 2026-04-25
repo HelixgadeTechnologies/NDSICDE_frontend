@@ -26,6 +26,8 @@ import {
 import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
+import { useParams } from "next/navigation";
+
 
 export default function ProjectRequestRetirementPage() {
   const searchParams = useSearchParams();
@@ -42,7 +44,8 @@ export default function ProjectRequestRetirementPage() {
   const [openEditRetirement, setOpenEditRetirement] = useState(false);
   const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
   
-  
+  const { projectId } = useParams();
+
   useEffect(() => {
     const loadRequest = async () => {
       setIsLoading(true);
@@ -64,10 +67,7 @@ export default function ProjectRequestRetirementPage() {
 
             try {
                 const res = await axios.get(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list`,
-                  {
-                    params: { type: "retirement" },
-                  },
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/project/${projectId}`,
                 );
                 const allRetirements = res.data?.data || [];
                 const matchingRetirements = allRetirements.filter((r: RetirementRequestType) => r.requestId === requestId);
@@ -84,7 +84,7 @@ export default function ProjectRequestRetirementPage() {
     };
     
     loadRequest();
-  }, [requestId, requests]);
+  }, [requestId, requests, projectId]);
 
   const head = [
     "Item Line Description",

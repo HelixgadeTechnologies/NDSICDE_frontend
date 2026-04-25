@@ -22,6 +22,8 @@ import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
+import { useParams } from "next/navigation";
+
 
 // Define the type for role from API
 interface ApiRole {
@@ -45,11 +47,13 @@ export default function ProjectTeam() {
   const token = getToken();
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const { projectId } = useParams();
+
   // api call to get project team members
   const fetchProjectTeam = async () => {
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-members`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-members/project/${projectId}`,
       );
       // Ensure data is an array
       const teamMembers = res.data.data || [];

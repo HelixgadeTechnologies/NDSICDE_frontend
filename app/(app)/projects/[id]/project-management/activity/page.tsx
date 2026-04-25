@@ -53,7 +53,7 @@ export default function ProjectActivity() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities/project/${projectId}`,
       );
       setData(response.data.data);
     } catch (error) {

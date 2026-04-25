@@ -2,7 +2,7 @@
 
 import LineChartComponent from "@/ui/line-chart";
 import TabComponent from "@/ui/tab-component";
-import Table from "@/ui/table";
+import TableWithAccordion from "@/ui/table-with-accordion";
 
 function BurnRateChart({ burnData }: { burnData?: ProjectFinancialDashboardResponse["BURN_RATE"] }) {
   const burnRate = burnData?.map((item) => ({
@@ -22,26 +22,62 @@ function BurnRateChart({ burnData }: { burnData?: ProjectFinancialDashboardRespo
   );
 }
 
-function BurnRateTable({ burnData }: { burnData?: ProjectFinancialDashboardResponse["BURN_RATE"] }) {
-    const head = ["Output ID", "Output Statement", "Actual Cost", "Budget", "Burn Rate"];
-    if (!burnData || burnData.length === 0) return <div className="text-center py-10 text-gray-500">No data available</div>;
+function BurnRateTable({ activities }: { activities?: ProjectFinancialDashboardResponse["ACTIVITY_FINANCIAL_DATA"] }) {
+    const head = ["Description", "Budget","Actual Cost", "Burn Rate"];
+    const childHead = ["Activity Statement", "Budget", "Actual Cost", "Burn Rate"];
+    
+    if (!activities || activities.length === 0) return <div className="text-center py-10 text-gray-500">No data available</div>;
+
+    // Group activities by outputId
+    const groupedData = activities.reduce((acc: any, activity) => {
+      const outputId = activity.outputId || "unknown";
+      if (!acc[outputId]) {
+        acc[outputId] = {
+          outputId: activity.outputId,
+          outputStatement: activity.outputStatement,
+          activities: [],
+        };
+      }
+      acc[outputId].activities.push(activity);
+      return acc;
+    }, {});
+
+    const burnData = Object.values(groupedData).map((output: any) => {
+      const sumActualCost = output.activities.reduce((sum: number, act: any) => sum + (act.actualCost || 0), 0);
+      const sumBudget = output.activities.reduce((sum: number, act: any) => sum + (act.budgetAtCompletion || 0), 0);
+      const burnRate = sumBudget > 0 ? (sumActualCost / sumBudget) * 100 : 0;
+      
+      return {
+        ...output,
+        sumActualCost,
+        sumBudget,
+        burnRate: burnRate.toFixed(2),
+      };
+    });
 
     return (
         <div className="mt-5">
-          <Table
-          tableHead={head}
-          tableData={burnData}
-          checkbox
-          idKey={"outputId"}
-          renderRow={(row: any) => (
+          <TableWithAccordion
+            tableHead={head}
+            tableData={burnData}
+            childrenKey="activities"
+            // childTableHead={childHead}
+            renderRow={(row: any) => (
+                <>
+                <td className="px-6">{row.outputStatement ?? "-"}</td>
+                <td className="px-6">₦{row.sumBudget.toLocaleString()}</td>
+                <td className="px-6">₦{row.sumActualCost.toLocaleString()}</td>
+                <td className="px-6">{row.burnRate}%</td>
+                </>
+            )}
+            renderChildRow={(child: any) => (
               <>
-              <td className="px-6 truncate uppercase">{row.outputId ? `${row.outputId.substring(0, 4)}...` : "-"}</td>
-              <td className="px-6">{row.outputStatement ?? "-"}</td>
-              <td className="px-6">{row.sumActualCost ?? "-"}</td>
-              <td className="px-6">{row.sumBudget ?? "-"}</td>
-              <td className="px-6">{row.burnRate ?? 0}%</td>
+                <td className="px-4">{child.activityStatement ?? "-"}</td>
+                <td className="px-4">₦{(child.budgetAtCompletion || 0).toLocaleString()}</td>
+                <td className="px-4">₦{(child.actualCost || 0).toLocaleString()}</td>
+                <td className="px-4">{(child.burnRate || 0).toFixed(2)}%</td>
               </>
-          )}
+            )}
           />
         </div>
     )
@@ -65,7 +101,7 @@ export default function BurnRateComponent({
             if (rowId === 1) {
               return <BurnRateChart burnData={statData?.BURN_RATE} />;
             } else {
-              return <BurnRateTable burnData={statData?.BURN_RATE} />;
+              return <BurnRateTable activities={statData?.ACTIVITY_FINANCIAL_DATA} />;
             }
           }}
         />

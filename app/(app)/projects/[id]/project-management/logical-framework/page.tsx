@@ -62,7 +62,7 @@ export default function ProjectLogicalFramework() {
     setIsLoadingTable(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/logical_frameworks`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/logicalframeworks/project/${projectId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -211,8 +211,6 @@ export default function ProjectLogicalFramework() {
           },
         },
       );
-
-      console.log("Response:", response.data);
 
       // Reset form
       setFormData({

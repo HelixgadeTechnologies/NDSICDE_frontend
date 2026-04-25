@@ -65,22 +65,22 @@ export default function ProjectRequest() {
   const requestStats = [
     {
       title: "Total Requests",
-      value: data.length,
+      value: data?.length || 0,
       icon: "mdi:chart-box-outline",
     },
     {
       title: "Approved Requests",
-      value: data.filter((r) => r.status === "Approved").length,
+      value: data?.filter((r) => r.status === "Approved").length || 0,
       icon: "mdi:check-circle-outline",
     },
     {
       title: "Pending Requests",
-      value: data.filter((r) => r.status === "Pending").length,
+      value: data?.filter((r) => r.status === "Pending").length || 0,
       icon: "mdi:clock-outline",
     },
     {
       title: "Rejected Requests",
-      value: data.filter((r) => r.status === "Rejected").length,
+      value: data?.filter((r) => r.status === "Rejected").length || 0,
       icon: "mdi:close-circle-outline",
     },
   ];
@@ -88,22 +88,22 @@ export default function ProjectRequest() {
   const retirementStats = [
     {
       title: "Total Retired",
-      value: retirementData.filter((r) => r.retirementStatus === "Approved").length,
+      value: retirementData?.filter((r) => r.retirementStatus === "Approved").length || 0,
       icon: "mdi:check-circle-outline",
     },
     {
       title: "Total Rejected",
-      value: retirementData.filter((r) => r.retirementStatus === "Rejected").length,
+      value: retirementData?.filter((r) => r.retirementStatus === "Rejected").length || 0,
       icon: "mdi:close-circle-outline",
     },
     {
       title: "Total Under Review",
-      value: retirementData.filter((r) => r.retirementStatus === "Pending").length,
+      value: retirementData?.filter((r) => r.retirementStatus === "Pending").length || 0,
       icon: "mdi:clock-outline",
     },
     {
       title: "Total Retirements",
-      value: retirementData.length,
+      value: retirementData?.length || 0,
       icon: "mdi:chart-box-outline",
     },
   ];
@@ -125,9 +125,9 @@ export default function ProjectRequest() {
     setIsLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/requests`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/getRequestByProjectId/${projectId}`,
       );
-      setData(res.data.data);
+      setData(res.data?.data || []);
     } catch (error) {
       toast.error("Error retrieving requests. Please try again.");
     } finally {
@@ -239,7 +239,7 @@ export default function ProjectRequest() {
           ) : (
           <Table
             tableHead={head}
-            tableData={data}
+            tableData={data || []}
             checkbox
             idKey={"requestId"}
             renderRow={(row) => (
@@ -345,7 +345,7 @@ export default function ProjectRequest() {
             <div className="space-y-5 mt-4">
               <Table
                 tableHead={retirementHead}
-                tableData={retirementData}
+                tableData={retirementData || []}
                 checkbox
                 idKey={"retirementId"}
                 renderRow={(row) => (
@@ -360,7 +360,7 @@ export default function ProjectRequest() {
                 )}
               />
               <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-                <p>Total Activity Cost (₦): {retirementData.reduce((acc, curr) => acc + (curr.actualCost || 0), 0).toLocaleString()}</p>
+                <p>Total Activity Cost (₦): {(retirementData || []).reduce((acc, curr) => acc + (curr.actualCost || 0), 0).toLocaleString()}</p>
                 <p>Amount to reimburse to NDSICDE (₦): 0</p>
                 <p>Amount to reimburse to Staff (₦): 0</p>
               </div>

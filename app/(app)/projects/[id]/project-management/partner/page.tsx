@@ -19,6 +19,7 @@ import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
+import { useParams } from "next/navigation";
 
 // Define the type for role from API
 interface ApiRole {
@@ -48,13 +49,14 @@ export default function ProjectPartner() {
     "Last Active",
     "Actions",
   ];
+  const { projectId } = useParams();
 
   // Fetch project partners
   const fetchProjectPartners = async () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/partners`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/partners/project/${projectId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

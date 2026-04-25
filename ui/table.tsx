@@ -40,13 +40,16 @@ export default function Table<T>({
   const [currentPage, setCurrentPage] = useState(1);
   
   // Calculate paginated data
-  const totalItems = tableData.length;
+  const safeTableData = Array.isArray(tableData) ? tableData : [];
+
+  // Calculate paginated data
+  const totalItems = safeTableData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
   // Get the data for the current page
   const paginatedData = pagination
-    ? tableData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-    : tableData;
+    ? safeTableData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    : safeTableData;
   
   // Reset to page 1 when tableData changes
   useEffect(() => {
@@ -54,7 +57,7 @@ export default function Table<T>({
   }, [tableData]);
 
   const isAllSelected =
-    checkbox && tableData.length > 0 && selectedIds.length === tableData.length;
+    checkbox && safeTableData.length > 0 && selectedIds.length === safeTableData.length;
 
   const toggleRow = (id: T[keyof T]) => {
     setSelectedIds((prev) =>
@@ -67,19 +70,19 @@ export default function Table<T>({
     if (isAllSelected) {
       setSelectedIds([]);
     } else {
-      const allIds = tableData.map((row) => row[idKey]);
+      const allIds = safeTableData.map((row) => row[idKey]);
       setSelectedIds(allIds);
     }
   };
 
   useEffect(() => {
     if (onSelectionChange && idKey) {
-      const selectedRows = tableData.filter((row) =>
+      const selectedRows = safeTableData.filter((row) =>
         selectedIds.includes(row[idKey])
       );
       onSelectionChange(selectedRows);
     }
-  }, [selectedIds, idKey, onSelectionChange, tableData]);
+  }, [selectedIds, idKey, onSelectionChange, safeTableData]);
 
   // Pagination handlers
   const goToPage = (page: number) => {
@@ -94,7 +97,7 @@ export default function Table<T>({
   const prevPage = () => goToPage(currentPage - 1);
 
   // Check if table is empty
-  const isEmpty = tableData.length === 0;
+  const isEmpty = safeTableData.length === 0;
 
   return (
     <div className="w-full h-fit overflow-visible rounded-lg border border-[#E5E7EB]">

@@ -48,14 +48,16 @@ export default function ProjectOutput() {
     handleRemoveEntity: handleRemoveProjectOutput,
   } = useEntityModal<ProjectOutputTypes>();
 
+
   // fetch output
   const fetchOutput = async () => {
     setIsLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs/project/${projectId}`,
       );
-      setData(res.data.data);
+      const result = res.data.data;
+      setData(Array.isArray(result) ? result : result ? [result] : []);
     } catch (error) {
       console.error(`Error fetching outputs: ${error}`);
     } finally {

@@ -52,7 +52,7 @@ export default function ProjectImpact() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impacts`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impacts/project/${projectId}`,
       );
       setData(response.data.data);
     } catch (error) {
