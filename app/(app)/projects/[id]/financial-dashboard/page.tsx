@@ -26,31 +26,61 @@ export default function FinancialDashboard() {
     fetchDashboardData();
   }, [params?.id]);
 
+  const cpiValue = statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.onBudgetActivities ?? 0;
+  const spiValue = statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.onScheduleActivities ?? 0;
+
+  const getCPIStatus = (value: number) => {
+    if (value === 0) return { text: "NO SPENDING YET", color: "text-gray-500" };
+    if (value > 0 && value < 1) return { text: "OVER BUDGET", color: "text-red-500" };
+    if (value === 1) return { text: "BUDGET AS PLANNED", color: "text-blue-500" };
+    if (value > 1) return { text: "UNDER BUDGET", color: "text-green-500" };
+    return { text: "NO SPENDING YET", color: "text-gray-500" };
+  };
+
+  const getSPIStatus = (value: number) => {
+    if (value === 0) return { text: "NOT STARTED YET", color: "text-gray-500" };
+    if (value > 0 && value < 1) return { text: "BEHIND SCHEDULE", color: "text-red-500" };
+    if (value === 1) return { text: "ON SCHEDULE", color: "text-blue-500" };
+    if (value > 1) return { text: "AHEAD OF SCHEDULE", color: "text-green-500" };
+    return { text: "NOT STARTED YET", color: "text-gray-500" };
+  };
+
+  const cpiStatus = getCPIStatus(cpiValue);
+  const spiStatus = getSPIStatus(spiValue);
+
   const dashboardData = [
     {
-      title: "Total Budget",
-      value: statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.totalActivities ?? 0,
+      title: "Total Project Budget",
+      value: `₦${statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.totalActivities ?? 0}`,
       percentage: 0,
       percentInfo: "from last month",
       icon: "proicons:graph",
     },
     {
-      title: "On Budget",
-      value: statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.onBudgetActivities ?? 0,
-      percentage: statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.onBudgetPercentage ?? 0,
-      percentInfo: "of total projects",
-      icon: "material-symbols:planner-review-rounded",
-    },
-    {
       title: "Burn Rate",
-      value: statData?.BURN_RATE?.[0]?.burnRate ?? 0,
+      value: `${statData?.BURN_RATE?.[0]?.burnRate ?? 0}%`,
       percentage: 0,
       percentInfo: "overall burn rate",
       icon: "material-symbols:planner-review-rounded",
     },
     {
-      title: "On Schedule",
-      value: statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.onScheduleActivities ?? 0,
+      title: "Cost Performance Index (CPI)",
+      value: (
+        <span className={`${cpiStatus.color} text-sm font-bold uppercase`}>
+          {cpiStatus.text}
+        </span>
+      ),
+      percentage: statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.onBudgetPercentage ?? 0,
+      percentInfo: "of total projects",
+      icon: "material-symbols:planner-review-rounded",
+    },
+    {
+      title: "Schedule Performance Index (SPI)",
+      value: (
+        <span className={`${spiStatus.color} text-sm font-bold uppercase`}>
+          {spiStatus.text}
+        </span>
+      ),
       percentage: statData?.PROJECT_BUDGET_PERFORMANCE_SUMMARY?.onSchedulePercentage ?? 0,
       percentInfo: "of total Projects",
       icon: "duo-icons:approved",

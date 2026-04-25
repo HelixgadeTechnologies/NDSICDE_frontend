@@ -1,3 +1,4 @@
+import React from "react";
 import { Icon } from "@iconify/react";
 
 interface List {
@@ -8,7 +9,7 @@ interface List {
 interface StatType {
   title: string;
   icon?: string;
-  value?: number | string;
+  value?: React.ReactNode;
   percentage?: number;
   percentInfo?: string;
   lists?: Array<List>;

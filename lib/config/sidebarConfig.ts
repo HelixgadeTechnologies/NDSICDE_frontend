@@ -120,7 +120,7 @@ const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
         },
         {
           id: "request",
-          name: "Request",
+          name: "Requests and Retirement",
           href: `/projects/${pid}/project-management/request`,
           icon: "",
         },

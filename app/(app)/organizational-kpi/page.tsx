@@ -55,16 +55,28 @@ export default function OrganizationalKPI() {
   return (
     <section>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-5">
-        {loading ?
-        <>
-        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
-        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
-        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
-        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
-        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
-        <div className="h-39.5 animate-pulse bg-zinc-300 rounded-lg"></div>
-        </> : <DashboardStat data={dashboardData} bigger />
-        }
+        {loading ? (
+          <>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-[158px] w-full rounded-lg bg-white border border-gray-200 p-4 flex flex-col justify-between">
+                <div className="flex justify-between items-center">
+                  <div className="h-4 bg-gray-200 animate-pulse rounded w-1/3"></div>
+                  <div className="h-5 w-5 bg-gray-200 animate-pulse rounded-full"></div>
+                </div>
+                <div className="space-y-3 mt-4 flex-1 overflow-hidden">
+                  {[1, 2, 3].map((j) => (
+                    <div key={j} className="flex justify-between items-center">
+                      <div className="h-3 bg-gray-200 animate-pulse rounded w-1/4"></div>
+                      <div className="h-3 bg-gray-200 animate-pulse rounded w-8"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          <DashboardStat data={dashboardData} bigger />
+        )}
       </div>
       <ChartsAndTableParent statData={statData} />
     </section>

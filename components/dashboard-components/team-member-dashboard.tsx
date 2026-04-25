@@ -71,7 +71,16 @@ export default function TeamMemberDashboard() {
       <section className="space-y-7">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {Array(5).fill(0).map((_, index) => (
-            <div key={index} className="h-32 bg-gray-100 animate-pulse rounded-lg"></div>
+            <div key={index} className="h-[126px] w-full rounded-lg bg-white border border-gray-200 p-4 flex flex-col justify-between">
+              <div className="flex justify-between items-center">
+                <div className="h-3 bg-gray-200 animate-pulse rounded w-1/2"></div>
+                <div className="h-5 w-5 bg-gray-200 animate-pulse rounded-full"></div>
+              </div>
+              <div className="space-y-2 mt-4">
+                <div className="h-6 bg-gray-200 animate-pulse rounded w-1/4"></div>
+                <div className="h-3 bg-gray-200 animate-pulse rounded w-3/4"></div>
+              </div>
+            </div>
           ))}
         </div>
         <ProjectsTable />
