@@ -47,7 +47,8 @@ export default function ProjectTeam() {
   const token = getToken();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { projectId } = useParams();
+  const params = useParams();
+  const projectId = (params?.id as string) || "";
 
   // api call to get project team members
   const fetchProjectTeam = async () => {
@@ -255,6 +256,7 @@ export default function ProjectTeam() {
         onSuccess={fetchProjectTeam}
         roles={roles}
         mode="create"
+        projectId={projectId}
       />
 
       {/* {selectedMember && (
@@ -273,6 +275,7 @@ export default function ProjectTeam() {
           onSuccess={fetchProjectTeam}
           roles={roles}
           mode="update"
+          projectId={projectId}
           initialData={{
             email: selectedMember.email,
             roleId:

@@ -10,12 +10,14 @@ import Button from "@/ui/form/button";
 import DropDown from "@/ui/form/select-dropdown";
 import TagInput from "@/ui/form/tag-input";
 import TextInput from "@/ui/form/text-input";
+import TextareaInput from "@/ui/form/textarea";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 
 type AddProps = {
   isOpen: boolean;
@@ -23,6 +25,7 @@ type AddProps = {
   onSuccess?: () => void;
   mode?: "create" | "edit";
   initialData?: ProjectOutcomeTypes;
+  projectId?: string;
 };
 
 export default function ProjectOutcomeModal({
@@ -31,6 +34,7 @@ export default function ProjectOutcomeModal({
   onSuccess,
   mode = "create",
   initialData,
+  projectId: propProjectId,
 }: AddProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResultTypes, setIsLoadingResultTypes] = useState(false);
@@ -41,7 +45,7 @@ export default function ProjectOutcomeModal({
   const hasInitializedRef = useRef(false);
 
   const params = useParams();
-  const projectId = (params.id as string) || "";
+  const projectId = propProjectId || (params.id as string) || "";
   const token = getToken();
 
   // form data
@@ -181,7 +185,9 @@ export default function ProjectOutcomeModal({
   };
 
   // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -316,7 +322,7 @@ export default function ProjectOutcomeModal({
         className="text-center"
       />
       <div className="space-y-6 mt-6">
-        <TextInput
+        <TextareaInput
           label="Project Outcome Statement"
           value={formData.outcomeStatement}
           name="outcomeStatement"
@@ -324,10 +330,14 @@ export default function ProjectOutcomeModal({
           placeholder="Enter outcome statement"
         />
 
-        <TextInput
+        <DropDown
           label="Outcome Type"
           name="outcomeType"
-          onChange={handleInputChange}
+          onChange={(value) => handleDropdownChange("outcomeType", value)}
+          options={[
+            { label: "Development Outcome", value: "development" },
+            { label: "Intermediate Outcome", value: "intermediate" },
+          ]}  
           value={formData.outcomeType}
           placeholder="Enter outcome type"
         />
@@ -341,12 +351,12 @@ export default function ProjectOutcomeModal({
           placeholder={isLoadingImpacts ? "Loading..." : "Select an impact"}
         />
 
-        <TextInput
+        <DropDown
           label="Thematic Areas"
-          name="thematicAreas" // Changed to match payload
-          onChange={handleInputChange}
+          name="thematicAreas"
+          onChange={(value) => handleDropdownChange("thematicAreas", value)}
+          options={THEMATIC_AREAS_OPTIONS}
           value={formData.thematicAreas}
-          placeholder="Enter thematic area"
         />
 
         <TagInput

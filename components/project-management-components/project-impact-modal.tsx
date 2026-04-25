@@ -13,6 +13,9 @@ import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 import { fetchResultTypes } from "@/lib/api/result-types";
 import { ProjectImpactTypes } from "@/types/project-management-types";
+import TextareaInput from "@/ui/form/textarea";
+import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
+import DropDown from "@/ui/form/select-dropdown";
 
 type AddProps = {
   isOpen: boolean;
@@ -20,6 +23,7 @@ type AddProps = {
   onSuccess?: () => void;
   mode?: "create" | "edit";
   initialData?: ProjectImpactTypes;
+  projectId?: string;
 };
 
 export default function ProjectImpactModal({
@@ -28,6 +32,7 @@ export default function ProjectImpactModal({
   onSuccess,
   mode = "create",
   initialData,
+  projectId: propProjectId,
 }: AddProps) {
   const [successModal, setSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +43,7 @@ export default function ProjectImpactModal({
   const hasInitializedRef = useRef(false);
 
   const params = useParams();
-  const projectId = (params?.id as string) || "";
+  const projectId = propProjectId || (params?.id as string) || "";
   const token = getToken() || undefined;
 
   const [formData, setFormData] = useState({
@@ -128,8 +133,17 @@ export default function ProjectImpactModal({
   };
 
   // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -252,20 +266,19 @@ export default function ProjectImpactModal({
         </div>
 
         <div className="space-y-6 mt-6">
-          <TextInput
+          <TextareaInput
             name="statement"
             value={formData.statement}
             onChange={handleInputChange}
             placeholder="Improve access to clean water"
             label="Project Impact Statement"
-            isBigger
           />
 
-          <TextInput
+          <DropDown
             name="thematicArea"
             value={formData.thematicArea}
-            onChange={handleInputChange}
-            placeholder="Health & Sanitation"
+            onChange={(value) => handleSelectChange("thematicArea", value)}
+            options={THEMATIC_AREAS_OPTIONS}
             label="Thematic Area"
             isBigger
           />

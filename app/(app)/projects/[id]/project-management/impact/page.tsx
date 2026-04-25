@@ -171,6 +171,7 @@ export default function ProjectImpact() {
         onClose={() => setAddProjectImpact(false)}
         onSuccess={fetchImpact}
         mode="create"
+        projectId={projectId}
         initialData={selectedProjectImpact ?? undefined}
       />
 
@@ -181,6 +182,7 @@ export default function ProjectImpact() {
           mode="edit"
           onSuccess={fetchImpact}
           initialData={selectedProjectImpact}
+          projectId={projectId}
         />
       )}
 

@@ -45,6 +45,8 @@ export const getResultTypeById = async (
   }
 };
 
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
 /**
  * Transform result types to dropdown options format
  * @param resultTypes - Array of result types
@@ -52,7 +54,7 @@ export const getResultTypeById = async (
  */
 export const transformResultTypesToOptions = (resultTypes: ResultType[]) => {
   return resultTypes.map((type) => ({
-    label: type.resultName,
+    label: capitalize(type.resultName),
     value: type.resultTypeId,
   }));
 };

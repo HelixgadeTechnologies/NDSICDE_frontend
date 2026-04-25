@@ -54,7 +54,7 @@ const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
     },
     {
       id: "result-dashboard",
-      name: "Project Result Dashboard",
+      name: "Project Result KPI Dashboard",
       href: `/projects/${pid}`,
       icon: "carbon:result-old",
     },

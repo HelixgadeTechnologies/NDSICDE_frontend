@@ -75,18 +75,18 @@ export default function DropDown({
         onClick={handleToggle}
         className={`${
           isBigger ? "h-12" : "h-10"
-        } min-w-full md:w-fit outline-none border border-[#B6D8FF] focus:border-(--primary-light) rounded-md px-4 text-sm flex items-center justify-between gap-5 bg-white transition-colors duration-200 ${
+        } w-full outline-none border border-[#B6D8FF] focus:border-(--primary-light) rounded-md px-4 text-sm flex items-center justify-between gap-5 bg-white transition-colors duration-200 overflow-hidden ${
           isDisabled
             ? "cursor-not-allowed text-gray-400 border-gray-100 bg-gray-400"
             : "cursor-pointer hover:border-(--primary-light) "
         }`}>
-        <span className="text-gray-500 whitespace-nowrap">{displayValue}</span>
+        <span className="text-gray-500 truncate flex-1">{displayValue}</span>
         <Icon
           icon="formkit:down"
           width={25}
           height={25}
           color="#667185"
-          className={`transition-transform duration-200 ${
+          className={`shrink-0 transition-transform duration-200 ${
             isOpen && !isDisabled ? "rotate-180" : ""
           }`}
         />

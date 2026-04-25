@@ -174,6 +174,7 @@ export default function ProjectOutcome() {
         onClose={() => setAddProjectOutcome(false)}
         onSuccess={fetchOutcome}
         mode="create"
+        projectId={projectId}
       />
 
       {selectedProjectOutcome && (
@@ -183,6 +184,7 @@ export default function ProjectOutcome() {
           mode="edit"
           onSuccess={fetchOutcome}
           initialData={selectedProjectOutcome}
+          projectId={projectId}
         />
       )}
 

@@ -31,7 +31,7 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
     try {
       const payload = {
         isCreate: true,
-        payload: {
+        data: {
           requestId: crypto.randomUUID(),
           staff: formData.staff,
           outputId: formData.outputId,

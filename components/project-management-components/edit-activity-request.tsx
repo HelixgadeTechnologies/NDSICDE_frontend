@@ -174,7 +174,7 @@ export default function EditActivityRequest({ isOpen, onClose, initialData, proj
     try {
       const payload = {
         isCreate: false,
-        payload: {
+        data: {
           requestId: initialData?.requestId,
           staff: formData.staff,
           outputId: formData.outputId,

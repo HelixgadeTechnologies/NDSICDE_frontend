@@ -11,6 +11,9 @@ import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
 import { ProjectResultResponse } from "@/types/project-result-dashboard";
 import EmptyChartState from "@/ui/empty-chart-state";
+import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
+import { fetchResultTypes, ResultType, transformResultTypesToOptions } from "@/lib/api/result-types";
+import { useEffect } from "react";
 
 export default function ProjectKpiChartsTableParent({
   data,
@@ -25,6 +28,21 @@ export default function ProjectKpiChartsTableParent({
   });
 
   const { allThematicArea, resultLevel, indicators, disaggregation } = filters;
+  const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
+
+  useEffect(() => {
+    const getResultTypes = async () => {
+      try {
+        const types = await fetchResultTypes();
+        setResultTypes(types);
+      } catch (error) {
+        console.error("Failed to fetch result types", error);
+      }
+    };
+    getResultTypes();
+  }, []);
+
+  const resultTypeOptions = useMemo(() => transformResultTypesToOptions(resultTypes), [resultTypes]);
 
   const setField = (field: string, value: string) => {
     setFilters((prev) => ({ ...prev, [field]: value }));
@@ -44,18 +62,6 @@ export default function ProjectKpiChartsTableParent({
   const lines = [{ key: "value", label: "Performance", color: "#003B99" }];
 
   const allTableData = data?.KPI_TABLE_DATA || [];
-
-  const thematicAreaOptions = useMemo(() => {
-    const unique = Array.from(new Set(allTableData.map((d) => d.thematicArea).filter(Boolean)));
-    return unique.map((val) => ({ label: val, value: val }));
-  }, [allTableData]);
-
-  const resultLevelOptions = useMemo(() => {
-    let filtered = allTableData;
-    if (allThematicArea) filtered = filtered.filter((d) => d.thematicArea === allThematicArea);
-    const unique = Array.from(new Set(filtered.map((d) => d.resultLevel).filter(Boolean)));
-    return unique.map((val) => ({ label: val, value: val }));
-  }, [allTableData, allThematicArea]);
 
   const dynamicIndicatorOptions = useMemo(() => {
     let filtered = allTableData;
@@ -93,14 +99,14 @@ export default function ProjectKpiChartsTableParent({
   return (
     <div className="space-y-5">
       <CardComponent fitWidth>
-        <div className="flex grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10 overflow-auto no-scrollbar">
+        <div className="flex grow flex-col md:flex-row mb-5 gap-4 md:items-center mt-10">
           <DropDown
             label="Thematic Area"
             value={allThematicArea}
             placeholder="Thematic Area"
             name="allThematicArea"
             onChange={(value: string) => setField("allThematicArea", value)}
-            options={thematicAreaOptions}
+            options={THEMATIC_AREAS_OPTIONS}
           />
 
           <DropDown
@@ -109,7 +115,7 @@ export default function ProjectKpiChartsTableParent({
             placeholder="Result Level"
             name="resultLevel"
             onChange={(value: string) => setField("resultLevel", value)}
-            options={resultLevelOptions}
+            options={resultTypeOptions}
           />
 
           <DropDown

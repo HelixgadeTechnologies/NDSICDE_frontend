@@ -103,12 +103,6 @@ export default function FormOne({ onNext, formData, updateFormData }: FormOnePro
     e.preventDefault();
   };
 
-  const handleBudgetCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    if (/^[0-9.]*$/.test(value)) {
-      updateFormData({ activityBudgetCode: value });
-    }
-  };
 
   const handleNext = () => {
     // Basic validation
@@ -179,7 +173,7 @@ export default function FormOne({ onNext, formData, updateFormData }: FormOnePro
           label="Activity Budget Code"
           name="activityBudgetCode"
           value={formData.activityBudgetCode}
-          onChange={handleBudgetCodeChange}
+          onChange={(e) => updateFormData({ activityBudgetCode: e.target.value })}
           placeholder="Enter budget code (numbers and periods only)"
         />
         <TagInput

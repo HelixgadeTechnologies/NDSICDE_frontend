@@ -10,6 +10,7 @@ import Button from "@/ui/form/button";
 import SubmitAndReview from "./submit-and-review";
 import FormThree from "./form-three";
 import { useParams } from "next/navigation";
+import { useRoleStore } from "@/store/role-store";
 
 export type RequestFormData = {
   staff: string;
@@ -45,9 +46,10 @@ export default function FormParent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const params = useParams();
   const projectId = params.id as string;
+  const { user } = useRoleStore();
 
   const [formData, setFormData] = useState<RequestFormData>({
-    staff: "",
+    staff: user?.name || "",
     outputId: "",
     activityTitle: "",
     activityBudgetCode: "",

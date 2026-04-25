@@ -231,8 +231,9 @@ export default function AddProjectActivity() {
         toast.error("Please describe all sub-activities");
         return;
       }
-      if (!subActivity.deliveryDate) {
-        toast.error("Please select delivery date for all sub-activities");
+      const withinSelectedDate = new Date(subActivity.deliveryDate) >= new Date(formData.startDate) && new Date(subActivity.deliveryDate) <= new Date(formData.endDate);
+      if (!subActivity.deliveryDate || !withinSelectedDate) {
+        toast.error("Please select delivery date for all sub-activities that falls within the activity start and end date");
         return;
       }
     }

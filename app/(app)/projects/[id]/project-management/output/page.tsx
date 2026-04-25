@@ -27,7 +27,7 @@ export default function ProjectOutput() {
   const projectId = (params?.id as string) || "";
 
   const head = [
-    "Project Impact Statement",
+    "Project Output Statement",
     "Linked to Outcome",
     "Thematic Areas",
     "Responsible Person(s)",
@@ -175,6 +175,7 @@ export default function ProjectOutput() {
         onClose={() => setAddProjectOutput(false)}
         mode="create"
         onSuccess={fetchOutput}
+        projectId={projectId}
       />
 
       {selectedProjectOutput && (
@@ -184,6 +185,7 @@ export default function ProjectOutput() {
           mode="edit"
           onSuccess={fetchOutput}
           initialData={selectedProjectOutput}
+          projectId={projectId}
         />
       )}
 

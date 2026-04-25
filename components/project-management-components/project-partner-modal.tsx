@@ -12,6 +12,7 @@ import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
+import { TEAM_DESIGNATIONS } from "@/utils/team-member-utility";
 
 type AddProps = {
   isOpen: boolean;
@@ -305,7 +306,7 @@ export default function ProjectPartnerModal({
             name="roleId"
             label="Role"
             placeholder="Select role"
-            options={roles}
+            options={TEAM_DESIGNATIONS}
             value={formData.roleId}
             onChange={(value) => handleDropdownChange("roleId", value)}
             isBigger

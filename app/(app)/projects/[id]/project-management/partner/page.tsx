@@ -49,7 +49,8 @@ export default function ProjectPartner() {
     "Last Active",
     "Actions",
   ];
-  const { projectId } = useParams();
+  const params = useParams();
+  const projectId = (params?.id as string) || "";
 
   // Fetch project partners
   const fetchProjectPartners = async () => {
@@ -281,6 +282,7 @@ export default function ProjectPartner() {
         onSuccess={fetchProjectPartners}
         roles={roles}
         mode="create"
+        projectId={projectId}
       />
 
       {selectedPartner && (
@@ -291,6 +293,7 @@ export default function ProjectPartner() {
           roles={roles}
           mode="update"
           initialData={selectedPartner}
+          projectId={projectId}
         />
       )}
 

@@ -30,9 +30,9 @@ export default function ProjectActivity() {
   const head = [
     "Activity Statement",
     "Sub Activity",
+    "Activity Frequency",
     "Budget (₦)",
-    "Start Date",
-    "End Date",
+    "Start - End Date",
     "Responsible Person(s)",
     "Actions",
   ];
@@ -132,10 +132,10 @@ export default function ProjectActivity() {
             renderRow={(row) => (
               <>
                 <td className="px-6">{row.activityStatement}</td>
-                <td className="px-6">{row.subActivity}</td>
+                <td className="px-6">{row.subActivity.toLowerCase() === "one off" ? 'One Off' : 'Multiple'}</td>
+                <td className="px-6">{row.activityFrequency}</td>
                 <td className="px-6">{row.activityTotalBudget}</td>
-                <td className="px-6">{formatDate(row.startDate, "date-only")}</td>
-                <td className="px-6">{formatDate(row.endDate, "date-only")}</td>
+                <td className="px-6">{formatDate(row.startDate, "date-only")} - {formatDate(row.endDate, "date-only")}</td>
                 <td className="px-6">{row.responsiblePerson}</td>
                 <td className="px-6 relative">
                   <Icon

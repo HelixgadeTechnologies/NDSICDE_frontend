@@ -373,7 +373,7 @@ export default function AddIndicatorForm({
       />
 
       {/* items in measurement */}
-      <DropDown
+      {/* <DropDown
         label="Items in Measurement"
         value={formData.itemInMeasure}
         name="itemInMeasure"
@@ -381,7 +381,7 @@ export default function AddIndicatorForm({
         onChange={handleDropdownChange("itemInMeasure")}
         options={[]}
         isBigger
-      />
+      /> */}
 
       {/* checkboxes */}
       <DisaggregationComponent onChange={handleDisaggregationChange} />
@@ -437,7 +437,7 @@ export default function AddIndicatorForm({
         {/* <p className="text-gray-900 text-sm font-medium mb-3">Target</p> */}
 
         {/* target date */}
-        {/* <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Target Date</p>
           <div className="w-2/3">
             <DateInput
@@ -445,10 +445,10 @@ export default function AddIndicatorForm({
               onChange={(value) => handleInputChange("targetDate", value)}
             />
           </div>
-        </div> */}
+        </div>
 
         {/* cumulative target */}
-        {/* <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-medium w-1/3">Cumulative Target</p>
           <div className="w-2/3">
             <TextInput
@@ -460,10 +460,10 @@ export default function AddIndicatorForm({
               }
             />
           </div>
-        </div> */}
+        </div>
 
         {/* target narrative */}
-        {/* <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <p className="text-sm font-medium w-1/3">Target Narrative</p>
           <div className="w-2/3">
             <TextareaInput
@@ -475,7 +475,7 @@ export default function AddIndicatorForm({
               }
             />
           </div>
-        </div> */}
+        </div>
       </div>
 
       {/* target type */}

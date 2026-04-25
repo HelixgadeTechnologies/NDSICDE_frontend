@@ -339,7 +339,7 @@ export default function EditProjectActivity({
       // Prepare payloads for each sub-activity
       const payloads = subActivities.map((subActivity, index) => ({
         isCreate: mode === "create",
-        payload: {
+        data: {
           activityId: mode === "edit" ? formData.activityId : "",
           activityStatement: formData.activityStatement,
           outputId: formData.outputId,

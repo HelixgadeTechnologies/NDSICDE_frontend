@@ -9,12 +9,14 @@ import Button from "@/ui/form/button";
 import DropDown from "@/ui/form/select-dropdown";
 import TagInput from "@/ui/form/tag-input";
 import TextInput from "@/ui/form/text-input";
+import TextareaInput from "@/ui/form/textarea";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 
 type AddProps = {
   isOpen: boolean;
@@ -22,6 +24,7 @@ type AddProps = {
   onSuccess?: () => void;
   mode?: "create" | "edit";
   initialData?: ProjectOutputTypes;
+  projectId?: string;
 };
 
 export default function ProjectOutputModal({
@@ -30,6 +33,7 @@ export default function ProjectOutputModal({
   onSuccess,
   mode = "create",
   initialData,
+  projectId: propProjectId,
 }: AddProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingOutcome, setIsLoadingOutcome] = useState(false);
@@ -38,7 +42,7 @@ export default function ProjectOutputModal({
   const hasInitializedRef = useRef(false);
 
   const params = useParams();
-  const projectId = (params.id as string) || "";
+  const projectId = propProjectId || (params.id as string) || "";
   const token = getToken();
 
   // form data
@@ -185,7 +189,9 @@ export default function ProjectOutputModal({
   };
 
   // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -194,11 +200,10 @@ export default function ProjectOutputModal({
   };
 
   // Handle dropdown changes
-  const handleDropdownChange = (value: string) => {
-
+  const handleDropdownChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
-      outcomeId: value,
+      [name]: value,
     }));
   };
 
@@ -236,7 +241,7 @@ export default function ProjectOutputModal({
     }
 
     setIsSubmitting(true);
-
+    
     try {
       // Prepare payload matching your example structure
       const payload = {
@@ -250,7 +255,8 @@ export default function ProjectOutputModal({
           projectId: projectId,
         },
       };
-
+      
+      console.log(payload);
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output`,
@@ -316,7 +322,7 @@ export default function ProjectOutputModal({
         className="text-center"
       />
       <div className="space-y-6 mt-6">
-        <TextInput
+        <TextareaInput
           label="Project Output Statement"
           value={formData.outputStatement}
           name="outputStatement"
@@ -327,18 +333,18 @@ export default function ProjectOutputModal({
         <DropDown
           label="Linked to Outcome"
           name="outcomeId"
-          onChange={handleDropdownChange}
+          onChange={(value) => handleDropdownChange("outcomeId", value)}
           options={outcomeOptions}
           value={formData.outcomeId}
           placeholder={isLoadingOutcome ? "Loading..." : "Select an outcome"}
         />
 
-        <TextInput
+        <DropDown
           label="Thematic Areas"
           name="thematicAreas"
-          onChange={handleInputChange}
+          onChange={(value) => handleDropdownChange("thematicAreas", value)}
+          options={THEMATIC_AREAS_OPTIONS}
           value={formData.thematicAreas}
-          placeholder="Enter thematic area"
         />
 
         <TagInput

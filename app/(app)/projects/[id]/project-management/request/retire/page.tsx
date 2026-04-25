@@ -44,7 +44,8 @@ export default function ProjectRequestRetirementPage() {
   const [openEditRetirement, setOpenEditRetirement] = useState(false);
   const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
   
-  const { projectId } = useParams();
+  const params = useParams();
+  const projectId = (params?.id as string) || "";
 
   useEffect(() => {
     const loadRequest = async () => {

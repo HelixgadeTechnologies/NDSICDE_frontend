@@ -9,7 +9,7 @@ import Button from "@/ui/form/button";
 import axios from "axios";
 import { FormEvent, useState } from "react";
 import { getToken } from "@/lib/api/credentials";
-import { THEMATIC_AREAS } from "@/lib/config/admin-settings";
+import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 
 type AddSOProps = {
   isOpen: boolean;
@@ -108,14 +108,7 @@ export default function AddStrategicObjectiveModal({
           label="Select Thematic Areas"
           placeholder="All Thematic Areas"
           onChange={(value: string) => setField("thematicAreas", value)}
-          options={[
-            {label: "Economic Diversification", value: "Economic Diversification"},
-            {label: "Environment and Climate Change", value: "Environment and Climate Change"},
-            {label: "Governance", value: "Governance"},
-            {label: "Peace and Security", value: "Peace and Security"},
-            {label: "Cross-Cutting", value: "Cross-Cutting"},
-            {label: "Organizational transformation", value: "Organizational transformation"},
-          ]}
+          options={THEMATIC_AREAS_OPTIONS}
         />
 
         <TextInput
