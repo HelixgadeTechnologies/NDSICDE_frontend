@@ -38,4 +38,17 @@ export const indicatorApi = {
 
     return response.data;
   },
+
+  fetchIndicatorsByResultType: async (resultTypeId: string) => {
+    const token = getToken();
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/resultType/${resultTypeId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  },
 };

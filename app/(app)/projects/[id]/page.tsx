@@ -132,7 +132,7 @@ export default function ResultDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <DashboardStat data={dashboardData} bigger />
       </div>
-      <ProjectKpiChartsTableParent data={resultDashboardData} />
+      <ProjectKpiChartsTableParent data={resultDashboardData} projectId={projectId as string} />
     </section>
   );
 }

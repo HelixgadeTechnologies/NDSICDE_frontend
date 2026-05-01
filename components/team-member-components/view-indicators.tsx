@@ -46,7 +46,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${resultId}`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/resultType/${resultId}`
         );
         if (response.data?.success) {
           setIndicators(response.data.data || []);

@@ -94,6 +94,13 @@ export default function TableWithAccordion<T, K>({
                         </td>
                       </tr>
                     )}
+                    {isOpen && !hasChildren && (
+                      <tr>
+                        <td colSpan={tableHead.length + 1} className="bg-[#F9FAFB] px-6 py-4">
+                          <p className="text-xs text-gray-400 italic">No indicators yet.</p>
+                        </td>
+                      </tr>
+                    )}
                   </React.Fragment>
                 );
               })}
