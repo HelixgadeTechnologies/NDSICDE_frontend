@@ -12,7 +12,7 @@ import ViewIndicators from "../team-member-components/view-indicators";
 import TableWithAccordion from "@/ui/table-with-accordion";
 import axios from "axios";
 
-// ---- Types ----------------------------------------------------------------
+// types 
 
 type IndicatorChild = {
   indicatorId: string;

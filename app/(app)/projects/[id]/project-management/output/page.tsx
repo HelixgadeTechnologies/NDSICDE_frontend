@@ -157,7 +157,7 @@ export default function ProjectOutput() {
                         type: "link",
                         label: "View Indicator",
                         icon: "hugeicons:view",
-                        href: `/projects/${projectId}/project-management/indicator?resultType=output&resultId=${row.outputId}&mode=view`,
+                        href: `/projects/${projectId}`,
                         className: "border-b border-gray-300",
                       },
                     ]}

@@ -15,6 +15,8 @@ export default function NotFound() {
       style={{
         backgroundImage:
           "url(https://lh3.googleusercontent.com/aida-public/AB6AXuCy9XhBD-5oC_4jtm3uRn-RKKM5iLxPDqb9VusmFz5ZJ76vBsMh0a-qSnBt18lz_0J6LPDeCgXA97LMTArjO1Wb5cYS0yaUVdK_orPKAAo_bLuM7MJpN7WUw8tbwDPOWOTsSjuXDnzWgunwEJNAOgg4klCrSLFcMUkeBzdkYa2MRRX89LnnNz-DjyoIMOVUEnP2gqvg1RmzaismrD8jU5u8zNTlmslKSGD1zYXerrdHFLMPYa8mI8QxGpahDWnGzgtM3me6bqTeFZBt)",
+          // backgroundRepeat: "no-repeat",
+          // backgroundSize: "cover",
       }}
     >
       <div className="flex flex-col items-center text-center px-4">

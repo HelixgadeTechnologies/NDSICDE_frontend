@@ -153,7 +153,7 @@ export default function ProjectImpact() {
                         type: "link",
                         label: "View Indicator",
                         icon: "hugeicons:view",
-                        href: `/projects/${projectId}/project-management/indicator?resultType=impact&resultId=${row.impactId}&mode=view`,
+                        href: `/projects/${projectId}`,
                         className: "border-b border-gray-300",
                       },
                     ]}

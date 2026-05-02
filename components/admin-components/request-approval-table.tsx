@@ -119,7 +119,7 @@ function ActivityFinancialRequestTable({ type }: { type?: string }) {
             </td>
             <td className="px-6">{row.total || "0"}</td>
             <td className="px-6">{row.staff || "N/A"}</td>
-            <td className="px-6">{row.project.projectName || "N/A"}</td>
+            <td className="px-6">{row.project?.projectName || "N/A"}</td>
             <td className="px-6">
               {formatDate(row.activityStartDate, "date-only") || "N/A"}
             </td>

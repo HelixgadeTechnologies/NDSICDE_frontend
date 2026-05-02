@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 import { Icon } from "@iconify/react";
+import Button from "@/ui/form/button";
 
 type IndicatorDisaggregation = {
   indicatorDisaggregationId: string;
@@ -39,6 +41,11 @@ type IndicatorData = {
 export default function ViewIndicators({ resultId }: { resultId: string }) {
   const [indicators, setIndicators] = useState<IndicatorData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedIndicator, setSelectedIndicator] = useState<IndicatorData | null>(null);
+
+  const params = useParams();
+  const router = useRouter();
+  const projectId = params?.id;
 
   useEffect(() => {
     const fetchIndicators = async () => {
@@ -93,47 +100,75 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
     );
   }
 
-  return (
-    <div className="space-y-8 mt-6">
-      {indicators.map((indicator, index) => (
-        <div
-          key={indicator.indicatorId || index}
-          className="border border-gray-200 rounded-lg p-5 shadow-sm bg-white"
+  if (selectedIndicator) {
+    return (
+      <div className="mt-6 space-y-4">
+        <button
+          onClick={() => setSelectedIndicator(null)}
+          className="flex items-center text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit"
         >
-          <div className="flex items-start justify-between border-b border-gray-100 pb-4 mb-4 space-y-4">
+          <Icon icon="fluent:arrow-left-24-regular" width={16} height={16} className="mr-2" />
+          Back to Indicators
+        </button>
+
+        <div className="border border-gray-200 rounded-lg p-6 shadow-sm bg-white">
+          <div className="flex items-start justify-between border-b border-gray-100 pb-5 mb-5 gap-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                {indicator.statement || "No Statement Provided"}
+              <h3 className="text-xl font-bold text-gray-900">
+                {selectedIndicator.statement || "No Statement Provided"}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 mt-2">
                 <span className="font-medium text-gray-700">Source:</span>{" "}
-                {indicator.indicatorSource || "N/A"}
+                {selectedIndicator.indicatorSource || "N/A"}
               </p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex flex-col items-end gap-3 min-w-fit">
               <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
-                {indicator.thematicAreasOrPillar || "No Pillar"}
+                {selectedIndicator.thematicAreasOrPillar || "No Pillar"}
               </span>
+              <div className="flex items-center gap-3 w-[400px]">
+                <Button 
+                  content="View Actuals"
+                  icon="fluent:eye-24-regular"
+                  isSecondary={true}
+                  onClick={() => router.push(`/projects/${projectId}/indicator/${selectedIndicator.indicatorId}/view`)}
+                />
+                <Button 
+                  content="Report Actual"
+                  icon="fluent:document-add-24-regular"
+                  onClick={() => {
+                    const query = new URLSearchParams({
+                      orgKpiId: selectedIndicator.orgKpiId || "",
+                      resultTypeId: (selectedIndicator as any).resultTypeId || "",
+                      indicatorSource: selectedIndicator.indicatorSource || "",
+                      thematicArea: selectedIndicator.thematicAreasOrPillar || "",
+                      statement: selectedIndicator.statement || "",
+                      responsiblePersons: selectedIndicator.responsiblePersons || ""
+                    }).toString();
+                    router.push(`/projects/${projectId}/indicator/${selectedIndicator.indicatorId}/report?${query}`);
+                  }}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
               <div>
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Definition
                 </p>
                 <p className="text-sm text-gray-800 mt-1">
-                  {indicator.definition || "N/A"}
+                  {selectedIndicator.definition || "N/A"}
                 </p>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-6">
                 <div className="flex-1">
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Unit
                   </p>
                   <p className="text-sm text-gray-800 mt-1">
-                    {indicator.unitOfMeasure || "N/A"}
+                    {selectedIndicator.unitOfMeasure || "N/A"}
                   </p>
                 </div>
                 <div className="flex-1">
@@ -141,7 +176,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                     Target Type
                   </p>
                   <p className="text-sm text-gray-800 mt-1 capitalize">
-                    {indicator.targetType || "N/A"}
+                    {selectedIndicator.targetType || "N/A"}
                   </p>
                 </div>
               </div>
@@ -150,70 +185,118 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                   Responsible Persons
                 </p>
                 <p className="text-sm text-gray-800 mt-1">
-                  {indicator.responsiblePersons || "N/A"}
+                  {selectedIndicator.responsiblePersons || "N/A"}
                 </p>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="bg-gray-50 p-3 rounded-md border border-gray-100">
-                <div className="flex justify-between items-center mb-1">
+            <div className="space-y-5">
+              <div className="bg-gray-50 p-4 rounded-md border border-gray-100">
+                <div className="flex justify-between items-center mb-2">
                   <p className="text-xs font-bold text-gray-700">BASELINE</p>
                   <p className="text-xs text-gray-500">
-                    {indicator.baseLineDate ? formatDate(indicator.baseLineDate) : "No Date"}
+                    {selectedIndicator.baseLineDate ? formatDate(selectedIndicator.baseLineDate) : "No Date"}
                   </p>
                 </div>
-                <p className="text-lg font-semibold text-gray-900">
-                  {indicator.cumulativeValue ?? 0}
+                <p className="text-2xl font-semibold text-gray-900">
+                  {selectedIndicator.cumulativeValue ?? 0}
                 </p>
-                {indicator.baselineNarrative && (
-                  <p className="text-xs text-gray-600 mt-1 italic">
-                    "{indicator.baselineNarrative}"
+                {selectedIndicator.baselineNarrative && (
+                  <p className="text-sm text-gray-600 mt-2 italic">
+                    "{selectedIndicator.baselineNarrative}"
                   </p>
                 )}
               </div>
 
-              <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
-                <div className="flex justify-between items-center mb-1">
+              <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+                <div className="flex justify-between items-center mb-2">
                   <p className="text-xs font-bold text-blue-700">TARGET</p>
                   <p className="text-xs text-blue-500">
-                    {indicator.targetDate ? formatDate(indicator.targetDate) : "No Date"}
+                    {selectedIndicator.targetDate ? formatDate(selectedIndicator.targetDate) : "No Date"}
                   </p>
                 </div>
-                <p className="text-lg font-semibold text-blue-900">
-                  {indicator.cumulativeTarget ?? 0}
+                <p className="text-2xl font-semibold text-blue-900">
+                  {selectedIndicator.cumulativeTarget ?? 0}
                 </p>
-                {indicator.targetNarrative && (
-                  <p className="text-xs text-blue-600 mt-1 italic">
-                    "{indicator.targetNarrative}"
+                {selectedIndicator.targetNarrative && (
+                  <p className="text-sm text-blue-600 mt-2 italic">
+                    "{selectedIndicator.targetNarrative}"
                   </p>
                 )}
               </div>
             </div>
           </div>
 
-          {indicator.IndicatorDisaggregation && indicator.IndicatorDisaggregation.length > 0 && (
-            <div className="mt-5 pt-4 border-t border-gray-100">
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+          {selectedIndicator.IndicatorDisaggregation && selectedIndicator.IndicatorDisaggregation.length > 0 && (
+            <div className="mt-8 pt-5 border-t border-gray-100">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">
                 Disaggregation Targets
               </p>
               <div className="flex flex-wrap gap-2">
-                {indicator.IndicatorDisaggregation.map((dis) => (
+                {selectedIndicator.IndicatorDisaggregation.map((dis) => (
                   <div
                     key={dis.indicatorDisaggregationId}
-                    className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800"
+                    className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-gray-100 text-gray-800"
                   >
-                    <span className="capitalize text-gray-500 mr-1">{dis.type}:</span>
+                    <span className="capitalize text-gray-500 mr-2">{dis.type}:</span>
                     <span className="capitalize">{dis.category}</span>
-                    <span className="mx-1 text-gray-300">|</span>
-                    <span className="text-blue-600 font-semibold">{dis.target}</span>
+                    <span className="mx-2 text-gray-300">|</span>
+                    <span className="text-blue-600 font-bold">{dis.target}</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 mt-6">
+      {indicators.map((indicator, index) => (
+        <div
+          key={indicator.indicatorId || index}
+          onClick={() => setSelectedIndicator(indicator)}
+          className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1 pr-4">
+              <div className="flex items-center gap-3 mb-2">
+                 <span className="inline-block px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px] font-medium uppercase tracking-wider">
+                  {indicator.thematicAreasOrPillar || "No Pillar"}
+                </span>
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 line-clamp-2">
+                {indicator.statement || "No Statement Provided"}
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Source: {indicator.indicatorSource || "N/A"}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+               <button
+                  onClick={() => setSelectedIndicator(indicator)}
+                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors flex items-center justify-center"
+                  title="View Details"
+                >
+                  <Icon icon="fluent:eye-24-regular" width={20} height={20} />
+               </button>
+            </div>
+          </div>
+          <div className="mt-4 flex gap-6 border-t border-gray-50 pt-3">
+             <div>
+               <p className="text-[10px] font-medium text-gray-400 uppercase">Baseline</p>
+               <p className="text-sm font-semibold text-gray-800">{indicator.cumulativeValue ?? 0}</p>
+             </div>
+             <div>
+               <p className="text-[10px] font-medium text-gray-400 uppercase">Target</p>
+               <p className="text-sm font-semibold text-blue-600">{indicator.cumulativeTarget ?? 0}</p>
+             </div>
+          </div>
+        </div>
       ))}
     </div>
+
   );
 }
