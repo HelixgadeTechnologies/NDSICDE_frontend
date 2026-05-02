@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { Icon } from "@iconify/react";
 import Heading from "./text-heading";
+import { usePersistState } from "@/hooks/usePersistState";
 
 type TableWithAccordionProps<T, K> = {
   tableHead: Array<string>;
@@ -12,6 +13,7 @@ type TableWithAccordionProps<T, K> = {
   childTableHead?: Array<string>;
   emptyStateMessage?: string;
   emptyStateSubMessage?: string;
+  persistKey?: string;
 };
 
 export default function TableWithAccordion<T, K>({
@@ -21,10 +23,11 @@ export default function TableWithAccordion<T, K>({
   childrenKey,
   renderChildRow,
   childTableHead,
-  emptyStateMessage = "No data available",
   emptyStateSubMessage = "There are no records to display at the moment.",
+  emptyStateMessage="No data available",
+  persistKey,
 }: TableWithAccordionProps<T, K>) {
-  const [openRows, setOpenRows] = useState<number[]>([]);
+  const [openRows, setOpenRows] = usePersistState<number[]>(persistKey, []);
 
   const toggleRow = (index: number) => {
     setOpenRows((prev) =>

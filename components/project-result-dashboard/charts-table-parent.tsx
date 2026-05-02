@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import CardComponent from "@/ui/card-wrapper";
 import TabComponent from "@/ui/tab-component";
+import { usePersistState } from "@/hooks/usePersistState";
 import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
 import { ProjectResultResponse } from "@/types/project-result-dashboard";
@@ -70,7 +71,7 @@ export default function ProjectKpiChartsTableParent({
   data: ProjectResultResponse;
   projectId: string;
 }) {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = usePersistState(`project-${projectId}-filters`, {
     allThematicArea: "",
     resultLevel: "",
     disaggregation: "",
@@ -240,6 +241,7 @@ export default function ProjectKpiChartsTableParent({
         <TabComponent
           width="80"
           data={tabs}
+          persistKey={`project-${projectId}-tabs`}
           renderContent={(tabId) => {
             if (tabId === 1) {
               return (
@@ -263,6 +265,7 @@ export default function ProjectKpiChartsTableParent({
                       tableHead={tableHead}
                       tableData={filteredResultRows}
                       childrenKey="indicators"
+                      persistKey={`project-${projectId}-accordion`}
                       emptyStateMessage={resultLevel ? "No results found" : "Select a Result Level"}
                       emptyStateSubMessage={
                         resultLevel

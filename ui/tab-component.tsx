@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { usePersistState } from "@/hooks/usePersistState";
 
 interface TabType {
   tabName: string;
@@ -14,6 +14,7 @@ type TabProps = {
   width?: string;
   activeTab?: number;
   onTabChange?: (tabId: number) => void;
+  persistKey?: string;
 };
 
 export default function TabComponent({ 
@@ -22,9 +23,10 @@ export default function TabComponent({
     width,
     activeTab: externalActiveTab,
     onTabChange,
+    persistKey,
  }: TabProps) {
 
-  const [internalActiveTab, setInternalActiveTab] = useState(1);
+  const [internalActiveTab, setInternalActiveTab] = usePersistState(persistKey ?? "", 1);
   const activeTab = externalActiveTab !== undefined ? externalActiveTab : internalActiveTab;
   
   const handleTabChange = (index: number) => {
