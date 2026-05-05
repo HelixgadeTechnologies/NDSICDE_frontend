@@ -322,11 +322,11 @@ export default function AddIndicatorForm() {
     <div className="">
       <Heading
         heading={`Add ${resultLabel} Indicator`}
-        className="text-center"
+        className="ml-5"
       />
       <form
         onSubmit={handleSubmit}
-        className="space-y-5 my-8 max-w-3xl p-6"
+        className="space-y-5 mb-8 max-w-3xl p-6"
       >
         {/* ── Indicator source & classification */}
         <IndicatorSourceSelector
