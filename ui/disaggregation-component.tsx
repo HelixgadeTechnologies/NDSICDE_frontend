@@ -44,11 +44,7 @@ const FIXED_CATEGORIES: Partial<Record<DisaggType, string[]>> = {
 };
 
 /** Types where the user picks categories from a dropdown and adds them as rows */
-const PICK_AND_ADD_TYPES: DisaggType[] = [
-  "State",
-  "Year",
-  "Thematic Area",
-];
+const PICK_AND_ADD_TYPES: DisaggType[] = ["State", "Year", "Thematic Area"];
 
 function getDropdownOptions(type: DisaggType) {
   switch (type) {
@@ -79,7 +75,12 @@ type DisaggRow = {
 type DisaggregationComponentProps = {
   cumulativeValue?: string | number;
   cumulativeTarget?: string | number;
-  onChange?: (items: Omit<IndicatorDisaggregationItem, "indicatorDisaggregationId" | "indicatorId">[]) => void;
+  onChange?: (
+    items: Omit<
+      IndicatorDisaggregationItem,
+      "indicatorDisaggregationId" | "indicatorId"
+    >[],
+  ) => void;
 };
 
 // ─── Small helper ──────────────────────────────────────────────────────────────
@@ -108,16 +109,19 @@ function ValidationBadge({
         ok
           ? "bg-green-50 text-green-700 border border-green-200"
           : over
-          ? "bg-red-50 text-red-600 border border-red-200"
-          : "bg-amber-50 text-amber-700 border border-amber-200"
-      }`}
-    >
+            ? "bg-red-50 text-red-600 border border-red-200"
+            : "bg-amber-50 text-amber-700 border border-amber-200"
+      }`}>
       {ok ? (
         <>✓ {label} matches</>
       ) : over ? (
-        <>⚠ {label} over by {Math.abs(diff).toLocaleString()}</>
+        <>
+          ⚠ {label} over by {Math.abs(diff).toLocaleString()}
+        </>
       ) : (
-        <>{diff.toLocaleString()} remaining in {label}</>
+        <>
+          {diff.toLocaleString()} remaining in {label}
+        </>
       )}
     </span>
   );
@@ -131,7 +135,7 @@ export default function DisaggregationComponent({
   onChange,
 }: DisaggregationComponentProps) {
   const [checkboxes, setCheckboxes] = useState<boolean[]>(
-    Array(DISAGG_TYPES.length).fill(false)
+    Array(DISAGG_TYPES.length).fill(false),
   );
 
   // For each disagg type, maintain a list of rows
@@ -145,7 +149,7 @@ export default function DisaggregationComponent({
 
   // Derive checked labels (excluding "None")
   const checkedTypes = DISAGG_TYPES.filter(
-    (_, i) => checkboxes[i] && DISAGG_TYPES[i] !== "None"
+    (_, i) => checkboxes[i] && DISAGG_TYPES[i] !== "None",
   );
 
   // ── Initialise rows when a type is first checked ──────────────────────────
@@ -177,7 +181,10 @@ export default function DisaggregationComponent({
   // ── Notify parent whenever rows change ────────────────────────────────────
   useEffect(() => {
     if (!onChange) return;
-    const items: Omit<IndicatorDisaggregationItem, "indicatorDisaggregationId" | "indicatorId">[] = [];
+    const items: Omit<
+      IndicatorDisaggregationItem,
+      "indicatorDisaggregationId" | "indicatorId"
+    >[] = [];
     Object.entries(rows).forEach(([type, typeRows]) => {
       typeRows.forEach((row) => {
         items.push({
@@ -189,7 +196,7 @@ export default function DisaggregationComponent({
       });
     });
     onChange(items);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows]);
 
   // ── Checkbox toggle ───────────────────────────────────────────────────────
@@ -212,7 +219,7 @@ export default function DisaggregationComponent({
     type: string,
     rowIndex: number,
     field: "value" | "target",
-    val: string
+    val: string,
   ) => {
     setRows((prev) => {
       const typeRows = [...(prev[type] ?? [])];
@@ -255,7 +262,9 @@ export default function DisaggregationComponent({
     const targetSum = sumRows(typeRows, "target");
 
     return (
-      <div key={type} className="border border-gray-200 rounded-lg overflow-hidden">
+      <div
+        key={type}
+        className="border border-gray-200 rounded-lg overflow-hidden">
         {/* Header */}
         <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-2">
           <div>
@@ -263,8 +272,8 @@ export default function DisaggregationComponent({
             {isPickAndAdd && (
               <p className="text-xs text-gray-400 mt-0.5">
                 Select each {type.toLowerCase()} you want to include, then enter
-                the baseline and target values for each. These should sum to your
-                cumulative totals above.
+                the baseline and target values for each. These should sum to
+                your cumulative totals above.
               </p>
             )}
           </div>
@@ -289,7 +298,7 @@ export default function DisaggregationComponent({
                   setPickedOption((prev) => ({ ...prev, [type]: v }))
                 }
                 options={options.filter(
-                  (o) => !typeRows.some((r) => r.category === o.value)
+                  (o) => !typeRows.some((r) => r.category === o.value),
                 )}
                 placeholder={`Select ${type}…`}
               />
@@ -298,8 +307,7 @@ export default function DisaggregationComponent({
               type="button"
               onClick={() => addPickedRow(type)}
               disabled={!pickedOption[type]}
-              className="shrink-0 h-10 px-4 rounded-md text-sm font-medium bg-(--primary) text-white disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
-            >
+              className="shrink-0 h-10 px-4 rounded-md text-sm font-medium bg-(--primary) text-white disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
               + Add
             </button>
           </div>
@@ -332,8 +340,7 @@ export default function DisaggregationComponent({
             {typeRows.map((row, ri) => (
               <div
                 key={row.category}
-                className="grid grid-cols-[1fr_1fr_1fr] gap-px bg-gray-100 items-center"
-              >
+                className="grid grid-cols-[1fr_1fr_1fr] gap-px bg-gray-100 items-center">
                 {/* Category label */}
                 <div className="bg-white px-4 py-2.5 flex items-center justify-between gap-2">
                   <span className="text-sm text-gray-700 font-medium">
@@ -344,8 +351,7 @@ export default function DisaggregationComponent({
                       type="button"
                       onClick={() => removeRow(type, ri)}
                       className="text-gray-300 hover:text-red-400 transition-colors text-xs"
-                      title="Remove"
-                    >
+                      title="Remove">
                       ✕
                     </button>
                   )}
@@ -358,7 +364,9 @@ export default function DisaggregationComponent({
                     min="0"
                     step="any"
                     value={row.value}
-                    onChange={(e) => updateRow(type, ri, "value", e.target.value)}
+                    onChange={(e) =>
+                      updateRow(type, ri, "value", e.target.value)
+                    }
                     placeholder="0"
                     className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
                   />
@@ -371,7 +379,9 @@ export default function DisaggregationComponent({
                     min="0"
                     step="any"
                     value={row.target}
-                    onChange={(e) => updateRow(type, ri, "target", e.target.value)}
+                    onChange={(e) =>
+                      updateRow(type, ri, "target", e.target.value)
+                    }
                     placeholder="0"
                     className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
                   />
@@ -392,13 +402,15 @@ export default function DisaggregationComponent({
                 cumVal > 0 && Math.abs(cumVal - valueSum) < 0.001
                   ? "text-green-600"
                   : cumVal > 0 && valueSum > cumVal
-                  ? "text-red-500"
-                  : "text-gray-700"
-              }`}
-            >
+                    ? "text-red-500"
+                    : "text-gray-700"
+              }`}>
               {valueSum.toLocaleString()}
               {cumVal > 0 && (
-                <span className="text-gray-400 font-normal"> / {cumVal.toLocaleString()}</span>
+                <span className="text-gray-400 font-normal">
+                  {" "}
+                  / {cumVal.toLocaleString()}
+                </span>
               )}
             </div>
             <div
@@ -406,13 +418,15 @@ export default function DisaggregationComponent({
                 cumTgt > 0 && Math.abs(cumTgt - targetSum) < 0.001
                   ? "text-green-600"
                   : cumTgt > 0 && targetSum > cumTgt
-                  ? "text-red-500"
-                  : "text-gray-700"
-              }`}
-            >
+                    ? "text-red-500"
+                    : "text-gray-700"
+              }`}>
               {targetSum.toLocaleString()}
               {cumTgt > 0 && (
-                <span className="text-gray-400 font-normal"> / {cumTgt.toLocaleString()}</span>
+                <span className="text-gray-400 font-normal">
+                  {" "}
+                  / {cumTgt.toLocaleString()}
+                </span>
               )}
             </div>
           </div>
@@ -444,8 +458,8 @@ export default function DisaggregationComponent({
           {cumVal === 0 && cumTgt === 0 && (
             <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-md px-3 py-2">
               Fill in the <strong>Cumulative Value</strong> and{" "}
-              <strong>Cumulative Target</strong> above so the component can validate
-              that your disaggregated entries add up correctly.
+              <strong>Cumulative Target</strong> above so the component can
+              validate that your disaggregated entries add up correctly.
             </p>
           )}
           {checkedTypes.map((type) => renderTypeSection(type))}

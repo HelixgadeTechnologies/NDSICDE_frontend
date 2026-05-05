@@ -320,14 +320,8 @@ export default function AddIndicatorForm() {
 
   return (
     <div className="">
-      <Heading
-        heading={`Add ${resultLabel} Indicator`}
-        className="ml-5"
-      />
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-5 mb-8 max-w-3xl p-6"
-      >
+      <Heading heading={`Add ${resultLabel} Indicator`} className="ml-5" />
+      <form onSubmit={handleSubmit} className="space-y-5 mb-8 max-w-3xl p-6">
         {/* ── Indicator source & classification */}
         <IndicatorSourceSelector
           onChange={handleIndicatorSourceChange}
@@ -379,6 +373,15 @@ export default function AddIndicatorForm() {
           />
         </div>
 
+        {/* ── Disaggregation */}
+        <div className="border-t border-gray-100 pt-5">
+          <DisaggregationComponent
+            cumulativeValue={formData.cumulativeValue}
+            cumulativeTarget={formData.cumulativeTarget}
+            onChange={handleDisaggregationChange}
+          />
+        </div>
+
         {/* ── Baseline */}
         <div className="border-t border-gray-100 pt-5 space-y-4">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
@@ -387,7 +390,9 @@ export default function AddIndicatorForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-1.5">Baseline Date</p>
+              <p className="text-sm font-medium text-gray-700 mb-1.5">
+                Baseline Date
+              </p>
               <DateInput
                 value={formData.baseLineDate}
                 onChange={(value) => handleInputChange("baseLineDate", value)}
@@ -423,7 +428,9 @@ export default function AddIndicatorForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-1.5">Target Date</p>
+              <p className="text-sm font-medium text-gray-700 mb-1.5">
+                Target Date
+              </p>
               <DateInput
                 value={formData.targetDate}
                 onChange={(value) => handleInputChange("targetDate", value)}
@@ -469,15 +476,6 @@ export default function AddIndicatorForm() {
               />
             </div>
           </div> */}
-        </div>
-
-        {/* ── Disaggregation */}
-        <div className="border-t border-gray-100 pt-5">
-          <DisaggregationComponent
-            cumulativeValue={formData.cumulativeValue}
-            cumulativeTarget={formData.cumulativeTarget}
-            onChange={handleDisaggregationChange}
-          />
         </div>
 
         {/* ── Responsible persons */}
