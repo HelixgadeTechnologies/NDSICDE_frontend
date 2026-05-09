@@ -46,7 +46,7 @@ export default function EditProjectActivity({
   const params = useParams();
   const projectId = (params?.id as string) || "";
 
-  const [activityType, setActivityType] = useState<"oneOff" | "multiple">(
+  const [activityType, setActivityType] = useState<"none" | "oneOff" | "multiple">(
     "oneOff",
   );
   const [subActivities, setSubActivities] = useState<SubActivity[]>([
@@ -101,11 +101,18 @@ export default function EditProjectActivity({
         // Determine activity type and sub-activities
         if (
           initialData.subActivity &&
-          initialData.subActivity.includes("Sub-Activity")
+          initialData.subActivity.toLowerCase() === "multiple"
         ) {
           setActivityType("multiple");
-          // If we have descriptionAction and deliveryDate, use them
-          if (initialData.descriptionAction && initialData.deliveryDate) {
+          // @ts-ignore - subActivities might be in the raw response
+          if (initialData.subActivities && Array.isArray(initialData.subActivities)) {
+            // @ts-ignore
+            setSubActivities(initialData.subActivities.map((sa: any, index: number) => ({
+              id: index + 1,
+              description: sa.description || "",
+              deliveryDate: sa.activityDate || "",
+            })));
+          } else if (initialData.descriptionAction && initialData.deliveryDate) {
             setSubActivities([
               {
                 id: 1,
@@ -114,6 +121,12 @@ export default function EditProjectActivity({
               },
             ]);
           }
+        } else if (
+          initialData.subActivity &&
+          initialData.subActivity.toLowerCase() === "none"
+        ) {
+          setActivityType("none");
+          setSubActivities([]);
         } else {
           setActivityType("oneOff");
           // For one-off, use the main activity data
@@ -213,12 +226,28 @@ export default function EditProjectActivity({
     }
   };
 
-  const handleActivityTypeChange = (type: "oneOff" | "multiple") => {
+  const handleActivityTypeChange = (type: "none" | "oneOff" | "multiple") => {
     setActivityType(type);
 
-    // Reset to single activity when switching to "One Off"
-    if (type === "oneOff" && subActivities.length > 1) {
-      setSubActivities([subActivities[0]]);
+    // Reset activities based on type
+    if (type === "none") {
+      setSubActivities([]);
+    } else if (type === "oneOff") {
+      setSubActivities([
+        {
+          id: 1,
+          description: "",
+          deliveryDate: "",
+        },
+      ]);
+    } else if (type === "multiple" && subActivities.length === 0) {
+      setSubActivities([
+        {
+          id: 1,
+          description: "",
+          deliveryDate: "",
+        },
+      ]);
     }
   };
 
@@ -321,25 +350,27 @@ export default function EditProjectActivity({
       return;
     }
 
-    // Validate sub-activities
-    for (const subActivity of subActivities) {
-      if (!subActivity.description.trim()) {
-        toast.error("Please describe all sub-activities");
-        return;
-      }
-      if (!subActivity.deliveryDate) {
-        toast.error("Please select delivery date for all sub-activities");
-        return;
+    // Validate sub-activities if not "None"
+    if (activityType !== "none") {
+      for (const subActivity of subActivities) {
+        if (!subActivity.description.trim()) {
+          toast.error("Please describe all sub-activities");
+          return;
+        }
+        if (!subActivity.deliveryDate) {
+          toast.error("Please select delivery date for all sub-activities");
+          return;
+        }
       }
     }
 
     setIsSubmitting(true);
 
     try {
-      // Prepare payloads for each sub-activity
-      const payloads = subActivities.map((subActivity, index) => ({
+      // Prepare single payload matching the new structure
+      const payload = {
         isCreate: mode === "create",
-        data: {
+        payload: {
           activityId: mode === "edit" ? formData.activityId : "",
           activityStatement: formData.activityStatement,
           outputId: formData.outputId,
@@ -350,33 +381,43 @@ export default function EditProjectActivity({
           activityFrequency: parseInt(formData.activityFrequency) || 0,
           subActivity:
             activityType === "multiple"
-              ? `Sub-Activity ${index + 1}`
-              : "One Off",
-          descriptionAction: subActivity.description,
-          deliveryDate: new Date(subActivity.deliveryDate).toISOString(),
+              ? "Multiple"
+              : activityType === "oneOff"
+                ? "One Off"
+                : "None",
+          descriptionAction:
+            activityType === "oneOff" ? subActivities[0]?.description : "N/A",
+          deliveryDate:
+            activityType === "oneOff"
+              ? new Date(subActivities[0]?.deliveryDate).toISOString()
+              : new Date().toISOString(),
           projectId: projectId,
+          subActivities:
+            activityType === "multiple"
+              ? subActivities.map((sa) => ({
+                  subActivitiesId: crypto.randomUUID(),
+                  activityId: mode === "edit" ? formData.activityId : "",
+                  description: sa.description,
+                  activityDate: new Date(sa.deliveryDate).toISOString(),
+                }))
+              : [],
         },
-      }));
+      };
 
-      // Send all sub-activities
-      const promises = payloads.map((payload) =>
-        axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity`,
-          payload,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+      console.log("Submitting activity payload:", JSON.stringify(payload, null, 2));
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        ),
+        },
       );
 
-      const responses = await Promise.all(promises);
-      console.log(
-        "API Responses:",
-        responses.map((r) => r.data),
-      );
+      console.log("API Response:", response.data);
 
         toast.success(`Project activity ${mode === "create" ? "added" : "updated"} successfully!`),
 
@@ -496,6 +537,13 @@ export default function EditProjectActivity({
             <p className="text-sm text-gray-900 font-medium">Sub-Activity</p>
             <div className="flex items-center gap-6">
               <RadioInput
+                label="None"
+                name="subActivity"
+                value="none"
+                onChange={() => handleActivityTypeChange("none")}
+                is_checked={activityType === "none"}
+              />
+              <RadioInput
                 label="One Off"
                 name="subActivity"
                 value="oneOff"
@@ -513,69 +561,71 @@ export default function EditProjectActivity({
           </div>
 
           {/* Sub-Activities List */}
-          <div className="space-y-4">
-            {subActivities.map((subActivity, index) => (
-              <div
-                key={subActivity.id}
-                className={`space-y-4 ${
-                  activityType === "multiple" && subActivities.length > 1
-                    ? "rounded-lg relative"
-                    : ""
-                }`}>
-                {/* Remove button */}
-                {activityType === "multiple" && subActivities.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeSubActivity(subActivity.id)}
-                    className="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white size-7 rounded-full flex items-center justify-center transition-colors shadow-md z-10"
-                    title="Remove sub-activity">
-                    <Icon icon="heroicons:x-mark" className="size-4" />
-                  </button>
-                )}
+          {activityType !== "none" && (
+            <div className="space-y-4">
+              {subActivities.map((subActivity, index) => (
+                <div
+                  key={subActivity.id}
+                  className={`space-y-4 ${
+                    activityType === "multiple" && subActivities.length > 1
+                      ? "rounded-lg relative"
+                      : ""
+                  }`}>
+                  {/* Remove button */}
+                  {activityType === "multiple" && subActivities.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSubActivity(subActivity.id)}
+                      className="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white size-7 rounded-full flex items-center justify-center transition-colors shadow-md z-10"
+                      title="Remove sub-activity">
+                      <Icon icon="heroicons:x-mark" className="size-4" />
+                    </button>
+                  )}
 
-                <TextareaInput
-                  label={
-                    index === 0
-                      ? "Describe Action"
-                      : `Describe Action ${index + 1}`
-                  }
-                  name={`describeAction-${subActivity.id}`}
-                  value={subActivity.description}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    updateSubActivity(
-                      subActivity.id,
-                      "description",
-                      e.target.value,
-                    )
-                  }
-                  placeholder="Describe the action to be taken"
-                />
+                  <TextareaInput
+                    label={
+                      index === 0
+                        ? "Describe Action"
+                        : `Describe Action ${index + 1}`
+                    }
+                    name={`describeAction-${subActivity.id}`}
+                    value={subActivity.description}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      updateSubActivity(
+                        subActivity.id,
+                        "description",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="Describe the action to be taken"
+                  />
 
-                <DateInput
-                  label={
-                    index === 0
-                      ? "Planned Delivery Date (This date must be within the linked activity start and end date)"
-                      : `Delivery Date ${index + 1}`
-                  }
-                  value={formatDate(subActivity.deliveryDate, "custom")}
-                  onChange={(value) =>
-                    updateSubActivity(subActivity.id, "deliveryDate", value)
-                  }
-                />
-              </div>
-            ))}
+                  <DateInput
+                    label={
+                      index === 0
+                        ? "Planned Delivery Date (This date must be within the linked activity start and end date)"
+                        : `Delivery Date ${index + 1}`
+                    }
+                    value={formatDate(subActivity.deliveryDate, "custom")}
+                    onChange={(value) =>
+                      updateSubActivity(subActivity.id, "deliveryDate", value)
+                    }
+                  />
+                </div>
+              ))}
 
-            {/* Add Another Sub-Activity Button */}
-            {activityType === "multiple" && (
-              <button
-                type="button"
-                onClick={addSubActivity}
-                className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border-2 border-dashed border-blue-300 hover:border-blue-400 w-full justify-center">
-                <Icon icon="ic:round-plus" height={20} width={20} />
-                Add Another Sub-Activity
-              </button>
-            )}
-          </div>
+              {/* Add Another Sub-Activity Button */}
+              {activityType === "multiple" && (
+                <button
+                  type="button"
+                  onClick={addSubActivity}
+                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border-2 border-dashed border-blue-300 hover:border-blue-400 w-full justify-center">
+                  <Icon icon="ic:round-plus" height={20} width={20} />
+                  Add Another Sub-Activity
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

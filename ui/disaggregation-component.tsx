@@ -251,9 +251,10 @@ export default function DisaggregationComponent({
         items.push({
           type: type.toLowerCase(),
           category: row.category,
-          value: parseFloat(row.value) || 0,
-          target: parseFloat(row.target) || 0,
+          value: isStatusType ? row.value : (parseFloat(row.value) || 0),
+          target: isStatusType ? row.target : (parseFloat(row.target) || 0),
         });
+
       });
     });
     onChange(items);

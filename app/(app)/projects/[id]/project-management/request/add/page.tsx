@@ -39,7 +39,10 @@ export type RequestFormData = {
   recipientPhoneNumber: string;
   documentName: string;
   documentURL: string;
+  activityId: string;
+  createdBy: string;
 };
+
 
 export default function FormParent() {
   const [activeTab, setActiveTab] = useState(1);
@@ -77,7 +80,10 @@ export default function FormParent() {
     recipientPhoneNumber: "",
     documentName: "",
     documentURL: "",
+    activityId: "",
+    createdBy: user?.id || "",
   });
+
 
   const updateFormData = (data: Partial<RequestFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));

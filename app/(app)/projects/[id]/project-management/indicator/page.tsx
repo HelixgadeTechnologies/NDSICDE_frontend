@@ -16,7 +16,9 @@ import { indicatorApi } from "@/lib/api/indicatorApi";
 import {
   IndicatorFormData,
   IndicatorDisaggregationItem,
+  IndicatorPayload,
 } from "@/types/indicator";
+
 import { fetchResultTypes, ResultType } from "@/lib/api/result-types";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -196,8 +198,9 @@ export default function AddIndicatorForm() {
   };
 
   // Prepare payload for API
-  const preparePayload = () => {
+  const preparePayload = (): IndicatorPayload => {
     const cumulativeValue =
+
       formData.unitOfMeasure === "Status"
         ? formData.cumulativeValue
         : parseFloat(formData.cumulativeValue as string) || 0;

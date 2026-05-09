@@ -128,6 +128,7 @@ export default function ProjectRequest() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/getRequestByProjectId/${projectId}`,
       );
       setData(res.data?.data || []);
+      console.log(res.data.data)
     } catch (error) {
       toast.error("Error retrieving requests. Please try again.");
     } finally {

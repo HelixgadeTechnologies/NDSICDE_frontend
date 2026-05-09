@@ -9,9 +9,10 @@ export type IndicatorDisaggregationItem = {
   indicatorId: string;
   type: string;
   category: string;
-  value: number; // baseline disaggregated value (sums to cumulativeValue)
-  target: number; // target disaggregated value (sums to cumulativeTarget)
+  value: number | string; // baseline disaggregated value
+  target: number | string; // target disaggregated value
 };
+
 
 export type IndicatorFormData = {
   indicatorId: string;
@@ -51,10 +52,11 @@ export type IndicatorPayload = {
     unitOfMeasure: string;
     itemInMeasure: string;
     baseLineDate: string;
-    cumulativeValue: number;
+    cumulativeValue: number | string;
     baselineNarrative: string;
     targetDate: string;
-    cumulativeTarget: number;
+    cumulativeTarget: number | string;
+
     targetNarrative: string;
     targetType: string;
     responsiblePersons: string;

@@ -49,16 +49,20 @@ export default function ReportActualValue() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activity-reports`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
-      
+
       const allReports = response.data.data || [];
-      const filteredReports = activityId 
-        ? allReports.filter((report: ProjectActivityReportTypes) => report.activityId === activityId)
+      const filteredReports = activityId
+        ? allReports.filter(
+            (report: ProjectActivityReportTypes) =>
+              report.activityId === activityId,
+          )
         : allReports;
-        
+
+      setData(filteredReports);
     } catch (error) {
       console.log(`Error fetching activity reports: ${error}`);
       toast.error("Error retrieving activity report. Please try again.");
@@ -70,7 +74,7 @@ export default function ReportActualValue() {
   // fetch automatically
   useEffect(() => {
     fetchActivityReports();
-  }, []);
+  }, [activityId, token]);
   console.log(data);
 
   // Handle delete click - opens confirmation modal

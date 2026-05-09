@@ -31,7 +31,7 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
     try {
       const payload = {
         isCreate: true,
-        data: {
+        payload: {
           requestId: crypto.randomUUID(),
           staff: formData.staff,
           outputId: formData.outputId,
@@ -39,30 +39,39 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           activityBudgetCode: Number(formData.activityBudgetCode) || 0,
           activityLocation: formData.activityLocation,
           activityPurposeDescription: formData.activityPurposeDescription,
-          activityStartDate: formData.activityStartDate ? new Date(formData.activityStartDate).toISOString() : new Date().toISOString(),
-          activityEndDate: formData.activityEndDate ? new Date(formData.activityEndDate).toISOString() : new Date().toISOString(),
-          budgetLineItems: formData.budgetLineItems?.map(item => ({
-            activityLineDescription: item.activityLineDescription,
-            quantity: Number(item.quantity) || 0,
-            frequency: Number(item.frequency) || 0,
-            unitCost: Number(item.unitCost) || 0,
-            total: Number(item.total) || 0,
-          })),
+          activityStartDate: formData.activityStartDate
+            ? new Date(formData.activityStartDate).toISOString()
+            : new Date().toISOString(),
+          activityEndDate: formData.activityEndDate
+            ? new Date(formData.activityEndDate).toISOString()
+            : new Date().toISOString(),
           budgetCode: Number(formData.budgetCode) || 0,
           modeOfTransport: formData.modeOfTransport,
           driverName: formData.driverName,
           driversPhoneNumber: formData.driversPhoneNumber,
           vehiclePlateNumber: formData.vehiclePlateNumber,
           vehicleColor: formData.vehicleColor,
-          departureTime: formData.departureTime ? new Date(formData.departureTime).toISOString() : new Date().toISOString(),
+          departureTime: formData.departureTime
+            ? new Date(formData.departureTime).toISOString()
+            : new Date().toISOString(),
           route: formData.route,
           recipientPhoneNumber: formData.recipientPhoneNumber,
           documentName: formData.documentName,
           documentURL: formData.documentURL || "string",
           projectId: projectId,
-          status: "Pending"
-        }
+          createdBy: formData.createdBy,
+          status: "Pending",
+          lineItems: formData.budgetLineItems?.map((item) => ({
+            description: item.activityLineDescription,
+            quantity: Number(item.quantity) || 0,
+            frequency: Number(item.frequency) || 0,
+            unitCost: Number(item.unitCost) || 0,
+            totalBudget: Number(item.total) || 0,
+            activityId: formData.activityId,
+          })),
+        },
       };
+
 
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request`, 
