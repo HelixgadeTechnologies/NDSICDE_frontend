@@ -10,7 +10,6 @@ import TextInput from "@/ui/form/text-input";
 import DisaggregationComponent from "@/ui/disaggregation-component";
 import DateInput from "@/ui/form/date-input";
 import TextareaInput from "@/ui/form/textarea";
-import RadioInput from "@/ui/form/radio";
 import TagInput from "@/ui/form/tag-input";
 import Button from "@/ui/form/button";
 import { indicatorApi } from "@/lib/api/indicatorApi";
@@ -39,6 +38,14 @@ export default function AddIndicatorForm() {
     { label: string; value: string }[]
   >([]);
   const [isLoadingKpis, setIsLoadingKpis] = useState(false);
+
+  // Shared disaggregation state — lifted up so all three split-view
+  // DisaggregationComponent instances (setup / baseline / target) stay in sync
+  const [disaggCheckboxes, setDisaggCheckboxes] = useState<boolean[]>(
+    Array(9).fill(false), // 9 = number of DISAGG_TYPES
+  );
+  type DisaggRow = { category: string; value: string; target: string };
+  const [disaggRows, setDisaggRows] = useState<Record<string, DisaggRow[]>>({});
 
   const [formData, setFormData] = useState<IndicatorFormData>({
     indicatorId: "",
@@ -132,6 +139,7 @@ export default function AddIndicatorForm() {
         indicatorSource: data.indicatorSource,
         thematicAreasOrPillar: data.thematicAreasOrPillar || "",
         statement: data.statement || "",
+        linkKpiToSdnOrgKpi: data.linkKpiToSdnOrgKpi || "",
       }));
     },
     [],
@@ -157,7 +165,7 @@ export default function AddIndicatorForm() {
       }));
     };
 
-  // Handle disaggregation change — receives typed array directly from component
+  // Handle disaggregation change — derives items from the shared row state
   const handleDisaggregationChange = (
     items: Omit<
       IndicatorDisaggregationItem,
@@ -318,6 +326,7 @@ export default function AddIndicatorForm() {
   }
   const resultLabel = getResultLabel(resultType);
 
+
   return (
     <div className="">
       <Heading heading={`Add ${resultLabel} Indicator`} className="ml-5" />
@@ -326,16 +335,14 @@ export default function AddIndicatorForm() {
         <IndicatorSourceSelector
           onChange={handleIndicatorSourceChange}
           thematicAreaOptions={THEMATIC_AREAS_OPTIONS}
-        />
-
-        <DropDown
-          label="SDN Org KPIs"
-          value={formData.linkKpiToSdnOrgKpi}
-          name="linkKpiToSdnOrgKpi"
-          placeholder={isLoadingKpis ? "Loading KPIs..." : "Select a KPI"}
-          onChange={handleDropdownChange("linkKpiToSdnOrgKpi")}
-          options={kpiOptions}
-          isBigger
+          kpiOptions={kpiOptions}
+          isLoadingKpis={isLoadingKpis}
+          initialValues={{
+            indicatorSource: formData.indicatorSource,
+            thematicAreasOrPillar: formData.thematicAreasOrPillar,
+            statement: formData.statement,
+            linkKpiToSdnOrgKpi: formData.linkKpiToSdnOrgKpi,
+          }}
         />
 
         <TextInput
@@ -373,12 +380,17 @@ export default function AddIndicatorForm() {
           />
         </div>
 
-        {/* ── Disaggregation */}
+        {/* ── Disaggregation – selection only */}
         <div className="border-t border-gray-100 pt-5">
           <DisaggregationComponent
+            view="setup"
+            sharedCheckboxes={disaggCheckboxes}
+            sharedRows={disaggRows}
+            onCheckboxesChange={setDisaggCheckboxes}
+            onRowsChange={setDisaggRows}
+            onChange={handleDisaggregationChange}
             cumulativeValue={formData.cumulativeValue}
             cumulativeTarget={formData.cumulativeTarget}
-            onChange={handleDisaggregationChange}
           />
         </div>
 
@@ -418,7 +430,19 @@ export default function AddIndicatorForm() {
               handleInputChange("baselineNarrative", e.target.value)
             }
           />
+          {/* ── Disaggregated baseline entry fields */}
+          <DisaggregationComponent
+            view="baseline"
+            sharedCheckboxes={disaggCheckboxes}
+            sharedRows={disaggRows}
+            onCheckboxesChange={setDisaggCheckboxes}
+            onRowsChange={setDisaggRows}
+            onChange={handleDisaggregationChange}
+            cumulativeValue={formData.cumulativeValue}
+            cumulativeTarget={formData.cumulativeTarget}
+          />
         </div>
+
 
         {/* ── Target */}
         <div className="border-t border-gray-100 pt-5 space-y-4">
@@ -456,29 +480,24 @@ export default function AddIndicatorForm() {
               handleInputChange("targetNarrative", e.target.value)
             }
           />
-
-          {/* <div className="space-y-1">
-            <p className="text-sm font-medium text-gray-700">Target Type</p>
-            <div className="flex items-center gap-6">
-              <RadioInput
-                label="Cumulative"
-                value="cumulative"
-                name="targetType"
-                is_checked={formData.targetType === "cumulative"}
-                onChange={() => handleInputChange("targetType", "cumulative")}
-              />
-              <RadioInput
-                label="Periodic"
-                value="periodic"
-                name="targetType"
-                is_checked={formData.targetType === "periodic"}
-                onChange={() => handleInputChange("targetType", "periodic")}
-              />
-            </div>
-          </div> */}
+          {/* ── Disaggregated target entry fields */}
+          <DisaggregationComponent
+            view="target"
+            sharedCheckboxes={disaggCheckboxes}
+            sharedRows={disaggRows}
+            onCheckboxesChange={setDisaggCheckboxes}
+            onRowsChange={setDisaggRows}
+            onChange={handleDisaggregationChange}
+            cumulativeValue={formData.cumulativeValue}
+            cumulativeTarget={formData.cumulativeTarget}
+          />
         </div>
 
+
+
         {/* ── Responsible persons */}
+
+
         <div className="border-t border-gray-100 pt-5">
           <TagInput
             label="Responsible Person(s)"

@@ -9,21 +9,29 @@ type IndicatorSource = "organizational-kpi" | "custom-indicator" | null;
 
 export interface IndicatorSourceData {
   indicatorSource: string;
-  thematicAreasOrPillar: string | null; // Changed to allow null
-  statement: string | null; // Changed to allow null
+  thematicAreasOrPillar: string | null;
+  statement: string | null;
+  linkKpiToSdnOrgKpi: string | null;
 }
+
 
 interface IndicatorSourceSelectorProps {
   onChange: (data: IndicatorSourceData) => void;
   thematicAreaOptions?: Array<{ label: string; value: string }>;
   initialValues?: Partial<IndicatorSourceData>;
+  kpiOptions?: Array<{ label: string; value: string }>;
+  isLoadingKpis?: boolean;
 }
+
 
 export default function IndicatorSourceSelector({
   onChange,
   thematicAreaOptions = [],
   initialValues,
+  kpiOptions = [],
+  isLoadingKpis = false,
 }: IndicatorSourceSelectorProps) {
+
   const [selectedSource, setSelectedSource] = useState<"organizational-kpi" | "custom-indicator" | null>(
     initialValues?.indicatorSource === "organizational-kpi" || initialValues?.indicatorSource === "custom-indicator" 
       ? initialValues.indicatorSource 
@@ -42,29 +50,41 @@ export default function IndicatorSourceSelector({
       : null
   );
 
+  const [linkKpiToSdnOrgKpi, setLinkKpiToSdnOrgKpi] = useState<string | null>(
+    initialValues?.linkKpiToSdnOrgKpi !== undefined && initialValues?.linkKpiToSdnOrgKpi !== null
+      ? initialValues.linkKpiToSdnOrgKpi
+      : null
+  );
+
+
   // Notify parent of changes
   useEffect(() => {
     let indicatorSourceValue = "";
     let thematicAreaValue: string | null = null;
     let statementValue: string | null = null;
+    let linkKpiValue: string | null = null;
 
     if (selectedSource === "organizational-kpi") {
       indicatorSourceValue = "Organization KPI";
       thematicAreaValue = thematicAreaPillar;
-      statementValue = null; // Set to null for organizational KPI
+      statementValue = null;
+      linkKpiValue = linkKpiToSdnOrgKpi;
     } else if (selectedSource === "custom-indicator") {
       indicatorSourceValue = "Custom Indicator";
-      thematicAreaValue = null; // Set to null for custom indicator
+      thematicAreaValue = null;
       statementValue = customIndicatorStatement;
+      linkKpiValue = null;
     }
 
     const data: IndicatorSourceData = {
       indicatorSource: indicatorSourceValue,
       thematicAreasOrPillar: thematicAreaValue,
       statement: statementValue,
+      linkKpiToSdnOrgKpi: linkKpiValue,
     };
     onChange(data);
-  }, [selectedSource, thematicAreaPillar, customIndicatorStatement, onChange]);
+  }, [selectedSource, thematicAreaPillar, customIndicatorStatement, linkKpiToSdnOrgKpi, onChange]);
+
 
   const handleSourceSelect = (source: "organizational-kpi" | "custom-indicator") => {
     if (selectedSource === source) {
@@ -76,14 +96,14 @@ export default function IndicatorSourceSelector({
       // Select new source
       setSelectedSource(source);
       if (source === "organizational-kpi") {
-        setCustomIndicatorStatement(null); // Set to null, not empty string
-        // Keep existing thematicAreaPillar value if already set
+        setCustomIndicatorStatement(null);
       } else {
-        setThematicAreaPillar(null); // Set to null, not empty string
-        // Keep existing customIndicatorStatement value if already set
+        setThematicAreaPillar(null);
+        setLinkKpiToSdnOrgKpi(null);
       }
     }
   };
+
 
   const handleThematicAreaChange = (value: string | React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = typeof value === 'string' ? value : value.target.value;
@@ -122,7 +142,7 @@ export default function IndicatorSourceSelector({
 
       {/* Conditional Rendering Based on Selection */}
       {selectedSource === "organizational-kpi" && (
-        <div className="space-y-4 border-l-2 border-blue-500 pl-4 mt-4">
+        <div className="space-y-4 mt-4">
           <DropDown
             label="Thematic Area/Pillar"
             value={thematicAreaPillar || ""} // Convert null to empty string for UI
@@ -132,11 +152,21 @@ export default function IndicatorSourceSelector({
             options={thematicAreaOptions}
             isBigger
           />
+          <DropDown
+            label="SDN Org KPIs"
+            value={linkKpiToSdnOrgKpi || ""}
+            name="linkKpiToSdnOrgKpi"
+            placeholder={isLoadingKpis ? "Loading KPIs..." : "Select a KPI"}
+            onChange={(val) => setLinkKpiToSdnOrgKpi(val as string)}
+            options={kpiOptions}
+            isBigger
+          />
         </div>
+
       )}
 
       {selectedSource === "custom-indicator" && (
-        <div className="space-y-4 border-l-2 border-green-500 pl-4 mt-4">
+        <div className="space-y-4 mt-4">
           <TextInput
             label="Indicator Statement"
             value={customIndicatorStatement || ""} // Convert null to empty string for UI

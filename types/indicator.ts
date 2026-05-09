@@ -66,6 +66,8 @@ export type IndicatorPayload = {
 
 export type IndicatorSourceData = {
   indicatorSource: string;
-  thematicAreasOrPillar: string;
-  statement: string;
+  thematicAreasOrPillar: string | null;
+  statement: string | null;
+  linkKpiToSdnOrgKpi: string | null;
 };
+

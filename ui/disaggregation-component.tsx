@@ -1,20 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import Checkbox from "@/ui/form/checkbox";
 import DropDown from "./form/select-dropdown";
 import naija from "naija-state-local-government";
-import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 import { IndicatorDisaggregationItem } from "@/types/indicator";
 
-// ─── Disaggregation type definitions ──────────────────────────────────────────
+// ─── Disaggregation type definitions
 
 const DISAGG_TYPES = [
-  "Gender & Social Inclusion",
+  "Gender & Social Inclusion (Sex)",
   "Age",
   "State",
   "Year",
-  "Thematic Area",
   "Donor Type",
   "Policy Action Type",
   "Institution Type",
@@ -26,7 +24,7 @@ type DisaggType = (typeof DISAGG_TYPES)[number];
 
 /** Fixed categories that are always shown (not user-selected) */
 const FIXED_CATEGORIES: Partial<Record<DisaggType, string[]>> = {
-  "Gender & Social Inclusion": ["Male", "Female", "PwDs"],
+  "Gender & Social Inclusion (Sex)": ["Male", "Female", "PwDs"],
   Age: ["Below 18", "18–35", "36–50", "50+"],
   "Donor Type": ["Bilateral", "Multilateral"],
   "Policy Action Type": ["Legislative", "Administrative"],
@@ -40,11 +38,11 @@ const FIXED_CATEGORIES: Partial<Record<DisaggType, string[]>> = {
     "LGA Council",
     "CSOs",
   ],
-  Sector: ["Environment", "Economy", "Climate Change", "Health", "Education"],
+  Sector: ["Environment", "Economy", "Climate Change", "Health", "Education", "Agriculture"],
 };
 
 /** Types where the user picks categories from a dropdown and adds them as rows */
-const PICK_AND_ADD_TYPES: DisaggType[] = ["State", "Year", "Thematic Area"];
+const PICK_AND_ADD_TYPES: DisaggType[] = ["State", "Year"];
 
 function getDropdownOptions(type: DisaggType) {
   switch (type) {
@@ -55,14 +53,12 @@ function getDropdownOptions(type: DisaggType) {
         const y = (2015 + i).toString() + (i === 11 ? "+" : "");
         return { label: y, value: y };
       });
-    case "Thematic Area":
-      return THEMATIC_AREAS_OPTIONS;
     default:
       return [];
   }
 }
 
-// ─── Row type (one category entry) ────────────────────────────────────────────
+// ─── Row type (one category entry)
 
 type DisaggRow = {
   category: string;
@@ -70,9 +66,16 @@ type DisaggRow = {
   target: string; // target input
 };
 
-// ─── Component props ───────────────────────────────────────────────────────────
+// ─── Component props
 
 type DisaggregationComponentProps = {
+  /**
+   * "setup"   → shows checkboxes only (no value inputs)
+   * "baseline" → shows category + baseline value inputs per checked type
+   * "target"   → shows category + target value inputs per checked type
+   * undefined  → legacy combined view (checkboxes + both columns together)
+   */
+  view?: "setup" | "baseline" | "target";
   cumulativeValue?: string | number;
   cumulativeTarget?: string | number;
   onChange?: (
@@ -81,9 +84,17 @@ type DisaggregationComponentProps = {
       "indicatorDisaggregationId" | "indicatorId"
     >[],
   ) => void;
+  /** Shared rows state when using split views – pass the same state from the parent */
+  sharedRows?: Record<string, DisaggRow[]>;
+  /** Shared checkboxes state when using split views */
+  sharedCheckboxes?: boolean[];
+  /** Setter for shared rows state */
+  onRowsChange?: (rows: Record<string, DisaggRow[]>) => void;
+  /** Setter for shared checkboxes state */
+  onCheckboxesChange?: (checkboxes: boolean[]) => void;
 };
 
-// ─── Small helper ──────────────────────────────────────────────────────────────
+// ─── Small helper
 
 function sumRows(rows: DisaggRow[], field: "value" | "target") {
   return rows.reduce((acc, r) => acc + (parseFloat(r[field]) || 0), 0);
@@ -127,22 +138,45 @@ function ValidationBadge({
   );
 }
 
-// ─── Main component ────────────────────────────────────────────────────────────
+// ─── Main component
 
 export default function DisaggregationComponent({
+  view,
   cumulativeValue,
   cumulativeTarget,
   onChange,
+  sharedRows,
+  sharedCheckboxes,
+  onRowsChange,
+  onCheckboxesChange,
 }: DisaggregationComponentProps) {
-  const [checkboxes, setCheckboxes] = useState<boolean[]>(
+  // If shared state is provided from parent, use it; otherwise manage locally
+  const [localCheckboxes, setLocalCheckboxes] = useState<boolean[]>(
     Array(DISAGG_TYPES.length).fill(false),
   );
-
-  // For each disagg type, maintain a list of rows
-  const [rows, setRows] = useState<Record<string, DisaggRow[]>>({});
-
-  // For pick-and-add: which option is currently selected in the dropdown
+  const [localRows, setLocalRows] = useState<Record<string, DisaggRow[]>>({});
   const [pickedOption, setPickedOption] = useState<Record<string, string>>({});
+
+  const checkboxes = sharedCheckboxes ?? localCheckboxes;
+  const rows = sharedRows ?? localRows;
+
+  const setCheckboxes = (updater: boolean[] | ((prev: boolean[]) => boolean[])) => {
+    const next = typeof updater === "function" ? updater(checkboxes) : updater;
+    if (onCheckboxesChange) {
+      onCheckboxesChange(next);
+    } else {
+      setLocalCheckboxes(next);
+    }
+  };
+
+  const setRows = (updater: Record<string, DisaggRow[]> | ((prev: Record<string, DisaggRow[]>) => Record<string, DisaggRow[]>)) => {
+    const next = typeof updater === "function" ? updater(rows) : updater;
+    if (onRowsChange) {
+      onRowsChange(next);
+    } else {
+      setLocalRows(next);
+    }
+  };
 
   const cumVal = parseFloat(String(cumulativeValue)) || 0;
   const cumTgt = parseFloat(String(cumulativeTarget)) || 0;
@@ -152,7 +186,7 @@ export default function DisaggregationComponent({
     (_, i) => checkboxes[i] && DISAGG_TYPES[i] !== "None",
   );
 
-  // ── Initialise rows when a type is first checked ──────────────────────────
+  // Initialise rows when a type is first checked
   useEffect(() => {
     setRows((prev) => {
       const next = { ...prev };
@@ -176,9 +210,10 @@ export default function DisaggregationComponent({
       });
       return next;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkboxes]);
 
-  // ── Notify parent whenever rows change ────────────────────────────────────
+  // Notify parent whenever rows change
   useEffect(() => {
     if (!onChange) return;
     const items: Omit<
@@ -199,7 +234,7 @@ export default function DisaggregationComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows]);
 
-  // ── Checkbox toggle ───────────────────────────────────────────────────────
+  // Checkbox toggle
   const toggleCheckbox = (index: number) => {
     const isNone = DISAGG_TYPES[index] === "None";
     setCheckboxes((prev) => {
@@ -214,7 +249,7 @@ export default function DisaggregationComponent({
     });
   };
 
-  // ── Row field update ──────────────────────────────────────────────────────
+  // Row field update
   const updateRow = (
     type: string,
     rowIndex: number,
@@ -228,13 +263,13 @@ export default function DisaggregationComponent({
     });
   };
 
-  // ── Pick-and-add: add a selected option as a new row ─────────────────────
+  // Pick-and-add: add a selected option as a new row
   const addPickedRow = (type: string) => {
     const selected = pickedOption[type];
     if (!selected) return;
     setRows((prev) => {
       const typeRows = prev[type] ?? [];
-      if (typeRows.some((r) => r.category === selected)) return prev; // already added
+      if (typeRows.some((r) => r.category === selected)) return prev;
       return {
         ...prev,
         [type]: [...typeRows, { category: selected, value: "", target: "" }],
@@ -243,7 +278,7 @@ export default function DisaggregationComponent({
     setPickedOption((prev) => ({ ...prev, [type]: "" }));
   };
 
-  // ── Remove a pick-and-add row ─────────────────────────────────────────────
+  // Remove a pick-and-add row
   const removeRow = (type: string, rowIndex: number) => {
     setRows((prev) => {
       const typeRows = [...(prev[type] ?? [])];
@@ -252,12 +287,142 @@ export default function DisaggregationComponent({
     });
   };
 
-  // ── Render the table for a disaggregation type ────────────────────────────
+  // ── Render a single-column input section (baseline OR target)
+  const renderSingleColumnSection = (type: DisaggType, field: "value" | "target") => {
+    const typeRows = rows[type] ?? [];
+    const isPickAndAdd = PICK_AND_ADD_TYPES.includes(type);
+    const options = isPickAndAdd ? getDropdownOptions(type) : [];
+    const total = field === "value" ? cumVal : cumTgt;
+    const sectionSum = sumRows(typeRows, field);
+    const label = field === "value" ? "Baseline" : "Target";
+
+    return (
+      <div key={type} className="border border-gray-200 rounded-lg overflow-hidden">
+        {/* Header */}
+        <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-2">
+          <span className="text-sm font-semibold text-gray-800">{type}</span>
+          {total > 0 && (
+            <ValidationBadge sum={sectionSum} total={total} label={label} />
+          )}
+        </div>
+
+        {/* Pick-and-add row */}
+        {isPickAndAdd && (
+          <div className="px-4 py-3 bg-blue-50/40 border-b border-gray-200 flex items-center gap-3">
+            <div className="flex-1">
+              <DropDown
+                name={`pick-${type}-${field}`}
+                value={pickedOption[type] ?? ""}
+                onChange={(v) =>
+                  setPickedOption((prev) => ({ ...prev, [type]: v }))
+                }
+                options={options.filter(
+                  (o) => !typeRows.some((r) => r.category === o.value),
+                )}
+                placeholder={`Select ${type}…`}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => addPickedRow(type)}
+              disabled={!pickedOption[type]}
+              className="shrink-0 h-10 px-4 rounded-md text-sm font-medium bg-(--primary) text-white disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
+              + Add
+            </button>
+          </div>
+        )}
+
+        {/* Column headers */}
+        {typeRows.length > 0 && (
+          <div className="grid grid-cols-[1fr_1fr] gap-px bg-gray-200">
+            <div className="bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              Category
+            </div>
+            <div className="bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              {label} Value
+            </div>
+          </div>
+        )}
+
+        {/* Rows */}
+        {typeRows.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-4 italic">
+            {isPickAndAdd
+              ? `Select a ${type.toLowerCase()} from the dropdown above and click + Add to begin.`
+              : "No categories."}
+          </p>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {typeRows.map((row, ri) => (
+              <div
+                key={row.category}
+                className="grid grid-cols-[1fr_1fr] gap-px bg-gray-100 items-center">
+                {/* Category label */}
+                <div className="bg-white px-4 py-2.5 flex items-center justify-between gap-2">
+                  <span className="text-sm text-gray-700 font-medium">
+                    {row.category}
+                  </span>
+                  {isPickAndAdd && (
+                    <button
+                      type="button"
+                      onClick={() => removeRow(type, ri)}
+                      className="text-gray-300 hover:text-red-400 transition-colors text-xs"
+                      title="Remove">
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* Value input */}
+                <div className="bg-white px-3 py-1.5">
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={row[field]}
+                    onChange={(e) => updateRow(type, ri, field, e.target.value)}
+                    placeholder="0"
+                    className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Sum footer */}
+        {typeRows.length > 0 && (
+          <div className="grid grid-cols-[1fr_1fr] gap-px bg-gray-200 border-t border-gray-200">
+            <div className="bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-500">
+              Total
+            </div>
+            <div
+              className={`bg-gray-50 px-4 py-2 text-xs font-bold ${
+                total > 0 && Math.abs(total - sectionSum) < 0.001
+                  ? "text-green-600"
+                  : total > 0 && sectionSum > total
+                    ? "text-red-500"
+                    : "text-gray-700"
+              }`}>
+              {sectionSum.toLocaleString()}
+              {total > 0 && (
+                <span className="text-gray-400 font-normal">
+                  {" "}
+                  / {total.toLocaleString()}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ── Render the combined table for a disaggregation type (legacy / no view prop)
   const renderTypeSection = (type: DisaggType) => {
     const typeRows = rows[type] ?? [];
     const isPickAndAdd = PICK_AND_ADD_TYPES.includes(type);
     const options = isPickAndAdd ? getDropdownOptions(type) : [];
-
     const valueSum = sumRows(typeRows, "value");
     const targetSum = sumRows(typeRows, "target");
 
@@ -341,7 +506,6 @@ export default function DisaggregationComponent({
               <div
                 key={row.category}
                 className="grid grid-cols-[1fr_1fr_1fr] gap-px bg-gray-100 items-center">
-                {/* Category label */}
                 <div className="bg-white px-4 py-2.5 flex items-center justify-between gap-2">
                   <span className="text-sm text-gray-700 font-medium">
                     {row.category}
@@ -356,32 +520,24 @@ export default function DisaggregationComponent({
                     </button>
                   )}
                 </div>
-
-                {/* Baseline value */}
                 <div className="bg-white px-3 py-1.5">
                   <input
                     type="number"
                     min="0"
                     step="any"
                     value={row.value}
-                    onChange={(e) =>
-                      updateRow(type, ri, "value", e.target.value)
-                    }
+                    onChange={(e) => updateRow(type, ri, "value", e.target.value)}
                     placeholder="0"
                     className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
                   />
                 </div>
-
-                {/* Target value */}
                 <div className="bg-white px-3 py-1.5">
                   <input
                     type="number"
                     min="0"
                     step="any"
                     value={row.target}
-                    onChange={(e) =>
-                      updateRow(type, ri, "target", e.target.value)
-                    }
+                    onChange={(e) => updateRow(type, ri, "target", e.target.value)}
                     placeholder="0"
                     className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
                   />
@@ -435,6 +591,63 @@ export default function DisaggregationComponent({
     );
   };
 
+  // ── "setup" view: checkboxes only
+  if (view === "setup") {
+    return (
+      <div className="space-y-6">
+        <h4 className="font-bold leading-7 text-base">Disaggregation</h4>
+        <div className="grid grid-cols-2 gap-2">
+          {DISAGG_TYPES.map((label, index) => (
+            <Checkbox
+              key={index}
+              label={label}
+              name={label}
+              isChecked={checkboxes[index]}
+              onChange={() => toggleCheckbox(index)}
+            />
+          ))}
+        </div>
+        {checkedTypes.length === 0 && (
+          <p className="text-sm text-gray-400 italic">
+            Select one or more disaggregation types above to split your baseline
+            and target values by category.
+          </p>
+        )}
+        {checkedTypes.length > 0 && (
+          <p className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded-md px-3 py-2">
+            Disaggregated entry fields will appear in the{" "}
+            <strong>Baseline</strong> and <strong>Target</strong> sections below.
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // ── "baseline" view: category + baseline value per checked type
+  if (view === "baseline") {
+    if (checkedTypes.length === 0) return null;
+    return (
+      <div className="space-y-4 mt-2">
+        {checkedTypes.map((type) =>
+          renderSingleColumnSection(type, "value"),
+        )}
+      </div>
+    );
+  }
+
+  // ── "target" view: category + target value per checked type
+  if (view === "target") {
+    if (checkedTypes.length === 0) return null;
+    return (
+      <div className="space-y-4 mt-2">
+        {checkedTypes.map((type) =>
+          renderSingleColumnSection(type, "target"),
+        )}
+      </div>
+    );
+  }
+
+  // ── Legacy combined view (no view prop)
   return (
     <div className="space-y-6">
       <h4 className="font-bold leading-7 text-base">Disaggregation</h4>
