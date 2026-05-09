@@ -58,7 +58,7 @@ export default function SuperAdminDashboardPage() {
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
-      title: "Team Members",
+      title: "Users",
       value: summaryData.teamMembers.count,
       percentInfo: summaryData.teamMembers.trend,
       icon: "majesticons:users-line",
