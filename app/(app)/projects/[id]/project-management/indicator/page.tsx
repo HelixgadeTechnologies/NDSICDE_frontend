@@ -23,6 +23,12 @@ import axios from "axios";
 import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 import Heading from "@/ui/text-heading";
 
+const STATUS_OPTIONS = [
+  { label: "Not started", value: "Not started" },
+  { label: "In progress", value: "In progress" },
+  { label: "Completed", value: "Completed" },
+];
+
 export default function AddIndicatorForm() {
   const searchParams = useSearchParams();
   const resultType = searchParams.get("resultType") ?? "impact";
@@ -191,10 +197,14 @@ export default function AddIndicatorForm() {
 
   // Prepare payload for API
   const preparePayload = () => {
-    // Convert string values to numbers for cumulative fields
-    const cumulativeValue = parseFloat(formData.cumulativeValue as string) || 0;
+    const cumulativeValue =
+      formData.unitOfMeasure === "Status"
+        ? formData.cumulativeValue
+        : parseFloat(formData.cumulativeValue as string) || 0;
     const cumulativeTarget =
-      parseFloat(formData.cumulativeTarget as string) || 0;
+      formData.unitOfMeasure === "Status"
+        ? formData.cumulativeTarget
+        : parseFloat(formData.cumulativeTarget as string) || 0;
 
     // Format dates to ISO string
     const baseLineDate = formData.baseLineDate
@@ -326,7 +336,6 @@ export default function AddIndicatorForm() {
   }
   const resultLabel = getResultLabel(resultType);
 
-
   return (
     <div className="">
       <Heading heading={`Add ${resultLabel} Indicator`} className="ml-5" />
@@ -345,24 +354,23 @@ export default function AddIndicatorForm() {
           }}
         />
 
-        <TextInput
-          label="Indicator Definition"
-          value={formData.definition}
-          name="definition"
-          placeholder="e.g. Number of people trained in water hygiene practices"
-          onChange={(e) => handleInputChange("definition", e.target.value)}
-          isBigger
-        />
-
         <div className="grid grid-cols-2 gap-4">
           <TextInput
+            label="Indicator Definition"
+            value={formData.definition}
+            name="definition"
+            placeholder="e.g. Number of people trained in water hygiene.."
+            onChange={(e) => handleInputChange("definition", e.target.value)}
+            isBigger
+          />
+          {/* <TextInput
             label="Specific Area"
             value={formData.specificArea}
             name="specificArea"
             placeholder="---"
             onChange={(e) => handleInputChange("specificArea", e.target.value)}
             isBigger
-          />
+          /> */}
           <DropDown
             label="Unit of Measurement"
             value={formData.unitOfMeasure}
@@ -370,7 +378,7 @@ export default function AddIndicatorForm() {
             placeholder="Select unit"
             onChange={handleDropdownChange("unitOfMeasure")}
             options={[
-              { label: "Percentage", value: "Percentage" },
+              { label: "Change", value: "Change" },
               { label: "Number", value: "Number" },
               { label: "Percentage of", value: "Percentage of" },
               { label: "Percentage change", value: "Percentage change" },
@@ -410,15 +418,26 @@ export default function AddIndicatorForm() {
                 onChange={(value) => handleInputChange("baseLineDate", value)}
               />
             </div>
-            <TextInput
-              label="Cumulative Value"
-              placeholder="e.g. 50"
-              value={formData.cumulativeValue}
-              name="cumulativeValue"
-              onChange={(e) =>
-                handleInputChange("cumulativeValue", e.target.value)
-              }
-            />
+            {formData.unitOfMeasure === "Status" ? (
+              <DropDown
+                label="Cumulative Value"
+                value={formData.cumulativeValue}
+                name="cumulativeValue"
+                placeholder="Select status"
+                onChange={handleDropdownChange("cumulativeValue")}
+                options={STATUS_OPTIONS}
+              />
+            ) : (
+              <TextInput
+                label="Cumulative Value"
+                placeholder="e.g. 50"
+                value={formData.cumulativeValue}
+                name="cumulativeValue"
+                onChange={(e) =>
+                  handleInputChange("cumulativeValue", e.target.value)
+                }
+              />
+            )}
           </div>
 
           <TextareaInput
@@ -433,6 +452,7 @@ export default function AddIndicatorForm() {
           {/* ── Disaggregated baseline entry fields */}
           <DisaggregationComponent
             view="baseline"
+            isStatusType={formData.unitOfMeasure === "Status"}
             sharedCheckboxes={disaggCheckboxes}
             sharedRows={disaggRows}
             onCheckboxesChange={setDisaggCheckboxes}
@@ -442,7 +462,6 @@ export default function AddIndicatorForm() {
             cumulativeTarget={formData.cumulativeTarget}
           />
         </div>
-
 
         {/* ── Target */}
         <div className="border-t border-gray-100 pt-5 space-y-4">
@@ -460,15 +479,26 @@ export default function AddIndicatorForm() {
                 onChange={(value) => handleInputChange("targetDate", value)}
               />
             </div>
-            <TextInput
-              label="Cumulative Target"
-              placeholder="e.g. 200"
-              value={formData.cumulativeTarget}
-              name="cumulativeTarget"
-              onChange={(e) =>
-                handleInputChange("cumulativeTarget", e.target.value)
-              }
-            />
+            {formData.unitOfMeasure === "Status" ? (
+              <DropDown
+                label="Cumulative Target"
+                value={formData.cumulativeTarget}
+                name="cumulativeTarget"
+                placeholder="Select status"
+                onChange={handleDropdownChange("cumulativeTarget")}
+                options={STATUS_OPTIONS}
+              />
+            ) : (
+              <TextInput
+                label="Cumulative Target"
+                placeholder="e.g. 200"
+                value={formData.cumulativeTarget}
+                name="cumulativeTarget"
+                onChange={(e) =>
+                  handleInputChange("cumulativeTarget", e.target.value)
+                }
+              />
+            )}
           </div>
 
           <TextareaInput
@@ -483,6 +513,7 @@ export default function AddIndicatorForm() {
           {/* ── Disaggregated target entry fields */}
           <DisaggregationComponent
             view="target"
+            isStatusType={formData.unitOfMeasure === "Status"}
             sharedCheckboxes={disaggCheckboxes}
             sharedRows={disaggRows}
             onCheckboxesChange={setDisaggCheckboxes}
@@ -493,10 +524,7 @@ export default function AddIndicatorForm() {
           />
         </div>
 
-
-
         {/* ── Responsible persons */}
-
 
         <div className="border-t border-gray-100 pt-5">
           <TagInput

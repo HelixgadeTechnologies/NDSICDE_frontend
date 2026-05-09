@@ -28,21 +28,31 @@ const FIXED_CATEGORIES: Partial<Record<DisaggType, string[]>> = {
   Age: ["Below 18", "18–35", "36–50", "50+"],
   "Donor Type": ["Bilateral", "Multilateral"],
   "Policy Action Type": ["Legislative", "Administrative"],
-  "Institution Type": [
-    "MDAs",
-    "Legislators",
-    "Executive",
-    "Community Leadership",
-    "CDC",
-    "Regional Body",
-    "LGA Council",
-    "CSOs",
-  ],
-  Sector: ["Environment", "Economy", "Climate Change", "Health", "Education", "Agriculture"],
 };
 
+const INSTITUTION_TYPES = [
+  "MDAs",
+  "Legislators",
+  "Executive",
+  "Community Leadership",
+  "CDC",
+  "Regional Body",
+  "LGA Council",
+  "CSOs",
+];
+
+const SECTOR_TYPES = [
+  "Environment",
+  "Economy",
+  "Climate Change",
+  "Health",
+  "Education",
+  "Agriculture",
+];
+
 /** Types where the user picks categories from a dropdown and adds them as rows */
-const PICK_AND_ADD_TYPES: DisaggType[] = ["State", "Year"];
+const PICK_AND_ADD_TYPES: DisaggType[] = ["State", "Year", "Institution Type", "Sector"];
+
 
 function getDropdownOptions(type: DisaggType) {
   switch (type) {
@@ -53,8 +63,13 @@ function getDropdownOptions(type: DisaggType) {
         const y = (2015 + i).toString() + (i === 11 ? "+" : "");
         return { label: y, value: y };
       });
+    case "Institution Type":
+      return INSTITUTION_TYPES.map((t) => ({ label: t, value: t }));
+    case "Sector":
+      return SECTOR_TYPES.map((t) => ({ label: t, value: t }));
     default:
       return [];
+
   }
 }
 
@@ -92,7 +107,16 @@ type DisaggregationComponentProps = {
   onRowsChange?: (rows: Record<string, DisaggRow[]>) => void;
   /** Setter for shared checkboxes state */
   onCheckboxesChange?: (checkboxes: boolean[]) => void;
+  /** Whether the unit of measure is Status */
+  isStatusType?: boolean;
 };
+
+const STATUS_OPTIONS = [
+  { label: "Not started", value: "Not started" },
+  { label: "In progress", value: "In progress" },
+  { label: "Completed", value: "Completed" },
+];
+
 
 // ─── Small helper
 
@@ -149,7 +173,9 @@ export default function DisaggregationComponent({
   sharedCheckboxes,
   onRowsChange,
   onCheckboxesChange,
+  isStatusType = false,
 }: DisaggregationComponentProps) {
+
   // If shared state is provided from parent, use it; otherwise manage locally
   const [localCheckboxes, setLocalCheckboxes] = useState<boolean[]>(
     Array(DISAGG_TYPES.length).fill(false),
@@ -297,13 +323,15 @@ export default function DisaggregationComponent({
     const label = field === "value" ? "Baseline" : "Target";
 
     return (
-      <div key={type} className="border border-gray-200 rounded-lg overflow-hidden">
+      <div key={type} className="border border-gray-200 rounded-lg">
         {/* Header */}
-        <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-2">
+        <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-2 rounded-t-lg">
+
           <span className="text-sm font-semibold text-gray-800">{type}</span>
-          {total > 0 && (
+          {total > 0 && !isStatusType && (
             <ValidationBadge sum={sectionSum} total={total} label={label} />
           )}
+
         </div>
 
         {/* Pick-and-add row */}
@@ -375,24 +403,37 @@ export default function DisaggregationComponent({
 
                 {/* Value input */}
                 <div className="bg-white px-3 py-1.5">
-                  <input
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={row[field]}
-                    onChange={(e) => updateRow(type, ri, field, e.target.value)}
-                    placeholder="0"
-                    className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
-                  />
+                  {isStatusType ? (
+                    <DropDown
+                      name={`val-${type}-${ri}`}
+                      value={row[field]}
+                      onChange={(v) => updateRow(type, ri, field, v as string)}
+                      options={STATUS_OPTIONS}
+                      placeholder="Select status"
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={row[field]}
+                      onChange={(e) =>
+                        updateRow(type, ri, field, e.target.value)
+                      }
+                      placeholder="0"
+                      className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
+                    />
+                  )}
                 </div>
+
               </div>
             ))}
           </div>
         )}
 
         {/* Sum footer */}
-        {typeRows.length > 0 && (
-          <div className="grid grid-cols-[1fr_1fr] gap-px bg-gray-200 border-t border-gray-200">
+        {typeRows.length > 0 && !isStatusType && (
+          <div className="grid grid-cols-[1fr_1fr] gap-px bg-gray-200 border-t border-gray-200 rounded-b-lg overflow-hidden">
             <div className="bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-500">
               Total
             </div>
@@ -414,6 +455,8 @@ export default function DisaggregationComponent({
             </div>
           </div>
         )}
+
+
       </div>
     );
   };
@@ -429,9 +472,10 @@ export default function DisaggregationComponent({
     return (
       <div
         key={type}
-        className="border border-gray-200 rounded-lg overflow-hidden">
+        className="border border-gray-200 rounded-lg">
         {/* Header */}
-        <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-2">
+        <div className="bg-gray-50 px-4 py-2.5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-2 rounded-t-lg">
+
           <div>
             <span className="text-sm font-semibold text-gray-800">{type}</span>
             {isPickAndAdd && (
@@ -443,13 +487,14 @@ export default function DisaggregationComponent({
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            {cumVal > 0 && (
+            {cumVal > 0 && !isStatusType && (
               <ValidationBadge sum={valueSum} total={cumVal} label="Baseline" />
             )}
-            {cumTgt > 0 && (
+            {cumTgt > 0 && !isStatusType && (
               <ValidationBadge sum={targetSum} total={cumTgt} label="Target" />
             )}
           </div>
+
         </div>
 
         {/* Pick-and-add row */}
@@ -521,35 +566,60 @@ export default function DisaggregationComponent({
                   )}
                 </div>
                 <div className="bg-white px-3 py-1.5">
-                  <input
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={row.value}
-                    onChange={(e) => updateRow(type, ri, "value", e.target.value)}
-                    placeholder="0"
-                    className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
-                  />
+                  {isStatusType ? (
+                    <DropDown
+                      name={`val-${type}-${ri}`}
+                      value={row.value}
+                      onChange={(v) => updateRow(type, ri, "value", v as string)}
+                      options={STATUS_OPTIONS}
+                      placeholder="Select status"
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={row.value}
+                      onChange={(e) =>
+                        updateRow(type, ri, "value", e.target.value)
+                      }
+                      placeholder="0"
+                      className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
+                    />
+                  )}
                 </div>
                 <div className="bg-white px-3 py-1.5">
-                  <input
-                    type="number"
-                    min="0"
-                    step="any"
-                    value={row.target}
-                    onChange={(e) => updateRow(type, ri, "target", e.target.value)}
-                    placeholder="0"
-                    className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
-                  />
+                  {isStatusType ? (
+                    <DropDown
+                      name={`tgt-${type}-${ri}`}
+                      value={row.target}
+                      onChange={(v) => updateRow(type, ri, "target", v as string)}
+                      options={STATUS_OPTIONS}
+                      placeholder="Select status"
+                    />
+                  ) : (
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={row.target}
+                      onChange={(e) =>
+                        updateRow(type, ri, "target", e.target.value)
+                      }
+                      placeholder="0"
+                      className="w-full h-9 outline-none border border-gray-300 focus:border-[--primary-light] rounded-md px-3 text-sm"
+                    />
+                  )}
                 </div>
+
               </div>
             ))}
           </div>
         )}
 
         {/* Sum footer */}
-        {typeRows.length > 0 && (
-          <div className="grid grid-cols-[1fr_1fr_1fr] gap-px bg-gray-200 border-t border-gray-200">
+        {typeRows.length > 0 && !isStatusType && (
+          <div className="grid grid-cols-[1fr_1fr_1fr] gap-px bg-gray-200 border-t border-gray-200 rounded-b-lg overflow-hidden">
             <div className="bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-500">
               Total
             </div>
@@ -587,6 +657,8 @@ export default function DisaggregationComponent({
             </div>
           </div>
         )}
+
+
       </div>
     );
   };
