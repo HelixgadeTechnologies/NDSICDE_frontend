@@ -11,6 +11,9 @@ import { fetchRoles } from "@/lib/api/roles";
 import { DropdownOption } from "@/types/project-management-types";
 import { ChangeEvent, useEffect, useState } from "react";
 import TagInput from "@/ui/form/tag-input";
+import { updateUser } from "@/lib/api/user-management";
+import { useRoleStore } from "@/store/role-store";
+import { toast } from "react-toastify";
 
 type EditProps = {
   isOpen: boolean;
@@ -95,8 +98,36 @@ export default function EditTeamMember({
     "Clean Water One",
   ];
 
-  const handleEdit = () => {
-    onEdit();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { token } = useRoleStore();
+
+  const handleEdit = async () => {
+    setIsSubmitting(true);
+    try {
+      await updateUser(
+        user.userId,
+        {
+          fullName,
+          email,
+          roleId,
+          department,
+          phoneNumber,
+          status,
+          assignedProjectId: "ALL",
+        },
+        token ?? ""
+      );
+      toast.success("User updated successfully");
+      onEdit();
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update user"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -161,7 +192,11 @@ export default function EditTeamMember({
             />
           </div>
         </div>
-        <Button content="Save Changes" onClick={handleEdit} />
+        <Button
+          content="Save Changes"
+          onClick={handleEdit}
+          isLoading={isSubmitting}
+        />
       </form>
     </Modal>
   );
