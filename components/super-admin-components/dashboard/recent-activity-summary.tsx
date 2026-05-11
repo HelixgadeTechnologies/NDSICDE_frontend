@@ -74,10 +74,10 @@ export default function RecentActivityTab() {
             <Avatar name={activity?.actor} />
             <div className="space-y-1">
               <p className="text-sm font-medium text-[#242424]">
-                {activity?.actor} {activity?.activityType}
+                {activity?.actor} ({activity?.activityType})
               </p>
               <span className="text-xs text-[#737373] block">
-                Project: {activity?.projectName}
+                Project: {activity?.projectName.substring(0, 50) + "..."}
               </span>
               <span className="text-xs text-[#737373] block">
                 {activity?.timeAgo}

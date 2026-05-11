@@ -59,7 +59,7 @@ export default function ProjectsTable() {
           projectName.toLowerCase().includes(lowerQuery) ||
           community.toLowerCase().includes(lowerQuery) ||
           state.toLowerCase().includes(lowerQuery) ||
-          item.strategicObjectiveStatement
+          item.strategicObjective.statement
             ?.toLowerCase()
             .includes(lowerQuery) ||
           item.thematicAreasOrPillar?.toLowerCase().includes(lowerQuery)
@@ -81,7 +81,7 @@ export default function ProjectsTable() {
 
     // Apply objective filter
     if (filters.objective) {
-      result = result.filter((item) => item.strategicObjectiveStatement === filters.objective);
+      result = result.filter((item) => item.strategicObjective.statement === filters.objective);
     }
 
     setFilteredData(result);
@@ -90,7 +90,7 @@ export default function ProjectsTable() {
   // Dynamically generate objective options based on current projects data
   const objectiveOptions = [
     { label: "All Objectives", value: "" },
-    ...Array.from(new Set((data as unknown as ProjectApiResponse[])?.map(p => p.strategicObjectiveStatement).filter(Boolean)))
+    ...Array.from(new Set((data as unknown as ProjectApiResponse[])?.map(p => p.strategicObjective?.statement).filter(Boolean)))
       .map(o => ({ label: o as string, value: o as string }))
   ];
 
@@ -127,6 +127,8 @@ export default function ProjectsTable() {
       console.error(`Error: ${error}`);
     }
   };
+
+  console.log(filteredData)
 
   return (
     <CardComponent>
@@ -190,7 +192,7 @@ export default function ProjectsTable() {
                 </Link>
               </td>
               <td className="px-4 py-3">
-                {row.strategicObjectiveStatement || "N/A"}
+                {row.strategicObjective?.statement.substring(0, 25) + "..." || "N/A"}
               </td>
               <td className="px-4 py-3">
                 <span
@@ -244,14 +246,16 @@ export default function ProjectsTable() {
                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50"
                       onClick={(e) => e.stopPropagation()}>
                       <ul className="text-sm">
-                        <li className="cursor-pointer hover:bg-gray-50 hover:text-blue-600 flex gap-2 p-3 items-center">
+                        <Link
+                          href={`/dashboard/create-project?projectId=${row.projectId}&mode=edit`}
+                          className="hover:bg-gray-50 hover:text-blue-600 flex gap-2 p-3 items-center">
                           <Icon
                             icon={"ph:pencil-simple-line"}
                             height={20}
                             width={20}
                           />
                           Edit
-                        </li>
+                        </Link>
                         {user?.role === "super-admin" && (
                           <li
                             onClick={() => {

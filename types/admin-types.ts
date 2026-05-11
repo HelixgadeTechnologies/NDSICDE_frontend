@@ -29,7 +29,9 @@ export type ProjectApiResponse = {
   community: string;
   thematicAreasOrPillar: string;
   strategicObjectiveId: string;
-  strategicObjectiveStatement: string;
+  strategicObjective: {
+    statement: string
+  };
   status: string;
   createAt: string;
   updateAt: string;
