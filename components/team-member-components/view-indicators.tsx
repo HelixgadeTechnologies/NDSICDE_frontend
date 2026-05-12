@@ -44,6 +44,10 @@ type IndicatorData = {
   targetNarrative: string;
   targetType: string;
   responsiblePersons: string;
+  actual?: number;
+  performance?: number;
+  target?: number;
+  resultTypeId?: string;
   IndicatorDisaggregation: IndicatorDisaggregation[];
 };
 
@@ -239,7 +243,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                     const query = new URLSearchParams({
                       orgKpiId: selectedIndicator.orgKpiId || "",
                       resultTypeId:
-                        (selectedIndicator as any).resultTypeId || "",
+                        selectedIndicator.resultTypeId || "",
                       indicatorSource: selectedIndicator.indicatorSource || "",
                       thematicArea:
                         selectedIndicator.thematicAreasOrPillar || "",
@@ -391,12 +395,12 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
   return (
     <div className="space-y-4 mt-6">
       {indicators.map((indicator, index) => {
-        const target   = indicator.cumulativeTarget ?? (indicator as any).target ?? null;
+        const target   = indicator.cumulativeTarget ?? indicator.target ?? null;
         const actual   = indicator.actual ?? null;
 
         const computedPerformance =
-          (indicator as any).performance != null
-            ? (indicator as any).performance
+          indicator.performance != null
+            ? indicator.performance
             : target && actual != null
             ? Math.round((actual / target) * 100)
             : 0;
