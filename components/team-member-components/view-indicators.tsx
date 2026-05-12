@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
+import { getResultTypeById } from "@/lib/api/result-types";
+import MeterPieChart from "@/ui/meter-pie-chart";
 
 // ─── Types
 
@@ -94,17 +96,55 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
 
   useEffect(() => {
     const fetchIndicators = async () => {
-      if (!resultId) return;
+      if (!resultId || !projectId) return;
       setIsLoading(true);
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/resultType/${resultId}`,
-        );
-        if (response.data?.success) {
-          setIndicators(response.data.data || []);
-        } else {
-          toast.error("Failed to fetch indicators.");
+        // Fetch the result type first
+        const resultType = await getResultTypeById(resultId);
+        if (!resultType) {
+           setIndicators([]);
+           setIsLoading(false);
+           return;
         }
+
+        const name = resultType.resultName.toLowerCase();
+        let segment = "";
+        let idKey = "id";
+        if (name.includes("output")) { segment = "outputs"; idKey = "outputId"; }
+        else if (name.includes("outcome")) { segment = "outcomes"; idKey = "outcomeId"; }
+        else if (name.includes("impact")) { segment = "impacts"; idKey = "impactId"; }
+        
+        if (!segment) {
+           setIndicators([]);
+           setIsLoading(false);
+           return;
+        }
+
+        // Fetch results for the project
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/${segment}/project/${projectId}`
+        );
+        const rows: any[] = res.data?.data || [];
+
+        // For each result row, fetch its indicators
+        let allIndicators: IndicatorData[] = [];
+        await Promise.all(
+          rows.map(async (row) => {
+            const specificResultId = row[idKey];
+            try {
+              const indRes = await axios.get(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${specificResultId}`
+              );
+              if (indRes.data?.success && indRes.data?.data) {
+                allIndicators = [...allIndicators, ...indRes.data.data];
+              }
+            } catch (err) {
+               // ignore failures for individual results
+            }
+          })
+        );
+        
+        setIndicators(allIndicators);
       } catch (error) {
         console.error("Error fetching indicators:", error);
         toast.error("An error occurred while fetching indicators.");
@@ -114,7 +154,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
     };
 
     fetchIndicators();
-  }, [resultId]);
+  }, [resultId, projectId]);
 
   if (isLoading) {
     return (
@@ -319,7 +359,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
               </div>
 
               {/* Actual */}
-              <div className="bg-emerald-50 px-4 py-3 rounded-md border border-emerald-100">
+              <div className="bg-emerald-50 px-4 py-3 rounded-md border border-emerald-100 relative">
                 <div className="flex justify-between items-center">
                   <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest">
                     Actual
@@ -329,7 +369,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                   </span>
                 </div>
                 <p className="text-2xl font-semibold text-emerald-900 mt-0.5">
-                  —
+                  {selectedIndicator.actual ?? "—"}
                 </p>
                 {hasDisagg && (
                   <DisaggChips
@@ -350,7 +390,18 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
   // ── List view 
   return (
     <div className="space-y-4 mt-6">
-      {indicators.map((indicator, index) => (
+      {indicators.map((indicator, index) => {
+        const target   = indicator.cumulativeTarget ?? (indicator as any).target ?? null;
+        const actual   = indicator.actual ?? null;
+
+        const computedPerformance =
+          (indicator as any).performance != null
+            ? (indicator as any).performance
+            : target && actual != null
+            ? Math.round((actual / target) * 100)
+            : 0;
+
+        return (
         <div
           key={indicator.indicatorId || index}
           onClick={() => setSelectedIndicator(indicator)}
@@ -370,7 +421,9 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                 Source: {indicator.indicatorSource || "N/A"}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <MeterPieChart performance={computedPerformance} />
+              
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -413,7 +466,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
             )}
           </div>
         </div>
-      ))}
+      )})}
     </div>
   );
 }

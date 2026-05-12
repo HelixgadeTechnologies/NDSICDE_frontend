@@ -176,7 +176,7 @@ function FormOne({ onClick, formData, updateFormData, isEditMode }: FormOneProps
               href={"/dashboard"}
             />
           </div>
-          <div className="w-3/5">isEditMode ? "/dashboard/project-management" : 
+          <div className="w-3/5">
             <Button content="Next" onClick={handleNext} />
           </div>
         </div>
@@ -185,7 +185,7 @@ function FormOne({ onClick, formData, updateFormData, isEditMode }: FormOneProps
   );
 }
 
-// ─── Form Step 2 ─────────────────────────────────────────────────────────────
+// ─── Form Step 2 
 
 function FormTwo({
   onClick,

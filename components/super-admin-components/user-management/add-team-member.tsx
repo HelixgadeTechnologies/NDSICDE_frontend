@@ -1,13 +1,14 @@
 "use client";
 
 import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useMemo, useState, useEffect } from "react";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
 import TagInput from "@/ui/form/tag-input";
+import FileUploader from "@/ui/form/file-uploader";
 import { useRoleStore } from "@/store/role-store";
 import { createUser } from "@/lib/api/user-management";
 import { useProjects } from "@/context/ProjectsContext";
@@ -23,6 +24,17 @@ const ALL_LABEL = "All";
 export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState(1);
+  const [signatureFiles, setSignatureFiles] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setStep(1);
+      setSignatureFiles([]);
+      setError(null);
+    }
+  }, [isOpen]);
+
   // Tags shown in the UI — either ["All"] or one/more project names
   const [selectedProjectTags, setSelectedProjectTags] = useState<string[]>([]);
   const { projects, projectOptions } = useProjects();
@@ -131,7 +143,9 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         subtitle="Fill in the details to add a new team member"
       />
       <form onSubmit={addUser}>
-        <div className="grid grid-cols-2 my-4 gap-5">
+        {step === 1 ? (
+          <>
+            <div className="grid grid-cols-2 my-4 gap-5">
           <TextInput
             value={fullName}
             label="Full Name"
@@ -216,12 +230,38 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
             />
           </div>
         </div>
-        {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
-        <Button
-          content="Save Changes"
-          isLoading={isLoading}
-          isDisabled={isLoading}
-        />
+            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+            <div className="flex w-full mt-6">
+              <Button content="Next" type="button" onClick={() => setStep(2)} />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="my-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Upload User's Signature</h3>
+              <FileUploader
+                maxFiles={1}
+                multiple={false}
+                autoUpload={false}
+                onFilesChange={(files) => setSignatureFiles(files)}
+              />
+            </div>
+            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+            <div className="flex gap-4 mt-6">
+              <div className="w-1/2">
+                <Button content="Back" isSecondary type="button" onClick={() => setStep(1)} />
+              </div>
+              <div className="w-1/2">
+                <Button
+                  content="Save Changes"
+                  type="submit"
+                  isLoading={isLoading}
+                  isDisabled={isLoading}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </form>
     </Modal>
   );
