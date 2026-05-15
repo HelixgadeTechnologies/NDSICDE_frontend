@@ -153,7 +153,7 @@ export default function Table<T>({
                   return (
                     <tr
                       key={i}
-                      className="border-t border-[#E5E7EB] h-15 text-[#6B7280]"
+                      className="border-t border-[#E5E7EB] h-30 text-[#6B7280]"
                     >
                       {renderRow(row, i, false)}
                     </tr>
@@ -166,7 +166,7 @@ export default function Table<T>({
                 return (
                   <tr
                     key={i}
-                    className="border-t border-[#E5E7EB] h-15 text-[#6B7280]"
+                    className="border-t border-[#E5E7EB] h-30 text-[#6B7280]"
                   >
                     {checkbox && idKey && (
                       <td className="px-6">

@@ -17,6 +17,7 @@ import {
   IndicatorFormData,
   IndicatorDisaggregationItem,
   IndicatorPayload,
+  PeriodicTargetItem,
 } from "@/types/indicator";
 
 import { fetchResultTypes, ResultType } from "@/lib/api/result-types";
@@ -24,6 +25,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 import Heading from "@/ui/text-heading";
+import Checkbox from "@/ui/form/checkbox";
 
 const STATUS_OPTIONS = [
   { label: "Not started", value: "Not started" },
@@ -52,7 +54,7 @@ export default function AddIndicatorForm() {
   const [disaggCheckboxes, setDisaggCheckboxes] = useState<boolean[]>(
     Array(9).fill(false), // 9 = number of DISAGG_TYPES
   );
-  type DisaggRow = { category: string; value: string; target: string };
+  type DisaggRow = { category: string; value: string; target: string; actual: string };
   const [disaggRows, setDisaggRows] = useState<Record<string, DisaggRow[]>>({});
 
   const [formData, setFormData] = useState<IndicatorFormData>({
@@ -76,6 +78,8 @@ export default function AddIndicatorForm() {
     responsiblePersons: [],
     result: resultId,
     resultTypeId: "",
+    isPeriodic: false,
+    PeriodicTarget: [],
     IndicatorDisaggregation: [],
   });
 
@@ -156,7 +160,7 @@ export default function AddIndicatorForm() {
   // Handle general form field changes
   const handleInputChange = (
     field: keyof IndicatorFormData,
-    value: string | number | string[],
+    value: string | number | string[] | boolean,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -173,6 +177,32 @@ export default function AddIndicatorForm() {
       }));
     };
 
+  // Periodic Target Handlers
+  const addPeriodicTarget = () => {
+    setFormData((prev) => ({
+      ...prev,
+      PeriodicTarget: [
+        ...(prev.PeriodicTarget || []),
+        { target: "", targetDate: "" }
+      ]
+    }));
+  };
+
+  const removePeriodicTarget = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      PeriodicTarget: (prev.PeriodicTarget || []).filter((_, i) => i !== index)
+    }));
+  };
+
+  const updatePeriodicTarget = (index: number, field: "target" | "targetDate", value: any) => {
+    setFormData((prev) => {
+      const newTargets = [...(prev.PeriodicTarget || [])];
+      newTargets[index] = { ...newTargets[index], [field]: value };
+      return { ...prev, PeriodicTarget: newTargets };
+    });
+  };
+
   // Handle disaggregation change — derives items from the shared row state
   const handleDisaggregationChange = (
     items: Omit<
@@ -180,20 +210,16 @@ export default function AddIndicatorForm() {
       "indicatorDisaggregationId" | "indicatorId"
     >[],
   ) => {
-    const disaggregationItems: IndicatorDisaggregationItem[] = items.map(
-      (item) => ({
-        indicatorDisaggregationId: "",
-        indicatorId: formData.indicatorId || "",
-        type: item.type,
-        category: item.category,
-        value: item.value,
-        target: item.target,
-      }),
-    );
+    const disaggregationItems = items.map((item) => ({
+      type: item.type,
+      category: item.category,
+      baseline: item.value,
+      target: item.target,
+    }));
 
     setFormData((prev) => ({
       ...prev,
-      IndicatorDisaggregation: disaggregationItems,
+      IndicatorDisaggregation: disaggregationItems as any,
     }));
   };
 
@@ -218,6 +244,14 @@ export default function AddIndicatorForm() {
       ? new Date(formData.targetDate).toISOString()
       : "";
 
+    let finalStatement = formData.statement;
+    if (formData.indicatorSource === "Organization KPI" && formData.linkKpiToSdnOrgKpi) {
+      const selectedKpi = kpiOptions.find(k => k.value === formData.linkKpiToSdnOrgKpi);
+      if (selectedKpi) {
+        finalStatement = selectedKpi.label;
+      }
+    }
+
     const payload = {
       isCreate: true,
       data: {
@@ -225,7 +259,7 @@ export default function AddIndicatorForm() {
         indicatorSource: formData.indicatorSource,
         orgKpiId: formData.orgKpiId,
         thematicAreasOrPillar: formData.thematicAreasOrPillar,
-        statement: formData.statement,
+        statement: finalStatement,
         linkKpiToSdnOrgKpi: formData.linkKpiToSdnOrgKpi,
         definition: formData.definition,
         specificArea: formData.specificArea,
@@ -242,6 +276,19 @@ export default function AddIndicatorForm() {
         // `result` is the actual entity ID (impactId / outcomeId / outputId) from the URL
         result: resultId || formData.result,
         resultTypeId: formData.resultTypeId,
+        PeriodicTarget: formData.isPeriodic
+          ? (formData.PeriodicTarget || []).map((pt) => ({
+              periodicTargetId: "",
+              indicatorId: formData.indicatorId || "",
+              target:
+                formData.unitOfMeasure === "Status"
+                  ? pt.target
+                  : parseFloat(pt.target as string) || 0,
+              targetDate: pt.targetDate
+                ? new Date(pt.targetDate).toISOString()
+                : "",
+            }))
+          : [],
         IndicatorDisaggregation: formData.IndicatorDisaggregation,
       },
     };
@@ -283,6 +330,8 @@ export default function AddIndicatorForm() {
         responsiblePersons: [],
         result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
+        isPeriodic: false,
+        PeriodicTarget: [],
         IndicatorDisaggregation: [],
       });
 
@@ -323,6 +372,8 @@ export default function AddIndicatorForm() {
       responsiblePersons: [],
       result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
       resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
+      isPeriodic: false,
+      PeriodicTarget: [],
       IndicatorDisaggregation: [],
     });
   };
@@ -513,6 +564,80 @@ export default function AddIndicatorForm() {
               handleInputChange("targetNarrative", e.target.value)
             }
           />
+
+          {/* ── Periodic Target Option */}
+          <div className="flex items-center gap-2 mt-4 pt-2">
+            <Checkbox
+            name="isPeriodic"
+            label="Is this target periodic?"
+            isChecked={formData.isPeriodic}
+            onChange={(checked) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  isPeriodic: checked,
+                  PeriodicTarget:
+                    checked && (!prev.PeriodicTarget || prev.PeriodicTarget.length === 0)
+                      ? [{ target: "", targetDate: "" }]
+                      : prev.PeriodicTarget || [],
+                }));
+              }}
+            />
+          </div>
+
+          {formData.isPeriodic && (
+            <div className="mt-2 p-4 border border-gray-100 rounded-md bg-gray-50/50 space-y-4">
+              {(formData.PeriodicTarget || []).map((pt, index) => (
+                <div key={index} className="flex gap-4 items-end relative border-b border-gray-200 pb-4 mb-2 last:border-0 last:pb-0 last:mb-0">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700 mb-1.5">
+                      Periodic Target Date
+                    </p>
+                    <DateInput
+                      value={pt.targetDate}
+                      onChange={(value) => updatePeriodicTarget(index, "targetDate", value)}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    {formData.unitOfMeasure === "Status" ? (
+                      <DropDown
+                        label="Periodic Target Value"
+                        value={pt.target as string}
+                        name={`periodicTargetValue-${index}`}
+                        placeholder="Select status"
+                        onChange={(val) => updatePeriodicTarget(index, "target", val)}
+                        options={STATUS_OPTIONS}
+                      />
+                    ) : (
+                      <TextInput
+                        label="Periodic Target Value"
+                        placeholder="e.g. 50"
+                        value={pt.target as string}
+                        name={`periodicTargetValue-${index}`}
+                        onChange={(e) => updatePeriodicTarget(index, "target", e.target.value)}
+                      />
+                    )}
+                  </div>
+                  {formData.PeriodicTarget.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removePeriodicTarget(index)}
+                      className="text-red-500 hover:text-red-700 text-sm font-medium mb-2 shrink-0"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addPeriodicTarget}
+                className="text-sm text-(--primary) font-medium mt-2 hover:underline"
+              >
+                + Add Another Period
+              </button>
+            </div>
+          )}
+
           {/* ── Disaggregated target entry fields */}
           <DisaggregationComponent
             view="target"

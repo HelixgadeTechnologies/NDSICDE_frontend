@@ -6,9 +6,8 @@ import Table from "@/ui/table";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import axios from "axios";
-import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 
 export default function ViewActualValue() {
@@ -59,7 +58,7 @@ export default function ViewActualValue() {
         <Button
           content="Report Actual Value"
           icon="si:add-fill"
-          onClick={() => window.location.assign(`/projects/${projectId}/indicator/${indicatorId}/report`)}
+          onClick={() => window.location.assign(`/projects/${projectId}/project-management/indicator/${indicatorId}/report`)}
         />
       </div>
 

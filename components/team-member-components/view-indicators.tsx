@@ -9,6 +9,8 @@ import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
 import { getResultTypeById } from "@/lib/api/result-types";
 import MeterPieChart from "@/ui/meter-pie-chart";
+import { indicatorApi } from "@/lib/api/indicatorApi";
+import GenericDeleteModal from "@/ui/generic-delete-modal";
 
 // ─── Types
 
@@ -67,20 +69,33 @@ function DisaggChips({
   valueColor = "text-gray-900",
 }: DisaggChipsProps) {
   if (!items || items.length === 0) return null;
+
+  // Group items by type (e.g. GENDER AND SOCIAL INCLUSION (SEX))
+  const grouped = items.reduce((acc, item) => {
+    const typeLabel = item.type.toUpperCase();
+    if (!acc[typeLabel]) acc[typeLabel] = [];
+    acc[typeLabel].push({ category: item.category, value: item[valueKey] ?? 0 });
+    return acc;
+  }, {} as Record<string, { category: string; value: number }[]>);
+
   return (
-    <div className="flex flex-wrap gap-1.5 mt-2">
-      {items.map((dis) => (
-        <span
-          key={`${dis.indicatorDisaggregationId}-${valueKey}`}
-          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ${chipBg}`}
+    <div className="flex flex-col gap-1.5 mt-2">
+      {Object.entries(grouped).map(([type, list]) => (
+        <div 
+          key={`${type}-${valueKey}`}
+          className={`px-3 py-1.5 rounded-md text-[11px] font-medium leading-relaxed ${chipBg}`}
         >
-          <span className="opacity-55 capitalize">
-            {dis.type} · {dis.category}
+          <span className="opacity-60 font-semibold uppercase tracking-wider">{type}:</span>
+          <span className={`ml-1.5 ${valueColor}`}>
+            {list.map((l, i) => (
+              <span key={l.category}>
+                {l.category}{" "}
+                <span className="font-bold">{l.value.toLocaleString()}</span>
+                {i < list.length - 1 ? ", " : ""}
+              </span>
+            ))}
           </span>
-          <span className={`font-bold ${valueColor}`}>
-            {(dis[valueKey] ?? 0).toLocaleString()}
-          </span>
-        </span>
+        </div>
       ))}
     </div>
   );
@@ -91,74 +106,92 @@ function DisaggChips({
 export default function ViewIndicators({ resultId }: { resultId: string }) {
   const [indicators, setIndicators] = useState<IndicatorData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [indicatorToDelete, setIndicatorToDelete] = useState<string | null>(null);
   const [selectedIndicator, setSelectedIndicator] =
     useState<IndicatorData | null>(null);
 
   const params = useParams();
   const router = useRouter();
-  const projectId = params?.id;
+  const projectId = params?.id as string;
+
+  const fetchIndicators = async () => {
+    if (!resultId || !projectId) return;
+    setIsLoading(true);
+    try {
+      // Fetch the result type first
+      const resultType = await getResultTypeById(resultId);
+      if (!resultType) {
+         setIndicators([]);
+         setIsLoading(false);
+         return;
+      }
+
+      const name = resultType.resultName.toLowerCase();
+      let segment = "";
+      let idKey = "id";
+      if (name.includes("output")) { segment = "outputs"; idKey = "outputId"; }
+      else if (name.includes("outcome")) { segment = "outcomes"; idKey = "outcomeId"; }
+      else if (name.includes("impact")) { segment = "impacts"; idKey = "impactId"; }
+      
+      if (!segment) {
+         setIndicators([]);
+         setIsLoading(false);
+         return;
+      }
+
+      // Fetch results for the project
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/${segment}/project/${projectId}`
+      );
+      const rows: any[] = res.data?.data || [];
+
+      // For each result row, fetch its indicators
+      let allIndicators: IndicatorData[] = [];
+      await Promise.all(
+        rows.map(async (row) => {
+          const specificResultId = row[idKey];
+          try {
+            const indRes = await axios.get(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${specificResultId}`
+            );
+            if (indRes.data?.success && indRes.data?.data) {
+              allIndicators = [...allIndicators, ...indRes.data.data];
+            }
+          } catch (err) {
+             // ignore failures for individual results
+          }
+        })
+      );
+      
+      setIndicators(allIndicators);
+    } catch (error) {
+      console.error("Error fetching indicators:", error);
+      toast.error("An error occurred while fetching indicators.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchIndicators = async () => {
-      if (!resultId || !projectId) return;
-      setIsLoading(true);
-      try {
-        // Fetch the result type first
-        const resultType = await getResultTypeById(resultId);
-        if (!resultType) {
-           setIndicators([]);
-           setIsLoading(false);
-           return;
-        }
-
-        const name = resultType.resultName.toLowerCase();
-        let segment = "";
-        let idKey = "id";
-        if (name.includes("output")) { segment = "outputs"; idKey = "outputId"; }
-        else if (name.includes("outcome")) { segment = "outcomes"; idKey = "outcomeId"; }
-        else if (name.includes("impact")) { segment = "impacts"; idKey = "impactId"; }
-        
-        if (!segment) {
-           setIndicators([]);
-           setIsLoading(false);
-           return;
-        }
-
-        // Fetch results for the project
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/${segment}/project/${projectId}`
-        );
-        const rows: any[] = res.data?.data || [];
-
-        // For each result row, fetch its indicators
-        let allIndicators: IndicatorData[] = [];
-        await Promise.all(
-          rows.map(async (row) => {
-            const specificResultId = row[idKey];
-            try {
-              const indRes = await axios.get(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${specificResultId}`
-              );
-              if (indRes.data?.success && indRes.data?.data) {
-                allIndicators = [...allIndicators, ...indRes.data.data];
-              }
-            } catch (err) {
-               // ignore failures for individual results
-            }
-          })
-        );
-        
-        setIndicators(allIndicators);
-      } catch (error) {
-        console.error("Error fetching indicators:", error);
-        toast.error("An error occurred while fetching indicators.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchIndicators();
   }, [resultId, projectId]);
+
+  const handleDelete = async () => {
+    if (!indicatorToDelete) return;
+    setIsDeleting(true);
+    try {
+      await indicatorApi.deleteIndicator(indicatorToDelete);
+      toast.success("Indicator deleted successfully.");
+      setIndicatorToDelete(null);
+      fetchIndicators(); // Refresh the list
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete indicator.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -193,6 +226,15 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
   if (selectedIndicator) {
     const disagg = selectedIndicator.IndicatorDisaggregation ?? [];
     const hasDisagg = disagg.length > 0;
+
+    const target = selectedIndicator.cumulativeTarget ?? selectedIndicator.target ?? null;
+    const actual = selectedIndicator.actual ?? null;
+    const computedPerformance =
+      selectedIndicator.performance != null
+        ? selectedIndicator.performance
+        : target && actual != null
+        ? Math.round((actual / target) * 100)
+        : 0;
 
     return (
       <div className="mt-6 space-y-4">
@@ -232,7 +274,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                   isSecondary={true}
                   onClick={() =>
                     router.push(
-                      `/projects/${projectId}/indicator/${selectedIndicator.indicatorId}/view`,
+                      `/projects/${projectId}/project-management/indicator/${selectedIndicator.indicatorId}/view`,
                     )
                   }
                 />
@@ -252,7 +294,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                         selectedIndicator.responsiblePersons || "",
                     }).toString();
                     router.push(
-                      `/projects/${projectId}/indicator/${selectedIndicator.indicatorId}/report?${query}`,
+                      `/projects/${projectId}/project-management/indicator/${selectedIndicator.indicatorId}/report?${query}`,
                     );
                   }}
                 />
@@ -297,6 +339,10 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                 <p className="text-sm text-gray-800 mt-1">
                   {selectedIndicator.responsiblePersons || "N/A"}
                 </p>
+              </div>
+
+              <div className="pt-6 mt-6 border-t border-gray-100 flex justify-center pb-2">
+                <MeterPieChart performance={computedPerformance} size="md" />
               </div>
             </div>
 
@@ -368,12 +414,22 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                   <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest">
                     Actual
                   </p>
-                  <span className="text-[10px] text-emerald-500 bg-emerald-100 px-2 py-0.5 rounded-full">
-                    Reported
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    selectedIndicator.actual && selectedIndicator.actual !== 0
+                      ? "text-emerald-500 bg-emerald-100 font-medium"
+                      : "text-gray-500 bg-gray-100 font-medium"
+                  }`}>
+                    {selectedIndicator.actual && selectedIndicator.actual !== 0 ? "Reported" : "Not Reported"}
                   </span>
                 </div>
-                <p className="text-2xl font-semibold text-emerald-900 mt-0.5">
-                  {selectedIndicator.actual ?? "—"}
+                <p className={`text-2xl font-semibold mt-0.5 ${
+                  selectedIndicator.actual && selectedIndicator.actual !== 0 
+                    ? "text-emerald-900" 
+                    : "text-gray-400 italic text-lg"
+                }`}>
+                  {selectedIndicator.actual && selectedIndicator.actual !== 0 
+                    ? selectedIndicator.actual 
+                    : "Not reported"}
                 </p>
                 {hasDisagg && (
                   <DisaggChips
@@ -428,16 +484,28 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
             <div className="flex items-center gap-4">
               <MeterPieChart performance={computedPerformance} />
               
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedIndicator(indicator);
-                }}
-                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors flex items-center justify-center"
-                title="View Details"
-              >
-                <Icon icon="fluent:eye-24-regular" width={20} height={20} />
-              </button>
+              <div className="flex items-center">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedIndicator(indicator);
+                  }}
+                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors flex items-center justify-center"
+                  title="View Details"
+                >
+                  <Icon icon="fluent:eye-24-regular" width={20} height={20} />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIndicatorToDelete(indicator.indicatorId);
+                  }}
+                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors flex items-center justify-center"
+                  title="Delete Indicator"
+                >
+                  <Icon icon="fluent:delete-24-regular" width={20} height={20} />
+                </button>
+              </div>
             </div>
           </div>
           <div className="mt-3 flex gap-6 border-t border-gray-50 pt-3">
@@ -471,6 +539,17 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
           </div>
         </div>
       )})}
+
+      {indicatorToDelete && (
+        <GenericDeleteModal
+          isOpen={!!indicatorToDelete}
+          onClose={() => setIndicatorToDelete(null)}
+          onDelete={handleDelete}
+          heading="Delete Indicator"
+          subtitle="Are you sure you want to delete this indicator? This action cannot be undone."
+          isDeleting={isDeleting}
+        />
+      )}
     </div>
   );
 }

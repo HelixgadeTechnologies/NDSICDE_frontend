@@ -5,12 +5,20 @@ export type Target = {
 };
 
 export type IndicatorDisaggregationItem = {
-  indicatorDisaggregationId: string;
-  indicatorId: string;
+  indicatorDisaggregationId?: string;
+  indicatorId?: string;
   type: string;
   category: string;
-  value: number | string; // baseline disaggregated value
+  value?: number | string; // baseline disaggregated value
+  baseline?: number | string; // backend baseline disaggregated value
   target: number | string; // target disaggregated value
+};
+
+export type PeriodicTargetItem = {
+  periodicTargetId?: string;
+  indicatorId?: string;
+  target: number | string;
+  targetDate: string;
 };
 
 
@@ -35,6 +43,8 @@ export type IndicatorFormData = {
   responsiblePersons: string[];
   result: string;
   resultTypeId: string;
+  isPeriodic: boolean;
+  PeriodicTarget: PeriodicTargetItem[];
   IndicatorDisaggregation: IndicatorDisaggregationItem[];
 };
 
@@ -62,6 +72,7 @@ export type IndicatorPayload = {
     responsiblePersons: string;
     result: string;
     resultTypeId: string;
+    PeriodicTarget?: PeriodicTargetItem[];
     IndicatorDisaggregation: IndicatorDisaggregationItem[];
   };
 };

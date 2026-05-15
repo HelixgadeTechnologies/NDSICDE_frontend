@@ -15,6 +15,26 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getToken } from "@/lib/api/credentials";
+import { indicatorApi } from "@/lib/api/indicatorApi";
+import DisaggregationComponent from "@/ui/disaggregation-component";
+
+const STATUS_OPTIONS = [
+  { label: "Not started", value: "Not started" },
+  { label: "In progress", value: "In progress" },
+  { label: "Completed", value: "Completed" },
+];
+
+const DISAGG_TYPES = [
+  "Gender & Social Inclusion (Sex)",
+  "Age",
+  "State",
+  "Year",
+  "Donor Type",
+  "Policy Action Type",
+  "Institution Type",
+  "Sector",
+  "None",
+] as const;
 
 function ReportActualValueForm() {
   const router = useRouter();
@@ -25,7 +45,6 @@ function ReportActualValueForm() {
   const indicatorId = params?.indicatorId as string;
   const token = getToken();
 
-  // Seed from query params (fast prefill, used while the fetch is in-flight)
   const [orgKpiId, setOrgKpiId] = useState(searchParams.get("orgKpiId") || "");
   const [resultTypeId, setResultTypeId] = useState(searchParams.get("resultTypeId") || "");
 
@@ -36,15 +55,29 @@ function ReportActualValueForm() {
     responsiblePersons: searchParams.get("responsiblePersons")
       ? searchParams.get("responsiblePersons")!.split(",").map((p) => p.trim())
       : [],
-    disaggregationType: "",
+    
+    definition: "",
+    unitOfMeasure: "",
+    
+    baseLineDate: "",
+    cumulativeValue: "",
+    baselineNarrative: "",
+    
+    targetDate: "",
+    cumulativeTarget: "",
+    targetNarrative: "",
+
     actualDate: "",
-    cummulativeActual: "",
+    cumulativeActual: "",
     actualNarrative: "",
     attachmentUrl: "",
   });
 
-  // Fetch indicator data directly — this is the source of truth.
-  // Overrides any partial/missing query param values once the API responds.
+  const [disaggCheckboxes, setDisaggCheckboxes] = useState<boolean[]>(Array(9).fill(false));
+  type DisaggRow = { category: string; value: string; target: string; actual: string };
+  const [disaggRows, setDisaggRows] = useState<Record<string, DisaggRow[]>>({});
+  const [actualDisaggItems, setActualDisaggItems] = useState<any[]>([]);
+
   useEffect(() => {
     if (!indicatorId) return;
     axios
@@ -54,6 +87,7 @@ function ReportActualValueForm() {
         if (!d) return;
         setOrgKpiId(d.orgKpiId || "");
         setResultTypeId((prev) => d.resultTypeId || prev);
+        
         setFormData((prev) => ({
           ...prev,
           indicatorSource: d.indicatorSource || prev.indicatorSource,
@@ -63,7 +97,37 @@ function ReportActualValueForm() {
             d.responsiblePersons && typeof d.responsiblePersons === "string"
               ? d.responsiblePersons.split(",").map((p: string) => p.trim())
               : prev.responsiblePersons,
+          definition: d.definition || "",
+          unitOfMeasure: d.unitOfMeasure || "",
+          baseLineDate: d.baseLineDate ? d.baseLineDate.split("T")[0] : "",
+          cumulativeValue: d.cumulativeValue?.toString() || "",
+          baselineNarrative: d.baselineNarrative || "",
+          targetDate: d.targetDate ? d.targetDate.split("T")[0] : "",
+          cumulativeTarget: d.cumulativeTarget?.toString() || "",
+          targetNarrative: d.targetNarrative || "",
         }));
+
+        if (d.IndicatorDisaggregation && d.IndicatorDisaggregation.length > 0) {
+           const newCheckboxes = Array(9).fill(false);
+           const newRows: Record<string, any[]> = {};
+           
+           d.IndicatorDisaggregation.forEach((item: any) => {
+             const typeIndex = DISAGG_TYPES.findIndex(t => t.toLowerCase() === item.type?.toLowerCase());
+             if (typeIndex !== -1) {
+                newCheckboxes[typeIndex] = true;
+                const typeName = DISAGG_TYPES[typeIndex];
+                if (!newRows[typeName]) newRows[typeName] = [];
+                newRows[typeName].push({
+                   category: item.category,
+                   value: item.value?.toString() ?? item.baseline?.toString() ?? "0",
+                   target: item.target?.toString() ?? "0",
+                   actual: item.actual?.toString() ?? "0",
+                });
+             }
+           });
+           setDisaggCheckboxes(newCheckboxes);
+           setDisaggRows(newRows);
+        }
       })
       .catch((err) => console.error("Failed to fetch indicator data:", err));
   }, [indicatorId]);
@@ -74,9 +138,13 @@ function ReportActualValueForm() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleDisaggregationChange = (items: any[]) => {
+    setActualDisaggItems(items);
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!formData.actualDate || !formData.cummulativeActual) {
+    if (!formData.actualDate || !formData.cumulativeActual) {
       toast.error("Please fill in required fields (Actual Date, Cumulative Actual).");
       return;
     }
@@ -87,40 +155,33 @@ function ReportActualValueForm() {
         payload: {
           indicatorReportId: "",
           indicatorSource: formData.indicatorSource,
-          orgKpiId: orgKpiId, 
+          orgKpiId: orgKpiId,
           thematicAreasOrPillar: formData.thematicArea,
           indicatorStatement: formData.statement,
           responsiblePersons: formData.responsiblePersons.join(", "),
           actualDate: new Date(formData.actualDate).toISOString(),
-          cumulativeActual: formData.cummulativeActual,
+          cumulativeActual: formData.unitOfMeasure === "Status"
+            ? formData.cumulativeActual
+            : Number(formData.cumulativeActual) || 0,
           actualNarrative: formData.actualNarrative,
-          attachmentUrl: formData.attachmentUrl, 
-          status: "Pending", 
+          attachmentUrl: formData.attachmentUrl,
+          status: "Pending",
           indicatorId: indicatorId || "",
-          resultTypeId: resultTypeId, 
-          IndicatorReportDisaggregation: formData.disaggregationType ? [
-            {
-              indicatorReportDisaggregationId: "",
-              indicatorReportId: "",
-              type: formData.disaggregationType,
-              category: "",
-              actual: Number(formData.cummulativeActual) || 0
-            }
-          ] : []
+          resultTypeId: resultTypeId,
+          IndicatorReportDisaggregation: actualDisaggItems.map((item) => ({
+            indicatorReportDisaggregationId: "",
+            indicatorReportId: "",
+            type: item.type,
+            category: item.category,
+            actual: formData.unitOfMeasure === "Status"
+              ? item.actual
+              : Number(item.actual) || 0
+          }))
         },
         isCreate: true
       };
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator_report`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await indicatorApi.reportIndicator(payload);
 
       if (response.data?.success) {
         toast.success("Indicator report submitted successfully.");
@@ -136,84 +197,185 @@ function ReportActualValueForm() {
     }
   };
 
+  const isStatusType = formData.unitOfMeasure === "Status";
+
   return (
     <CardComponent>
       <Heading
         heading="Indicator Reporting Format and Attributes"
         className="text-center"
       />
-      <form className="space-y-6 my-6" onSubmit={handleSubmit}>
-        <TagInput 
-          label="Indicator Source" 
-          value={formData.indicatorSource ? [formData.indicatorSource] : []}
-          onChange={(tags) => handleInputChange("indicatorSource", tags[0] || "")}
-        />
-        <DropDown 
-          label="Thematic Area/Pillar" 
-          name="thematicArea"
-          value={formData.thematicArea}
-          options={THEMATIC_AREAS_OPTIONS}
-          onChange={(val) => handleInputChange("thematicArea", val)}
-          isBigger
-        />
-        <TextInput 
-          label="Indicator Statement" 
-          name="statement"
-          value={formData.statement}
-          onChange={(e) => handleInputChange("statement", e.target.value)}
-          isBigger
-        />
-        <TagInput 
-          label="Responsible Person(s)" 
-          value={formData.responsiblePersons}
-          onChange={(tags) => handleInputChange("responsiblePersons", tags)}
-        />
-        <TextInput 
-          label="Disaggregation Type" 
-          name="disaggregationType"
-          value={formData.disaggregationType}
-          onChange={(e) => handleInputChange("disaggregationType", e.target.value)}
-          isBigger
-        />
-        <div className="space-y-6">
-          <Heading heading="Actual Value (s)" sm />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <p className="text-sm font-medium">Actual Date</p>
-            <DateInput 
-              value={formData.actualDate}
-              onChange={(val) => handleInputChange("actualDate", val)}
-            />
-            <p className="text-sm font-medium">Cummulative Actual</p>
+      <form className="space-y-8 my-6" onSubmit={handleSubmit}>
+        
+        {/* ── Indicator Metadata (Read Only mostly, or just prefilled) */}
+        <div className="space-y-4">
+          <TextInput
+            label="Indicator Source"
+            value={formData.indicatorSource}
+            name="indicatorSource"
+            onChange={() => {}}
+            isDisabled
+          />
+          <TextInput
+            label="Thematic Area/Pillar"
+            value={formData.thematicArea}
+            name="thematicArea"
+            onChange={() => {}}
+            isDisabled
+          />
+          <TextInput
+            label="Indicator Statement"
+            name="statement"
+            value={formData.statement}
+            onChange={() => {}}
+            isDisabled
+          />
+          <div className="grid grid-cols-2 gap-4">
             <TextInput
-              name="cummulativeActual"
-              value={formData.cummulativeActual}
-              onChange={(e) => handleInputChange("cummulativeActual", e.target.value)}
+              label="Indicator Definition"
+              value={formData.definition}
+              name="definition"
+              onChange={() => {}}
+              isDisabled
             />
-            <p className="text-sm font-medium">Actual Narrative</p>
-            <TextareaInput
-              name="actualNarrative"
-              value={formData.actualNarrative}
-              onChange={(e) => handleInputChange("actualNarrative", e.target.value)}
+            <TextInput
+              label="Unit of Measurement"
+              value={formData.unitOfMeasure}
+              name="unitOfMeasure"
+              onChange={() => {}}
+              isDisabled
             />
           </div>
+          <TextInput
+            label="Responsible Person(s)"
+            value={formData.responsiblePersons.join(", ")}
+            name="responsiblePersons"
+            onChange={() => {}}
+            isDisabled
+          />
         </div>
+
+        <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-5">
+          <div>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+              Baseline Context
+            </p>
+            <div className="space-y-2">
+              <TextInput
+                label="Baseline Date"
+                value={formData.baseLineDate}
+                name="baseLineDate"
+                onChange={() => {}}
+                isDisabled
+              />
+              <TextInput
+                label="Cumulative Baseline"
+                value={formData.cumulativeValue}
+                name="cumulativeValue"
+                onChange={() => {}}
+                isDisabled
+              />
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
+              Target Context
+            </p>
+            <div className="space-y-2">
+              <TextInput
+                label="Target Date"
+                value={formData.targetDate}
+                name="targetDate"
+                onChange={() => {}}
+                isDisabled
+              />
+              <TextInput
+                label="Cumulative Target"
+                value={formData.cumulativeTarget}
+                name="cumulativeTarget"
+                onChange={() => {}}
+                isDisabled
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Actual (Editable) */}
+        <div className="border-t border-gray-100 pt-5 space-y-4">
+          <p className="text-xs font-semibold text-green-600 uppercase tracking-widest">
+            Actual
+          </p>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-1.5">
+                Actual Date
+              </p>
+              <DateInput
+                value={formData.actualDate}
+                onChange={(val) => handleInputChange("actualDate", val)}
+              />
+            </div>
+            {isStatusType ? (
+              <DropDown
+                label="Cumulative Actual"
+                value={formData.cumulativeActual}
+                name="cumulativeActual"
+                onChange={(v) => handleInputChange("cumulativeActual", v)}
+                options={STATUS_OPTIONS}
+                placeholder="Select status"
+              />
+            ) : (
+              <TextInput
+                label="Cumulative Actual"
+                value={formData.cumulativeActual}
+                name="cumulativeActual"
+                onChange={(e) => handleInputChange("cumulativeActual", e.target.value)}
+              />
+            )}
+          </div>
+
+          <TextareaInput
+            label="Actual Narrative"
+            value={formData.actualNarrative}
+            name="actualNarrative"
+            onChange={(e) => handleInputChange("actualNarrative", e.target.value)}
+          />
+
+          <DisaggregationComponent
+            view="actual"
+            isStatusType={isStatusType}
+            sharedCheckboxes={disaggCheckboxes}
+            sharedRows={disaggRows}
+            onRowsChange={setDisaggRows}
+            onChange={handleDisaggregationChange}
+            cumulativeValue={formData.cumulativeValue}
+            cumulativeTarget={formData.cumulativeTarget}
+            cumulativeActual={formData.cumulativeActual}
+            isReadOnly={false}
+          />
+        </div>
+
         <FileUploader 
           token={token ?? undefined}
           onUploadComplete={(url) => handleInputChange("attachmentUrl", url)}
         />
-        <div className="flex items-center gap-6">
+        
+        <div className="flex items-center gap-6 border-t border-gray-100 pt-4">
           <Button 
             content="Cancel" 
             isSecondary 
             onClick={() => router.push(`/projects/${projectId}`)}
             type="button"
+            isDisabled={isSubmitting}
           />
           <div className="w-full">
               <Button
-                content={"Add"}
+                content={isSubmitting ? "Submitting..." : "Report Actual"}
                 isLoading={isSubmitting}
                 onClick={() => {}}
                 type="submit"
+                isDisabled={isSubmitting}
               />
           </div>
         </div>
@@ -224,7 +386,7 @@ function ReportActualValueForm() {
 
 export default function ReportActualValue() {
   return (
-    <section className="w-156 pt-8 pb-12">
+    <section className="w-full max-w-4xl pt-8 pb-12 mx-auto">
       <Suspense fallback={<div className="text-center py-10">Loading form...</div>}>
         <ReportActualValueForm />
       </Suspense>
