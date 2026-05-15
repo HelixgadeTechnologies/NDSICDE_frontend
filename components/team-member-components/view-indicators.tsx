@@ -88,7 +88,7 @@ function DisaggChips({
           <span className="opacity-60 font-semibold uppercase tracking-wider">{type}:</span>
           <span className={`ml-1.5 ${valueColor}`}>
             {list.map((l, i) => (
-              <span key={l.category}>
+              <span key={l.category} className="capitalize">
                 {l.category}{" "}
                 <span className="font-bold">{l.value.toLocaleString()}</span>
                 {i < list.length - 1 ? ", " : ""}
@@ -180,14 +180,16 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
   const handleDelete = async () => {
     if (!indicatorToDelete) return;
     setIsDeleting(true);
+    console.log("Attempting to delete indicator:", indicatorToDelete);
     try {
-      await indicatorApi.deleteIndicator(indicatorToDelete);
+      const res = await indicatorApi.deleteIndicator(indicatorToDelete);
+      console.log("Delete response:", res);
       toast.success("Indicator deleted successfully.");
       setIndicatorToDelete(null);
-      fetchIndicators(); // Refresh the list
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Failed to delete indicator.");
+      await fetchIndicators(); // Refresh the list
+    } catch (error: any) {
+      console.error("Delete error details:", error.response?.data || error.message);
+      toast.error(error.response?.data?.message || "Failed to delete indicator.");
     } finally {
       setIsDeleting(false);
     }
