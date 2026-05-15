@@ -53,18 +53,18 @@ function ReportActualValueForm() {
     thematicArea: searchParams.get("thematicArea") || "",
     statement: searchParams.get("statement") || "",
     responsiblePersons: searchParams.get("responsiblePersons")
-      ? searchParams.get("responsiblePersons")!.split(",").map((p) => p.trim())
+      ? searchParams.get("responsiblePersons")!.split(",").map((p: any) => p.trim())
       : [],
     
-    definition: "",
-    unitOfMeasure: "",
+    definition: searchParams.get("definition") || "",
+    unitOfMeasure: searchParams.get("unitOfMeasure") || "",
     
-    baseLineDate: "",
-    cumulativeValue: "",
+    baseLineDate: searchParams.get("baseLineDate") ? searchParams.get("baseLineDate")!.split("T")[0] : "",
+    cumulativeValue: searchParams.get("cumulativeValue") || "",
     baselineNarrative: "",
     
-    targetDate: "",
-    cumulativeTarget: "",
+    targetDate: searchParams.get("targetDate") ? searchParams.get("targetDate")!.split("T")[0] : "",
+    cumulativeTarget: searchParams.get("cumulativeTarget") || "",
     targetNarrative: "",
 
     actualDate: "",
@@ -81,37 +81,49 @@ function ReportActualValueForm() {
   useEffect(() => {
     if (!indicatorId) return;
     axios
-      .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${indicatorId}`)
+      .get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${indicatorId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
       .then((res) => {
         const d = res.data?.data;
         if (!d) return;
-        setOrgKpiId(d.orgKpiId || "");
-        setResultTypeId((prev) => d.resultTypeId || prev);
+        
+        // Handle both object and array responses
+        const currentIndicator = Array.isArray(d) 
+          ? (d.find((item: any) => item.indicatorId === indicatorId) || d[0])
+          : d;
+          
+        if (!currentIndicator) return;
+
+        setOrgKpiId(currentIndicator.orgKpiId || "");
+        setResultTypeId((prev) => currentIndicator.resultTypeId || prev);
         
         setFormData((prev) => ({
           ...prev,
-          indicatorSource: d.indicatorSource || prev.indicatorSource,
-          thematicArea: d.thematicAreasOrPillar || prev.thematicArea,
-          statement: d.statement || prev.statement,
+          indicatorSource: currentIndicator.indicatorSource || prev.indicatorSource,
+          thematicArea: currentIndicator.thematicAreasOrPillar || prev.thematicArea,
+          statement: currentIndicator.statement || prev.statement,
           responsiblePersons:
-            d.responsiblePersons && typeof d.responsiblePersons === "string"
-              ? d.responsiblePersons.split(",").map((p: string) => p.trim())
+            currentIndicator.responsiblePersons && typeof currentIndicator.responsiblePersons === "string"
+              ? currentIndicator.responsiblePersons.split(",").map((p: string) => p.trim())
               : prev.responsiblePersons,
-          definition: d.definition || "",
-          unitOfMeasure: d.unitOfMeasure || "",
-          baseLineDate: d.baseLineDate ? d.baseLineDate.split("T")[0] : "",
-          cumulativeValue: d.cumulativeValue?.toString() || "",
-          baselineNarrative: d.baselineNarrative || "",
-          targetDate: d.targetDate ? d.targetDate.split("T")[0] : "",
-          cumulativeTarget: d.cumulativeTarget?.toString() || "",
-          targetNarrative: d.targetNarrative || "",
+          definition: currentIndicator.definition || prev.definition,
+          unitOfMeasure: currentIndicator.unitOfMeasure || prev.unitOfMeasure,
+          baseLineDate: currentIndicator.baseLineDate ? currentIndicator.baseLineDate.split("T")[0] : prev.baseLineDate,
+          cumulativeValue: currentIndicator.cumulativeValue?.toString() || prev.cumulativeValue,
+          baselineNarrative: currentIndicator.baselineNarrative || prev.baselineNarrative,
+          targetDate: currentIndicator.targetDate ? currentIndicator.targetDate.split("T")[0] : prev.targetDate,
+          cumulativeTarget: currentIndicator.cumulativeTarget?.toString() || prev.cumulativeTarget,
+          targetNarrative: currentIndicator.targetNarrative || prev.targetNarrative,
         }));
 
-        if (d.IndicatorDisaggregation && d.IndicatorDisaggregation.length > 0) {
+        if (currentIndicator.IndicatorDisaggregation && currentIndicator.IndicatorDisaggregation.length > 0) {
            const newCheckboxes = Array(9).fill(false);
            const newRows: Record<string, any[]> = {};
            
-           d.IndicatorDisaggregation.forEach((item: any) => {
+           currentIndicator.IndicatorDisaggregation.forEach((item: any) => {
              const typeIndex = DISAGG_TYPES.findIndex(t => t.toLowerCase() === item.type?.toLowerCase());
              if (typeIndex !== -1) {
                 newCheckboxes[typeIndex] = true;
@@ -130,7 +142,7 @@ function ReportActualValueForm() {
         }
       })
       .catch((err) => console.error("Failed to fetch indicator data:", err));
-  }, [indicatorId]);
+  }, [indicatorId, token]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -162,7 +174,7 @@ function ReportActualValueForm() {
           actualDate: new Date(formData.actualDate).toISOString(),
           cumulativeActual: formData.unitOfMeasure === "Status"
             ? formData.cumulativeActual
-            : Number(formData.cumulativeActual) || 0,
+            : String(formData.cumulativeActual) || "",
           actualNarrative: formData.actualNarrative,
           attachmentUrl: formData.attachmentUrl,
           status: "Pending",
@@ -183,11 +195,11 @@ function ReportActualValueForm() {
 
       const response = await indicatorApi.reportIndicator(payload);
 
-      if (response.data?.success) {
+      if (response.success) {
         toast.success("Indicator report submitted successfully.");
         router.push(`/projects/${projectId}`);
       } else {
-        toast.error("Failed to submit indicator report.");
+        toast.error(response.message || "Failed to submit indicator report.");
       }
     } catch (error) {
       console.error("Error submitting report:", error);

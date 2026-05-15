@@ -11,7 +11,7 @@ import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 
 type KPI = {
-  baseLine: string;
+  cumulativeValue: string;
   createAt: string;
   definition: string;
   disaggregation: string;
@@ -20,7 +20,7 @@ type KPI = {
   specificAreas: string;
   statement: string;
   strategicObjectiveId: string;
-  target: string;
+  cumulativeTarget: string;
   type: string;
   unitOfMeasure: string;
   updateAt: string;
@@ -42,8 +42,8 @@ type KPIFormData = {
   unitOfMeasure: string;
   itemInMeasure: string;
   disaggregation: string;
-  baseLine: string;
-  target: string;
+  cumulativeValue: string;
+  cumulativeTarget: string;
   strategicObjectiveId: string;
 };
 
@@ -63,8 +63,8 @@ export default function EditKPIModal({
     unitOfMeasure: "",
     itemInMeasure: "",
     disaggregation: "",
-    baseLine: "",
-    target: "",
+    cumulativeValue: "",
+    cumulativeTarget: "",
     strategicObjectiveId: "",
   });
 
@@ -82,8 +82,8 @@ export default function EditKPIModal({
         unitOfMeasure: kpiData.unitOfMeasure,
         itemInMeasure: kpiData.itemInMeasure,
         disaggregation: kpiData.disaggregation,
-        baseLine: kpiData.baseLine,
-        target: kpiData.target,
+        cumulativeValue: kpiData.cumulativeValue,
+        cumulativeTarget: kpiData.cumulativeTarget,
         strategicObjectiveId: kpiData.strategicObjectiveId,
       });
     }
@@ -222,15 +222,15 @@ export default function EditKPIModal({
           />
           <TextInput
             label="Baseline"
-            value={formData.baseLine}
-            name="baseLine"
-            onChange={(e) => handleInputChange("baseLine", e.target.value)}
+            value={formData.cumulativeValue}
+            name="cumulativeValue"
+            onChange={(e) => handleInputChange("cumulativeValue", e.target.value)}
           />
           <TextInput
             label="Target"
-            value={formData.target}
+            value={formData.cumulativeTarget}
             name="target"
-            onChange={(e) => handleInputChange("target", e.target.value)}
+            onChange={(e) => handleInputChange("cumulativeTarget", e.target.value)}
           />
           <Button
             content={isSubmitting ? "Updating KPI..." : "Update KPI"}

@@ -8,7 +8,7 @@ import { IndicatorDisaggregationItem } from "@/types/indicator";
 
 // ─── Disaggregation type definitions
 
-const DISAGG_TYPES = [
+const DEFAULT_DISAGG_TYPES = [
   "Gender & Social Inclusion (Sex)",
   "Age",
   "State",
@@ -20,7 +20,7 @@ const DISAGG_TYPES = [
   "None",
 ] as const;
 
-type DisaggType = (typeof DISAGG_TYPES)[number];
+type DisaggType = string;
 
 /** Fixed categories that are always shown (not user-selected) */
 const FIXED_CATEGORIES: Partial<Record<DisaggType, string[]>> = {
@@ -114,6 +114,8 @@ type DisaggregationComponentProps = {
   isStatusType?: boolean;
   /** Whether inputs should be read-only */
   isReadOnly?: boolean;
+  /** Custom disaggregation types to override the defaults */
+  customTypes?: string[];
 };
 
 const STATUS_OPTIONS = [
@@ -181,11 +183,13 @@ export default function DisaggregationComponent({
   onCheckboxesChange,
   isStatusType = false,
   isReadOnly = false,
+  customTypes,
 }: DisaggregationComponentProps) {
+  const currentTypes = customTypes || (DEFAULT_DISAGG_TYPES as unknown as string[]);
 
   // If shared state is provided from parent, use it; otherwise manage locally
   const [localCheckboxes, setLocalCheckboxes] = useState<boolean[]>(
-    Array(DISAGG_TYPES.length).fill(false),
+    Array(currentTypes.length).fill(false),
   );
   const [localRows, setLocalRows] = useState<Record<string, DisaggRow[]>>({});
   const [pickedOption, setPickedOption] = useState<Record<string, string>>({});
@@ -216,15 +220,15 @@ export default function DisaggregationComponent({
   const cumAct = parseFloat(String(cumulativeActual)) || 0;
 
   // Derive checked labels (excluding "None")
-  const checkedTypes = DISAGG_TYPES.filter(
-    (_, i) => checkboxes[i] && DISAGG_TYPES[i] !== "None",
+  const checkedTypes = currentTypes.filter(
+    (_, i) => checkboxes[i] && currentTypes[i] !== "None",
   );
 
   // Initialise rows when a type is first checked
   useEffect(() => {
     setRows((prev) => {
       const next = { ...prev };
-      DISAGG_TYPES.forEach((type, i) => {
+      currentTypes.forEach((type, i) => {
         if (type === "None") return;
         if (checkboxes[i] && !next[type]) {
           const fixed = FIXED_CATEGORIES[type];
@@ -273,7 +277,7 @@ export default function DisaggregationComponent({
 
   // Checkbox toggle
   const toggleCheckbox = (index: number) => {
-    const isNone = DISAGG_TYPES[index] === "None";
+    const isNone = currentTypes[index] === "None";
     setCheckboxes((prev) => {
       if (isNone) {
         const noneState = !prev[index];
@@ -281,7 +285,7 @@ export default function DisaggregationComponent({
       }
       const next = [...prev];
       next[index] = !next[index];
-      next[DISAGG_TYPES.length - 1] = false; // uncheck "None"
+      next[currentTypes.length - 1] = false; // uncheck "None"
       return next;
     });
   };
@@ -739,7 +743,7 @@ export default function DisaggregationComponent({
       <div className="space-y-6">
         <h4 className="font-bold leading-7 text-base">Disaggregation</h4>
         <div className="grid grid-cols-2 gap-2">
-          {DISAGG_TYPES.map((label, index) => (
+          {currentTypes.map((label, index) => (
             <Checkbox
               key={index}
               label={label}
@@ -808,7 +812,7 @@ export default function DisaggregationComponent({
 
       {/* Checkbox grid */}
       <div className="grid grid-cols-2 gap-2">
-        {DISAGG_TYPES.map((label, index) => (
+        {currentTypes.map((label, index) => (
           <Checkbox
             key={index}
             label={label}

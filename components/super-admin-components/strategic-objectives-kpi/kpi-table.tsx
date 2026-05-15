@@ -12,7 +12,7 @@ import EditKPIModal from "./edit-kpi-form";
 import { toSentenceCase } from "@/utils/ui-utility";
 
 type KPI = {
-  baseLine: string;
+  cumulativeValue: string;
   createAt: string;
   definition: string;
   disaggregation: string;
@@ -21,7 +21,7 @@ type KPI = {
   specificAreas: string;
   statement: string;
   strategicObjectiveId: string;
-  target: string;
+  cumulativeTarget: string;
   type: string;
   unitOfMeasure: string;
   updateAt: string;
@@ -174,10 +174,10 @@ export default function KPITable({ searchQuery = "", typeFilter = "", soFilterId
           <>
             <td className="px-6">{row.statement}</td>
             <td className="px-6">{row.type}</td>
-            <td className="px-6">{row.baseLine}</td>
-            <td className="px-6">{row.target}</td>
+            <td className="px-6">{row.cumulativeValue}</td>
+            <td className="px-6">{row.cumulativeTarget}</td>
             <td className="px-6">No</td>
-            <td className="px-6">{toSentenceCase(row.disaggregation ?? "")}</td>
+            <td className="px-6">{toSentenceCase(row.disaggregation ?? "N/A")}</td>
             <td className="px-6 relative">
               <div className="flex justify-center items-center">
                 <Icon

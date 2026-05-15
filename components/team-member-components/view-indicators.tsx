@@ -286,14 +286,18 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                   onClick={() => {
                     const query = new URLSearchParams({
                       orgKpiId: selectedIndicator.orgKpiId || "",
-                      resultTypeId:
-                        selectedIndicator.resultTypeId || "",
+                      resultTypeId: selectedIndicator.resultTypeId || "",
                       indicatorSource: selectedIndicator.indicatorSource || "",
-                      thematicArea:
-                        selectedIndicator.thematicAreasOrPillar || "",
+                      thematicArea: selectedIndicator.thematicAreasOrPillar || "",
                       statement: selectedIndicator.statement || "",
-                      responsiblePersons:
-                        selectedIndicator.responsiblePersons || "",
+                      responsiblePersons: selectedIndicator.responsiblePersons || "",
+                      // Added missing fields below
+                      baseLineDate: selectedIndicator.baseLineDate || "",
+                      cumulativeValue: selectedIndicator.cumulativeValue?.toString() || "",
+                      targetDate: selectedIndicator.targetDate || "",
+                      cumulativeTarget: (selectedIndicator.cumulativeTarget ?? selectedIndicator.target)?.toString() || "",
+                      definition: selectedIndicator.definition || "",
+                      unitOfMeasure: selectedIndicator.unitOfMeasure || "",
                     }).toString();
                     router.push(
                       `/projects/${projectId}/project-management/indicator/${selectedIndicator.indicatorId}/report?${query}`,
