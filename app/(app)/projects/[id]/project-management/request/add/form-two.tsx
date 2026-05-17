@@ -1,96 +1,62 @@
 "use client";
 
 import TextInput from "@/ui/form/text-input";
-import DateInput from "@/ui/form/date-input";
 import Button from "@/ui/form/button";
 import Heading from "@/ui/text-heading";
-import RadioInput from "@/ui/form/radio";
+import FileUploader from "@/ui/form/file-uploader";
 import { toast } from "react-toastify";
 import { RequestFormData } from "./page";
+import { getToken } from "@/lib/api/credentials";
 
-type FormTwoProps = {
+type FormThreeProps = {
   onBack: () => void;
   onNext: () => void;
   formData: RequestFormData;
   updateFormData: (data: Partial<RequestFormData>) => void;
 };
 
-export default function FormTwo({ onBack, onNext, formData, updateFormData }: FormTwoProps) {
+export default function FormThree({ onBack, onNext, formData, updateFormData }: FormThreeProps) {
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // Prevent form submission
   };
 
+  const token = getToken();
+
   const handleNext = () => {
-    if (!formData.modeOfTransport || !formData.driverName || !formData.driversPhoneNumber || !formData.vehiclePlateNumber || !formData.vehicleColor || !formData.departureTime || !formData.route || !formData.recipientPhoneNumber) {
-      toast.error("Please fill in all required fields.");
+    if (!formData.documentName) {
+      toast.error("Please provide a Document Name.");
+      return;
+    }
+    if (!formData.documentURL) {
+      toast.error("Please upload a supporting document.");
       return;
     }
     onNext();
   };
 
+  const handleFileUploadComplete = (uploadedUrl: string) => {
+    updateFormData({ documentURL: uploadedUrl });
+  };
+
+  const handleUploadError = (error: string) => {
+    toast.error(error || "Failed to upload document.");
+  };
+
   return (
     <section>
       <form className="space-y-6" onSubmit={handleFormSubmit}>
-        <Heading heading="Journey Management" className="text-center" />
-        <div className="space-y-1">
-          <p className="text-sm text-gray-900 font-medium">Mode of Transport</p>
-          <div className="flex items-center gap-6">
-            <RadioInput
-              label="Road"
-              value="Road"
-              name="modeOfTransport"
-              onChange={(e) => updateFormData({ modeOfTransport: "Road" })}
-              is_checked={formData.modeOfTransport === "Road"}
-            />
-            <RadioInput
-              label="Flight"
-              value="Flight"
-              name="modeOfTransport"
-              onChange={(e) => updateFormData({ modeOfTransport: "Flight" })}
-              is_checked={formData.modeOfTransport === "Flight"}
-            />
-          </div>
-        </div>
+        <Heading heading="Support Document" className="text-center" />
         <TextInput
-          label="Driver's Name"
-          name="driverName"
-          value={formData.driverName}
-          onChange={(e) => updateFormData({ driverName: e.target.value })}
+          label="Document Name"
+          name="documentName"
+          value={formData.documentName}
+          onChange={(e) => updateFormData({ documentName: e.target.value })}
         />
-        <TextInput
-          label="Driver's Phone Number"
-          name="driversPhoneNumber"
-          value={formData.driversPhoneNumber}
-          onChange={(e) => updateFormData({ driversPhoneNumber: e.target.value })}
-        />
-        <TextInput
-          label="Vehicle Plate Number"
-          name="vehiclePlateNumber"
-          value={formData.vehiclePlateNumber}
-          onChange={(e) => updateFormData({ vehiclePlateNumber: e.target.value })}
-        />
-        <TextInput
-          label="Vehicle Color"
-          name="vehicleColor"
-          value={formData.vehicleColor}
-          onChange={(e) => updateFormData({ vehicleColor: e.target.value })}
-        />
-        <DateInput 
-          label="Departure Date" 
-          value={formData.departureTime}
-          onChange={(val) => updateFormData({ departureTime: val })}
-        />
-        <TextInput 
-          label="Route" 
-          name="route" 
-          value={formData.route} 
-          onChange={(e) => updateFormData({ route: e.target.value })} 
-        />
-        <TextInput
-          label="Recipient's Phone Number"
-          name="recipientPhoneNumber"
-          value={formData.recipientPhoneNumber}
-          onChange={(e) => updateFormData({ recipientPhoneNumber: e.target.value })}
+        <FileUploader 
+          multiple={false}
+          token={token || undefined}
+          onUploadComplete={handleFileUploadComplete}
+          onUploadError={handleUploadError}
         />
 
         {/* buttons */}

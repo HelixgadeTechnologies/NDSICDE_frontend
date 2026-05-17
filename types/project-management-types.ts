@@ -57,6 +57,8 @@ export type ProjectRequestType = {
   documentURL: string;
   projectId: string;
   status: string;
+  budgetName?: string;
+  requestDate?: string;
   project?: {
     projectName: string;
   }
@@ -77,6 +79,29 @@ export type ProjectRequestType = {
   comment_E?: null | "string",
   createAt?: string,
   lineItems: RequestLineItemType[];
+  // New fields
+  purposeOfTrip?: string;
+  vehicleMake?: string;
+  vehicleModel?: string;
+  otherPersonnel?: {
+    name: string;
+    company: string;
+    phoneNumber: string;
+  }[];
+  departureDate?: string;
+  departureLocationAndTime?: string;
+  destination?: string;
+  contactPersonPhoneNumberAtDestination?: string;
+  flightDepartureState?: string;
+  flightDepartureTime?: string;
+  flightArrivalState?: string;
+  flightArrivalTime?: string;
+  hotelAccommodationName?: string;
+  hotelAddress?: string;
+  returnDate?: string;
+  returnTime?: string;
+  airportDropoffOfficerName?: string;
+  airportPickupOfficerName?: string;
 };
 
 export type RequestLineItemType = {

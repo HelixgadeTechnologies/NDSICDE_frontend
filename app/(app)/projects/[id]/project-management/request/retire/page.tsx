@@ -10,6 +10,7 @@ import { useRequests } from "@/context/RequestsContext";
 import { useEffect, useState } from "react";
 import AddProjectRequestRetirement from "@/components/project-management-components/add-project-request-retirement";
 import EditProjectRequestRetirement from "@/components/project-management-components/edit-project-request-retirement";
+import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
 import FileDisplay from "@/ui/file-display";
 import InfoItem from "@/ui/info-item";
 import { ProjectRequestType, ProjectOutputTypes } from "@/types/project-management-types";
@@ -172,16 +173,21 @@ export default function ProjectRequestRetirementPage() {
     <div className="mt-12 space-y-7 pb-12">
       {/* submission details */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <InternalMemorandum
+          isReadOnly
+          staff={selectedRequest.staff}
+          requestDate={selectedRequest.requestDate || (selectedRequest.activityStartDate ? formatDate(selectedRequest.activityStartDate, "date-only") : "N/A")}
+          budgetName={selectedRequest.budgetName || "N/A"}
+          budgetCode={selectedRequest.activityBudgetCode?.toString() || "N/A"}
+        />
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-          Submission Details
+          Activity Details
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <InfoItem
-            label="Submitted by"
-            value={selectedRequest.staff || "N/A"}
-            icon={<User className="w-4 h-4" />}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InfoItem
             label="Output"
             value={outputDetails?.outputStatement || "N/A"}
@@ -190,11 +196,6 @@ export default function ProjectRequestRetirementPage() {
           <InfoItem
             label="Activity Title"
             value={selectedRequest.activityTitle || "N/A"}
-            icon={<ActivityIcon className="w-4 h-4" />}
-          />
-          <InfoItem
-            label="Activity Budget Code"
-            value={selectedRequest.activityBudgetCode?.toString() || "N/A"}
             icon={<ActivityIcon className="w-4 h-4" />}
           />
           <InfoItem

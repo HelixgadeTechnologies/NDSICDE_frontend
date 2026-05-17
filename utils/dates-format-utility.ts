@@ -175,3 +175,20 @@ export function convertDateToISO8601(dateInput: any) {
   
   return date.toISOString();
 }
+
+export function formatMemoDate(date: Date): string {
+  const day = date.getDate();
+  const monthNames = [
+    "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+    "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+  ];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+
+  let suffix = "th";
+  if (day === 1 || day === 21 || day === 31) suffix = "st";
+  else if (day === 2 || day === 22) suffix = "nd";
+  else if (day === 3 || day === 23) suffix = "rd";
+
+  return `${day}${suffix} ${month}, ${year}`;
+}

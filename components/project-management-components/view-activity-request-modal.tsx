@@ -24,6 +24,7 @@ import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import { getToken } from "@/lib/api/credentials";
 import { ProjectRequestType, RequestLineItemType } from "@/types/project-management-types";
+import InternalMemorandum from "./internal-memorandum";
 
 type ViewActivityRequestProps = {
   isOpen: boolean;
@@ -100,16 +101,21 @@ export default function ViewActivityRequestModal({ isOpen, onClose, requestId }:
              {/* Left Column */}
             <div className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <InternalMemorandum
+                  isReadOnly
+                  staff={requestDetails.staff}
+                  requestDate={requestDetails.requestDate || formatDate(requestDetails.activityStartDate, "date-only")}
+                  budgetName={requestDetails.budgetName || "N/A"}
+                  budgetCode={requestDetails.activityBudgetCode?.toString() || "N/A"}
+                />
+              </div>
+
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  Submission Details
+                  Activity Details
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InfoItem
-                    label="Submitted by"
-                    value={requestDetails.staff}
-                    icon={<User className="w-4 h-4" />}
-                  />
                   <InfoItem
                     label="Output"
                     value={outputDetails?.outputStatement || "N/A"}
@@ -118,11 +124,6 @@ export default function ViewActivityRequestModal({ isOpen, onClose, requestId }:
                   <InfoItem
                     label="Activity Title"
                     value={requestDetails.activityTitle}
-                    icon={<ActivityIcon className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Activity Budget Code"
-                    value={requestDetails.activityBudgetCode?.toString() || "N/A"}
                     icon={<ActivityIcon className="w-4 h-4" />}
                   />
                   <InfoItem

@@ -27,6 +27,7 @@ import { formatDate } from "@/utils/dates-format-utility";
 import { getToken } from "@/lib/api/credentials";
 import { ProjectRequestType, RequestLineItemType } from "@/types/project-management-types";
 import { useSearchParams } from "next/navigation";
+import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
 
 export default function ViewActivityRequestPage() {
   const searchParams = useSearchParams();
@@ -106,56 +107,56 @@ export default function ViewActivityRequestPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
         {/* Left column: Submission Details & Budget breakdown */}
         <div className="lg:col-span-2 space-y-7">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-              Submission Details
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InfoItem
-                label="Submitted by"
-                value={requestDetails.staff}
-                icon={<User className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Output"
-                value={outputDetails?.outputStatement || "N/A"}
-                icon={<FileOutput className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Activity Title"
-                value={requestDetails.activityTitle}
-                icon={<ActivityIcon className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Activity Budget Code"
-                value={requestDetails.activityBudgetCode?.toString() || "N/A"}
-                icon={<ActivityIcon className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Activity Location(s)"
-                value={requestDetails.activityLocation}
-                icon={<Navigation className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Activity Start Date"
-                value={formatDate(requestDetails.activityStartDate, "date-only")}
-                icon={<Calendar className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Activity End Date"
-                value={formatDate(requestDetails.activityEndDate, "date-only")}
-                icon={<Calendar className="w-4 h-4" />}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <InternalMemorandum
+                isReadOnly
+                staff={requestDetails.staff}
+                requestDate={requestDetails.requestDate || formatDate(requestDetails.activityStartDate, "date-only")}
+                budgetName={requestDetails.budgetName || requestDetails.project?.projectName || "N/A"}
+                budgetCode={requestDetails.activityBudgetCode?.toString() || "N/A"}
               />
             </div>
 
-            <div className="mt-6">
-              <TitleAndContent
-                title="Activity Purpose/Description"
-                content={requestDetails.activityPurposeDescription}
-              />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                Activity Details
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InfoItem
+                  label="Output"
+                  value={outputDetails?.outputStatement || "N/A"}
+                  icon={<FileOutput className="w-4 h-4" />}
+                />
+                <InfoItem
+                  label="Activity Title"
+                  value={requestDetails.activityTitle}
+                  icon={<ActivityIcon className="w-4 h-4" />}
+                />
+                <InfoItem
+                  label="Activity Location(s)"
+                  value={requestDetails.activityLocation}
+                  icon={<Navigation className="w-4 h-4" />}
+                />
+                <InfoItem
+                  label="Activity Start Date"
+                  value={formatDate(requestDetails.activityStartDate, "date-only")}
+                  icon={<Calendar className="w-4 h-4" />}
+                />
+                <InfoItem
+                  label="Activity End Date"
+                  value={formatDate(requestDetails.activityEndDate, "date-only")}
+                  icon={<Calendar className="w-4 h-4" />}
+                />
+              </div>
+
+              <div className="mt-6">
+                <TitleAndContent
+                  title="Activity Purpose/Description"
+                  content={requestDetails.activityPurposeDescription}
+                />
+              </div>
             </div>
-          </div>
 
           {/* Budget Breakdown Card */}
           <CardComponent>

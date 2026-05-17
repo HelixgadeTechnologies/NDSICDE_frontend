@@ -15,6 +15,8 @@ import { getToken } from "@/lib/api/credentials";
 import { Icon } from "@iconify/react";
 import naija from "naija-state-local-government";
 import { useParams } from "next/navigation";
+import { useProjects } from "@/context/ProjectsContext";
+import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
 
 type FormOneProps = {
   onNext: () => void;
@@ -184,14 +186,15 @@ export default function FormOne({
   return (
     <section>
       <form className="space-y-6" onSubmit={handleFormSubmit}>
-        <Heading heading="Financial Request Form" className="text-center" />
-        <TextInput
-          label="Staff"
-          name="staff"
-          value={formData.staff}
-          onChange={(e) => updateFormData({ staff: e.target.value })}
-          isDisabled={true}
+        <InternalMemorandum
+          staff={formData.staff}
+          requestDate={formData.requestDate}
+          budgetName={formData.budgetName}
+          setBudgetName={(val) => updateFormData({ budgetName: val })}
+          budgetCode={formData.activityBudgetCode}
+          setBudgetCode={(val) => updateFormData({ activityBudgetCode: val })}
         />
+
         <DropDown
           label="Output"
           name="outputId"
@@ -216,16 +219,6 @@ export default function FormOne({
             });
           }}
           options={activitiesOptions}
-        />
-
-        <TextInput
-          label="Activity Budget Code"
-          name="activityBudgetCode"
-          value={formData.activityBudgetCode}
-          onChange={(e) =>
-            updateFormData({ activityBudgetCode: e.target.value })
-          }
-          placeholder="Enter budget code (numbers and periods only)"
         />
         <TagInput
           label="Activity Location(s)"

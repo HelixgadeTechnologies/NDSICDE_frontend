@@ -5,12 +5,16 @@ import Modal from "@/ui/popup-modal";
 import { Icon } from "@iconify/react";
 import { JSX, useState } from "react";
 import FormOne from "./form-one";
+import FormThree from "./form-three";
 import FormTwo from "./form-two";
 import Button from "@/ui/form/button";
 import SubmitAndReview from "./submit-and-review";
-import FormThree from "./form-three";
 import { useParams } from "next/navigation";
 import { useRoleStore } from "@/store/role-store";
+import { useProjects } from "@/context/ProjectsContext";
+import { useEffect } from "react";
+import { formatMemoDate } from "@/utils/dates-format-utility";
+
 
 export type RequestFormData = {
   staff: string;
@@ -41,6 +45,31 @@ export type RequestFormData = {
   documentURL: string;
   activityId: string;
   createdBy: string;
+  budgetName: string;
+  requestDate: string;
+  // New fields
+  purposeOfTrip: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  otherPersonnel: {
+    name: string;
+    company: string;
+    phoneNumber: string;
+  }[];
+  departureDate: string;
+  departureLocationAndTime: string;
+  destination: string;
+  contactPersonPhoneNumberAtDestination: string;
+  flightDepartureState: string;
+  flightDepartureTime: string;
+  flightArrivalState: string;
+  flightArrivalTime: string;
+  hotelAccommodationName: string;
+  hotelAddress: string;
+  returnDate: string;
+  returnTime: string;
+  airportDropoffOfficerName: string;
+  airportPickupOfficerName: string;
 };
 
 
@@ -82,6 +111,26 @@ export default function FormParent() {
     documentURL: "",
     activityId: "",
     createdBy: user?.id || "",
+    budgetName: "",
+    requestDate: formatMemoDate(new Date()),
+    purposeOfTrip: "",
+    vehicleMake: "",
+    vehicleModel: "",
+    otherPersonnel: [],
+    departureDate: "",
+    departureLocationAndTime: "",
+    destination: "",
+    contactPersonPhoneNumberAtDestination: "",
+    flightDepartureState: "",
+    flightDepartureTime: "",
+    flightArrivalState: "",
+    flightArrivalTime: "",
+    hotelAccommodationName: "",
+    hotelAddress: "",
+    returnDate: "",
+    returnTime: "",
+    airportDropoffOfficerName: "",
+    airportPickupOfficerName: "",
   });
 
 
@@ -100,12 +149,12 @@ export default function FormParent() {
     },
     {
       id: 2,
-      title: "Journey Management",
+      title: "Supporting Documents",
       subtitle: "Fill out these details",
     },
     {
       id: 3,
-      title: "Supporting Documents",
+      title: "Journey Management",
       subtitle: "Fill out these details",
     },
     {
