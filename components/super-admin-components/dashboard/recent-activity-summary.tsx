@@ -77,7 +77,7 @@ export default function RecentActivityTab() {
                 {activity?.actor} ({activity?.activityType})
               </p>
               <span className="text-xs text-[#737373] block">
-                Project: {activity?.projectName.substring(0, 50) + "..."}
+                Project: {activity?.projectName?.substring(0, 50) + "..."}
               </span>
               <span className="text-xs text-[#737373] block">
                 {activity?.timeAgo}

@@ -39,13 +39,12 @@ type ResultChild = {
 };
 
 /**
- * Table parent row = one Indicator.
- * `parentResults` holds the single result row it belongs to, kept as an
- * array so TableWithAccordion can render it as child rows.
+ * Table parent row = one Result (output / outcome / impact).
+ * `childIndicators` holds the indicators belonging to it.
  */
-type IndicatorRow = RawIndicator & {
+type ResultRow = ResultChild & {
   id: string;
-  parentResults: ResultChild[];
+  childIndicators: RawIndicator[];
 };
 
 /** Intermediate shape used while fetching: result with its indicators */
@@ -189,32 +188,26 @@ export default function ProjectKpiChartsTableParent({
   };
 
   /**
-   * Flatten result rows → indicator-centric rows.
-   * Each indicator becomes the parent; the result it belongs to becomes
-   * the single child in `parentResults[]`.
+   * Result-centric rows: each result is the parent, its indicators are children.
    * Optionally filtered by thematic area.
    */
-  const indicatorRows = useMemo<IndicatorRow[]>(() => {
+  const resultTableRows = useMemo<ResultRow[]>(() => {
     const filtered = allThematicArea
       ? resultRows.filter(
           (r) => r.thematicArea?.toUpperCase() === allThematicArea.toUpperCase()
         )
       : resultRows;
 
-    return filtered.flatMap((result) =>
-      result.indicators.map((ind) => ({
+    return filtered.map((result) => ({
+      id: result.id,
+      statement: result.statement,
+      thematicArea: result.thematicArea,
+      responsiblePerson: result.responsiblePerson,
+      childIndicators: result.indicators.map((ind) => ({
         ...ind,
         id: ind.indicatorId,
-        parentResults: [
-          {
-            id: result.id,
-            statement: result.statement,
-            thematicArea: result.thematicArea,
-            responsiblePerson: result.responsiblePerson,
-          },
-        ],
-      }))
-    );
+      })),
+    }));
   }, [resultRows, allThematicArea]);
 
   const tabs = [
@@ -222,17 +215,16 @@ export default function ProjectKpiChartsTableParent({
     { tabName: "Table", id: 2 },
   ];
 
-  /** Columns — same count used for both parent (indicator) and child (result) rows */
+  /** Columns — same count used for both parent (result) and child (indicator) rows */
   const tableHead = [
-    "Indicator Statement",
+    "Result Statement",
+    "Thematic Area",
+    "Responsible Person",
     "Baseline",
-    "Baseline Narrative",
     "Target",
-    "Target Narrative",
     "Actual",
-    "Actual Narrative",
     "Performance",
-    "Status",
+    // "Status",
   ];
 
   return (
@@ -300,18 +292,35 @@ export default function ProjectKpiChartsTableParent({
                       </div>
                     </div>
                   ) : (
-                    <TableWithAccordion<IndicatorRow, ResultChild>
+                    <TableWithAccordion<ResultRow, RawIndicator>
                       tableHead={tableHead}
-                      tableData={indicatorRows}
-                      childrenKey="parentResults"
+                      tableData={resultTableRows}
+                      childrenKey="childIndicators"
                       persistKey={`project-${projectId}-accordion`}
-                      emptyStateMessage={resultLevel ? "No indicators found" : "Select a Result Level"}
+                      emptyStateMessage={resultLevel ? "No results found" : "Select a Result Level"}
                       emptyStateSubMessage={
                         resultLevel
-                          ? "No indicators match the selected filters."
-                          : "Choose a result level from the dropdown above to view its indicators."
+                          ? "No results match the selected filters."
+                          : "Choose a result level from the dropdown above to view results and their indicators."
                       }
-                      renderRow={(indicator, _i, _isOpen) => {
+                      renderRow={(result) => (
+                        <>
+                          <td className="px-6 text-xs text-gray-800 font-medium max-w-xs">
+                            <div className="flex items-center gap-2 pb-4">
+                              {result.statement ?? "-"}
+                            </div>
+                          </td>
+                          <td className="px-6 text-xs text-gray-600">{result.thematicArea || "-"}</td>
+                          <td className="px-6 text-xs text-gray-600">{result.responsiblePerson || "-"}</td>
+                          {/* indicator-specific columns not applicable at result level */}
+                          <td className="px-6 text-xs text-gray-300">—</td>
+                          <td className="px-6 text-xs text-gray-300">—</td>
+                          <td className="px-6 text-xs text-gray-300">—</td>
+                          <td className="px-6 text-xs text-gray-300">—</td>
+                          {/* <td className="px-6 text-xs text-gray-300">—</td> */}
+                        </>
+                      )}
+                      renderChildRow={(indicator) => {
                         const baseline = indicator.cumulativeValue ?? indicator.baseline ?? null;
                         const target   = indicator.cumulativeTarget ?? indicator.target ?? null;
                         const actual   = indicator.actual ?? null;
@@ -325,26 +334,20 @@ export default function ProjectKpiChartsTableParent({
 
                         return (
                           <>
-                            <td className="px-6 text-xs text-gray-800 max-w-xs">
-                              <div className="flex items-center gap-2 pb-4">
-                                {indicator.statement ?? "-"}
-                              </div>
+                            <td className="px-6 py-2 text-xs text-gray-700 max-w-xs">
+                              {indicator.statement ?? "-"}
                             </td>
-                            <td className="px-6 text-xs text-gray-700">{baseline ?? 0}</td>
-                            <td className="px-6 text-xs text-gray-500 italic">
-                              {indicator.baselineNarrative || "-"}
-                            </td>
-                            <td className="px-6 text-xs text-gray-700">{target ?? 0}</td>
-                            <td className="px-6 text-xs text-gray-500 italic">
-                              {indicator.targetNarrative || "-"}
-                            </td>
-                            <td className="px-6 text-xs text-gray-700">{actual ?? 0}</td>
-                            <td className="px-6 text-xs text-gray-400">—</td>
-                            <td className="px-6 text-xs text-gray-700">
+                            {/* thematic area & responsible person not on indicator */}
+                            <td className="px-6 py-2 text-xs text-gray-300">—</td>
+                            <td className="px-6 py-2 text-xs text-gray-300">—</td>
+                            <td className="px-6 py-2 text-xs text-gray-700">{baseline ?? 0}</td>
+                            <td className="px-6 py-2 text-xs text-gray-700">{target ?? 0}</td>
+                            <td className="px-6 py-2 text-xs text-gray-700">{actual ?? 0}</td>
+                            <td className="px-6 py-2 text-xs text-gray-700">
                               {computedPerformance != null ? `${computedPerformance}%` : "—"}
                             </td>
-                            <td
-                              className={`px-6 text-xs font-medium ${
+                            {/* <td
+                              className={`px-6 py-2 text-xs font-medium ${
                                 indicator.status === "Met"
                                   ? "text-[#22C55E]"
                                   : indicator.status
@@ -353,30 +356,10 @@ export default function ProjectKpiChartsTableParent({
                               }`}
                             >
                               {indicator.status || "-"}
-                            </td>
+                            </td> */}
                           </>
                         );
                       }}
-                      renderChildRow={(result) => (
-                        <>
-                          <td className="px-6 py-2 text-xs text-gray-700 max-w-xs">
-                            {result.statement ?? "-"}
-                          </td>
-                          <td className="px-6 py-2 text-xs text-gray-500">
-                            {result.thematicArea || "-"}
-                          </td>
-                          <td className="px-6 py-2 text-xs text-gray-500">
-                            {result.responsiblePerson || "-"}
-                          </td>
-                          {/* remaining columns not applicable at result level */}
-                          <td className="px-6 py-2 text-xs text-gray-300">—</td>
-                          <td className="px-6 py-2 text-xs text-gray-300">—</td>
-                          <td className="px-6 py-2 text-xs text-gray-300">—</td>
-                          <td className="px-6 py-2 text-xs text-gray-300">—</td>
-                          <td className="px-6 py-2 text-xs text-gray-300">—</td>
-                          <td className="px-6 py-2 text-xs text-gray-300">—</td>
-                        </>
-                      )}
                     />
                   )}
                 </div>

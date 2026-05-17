@@ -8,24 +8,8 @@ import { useEffect, useState } from "react";
 import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
-import EditKPIModal from "./edit-kpi-form";
+import EditKPIModal, { KPI } from "./edit-kpi-form";
 import { toSentenceCase } from "@/utils/ui-utility";
-
-type KPI = {
-  cumulativeValue: string;
-  createAt: string;
-  definition: string;
-  disaggregation: string;
-  itemInMeasure: string;
-  kpiId: string;
-  specificAreas: string;
-  statement: string;
-  strategicObjectiveId: string;
-  cumulativeTarget: string;
-  type: string;
-  unitOfMeasure: string;
-  updateAt: string;
-};
 
 export default function KPITable({ searchQuery = "", typeFilter = "", soFilterId = "" }: { searchQuery?: string; typeFilter?: string; soFilterId?: string }) {
   const head = [

@@ -69,37 +69,16 @@ export default function TableWithAccordion<T, K>({
                     <tr onClick={() => toggleRow(i)} className="h-15 text-[#6B7280] bg-gray-50 transition-colors">
                       {renderRow(row, i, isOpen, () => toggleRow(i))}
                     </tr>
-                    {isOpen && hasChildren && (
-                      <tr>
-                        <td colSpan={tableHead.length + 1} className="bg-[#F9FAFB] p-0">
-                          <div className="bg-white border-t border-[#E5E7EB]">
-                            <table className="min-w-full text-xs text-left border border-[#E5E7EB] rounded-lg overflow-hidden">
-                              {childTableHead && (
-                                <thead>
-                                  <tr className="bg-[#F3F4F6] h-10 text-[#374151] font-semibold">
-                                    {childTableHead.map((head, idx) => (
-                                      <th key={idx} className="py-2">
-                                        {head}
-                                      </th>
-                                    ))}
-                                  </tr>
-                                </thead>
-                              )}
-                              <tbody className="divide-y divide-[#F3F4F6]">
-                                {children.map((child, childIdx) => (
-                                  <tr key={childIdx} className="h-10 text-[#4B5563]">
-                                    {renderChildRow(child, childIdx)}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
+                    {isOpen && hasChildren && 
+                      children.map((child, childIdx) => (
+                        <tr key={childIdx} className="h-11 text-[#4B5563] bg-white border-t border-[#E5E7EB] hover:bg-gray-50/50 transition-colors">
+                          {renderChildRow(child, childIdx)}
+                        </tr>
+                      ))
+                    }
                     {isOpen && !hasChildren && (
                       <tr>
-                        <td colSpan={tableHead.length + 1} className="bg-[#F9FAFB] px-6 py-4">
+                        <td colSpan={tableHead.length} className="bg-[#F9FAFB] px-6 py-4">
                           <p className="text-xs text-gray-400 italic">No indicators yet.</p>
                         </td>
                       </tr>

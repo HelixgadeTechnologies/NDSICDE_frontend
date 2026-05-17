@@ -103,21 +103,32 @@ export default function AddActivityReport() {
     { id: "100", label: "Fully Completed (100%)", minValue: 100 },
   ];
 
+  const [isLoadingActivities, setIsLoadingActivities] = useState(true);
+
   // automatically fetch activities for prefilling
   useEffect(() => {
     const fetchActivities = async () => {
       try {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setActivity(response.data.data);
       } catch (error) {
-        toast.error("An error occured. Please try again.");
+        toast.error("An error occured fetching activities. Please try again.");
         console.log(error);
+      } finally {
+        setIsLoadingActivities(false);
       }
     };
-    fetchActivities();
-  }, []);
+    if (token) {
+      fetchActivities();
+    }
+  }, [token]);
 
   // Handle form input changes
   const handleInputChange = (
@@ -224,11 +235,33 @@ export default function AddActivityReport() {
     }
   };
 
-  // get activity to prefill form
+  if (isLoadingActivities) {
+    return (
+      <div className="flex justify-center items-center h-40 w-156">
+        <div className="dots">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+    );
+  }
+
   const selectedActivityToPrefillForm = activity.find(
     (act) => act.activityId === activityId,
   );
-  if (!selectedActivityToPrefillForm) return null;
+
+  if (!selectedActivityToPrefillForm) {
+    return (
+      <div className="w-156">
+        <CardComponent>
+          <div className="p-8 text-center text-gray-500">
+            Activity not found. Please go back and try again.
+          </div>
+        </CardComponent>
+      </div>
+    );
+  }
 
   return (
     <div className="w-156">

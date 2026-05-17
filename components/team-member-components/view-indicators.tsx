@@ -271,7 +271,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
               </span>
               <div className="flex items-center gap-3 w-[400px]">
                 <Button
-                  content="View Actuals"
+                  content="View Report"
                   icon="fluent:eye-24-regular"
                   isSecondary={true}
                   onClick={() =>

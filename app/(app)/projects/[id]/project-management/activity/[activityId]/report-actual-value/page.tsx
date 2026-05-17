@@ -33,11 +33,11 @@ export default function ReportActualValue() {
 
   const head = [
     "Activity Statement",
-    "Linked to Output", //linked to output
-    "Total Budget",
-    "Responsible Person(s)",
-    "Start Date",
-    "End Date",
+    "Actual Narrative",
+    "Completion (%)",
+    "Actual Cost",
+    "Actual Start Date",
+    "Actual End Date",
     "Actions",
   ];
 
@@ -137,14 +137,13 @@ export default function ReportActualValue() {
             renderRow={(row) => (
               <>
                 <td className="px-6">{row.activityStatement}</td>
-                {/* linked to output */}
+                <td className="px-6">{row.actualNarrative}</td>
                 <td className="px-6">{row.percentageCompletion}%</td>
-                <td className="px-6">₦ {row.activityTotalBudget}</td>
-                <td className="px-6">{row.responsiblePerson}</td>
+                <td className="px-6">₦ {row.actualCost}</td>
                 <td className="px-6">
-                  {formatDate(row.startDate, "date-only")}
+                  {formatDate(row.actualStartDate, "date-only")}
                 </td>
-                <td className="px-6">{formatDate(row.endDate, "date-only")}</td>
+                <td className="px-6">{formatDate(row.actualEndDate, "date-only")}</td>
                 <td className="px-6 relative">
                   <Icon
                     icon={"uiw:more"}
