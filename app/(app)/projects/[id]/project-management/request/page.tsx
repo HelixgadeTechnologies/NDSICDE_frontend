@@ -11,7 +11,6 @@ import { useEntityModal } from "@/utils/project-management-utility";
 import DeleteModal from "@/ui/generic-delete-modal";
 import Link from "next/link";
 import EditActivityRequest from "@/components/project-management-components/edit-activity-request";
-import ViewActivityRequestModal from "@/components/project-management-components/view-activity-request-modal";
 import EditProjectRequestRetirement from "@/components/project-management-components/edit-project-request-retirement";
 import DashboardStat from "@/ui/dashboard-stat-card";
 import axios from "axios";
@@ -22,6 +21,45 @@ import { formatDate } from "@/utils/dates-format-utility";
 import { RetirementRequestType } from "@/types/retirement-request";
 import LoadingSpinner from "@/ui/loading-spinner";
 import { toSentenceCase } from "@/utils/ui-utility";
+import DropDown from "@/ui/form/select-dropdown";
+import DateRangePicker from "@/ui/form/date-range";
+import { useUIStore } from "@/store/ui-store";
+
+const getRequestApprovalStatus = (step: number | undefined): string => {
+  if (step === undefined || step === null) return "Awaiting SPO approval";
+  switch (step) {
+    case 0:
+      return "Awaiting SPO approval";
+    case 1:
+      return "Awaiting Security Officer Approval";
+    case 2:
+      return "Awaiting Finance Officer Approval";
+    case 3:
+      return "Awaiting Finance Manager Approval";
+    case 4:
+      return "Awaiting Country Director Approval";
+    case 5:
+      return "Approved";
+    default:
+      return "Awaiting SPO approval";
+  }
+};
+
+const getRetirementApprovalStatus = (step: number | undefined): string => {
+  if (step === undefined || step === null) return "Awaiting Finance Officer Approval";
+  switch (step) {
+    case 0:
+      return "Awaiting Finance Officer Approval";
+    case 1:
+      return "Awaiting Finance Manager Approval";
+    case 2:
+      return "Awaiting Country Director Approval";
+    case 3:
+      return "Approved";
+    default:
+      return "Awaiting Finance Officer Approval";
+  }
+};
 
 export default function ProjectRequest() {
   const tabs = [
@@ -29,16 +67,79 @@ export default function ProjectRequest() {
     { tabName: "Activity Financial Retirement", id: 2 },
   ];
   const [activeTab, setActiveTab] = useState(1);
-
-  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [data, setData] = useState<ProjectRequestType[]>([]);
   const [retirementData, setRetirementData] = useState<RetirementRequestType[]>(
     [],
   );
-  const [isLoadingRetirements, setIsLoadingRetirements] = useState(false);
-  const [data, setData] = useState<ProjectRequestType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [viewRequestOpen, setViewRequestOpen] = useState(false);
-  const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
+  const [isLoadingRetirements, setIsLoadingRetirements] = useState(false);
+
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [dateRangeFilter, setDateRangeFilter] = useState<{ startDate: string; endDate: string } | null>(null);
+  const { resetDateRange } = useUIStore();
+
+  const isDateInRange = (dateStr: string | undefined): boolean => {
+    if (!dateStr || !dateRangeFilter) return true;
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return false;
+      
+      const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+      
+      const start = new Date(dateRangeFilter.startDate);
+      const startMs = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime();
+      
+      const end = new Date(dateRangeFilter.endDate);
+      const endMs = new Date(end.getFullYear(), end.getMonth(), end.getDate()).getTime();
+      
+      return compareDate >= startMs && compareDate <= endMs;
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const statusOptions = activeTab === 1 ? [
+    { value: "", label: "All Statuses" },
+    { value: "Pending", label: "Pending" },
+    { value: "In Review", label: "In Review" },
+    { value: "Approved", label: "Approved" },
+    { value: "Rejected", label: "Rejected" },
+  ] : [
+    { value: "", label: "All Statuses" },
+    { value: "Pending", label: "Pending" },
+    { value: "In Review", label: "In Review" },
+    { value: "Approved", label: "Approved and Closed" },
+    { value: "Rejected", label: "Rejected" },
+  ];
+
+  const filteredRequests = data.filter((row) => {
+    if (statusFilter) {
+      const s = row.status?.toLowerCase() || "";
+      const f = statusFilter.toLowerCase();
+      if (s !== f && !(f === "approved" && s === "active")) return false;
+    }
+    if (dateRangeFilter) {
+      if (!isDateInRange(row.activityStartDate)) return false;
+    }
+    return true;
+  });
+
+  const filteredRetirements = retirementData.filter((row) => {
+    if (statusFilter) {
+      const s = row.retirementStatus?.toLowerCase() || "pending";
+      const f = statusFilter.toLowerCase();
+      if (s !== f) return false;
+    }
+    if (dateRangeFilter) {
+      const rowDate = row.activityStartDate || row.createAt;
+      if (!isDateInRange(rowDate)) return false;
+    }
+    return true;
+  });
+
+  // const [viewRequestOpen, setViewRequestOpen] = useState(false);
+  // const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
   const [editRetirement, setEditRetirement] = useState(false);
   const [removeRetirement, setRemoveRetirement] = useState(false);
   const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
@@ -51,7 +152,7 @@ export default function ProjectRequest() {
   const head = [
     "Activity",
     "Total Requested Budget (₦)",
-    "Activity Location",
+    "Approval Status",
     "Staff",
     "Status",
     // "Retirement Status",
@@ -65,6 +166,8 @@ export default function ProjectRequest() {
     "Total Requested Budget (₦)",
     "Actual Retired Cost (₦)",
     "Variance (₦)",
+    "Approval Status",
+    "Status",
     "Actions",
   ];
 
@@ -210,7 +313,7 @@ export default function ProjectRequest() {
     setIsDeleting(true);
     try {
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/${retirementId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/${retirementId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -275,6 +378,37 @@ export default function ProjectRequest() {
           })}
         </div>
 
+        {/* Status and Date Filters */}
+        <div className="flex flex-wrap items-center justify-end gap-3 mb-6">
+          <div className="w-full sm:w-48">
+            <DropDown
+              name="statusFilter"
+              value={statusFilter}
+              onChange={(val) => setStatusFilter(val)}
+              options={statusOptions}
+              placeholder="All Statuses"
+            />
+          </div>
+          
+          <div className="w-full sm:w-auto min-w-45 relative">
+            <DateRangePicker
+              onChange={(range) => setDateRangeFilter(range)}
+            />
+          </div>
+
+          {(statusFilter || dateRangeFilter) && (
+            <button
+              onClick={() => {
+                setStatusFilter("");
+                setDateRangeFilter(null);
+                resetDateRange();
+              }}
+              className="h-10 px-4 w-full sm:w-auto text-sm font-semibold text-gray-555 hover:text-red-550 hover:bg-red-50 border border-gray-200 hover:border-red-100 rounded-md transition-all flex items-center justify-center gap-1.5">
+              Clear
+            </button>
+          )}
+        </div>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -288,7 +422,7 @@ export default function ProjectRequest() {
               ) : (
                 <Table
                   tableHead={head}
-                  tableData={data || []}
+                  tableData={filteredRequests}
                   checkbox
                   idKey={"requestId"}
                   onClick={(row) =>
@@ -311,20 +445,24 @@ export default function ProjectRequest() {
                           .toLocaleString()}
                       </td>
                       <td className="px-6">
-                        {toSentenceCase(row.activityLocation ?? "")}
+                        {getRequestApprovalStatus(row.approvalStep)}
                       </td>
                       <td className="px-6">
                         {toSentenceCase(row.staff ?? "")}
                       </td>
                       <td
-                        className={`px-6 ${
-                          row.status === "Active"
-                            ? "text-green-500"
+                        className={`px-6 font-semibold ${
+                          row.status === "Approved" || row.status === "Active"
+                            ? "text-green-600"
                             : row.status === "Pending"
-                              ? "text-yellow-500"
-                              : "text-red-500"
+                              ? "text-yellow-600"
+                              : row.status === "In Review"
+                                ? "text-blue-600"
+                                : row.status === "Rejected"
+                                  ? "text-red-600"
+                                  : "text-gray-600"
                         }`}>
-                        {row.status}
+                        {row.status || "Pending"}
                       </td>
                       <td className="px-6">
                         {formatDate(row.activityStartDate, "date-only")}
@@ -418,7 +556,7 @@ export default function ProjectRequest() {
                 <div className="space-y-5 mt-4">
                   <Table
                     tableHead={retirementHead}
-                    tableData={retirementData || []}
+                    tableData={filteredRetirements}
                     checkbox
                     idKey={"retirementId"}
                     onClick={(row) =>
@@ -460,6 +598,23 @@ export default function ProjectRequest() {
                               );
                             }
                           })()}
+                        </td>
+                        <td className="px-6">
+                          {getRetirementApprovalStatus(row.approvalStep)}
+                        </td>
+                        <td
+                          className={`px-6 font-semibold ${
+                            row.retirementStatus === "Approved"
+                              ? "text-green-600"
+                              : row.retirementStatus === "Pending"
+                                ? "text-yellow-600"
+                                : row.retirementStatus === "In Review"
+                                  ? "text-blue-600"
+                                  : row.retirementStatus === "Rejected"
+                                    ? "text-red-600"
+                                    : "text-gray-600"
+                          }`}>
+                          {row.retirementStatus === "Approved" ? "Approved and Closed" : (row.retirementStatus || "Pending")}
                         </td>
                         <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
                           <div className="flex justify-center items-center">

@@ -101,6 +101,7 @@ export type ActivityRequestType = {
   updateAt: string;
   vehicleColor: string;
   vehiclePlateNumber: string;
+  approvalStep?: number;
 };
 
 export type RetirementRequestType = {
@@ -125,4 +126,5 @@ export type RetirementRequestType = {
   activityStartDate?: string;
   activityEndDate?: string;
   outputId?: string;
+  approvalStep?: number;
 };

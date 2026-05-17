@@ -111,10 +111,12 @@ const DateInput: React.FC<DateInputProps> = ({
 
   return (
     <div className={`relative w-full ${className}`}>
-    <label className="text-sm capitalize font-medium text-gray-900 block mb-2">{label}</label>
+      {label && (
+        <label className="text-sm capitalize font-medium text-gray-900 block mb-2">{label}</label>
+      )}
       <div 
         ref={inputRef}
-        className="relative flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 h-10 cursor-pointer hover:border-gray-400 transition-colors"
+        className="w-full relative flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 h-10 cursor-pointer hover:border-gray-400 transition-colors overflow-hidden"
         onClick={toggleCalendar}
       >
         <input
@@ -122,11 +124,11 @@ const DateInput: React.FC<DateInputProps> = ({
           value={selectedDate}
           placeholder={placeholder}
           readOnly
-          className="flex-1 outline-none text-gray-700 placeholder-gray-400 text-sm cursor-pointer bg-transparent"
+          className="w-full min-w-0 flex-1 outline-none text-gray-700 placeholder-gray-400 text-sm cursor-pointer bg-transparent"
         />
         <Icon 
           icon="solar:calendar-linear" 
-          className="w-5 h-5 text-gray-500 ml-2 flex-shrink-0"
+          className="w-5 h-5 text-gray-500 ml-2 shrink-0"
         />
       </div>
       {error && <p className="text-xs text-red-500">{error}</p>}
@@ -134,7 +136,7 @@ const DateInput: React.FC<DateInputProps> = ({
       {isCalendarOpen && (
         <div 
           ref={calendarRef}
-          className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-full"
+          className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-md shadow-xl z-50 p-4 w-72 md:w-80"
         >
           {/* Calendar Header */}
           <div className="flex items-center justify-between mb-4">

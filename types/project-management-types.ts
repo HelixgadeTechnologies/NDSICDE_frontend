@@ -102,6 +102,7 @@ export type ProjectRequestType = {
   returnTime?: string;
   airportDropoffOfficerName?: string;
   airportPickupOfficerName?: string;
+  approvalStep?: number;
 };
 
 export type RequestLineItemType = {
