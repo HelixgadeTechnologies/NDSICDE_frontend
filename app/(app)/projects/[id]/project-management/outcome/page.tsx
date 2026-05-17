@@ -113,7 +113,9 @@ export default function ProjectOutcome() {
               <>
                 <td className="px-6">{toSentenceCase(row.outcomeStatement ?? "")}</td>
                 <td className="px-6">{toSentenceCase(row.outcomeType ?? "")}</td>
-                <td className="px-6">{toSentenceCase(row.impactStatement ?? "")}</td>
+                <td className="px-6">
+                  {toSentenceCase(row.impactStatement ?? "")}
+                </td>
                 <td className="px-6">{toSentenceCase(row.thematicAreas ?? "")}</td>
                 <td className="px-6">{toSentenceCase(row.responsiblePerson ?? "")}</td>
                 <td className="px-6 relative">

@@ -75,7 +75,23 @@ export type ProjectRequestType = {
   comment_C?: null | "string",
   comment_D?: null | "string",
   comment_E?: null | "string",
-  createAt?: string
+  createAt?: string,
+  lineItems: RequestLineItemType[];
+};
+
+export type RequestLineItemType = {
+  lineItemId: string;
+  requestId: string;
+  activityId: string;
+  description: string;
+  quantity: number;
+  frequency: number;
+  unitCost: number;
+  totalBudget: number;
+  totalSpent: number | null;
+  variance: number | null;
+  createAt: string;
+  updateAt: string;
 };
 
 export type ProjectActivityTypes = {

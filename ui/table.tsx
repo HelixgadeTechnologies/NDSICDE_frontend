@@ -31,8 +31,8 @@ export default function Table<T>({
   emptyStateMessage = "No data available",
   emptyStateSubMessage = "There are no records to display at the moment. If this seems like an error, please check back later or refresh the page.",
   // Pagination props
-  pagination = false,
-  itemsPerPage = 3, // Default to 3 items per page as requested
+  pagination = true,
+  itemsPerPage = 3, // Default to 4 items per page as requested
   showPaginationControls = true,
   onPageChange,
 }: TableProps<T>) {

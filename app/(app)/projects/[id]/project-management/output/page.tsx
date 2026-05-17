@@ -48,7 +48,6 @@ export default function ProjectOutput() {
     handleRemoveEntity: handleRemoveProjectOutput,
   } = useEntityModal<ProjectOutputTypes>();
 
-
   // fetch output
   const fetchOutput = async () => {
     setIsLoading(true);
@@ -113,10 +112,18 @@ export default function ProjectOutput() {
             idKey={"outputId"}
             renderRow={(row) => (
               <>
-                <td className="px-6">{toSentenceCase(row.outputStatement ?? "")}</td>
-                <td className="px-6">{toSentenceCase(row.outcomeStatement ?? "")}</td>
-                <td className="px-6">{toSentenceCase(row.thematicAreas ?? "")}</td>
-                <td className="px-6">{toSentenceCase(row.responsiblePerson ?? "")}</td>
+                <td className="px-6">
+                  {toSentenceCase(row.outputStatement ?? "")}
+                </td>
+                <td className="px-6">
+                  {toSentenceCase(row.outcomeStatement ?? "")}
+                </td>
+                <td className="px-6">
+                  {toSentenceCase(row.thematicAreas ?? "")}
+                </td>
+                <td className="px-6">
+                  {toSentenceCase(row.responsiblePerson ?? "")}
+                </td>
                 <td className="px-6 relative">
                   <Icon
                     icon={"uiw:more"}
@@ -137,14 +144,17 @@ export default function ProjectOutput() {
                         type: "button",
                         label: "Edit",
                         icon: "ph:pencil-simple-line",
-                        onClick: () => handleEditProjectOutput(row, setActiveRowId),
+                        onClick: () =>
+                          handleEditProjectOutput(row, setActiveRowId),
                       },
                       {
                         type: "button",
                         label: "Remove",
                         icon: "pixelarticons:trash",
-                        onClick: () => handleRemoveProjectOutput(row, setActiveRowId),
-                        className: "hover:text-(--primary-light) border-y border-gray-300",
+                        onClick: () =>
+                          handleRemoveProjectOutput(row, setActiveRowId),
+                        className:
+                          "hover:text-(--primary-light) border-y border-gray-300",
                       },
                       {
                         type: "link",

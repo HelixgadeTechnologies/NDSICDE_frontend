@@ -190,6 +190,7 @@ export default function FormOne({
           name="staff"
           value={formData.staff}
           onChange={(e) => updateFormData({ staff: e.target.value })}
+          isDisabled={true}
         />
         <DropDown
           label="Output"

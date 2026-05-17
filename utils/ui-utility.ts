@@ -18,8 +18,13 @@ export const typeChecker = (row: { status: string }) => {
     }
   };
 
-  export const toSentenceCase = (str: string) => {
-  return str
+export const toSentenceCase = (str: string, maxLength: number = 50) => {
+  if (!str) return "";
+  let truncatedStr = str;
+  if (str.length > maxLength) {
+    truncatedStr = str.substring(0, maxLength) + "...";
+  }
+  return truncatedStr
     .toLowerCase()
     .replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
-}
+};

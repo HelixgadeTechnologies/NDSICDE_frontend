@@ -42,8 +42,8 @@ export default function ProjectRequest() {
   const projectId = (params?.id as string) || "";
 
   const head = [
-    "Activity Description",
-    "Total (₦)",
+    "Activity",
+    "Total Requested Budget (₦)",
     "Activity Location",
     "Staff",
     "Status",
@@ -246,10 +246,14 @@ export default function ProjectRequest() {
             renderRow={(row) => (
               <>
                 <td className="px-6 w-37.5">
-                  {toSentenceCase(row.activityPurposeDescription ?? "")}
+                  {toSentenceCase(row.activityTitle ?? "")}
                 </td>
-                {/* budget total previously */}
-                <td className="px-6">{row.total}</td>
+                <td className="px-6">
+                  ₦
+                  {(row.lineItems || [])
+                    .reduce((sum, item) => sum + (item.totalBudget || 0), 0)
+                    .toLocaleString()}
+                </td>
                 <td className="px-6">{toSentenceCase(row.activityLocation ?? "")}</td>
                 <td className="px-6">{toSentenceCase(row.staff ?? "")}</td>
                 <td
