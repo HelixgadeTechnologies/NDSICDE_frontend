@@ -13,6 +13,7 @@ import { useParams, useRouter } from "next/navigation";
 import { getToken } from "@/lib/api/credentials";
 import { useProjects } from "@/context/ProjectsContext";
 import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
+import { Icon } from "@iconify/react";
 
 type FormTwoProps = {
   formData: RequestFormData;
@@ -86,6 +87,7 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           returnTime: formData.returnTime,
           airportDropoffOfficerName: formData.airportDropoffOfficerName,
           airportPickupOfficerName: formData.airportPickupOfficerName,
+          isJourneyRequired: formData.isJourneyRequired,
           documentName: formData.documentName,
           documentURL: formData.documentURL || "string",
           projectId: projectId,
@@ -196,161 +198,168 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
 
           <Heading heading="Journey Management" className="border-t border-gray-100 pt-4" />
 
-          <div className="space-y-4">
-            <p className="text-sm">
-              <span className="text-[#475367] font-medium">Purpose of Trip:</span>
-              <span className="font-semibold text-gray-900 block mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 whitespace-pre-wrap">{formData.purposeOfTrip || "N/A"}</span>
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p className="text-sm">
-                <span className="text-[#475367] font-medium">Mode of Transport:</span>
-                <span className="font-semibold text-gray-900 block mt-1">{formData.modeOfTransport || "N/A"}</span>
-              </p>
+          {!formData.isJourneyRequired ? (
+            <div className="p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 flex items-center gap-3">
+              <Icon icon="mdi:car-off" className="text-xl text-gray-400" />
+              <span className="text-sm font-semibold text-gray-600">Journey Management: Not Required for this request</span>
             </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm">
+                <span className="text-[#475367] font-medium">Purpose of Trip:</span>
+                <span className="font-semibold text-gray-900 block mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 whitespace-pre-wrap">{formData.purposeOfTrip || "N/A"}</span>
+              </p>
 
-            {/* Travel Details Section */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Travel Details</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <p className="text-sm">
-                  <span className="text-[#475367] font-medium">Departure Date:</span>
-                  <span className="font-semibold text-gray-900 block mt-0.5">{formData.departureDate || "N/A"}</span>
-                </p>
-                <p className="text-sm">
-                  <span className="text-[#475367] font-medium">Departure Location & Time:</span>
-                  <span className="font-semibold text-gray-900 block mt-0.5">{formData.departureLocationAndTime || "N/A"}</span>
-                </p>
-                <p className="text-sm">
-                  <span className="text-[#475367] font-medium">Destination:</span>
-                  <span className="font-semibold text-gray-900 block mt-0.5">{formData.destination || "N/A"}</span>
-                </p>
-                <p className="text-sm">
-                  <span className="text-[#475367] font-medium">Contact Person Phone Number:</span>
-                  <span className="font-semibold text-gray-900 block mt-0.5">{formData.contactPersonPhoneNumberAtDestination || "N/A"}</span>
-                </p>
-                <p className="text-sm md:col-span-2">
-                  <span className="text-[#475367] font-medium">Intended Route:</span>
-                  <span className="font-semibold text-gray-900 block mt-0.5">{formData.route || "N/A"}</span>
+                  <span className="text-[#475367] font-medium">Mode of Transport:</span>
+                  <span className="font-semibold text-gray-900 block mt-1">{formData.modeOfTransport || "N/A"}</span>
                 </p>
               </div>
-            </div>
 
-            {/* Driver & Vehicle Details (Only if Road) */}
-            {formData.modeOfTransport === "Road" && (
-              <>
-                <div className="space-y-2">
-                  <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Driver Details</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                    <p className="text-sm">
-                      <span className="text-[#475367] font-medium">Driver&apos;s Name:</span>
-                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.driverName || "N/A"}</span>
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-[#475367] font-medium">Driver&apos;s Phone Number:</span>
-                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.driversPhoneNumber || "N/A"}</span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Vehicle Details</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                    <p className="text-sm">
-                      <span className="text-[#475367] font-medium">Vehicle Make:</span>
-                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.vehicleMake || "N/A"}</span>
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-[#475367] font-medium">Vehicle Model:</span>
-                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.vehicleModel || "N/A"}</span>
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-[#475367] font-medium">Registration Number:</span>
-                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.vehiclePlateNumber || "N/A"}</span>
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-[#475367] font-medium">Vehicle Color:</span>
-                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.vehicleColor || "N/A"}</span>
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Flight Details (Only if Flight) */}
-            {formData.modeOfTransport === "Flight" && (
+              {/* Travel Details Section */}
               <div className="space-y-2">
-                <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Flight Details</h4>
+                <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Travel Details</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                   <p className="text-sm">
-                    <span className="text-[#475367] font-medium">Departure State:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.flightDepartureState || "N/A"}</span>
+                    <span className="text-[#475367] font-medium">Departure Date:</span>
+                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.departureDate || "N/A"}</span>
                   </p>
                   <p className="text-sm">
-                    <span className="text-[#475367] font-medium">Departure Time:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.flightDepartureTime || "N/A"}</span>
+                    <span className="text-[#475367] font-medium">Departure Location & Time:</span>
+                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.departureLocationAndTime || "N/A"}</span>
                   </p>
                   <p className="text-sm">
-                    <span className="text-[#475367] font-medium">Arrival State:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.flightArrivalState || "N/A"}</span>
+                    <span className="text-[#475367] font-medium">Destination:</span>
+                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.destination || "N/A"}</span>
                   </p>
                   <p className="text-sm">
-                    <span className="text-[#475367] font-medium">Arrival Time:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.flightArrivalTime || "N/A"}</span>
+                    <span className="text-[#475367] font-medium">Contact Person Phone Number:</span>
+                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.contactPersonPhoneNumberAtDestination || "N/A"}</span>
                   </p>
                   <p className="text-sm md:col-span-2">
-                    <span className="text-[#475367] font-medium">Hotel Accommodation Name:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.hotelAccommodationName || "N/A"}</span>
-                  </p>
-                  <p className="text-sm md:col-span-2">
-                    <span className="text-[#475367] font-medium">Address of Hotel:</span>
-                    <span className="font-semibold text-gray-900 block mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 whitespace-pre-wrap">{formData.hotelAddress || "N/A"}</span>
-                  </p>
-                  <p className="text-sm">
-                    <span className="text-[#475367] font-medium">Return Date:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.returnDate || "N/A"}</span>
-                  </p>
-                  <p className="text-sm">
-                    <span className="text-[#475367] font-medium">Return Time:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.returnTime || "N/A"}</span>
-                  </p>
-                  <p className="text-sm">
-                    <span className="text-[#475367] font-medium">Airport Drop-off Officer:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.airportDropoffOfficerName || "N/A"}</span>
-                  </p>
-                  <p className="text-sm">
-                    <span className="text-[#475367] font-medium">Airport Pick-up Officer:</span>
-                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.airportPickupOfficerName || "N/A"}</span>
+                    <span className="text-[#475367] font-medium">Intended Route:</span>
+                    <span className="font-semibold text-gray-900 block mt-0.5">{formData.route || "N/A"}</span>
                   </p>
                 </div>
               </div>
-            )}
 
-            {/* Other Personnel Travelling (Only if present) */}
-            {formData.otherPersonnel && formData.otherPersonnel.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Other Personnel Travelling</h4>
-                <div className="space-y-2">
-                  {formData.otherPersonnel.map((person, idx) => (
-                    <div key={idx} className="p-3 border border-gray-200 rounded-lg bg-gray-50 flex flex-wrap gap-4 text-sm justify-between">
+              {/* Driver & Vehicle Details (Only if Road) */}
+              {formData.modeOfTransport === "Road" && (
+                <>
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Driver Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                       <p className="text-sm">
-                        <span className="text-[#475367] font-medium">Name:</span>
-                        <span className="font-semibold text-gray-900 ml-1">{person.name || "N/A"}</span>
+                        <span className="text-[#475367] font-medium">Driver&apos;s Name:</span>
+                        <span className="font-semibold text-gray-900 block mt-0.5">{formData.driverName || "N/A"}</span>
                       </p>
                       <p className="text-sm">
-                        <span className="text-[#475367] font-medium">Company:</span>
-                        <span className="font-semibold text-gray-900 ml-1">{person.company || "N/A"}</span>
-                      </p>
-                      <p className="text-sm">
-                        <span className="text-[#475367] font-medium">Phone:</span>
-                        <span className="font-semibold text-gray-900 ml-1">{person.phoneNumber || "N/A"}</span>
+                        <span className="text-[#475367] font-medium">Driver&apos;s Phone Number:</span>
+                        <span className="font-semibold text-gray-900 block mt-0.5">{formData.driversPhoneNumber || "N/A"}</span>
                       </p>
                     </div>
-                  ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Vehicle Details</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                      <p className="text-sm">
+                        <span className="text-[#475367] font-medium">Vehicle Make:</span>
+                        <span className="font-semibold text-gray-900 block mt-0.5">{formData.vehicleMake || "N/A"}</span>
+                      </p>
+                      <p className="text-sm">
+                        <span className="text-[#475367] font-medium">Vehicle Model:</span>
+                        <span className="font-semibold text-gray-900 block mt-0.5">{formData.vehicleModel || "N/A"}</span>
+                      </p>
+                      <p className="text-sm">
+                        <span className="text-[#475367] font-medium">Registration Number:</span>
+                        <span className="font-semibold text-gray-900 block mt-0.5">{formData.vehiclePlateNumber || "N/A"}</span>
+                      </p>
+                      <p className="text-sm">
+                        <span className="text-[#475367] font-medium">Vehicle Color:</span>
+                        <span className="font-semibold text-gray-900 block mt-0.5">{formData.vehicleColor || "N/A"}</span>
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Flight Details (Only if Flight) */}
+              {formData.modeOfTransport === "Flight" && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Flight Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    <p className="text-sm">
+                      <span className="text-[#475367] font-medium">Departure State:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.flightDepartureState || "N/A"}</span>
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-[#475367] font-medium">Departure Time:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.flightDepartureTime || "N/A"}</span>
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-[#475367] font-medium">Arrival State:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.flightArrivalState || "N/A"}</span>
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-[#475367] font-medium">Arrival Time:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.flightArrivalTime || "N/A"}</span>
+                    </p>
+                    <p className="text-sm md:col-span-2">
+                      <span className="text-[#475367] font-medium">Hotel Accommodation Name:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.hotelAccommodationName || "N/A"}</span>
+                    </p>
+                    <p className="text-sm md:col-span-2">
+                      <span className="text-[#475367] font-medium">Address of Hotel:</span>
+                      <span className="font-semibold text-gray-900 block mt-1 p-3 bg-gray-50 rounded-lg border border-gray-100 whitespace-pre-wrap">{formData.hotelAddress || "N/A"}</span>
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-[#475367] font-medium">Return Date:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.returnDate || "N/A"}</span>
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-[#475367] font-medium">Return Time:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.returnTime || "N/A"}</span>
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-[#475367] font-medium">Airport Drop-off Officer:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.airportDropoffOfficerName || "N/A"}</span>
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-[#475367] font-medium">Airport Pick-up Officer:</span>
+                      <span className="font-semibold text-gray-900 block mt-0.5">{formData.airportPickupOfficerName || "N/A"}</span>
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+
+              {/* Other Personnel Travelling (Only if present) */}
+              {formData.otherPersonnel && formData.otherPersonnel.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-bold text-[#D2091E] border-b border-gray-50 pb-1">Other Personnel Travelling</h4>
+                  <div className="space-y-2">
+                    {formData.otherPersonnel.map((person, idx) => (
+                      <div key={idx} className="p-3 border border-gray-200 rounded-lg bg-gray-50 flex flex-wrap gap-4 text-sm justify-between">
+                        <p className="text-sm">
+                          <span className="text-[#475367] font-medium">Name:</span>
+                          <span className="font-semibold text-gray-900 ml-1">{person.name || "N/A"}</span>
+                        </p>
+                        <p className="text-sm">
+                          <span className="text-[#475367] font-medium">Company:</span>
+                          <span className="font-semibold text-gray-900 ml-1">{person.company || "N/A"}</span>
+                        </p>
+                        <p className="text-sm">
+                          <span className="text-[#475367] font-medium">Phone:</span>
+                          <span className="font-semibold text-gray-900 ml-1">{person.phoneNumber || "N/A"}</span>
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* attached evidence */}
           <div className="my-4">

@@ -70,6 +70,7 @@ export type RequestFormData = {
   returnTime: string;
   airportDropoffOfficerName: string;
   airportPickupOfficerName: string;
+  isJourneyRequired: boolean;
 };
 
 
@@ -131,6 +132,7 @@ export default function FormParent() {
     returnTime: "",
     airportDropoffOfficerName: "",
     airportPickupOfficerName: "",
+    isJourneyRequired: true,
   });
 
 
