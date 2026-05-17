@@ -12,7 +12,7 @@ import DeleteModal from "@/ui/generic-delete-modal";
 import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
 import { toSentenceCase } from "@/utils/ui-utility";
@@ -25,6 +25,7 @@ export default function ProjectOutput() {
   const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const projectId = (params?.id as string) || "";
+  const router = useRouter();
 
   const head = [
     "Project Output Statement",
@@ -110,6 +111,7 @@ export default function ProjectOutput() {
             tableData={data}
             checkbox
             idKey={"outputId"}
+            onClick={(row) => router.push(`/projects/${projectId}`)}
             renderRow={(row) => (
               <>
                 <td className="px-6">
@@ -124,7 +126,7 @@ export default function ProjectOutput() {
                 <td className="px-6">
                   {toSentenceCase(row.responsiblePerson ?? "")}
                 </td>
-                <td className="px-6 relative">
+                <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
                   <Icon
                     icon={"uiw:more"}
                     width={22}

@@ -13,6 +13,7 @@ type TableProps<T> = {
   isStraight?: boolean;
   emptyStateMessage?: string;
   emptyStateSubMessage?: string;
+  onClick?: (row: T) => void;
   // Pagination props
   pagination?: boolean;
   itemsPerPage?: number;
@@ -30,9 +31,10 @@ export default function Table<T>({
   onSelectionChange,
   emptyStateMessage = "No data available",
   emptyStateSubMessage = "There are no records to display at the moment. If this seems like an error, please check back later or refresh the page.",
+  onClick,
   // Pagination props
   pagination = true,
-  itemsPerPage = 3, // Default to 4 items per page as requested
+  itemsPerPage = 3,
   showPaginationControls = true,
   onPageChange,
 }: TableProps<T>) {
@@ -153,7 +155,8 @@ export default function Table<T>({
                   return (
                     <tr
                       key={i}
-                      className="border-t border-[#E5E7EB] h-30 text-[#6B7280]"
+                      onClick={() => onClick && onClick(row)}
+                      className={`border-t border-[#E5E7EB] h-30 text-[#6B7280] ${onClick ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""}`}
                     >
                       {renderRow(row, i, false)}
                     </tr>
@@ -166,10 +169,11 @@ export default function Table<T>({
                 return (
                   <tr
                     key={i}
-                    className="border-t border-[#E5E7EB] h-30 text-[#6B7280]"
+                    onClick={() => onClick && onClick(row)}
+                    className={`border-t border-[#E5E7EB] h-30 text-[#6B7280] ${onClick ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""}`}
                   >
                     {checkbox && idKey && (
-                      <td className="px-6">
+                      <td className="px-6" onClick={(e) => e.stopPropagation()}>
                         <Checkbox
                           name={`checkbox-${i}`}
                           isChecked={isChecked}

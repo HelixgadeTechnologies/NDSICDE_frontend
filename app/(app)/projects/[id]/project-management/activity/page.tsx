@@ -13,7 +13,7 @@ import EditProjectActivity from "@/components/project-management-components/edit
 import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { formatDate } from "@/utils/dates-format-utility";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
@@ -26,6 +26,7 @@ export default function ProjectActivity() {
   const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const projectId = (params?.id as string) || "";
+  const router = useRouter();
 
   const head = [
     "Activity Statement",
@@ -129,6 +130,7 @@ export default function ProjectActivity() {
             tableData={data}
             checkbox
             idKey={"activityId"}
+            onClick={(row) => router.push(`/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value`)}
             renderRow={(row) => (
               <>
                 <td className="px-6">{row.activityStatement}</td>
@@ -137,7 +139,7 @@ export default function ProjectActivity() {
                 <td className="px-6">{row.activityTotalBudget}</td>
                 <td className="px-6">{formatDate(row.startDate, "date-only")} - {formatDate(row.endDate, "date-only")}</td>
                 <td className="px-6">{row.responsiblePerson}</td>
-                <td className="px-6 relative">
+                <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
                   <Icon
                     icon={"uiw:more"}
                     width={22}

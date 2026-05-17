@@ -134,6 +134,13 @@ export default function FinancialRequestModal() {
     );
   }
 
+  const totalRetirementBudget = Number(retirement.totalBudget || 0);
+  const totalRetirementActualCost = Number(retirement.actualCost || 0);
+  const retirementVariance = totalRetirementBudget - totalRetirementActualCost;
+
+  const reimburseToNDSICDE = retirementVariance > 0 ? retirementVariance : 0;
+  const reimburseToStaff = retirementVariance < 0 ? Math.abs(retirementVariance) : 0;
+
   return (
     <>
       <BackButton />
@@ -237,16 +244,39 @@ export default function FinancialRequestModal() {
                   <td className="px-6">{row.quantity || "0"}</td>
                   <td className="px-6">{row.frequency || "0"}</td>
                   <td className="px-6">{row.unitCost || "0"}</td>
-                  <td className="px-6">{row.totalBudget || "0"}</td>
-                  <td className="px-6">{row.actualCost || "0"}</td>
-                  <td className="px-6">{ (Number(row.totalBudget) || 0) - (Number(row.actualCost) || 0) }</td>
+                  <td className="px-6">₦{Number(row.totalBudget || 0).toLocaleString()}</td>
+                  <td className="px-6">₦{Number(row.actualCost || 0).toLocaleString()}</td>
+                  <td className="px-6 font-medium">
+                    {(() => {
+                      const diff = (Number(row.totalBudget) || 0) - (Number(row.actualCost) || 0);
+                      if (diff < 0) {
+                        return (
+                          <span className="text-red-500">
+                            -₦{Math.abs(diff).toLocaleString()}
+                          </span>
+                        );
+                      } else if (diff > 0) {
+                        return (
+                          <span className="text-green-500">
+                            ₦{diff.toLocaleString()}
+                          </span>
+                        );
+                      } else {
+                        return (
+                          <span className="text-gray-500">
+                            ₦0
+                          </span>
+                        );
+                      }
+                    })()}
+                  </td>
                 </>
               )}
             />
             <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-              <p>Total Activity Cost (₦): {Number(retirement.actualCost || 0).toLocaleString()}</p>
-              <p>Amount to reimburse to NDSICDE (₦): 0</p>
-              <p>Amount to reimburse to Staff (₦): 0</p>
+              <p>Total Activity Cost (₦): {totalRetirementActualCost.toLocaleString()}</p>
+              <p>Amount to reimburse to NDSICDE (₦): {reimburseToNDSICDE.toLocaleString()}</p>
+              <p>Amount to reimburse to Staff (₦): {reimburseToStaff.toLocaleString()}</p>
             </div>
           </CardComponent>
         </div>

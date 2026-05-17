@@ -23,6 +23,7 @@ import {
   Navigation,
   User,
 } from "lucide-react";
+import BackButton from "@/ui/back-button";
 import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
@@ -32,6 +33,7 @@ import { useParams } from "next/navigation";
 export default function ProjectRequestRetirementPage() {
   const searchParams = useSearchParams();
   const requestId = searchParams.get("requestId");
+  const viewOnly = searchParams.get("viewOnly") === "true";
   const { requests, fetchRetirements } = useRequests();
   const [selectedRequest, setSelectedRequest] = useState<ProjectRequestType | null>(null);
   const [outputDetails, setOutputDetails] = useState<ProjectOutputTypes | null>(null);
@@ -46,6 +48,25 @@ export default function ProjectRequestRetirementPage() {
   
   const params = useParams();
   const projectId = (params?.id as string) || "";
+
+  const fetchLocalRetirements = async () => {
+    if (!requestId) return;
+    try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirements`,
+          {
+            params: {
+              projectId: projectId,
+            },
+          }
+        );
+        const allRetirements = res.data?.data || [];
+        const matchingRetirements = allRetirements.filter((r: RetirementRequestType) => r.requestId === requestId);
+        setRequestRetirements(matchingRetirements);
+    } catch (err) {
+        console.error("Failed to fetch retirements", err);
+    }
+  };
 
   useEffect(() => {
     const loadRequest = async () => {
@@ -66,16 +87,7 @@ export default function ProjectRequestRetirementPage() {
                 setOutputDetails(outputRes.data.data);
             }
 
-            try {
-                const res = await axios.get(
-                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/project/${projectId}`,
-                );
-                const allRetirements = res.data?.data || [];
-                const matchingRetirements = allRetirements.filter((r: RetirementRequestType) => r.requestId === requestId);
-                setRequestRetirements(matchingRetirements);
-            } catch (err) {
-                console.error("Failed to fetch retirements", err);
-            }
+            await fetchLocalRetirements();
         }
       } catch (error) {
         console.error("Error finding request specifics:", error);
@@ -87,13 +99,22 @@ export default function ProjectRequestRetirementPage() {
     loadRequest();
   }, [requestId, requests, projectId]);
 
-  const head = [
+  const head = viewOnly ? [
     "Item Line Description",
     "Quantity",
     "Frequency",
     "Unit Cost (₦)",
     "Total Budget (₦)",
     "Actual Cost (₦)",
+    "Variance (₦)",
+  ] : [
+    "Item Line Description",
+    "Quantity",
+    "Frequency",
+    "Unit Cost (₦)",
+    "Total Budget (₦)",
+    "Actual Cost (₦)",
+    "Variance (₦)",
     "Actions",
   ];
 
@@ -134,8 +155,21 @@ export default function ProjectRequestRetirementPage() {
     }
   }
 
+  const totalRetirementBudget = requestRetirements.reduce(
+    (acc, curr) => acc + (curr.totalBudget || 0),
+    0,
+  );
+  const totalRetirementActualCost = requestRetirements.reduce(
+    (acc, curr) => acc + (curr.actualCost || 0),
+    0,
+  );
+  const retirementVariance = totalRetirementBudget - totalRetirementActualCost;
+
+  const reimburseToNDSICDE = retirementVariance > 0 ? retirementVariance : 0;
+  const reimburseToStaff = retirementVariance < 0 ? Math.abs(retirementVariance) : 0;
+
   return (
-    <div className="mt-12 space-y-7">
+    <div className="mt-12 space-y-7 pb-12">
       {/* submission details */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -198,70 +232,96 @@ export default function ProjectRequestRetirementPage() {
           renderRow={(row: RetirementRequestType) => (
             <>
              <td className="px-6">{row.activityLineDescription || "N/A"}</td>
-            <td className="px-6">{row.quantity || "0"}</td>
-            <td className="px-6">{row.frequency || "0"}</td>
-            <td className="px-6">{row.unitCost || "0"}</td>
-            <td className="px-6">
-              {row.totalBudget || "0"}
-            </td>
-            <td className="px-6">{row.actualCost || "0"}</td>
-              <td className="px-6 relative">
-                <Icon
-                  icon={"uiw:more"}
-                  width={22}
-                  height={22}
-                  className="cursor-pointer"
-                  color="#909CAD"
-                  onClick={() =>
-                    setActiveRowId((prev) =>
-                      prev === row.retirementId ? null : row.retirementId
-                    )
-                  }
-                />
+             <td className="px-6">{row.quantity || "0"}</td>
+             <td className="px-6">{row.frequency || "0"}</td>
+             <td className="px-6">₦{(row.unitCost || 0).toLocaleString()}</td>
+             <td className="px-6 font-semibold">
+               ₦{(row.totalBudget || 0).toLocaleString()}
+             </td>
+             <td className="px-6">₦{(row.actualCost || 0).toLocaleString()}</td>
+             <td className="px-6 font-medium">
+               {(() => {
+                 const diff = (row.totalBudget || 0) - (row.actualCost || 0);
+                 if (diff < 0) {
+                   return (
+                     <span className="text-red-500">
+                       -₦{Math.abs(diff).toLocaleString()}
+                     </span>
+                   );
+                 } else if (diff > 0) {
+                   return (
+                     <span className="text-green-500">
+                       +₦{diff.toLocaleString()}
+                     </span>
+                   );
+                 } else {
+                   return (
+                     <span className="text-gray-500">
+                       ₦0
+                     </span>
+                   );
+                 }
+               })()}
+             </td>
+             {!viewOnly && (
+               <td className="px-6 relative">
+                 <Icon
+                   icon={"uiw:more"}
+                   width={22}
+                   height={22}
+                   className="cursor-pointer"
+                   color="#909CAD"
+                   onClick={() =>
+                     setActiveRowId((prev) =>
+                       prev === row.retirementId ? null : row.retirementId
+                     )
+                   }
+                 />
 
-                {activeRowId === row.retirementId && (
-                  <AnimatePresence>
-                    <motion.div
-                      initial={{ y: -10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -10, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                      <ul className="text-sm">
-                        <li 
-                          onClick={() => {
-                            setSelectedRetirement(row);
-                            setOpenEditRetirement(true);
-                            setActiveRowId(null);
-                          }}
-                          className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                          <Icon
-                            icon={"ph:pencil-simple-line"}
-                            height={20}
-                            width={20}
-                          />
-                          Edit
-                        </li>
-                        <li onClick={() => setOpenDeleteModal(true)} className="cursor-pointer hover:text-[--primary-light] border-y border-gray-300 flex gap-2 p-3 items-center">
-                          <Icon
-                            icon={"pixelarticons:trash"}
-                            height={20}
-                            width={20}
-                          />
-                          Remove
-                        </li>
-                      </ul>
-                    </motion.div>
-                  </AnimatePresence>
-                )}
-              </td>
+                 {activeRowId === row.retirementId && (
+                   <AnimatePresence>
+                     <motion.div
+                       initial={{ y: -10, opacity: 0 }}
+                       animate={{ y: 0, opacity: 1 }}
+                       exit={{ y: -10, opacity: 0 }}
+                       transition={{ duration: 0.2, ease: "easeOut" }}
+                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
+                       <ul className="text-sm">
+                         <li 
+                           onClick={() => {
+                             setSelectedRetirement(row);
+                             setOpenEditRetirement(true);
+                             setActiveRowId(null);
+                           }}
+                           className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                           <Icon
+                             icon={"ph:pencil-simple-line"}
+                             height={20}
+                             width={20}
+                           />
+                           Edit
+                         </li>
+                         <li onClick={() => setOpenDeleteModal(true)} className="cursor-pointer hover:text-[--primary-light] border-y border-gray-300 flex gap-2 p-3 items-center">
+                           <Icon
+                             icon={"pixelarticons:trash"}
+                             height={20}
+                             width={20}
+                           />
+                           Remove
+                         </li>
+                       </ul>
+                     </motion.div>
+                   </AnimatePresence>
+                 )}
+               </td>
+             )}
             </>
           )}
         />
         <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-          <p>Total Activity Cost (₦): {requestRetirements.reduce((acc, curr) => acc + (curr.actualCost || 0), 0).toLocaleString()}</p>
-          <p>Amount to reimburse to NDSICDE (₦): 0</p>
-          <p>Amount to reimburse to Staff (₦): 0</p>
+          <p>Total Activity Cost (₦): {totalRetirementActualCost.toLocaleString()}</p>
+          <p>Amount to reimburse to NDSICDE (₦): {reimburseToNDSICDE.toLocaleString()}</p>
+          <p>Amount to reimburse to Staff (₦): {reimburseToStaff.toLocaleString()}</p>
         </div>
       </CardComponent>
 
@@ -280,24 +340,26 @@ export default function ProjectRequestRetirementPage() {
       </div>
 
     {/* add retirement button */}
-      <div className="flex gap-3 items-center w-100">
+      <div className="flex gap-3 items-center w-100 print:hidden">
         <Button content="Print Report" isSecondary onClick={() => window.print()} />
-        <Button
-          content="Retire Request"
-          icon="si:add-fill"
-          onClick={() => setOpenAddRetirement(true)}
-        />
+        {!viewOnly && (
+          <Button
+            content="Retire Request"
+            icon="si:add-fill"
+            onClick={() => setOpenAddRetirement(true)}
+          />
+        )}
       </div>
 
       {openAddRetirement && <AddProjectRequestRetirement
         isOpen={openAddRetirement}
-        onClose={() => setOpenAddRetirement(false)}
+        onClose={() => { setOpenAddRetirement(false); fetchLocalRetirements(); }}
         selectedRequest={selectedRequest}
       />}
 
       {openEditRetirement && selectedRetirement && <EditProjectRequestRetirement
         isOpen={openEditRetirement}
-        onClose={() => { setOpenEditRetirement(false); fetchRetirements(); }}
+        onClose={() => { setOpenEditRetirement(false); fetchLocalRetirements(); }}
         selectedRequest={selectedRequest}
         retirementData={selectedRetirement}
       />}

@@ -12,10 +12,11 @@ import DeleteModal from "@/ui/generic-delete-modal";
 import Link from "next/link";
 import EditActivityRequest from "@/components/project-management-components/edit-activity-request";
 import ViewActivityRequestModal from "@/components/project-management-components/view-activity-request-modal";
+import EditProjectRequestRetirement from "@/components/project-management-components/edit-project-request-retirement";
 import DashboardStat from "@/ui/dashboard-stat-card";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 import { RetirementRequestType } from "@/types/retirement-request";
@@ -30,16 +31,22 @@ export default function ProjectRequest() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-  const [retirementData, setRetirementData] = useState<RetirementRequestType[]>([]);
+  const [retirementData, setRetirementData] = useState<RetirementRequestType[]>(
+    [],
+  );
   const [isLoadingRetirements, setIsLoadingRetirements] = useState(false);
   const [data, setData] = useState<ProjectRequestType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [viewRequestOpen, setViewRequestOpen] = useState(false);
   const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
+  const [editRetirement, setEditRetirement] = useState(false);
+  const [removeRetirement, setRemoveRetirement] = useState(false);
+  const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
   const token = getToken();
   const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const projectId = (params?.id as string) || "";
+  const router = useRouter();
 
   const head = [
     "Activity",
@@ -54,12 +61,11 @@ export default function ProjectRequest() {
   ];
 
   const retirementHead = [
-    "Activity Line Description",
-    "Quantity",
-    "Frequency",
-    "Unit Cost (₦)",
-    "Total Budget (₦)",
-    "Actual Cost (₦)",
+    "Activity",
+    "Total Requested Budget (₦)",
+    "Actual Retired Cost (₦)",
+    "Variance (₦)",
+    "Actions",
   ];
 
   const requestStats = [
@@ -87,23 +93,39 @@ export default function ProjectRequest() {
 
   const retirementStats = [
     {
+      title: "Total Approved Request",
+      value: 0,
+      icon: "mdi:check-circle-outline",
+    },
+    {
       title: "Total Retired",
-      value: retirementData?.filter((r) => r.retirementStatus === "Approved").length || 0,
+      value:
+        retirementData?.filter((r) => r.retirementStatus === "Approved")
+          .length || 0,
       icon: "mdi:check-circle-outline",
     },
     {
       title: "Total Rejected",
-      value: retirementData?.filter((r) => r.retirementStatus === "Rejected").length || 0,
+      value:
+        retirementData?.filter((r) => r.retirementStatus === "Rejected")
+          .length || 0,
       icon: "mdi:close-circle-outline",
     },
     {
       title: "Total Under Review",
-      value: retirementData?.filter((r) => r.retirementStatus === "Pending").length || 0,
+      value:
+        retirementData?.filter((r) => r.retirementStatus === "Pending")
+          .length || 0,
       icon: "mdi:clock-outline",
     },
     {
       title: "Total Retirements",
       value: retirementData?.length || 0,
+      icon: "mdi:chart-box-outline",
+    },
+    {
+      title: "Unretired",
+      value: 0,
       icon: "mdi:chart-box-outline",
     },
   ];
@@ -128,7 +150,7 @@ export default function ProjectRequest() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/getRequestByProjectId/${projectId}`,
       );
       setData(res.data?.data || []);
-      console.log(res.data.data)
+      console.log(res.data.data);
     } catch (error) {
       toast.error("Error retrieving requests. Please try again.");
     } finally {
@@ -145,7 +167,7 @@ export default function ProjectRequest() {
           params: {
             projectId: projectId,
           },
-        }
+        },
       );
       setRetirementData(res.data?.data || []);
     } catch (error) {
@@ -182,6 +204,33 @@ export default function ProjectRequest() {
       setIsDeleting(false);
     }
   };
+
+  // delete retirement
+  const deleteRetirement = async (retirementId: string) => {
+    setIsDeleting(true);
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/${retirementId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      toast.success("Retirement request deleted successfully.");
+      fetchRetirements();
+    } catch (error) {
+      console.error(`Error deleting retirement: ${error}`);
+      toast.error("An error occurred while deleting retirement.");
+    } finally {
+      setIsDeleting(false);
+      setRemoveRetirement(false);
+      setSelectedRetirement(null);
+    }
+  };
+
+
 
   return (
     <div className="relative mt-12 space-y-7">
@@ -225,7 +274,7 @@ export default function ProjectRequest() {
             );
           })}
         </div>
-        
+
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -233,146 +282,259 @@ export default function ProjectRequest() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25 }}>
-
-        {activeTab === 1 && (
-          isLoading ? (
-            <LoadingSpinner />
-          ) : (
-          <Table
-            tableHead={head}
-            tableData={data || []}
-            checkbox
-            idKey={"requestId"}
-            renderRow={(row) => (
-              <>
-                <td className="px-6 w-37.5">
-                  {toSentenceCase(row.activityTitle ?? "")}
-                </td>
-                <td className="px-6">
-                  ₦
-                  {(row.lineItems || [])
-                    .reduce((sum, item) => sum + (item.totalBudget || 0), 0)
-                    .toLocaleString()}
-                </td>
-                <td className="px-6">{toSentenceCase(row.activityLocation ?? "")}</td>
-                <td className="px-6">{toSentenceCase(row.staff ?? "")}</td>
-                <td
-                  className={`px-6 ${
-                    row.status === "Active" ? "text-green-500" :
-                    row.status === "Pending" ? 'text-yellow-500' 
-                    : "text-red-500"
-                  }`}>
-                  {row.status}
-                </td>
-                <td className="px-6">
-                  {formatDate(row.activityStartDate, "date-only")}
-                </td>
-                <td className="px-6">
-                  {formatDate(row.activityEndDate, "date-only")}
-                </td>
-                <td className="px-6 relative">
-                  <div className="flex justify-center items-center">
-                    <Icon
-                      icon={"uiw:more"}
-                      width={22}
-                      height={22}
-                      className="cursor-pointer"
-                      color="#909CAD"
-                      onClick={() =>
-                        setActiveRowId((prev) =>
-                          prev === row.requestId ? null : row.requestId,
-                        )
-                      }
-                    />
-                  </div>
-
-                  {activeRowId === row.requestId && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                        <ul className="text-sm">
-                          <li
+            {activeTab === 1 &&
+              (isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <Table
+                  tableHead={head}
+                  tableData={data || []}
+                  checkbox
+                  idKey={"requestId"}
+                  onClick={(row) =>
+                    router.push(
+                      `/projects/${projectId}/project-management/request/view?requestId=${row.requestId}`,
+                    )
+                  }
+                  renderRow={(row) => (
+                    <>
+                      <td className="px-6 w-37.5">
+                        {toSentenceCase(row.activityTitle ?? "")}
+                      </td>
+                      <td className="px-6">
+                        ₦
+                        {(row.lineItems || [])
+                          .reduce(
+                            (sum, item) => sum + (item.totalBudget || 0),
+                            0,
+                          )
+                          .toLocaleString()}
+                      </td>
+                      <td className="px-6">
+                        {toSentenceCase(row.activityLocation ?? "")}
+                      </td>
+                      <td className="px-6">
+                        {toSentenceCase(row.staff ?? "")}
+                      </td>
+                      <td
+                        className={`px-6 ${
+                          row.status === "Active"
+                            ? "text-green-500"
+                            : row.status === "Pending"
+                              ? "text-yellow-500"
+                              : "text-red-500"
+                        }`}>
+                        {row.status}
+                      </td>
+                      <td className="px-6">
+                        {formatDate(row.activityStartDate, "date-only")}
+                      </td>
+                      <td className="px-6">
+                        {formatDate(row.activityEndDate, "date-only")}
+                      </td>
+                      <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-center items-center">
+                          <Icon
+                            icon={"uiw:more"}
+                            width={22}
+                            height={22}
+                            className="cursor-pointer"
+                            color="#909CAD"
                             onClick={() =>
-                              handleEditRequest(row, setActiveRowId)
+                              setActiveRowId((prev) =>
+                                prev === row.requestId ? null : row.requestId,
+                              )
                             }
-                            className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"ph:pencil-simple-line"}
-                              height={20}
-                              width={20}
-                            />
-                            Edit
-                          </li>
-                          <li
-                            onClick={() =>
-                              handleRemoveRequest(row, setActiveRowId)
-                            }
-                            className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"pixelarticons:trash"}
-                              height={20}
-                              width={20}
-                            />
-                            Remove
-                          </li>
-                          <Link
-                            href={`/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`}
-                            className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
-                            <Icon icon={"si:add-fill"} height={20} width={20} />
-                            Retire
-                          </Link>
-                          <li onClick={() => { setViewRequestOpen(true); setSelectedViewId(row.requestId); setActiveRowId(null); }} className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"hugeicons:view"}
-                              height={20}
-                              width={20}
-                            />
-                            View Activity
-                          </li>
-                        </ul>
-                      </motion.div>
-                    </AnimatePresence>
+                          />
+                        </div>
+
+                        {activeRowId === row.requestId && (
+                          <AnimatePresence>
+                            <motion.div
+                              initial={{ y: -10, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              exit={{ y: -10, opacity: 0 }}
+                              transition={{ duration: 0.2, ease: "easeOut" }}
+                              className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
+                              <ul className="text-sm">
+                                <li
+                                  onClick={() =>
+                                    handleEditRequest(row, setActiveRowId)
+                                  }
+                                  className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                                  <Icon
+                                    icon={"ph:pencil-simple-line"}
+                                    height={20}
+                                    width={20}
+                                  />
+                                  Edit
+                                </li>
+                                <li
+                                  onClick={() =>
+                                    handleRemoveRequest(row, setActiveRowId)
+                                  }
+                                  className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
+                                  <Icon
+                                    icon={"pixelarticons:trash"}
+                                    height={20}
+                                    width={20}
+                                  />
+                                  Remove
+                                </li>
+                                <Link
+                                  href={`/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`}
+                                  className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
+                                  <Icon
+                                    icon={"si:add-fill"}
+                                    height={20}
+                                    width={20}
+                                  />
+                                  Retire
+                                </Link>
+                                <Link
+                                  href={`/projects/${projectId}/project-management/request/view?requestId=${row.requestId}`}
+                                  className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                                  <Icon
+                                    icon={"hugeicons:view"}
+                                    height={20}
+                                    width={20}
+                                  />
+                                  View Activity
+                                </Link>
+                              </ul>
+                            </motion.div>
+                          </AnimatePresence>
+                        )}
+                      </td>
+                    </>
                   )}
-                </td>
-              </>
-            )}
-          />
-        ))}
+                />
+              ))}
 
-        {activeTab === 2 && (
-          isLoadingRetirements ? (
-            <LoadingSpinner />
-          ) : (
-            <div className="space-y-5 mt-4">
-              <Table
-                tableHead={retirementHead}
-                tableData={retirementData || []}
-                checkbox
-                idKey={"retirementId"}
-                renderRow={(row) => (
-                  <>
-                    <td className="px-6">{row.activityLineDescription || "N/A"}</td>
-                    <td className="px-6">{row.quantity || "0"}</td>
-                    <td className="px-6">{row.frequency || "0"}</td>
-                    <td className="px-6">{row.unitCost || "0"}</td>
-                    <td className="px-6">{row.totalBudget || "0"}</td>
-                    <td className="px-6">{row.actualCost || "0"}</td>
-                  </>
-                )}
-              />
-              <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-                <p>Total Activity Cost (₦): {(retirementData || []).reduce((acc, curr) => acc + (curr.actualCost || 0), 0).toLocaleString()}</p>
-                <p>Amount to reimburse to NDSICDE (₦): 0</p>
-                <p>Amount to reimburse to Staff (₦): 0</p>
-              </div>
-            </div>
-          )
-        )}
-        </motion.div>
+            {activeTab === 2 &&
+              (isLoadingRetirements ? (
+                <LoadingSpinner />
+              ) : (
+                <div className="space-y-5 mt-4">
+                  <Table
+                    tableHead={retirementHead}
+                    tableData={retirementData || []}
+                    checkbox
+                    idKey={"retirementId"}
+                    onClick={(row) =>
+                      router.push(
+                        `/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`,
+                      )
+                    }
+                    renderRow={(row: RetirementRequestType) => (
+                      <>
+                        <td className="px-6">
+                          {toSentenceCase(row.requestActivityTitle || row.activityLineDescription || "")}
+                        </td>
+                        <td className="px-6">
+                          ₦{(row.totalBudget || 0).toLocaleString()}
+                        </td>
+                        <td className="px-6">
+                          ₦{(row.actualCost || 0).toLocaleString()}
+                        </td>
+                        <td className="px-6 font-medium">
+                          {(() => {
+                            const diff = (row.totalBudget || 0) - (row.actualCost || 0);
+                            if (diff < 0) {
+                              return (
+                                <span className="text-red-500">
+                                  -₦{Math.abs(diff).toLocaleString()}
+                                </span>
+                              );
+                            } else if (diff > 0) {
+                              return (
+                                <span className="text-green-500">
+                                  ₦{diff.toLocaleString()}
+                                </span>
+                              );
+                            } else {
+                              return (
+                                <span className="text-gray-500">
+                                  ₦0
+                                </span>
+                              );
+                            }
+                          })()}
+                        </td>
+                        <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex justify-center items-center">
+                            <Icon
+                              icon={"uiw:more"}
+                              width={22}
+                              height={22}
+                              className="cursor-pointer"
+                              color="#909CAD"
+                              onClick={() =>
+                                setActiveRowId((prev) =>
+                                  prev === row.retirementId ? null : row.retirementId,
+                                )
+                              }
+                            />
+                          </div>
+
+                          {activeRowId === row.retirementId && (
+                            <AnimatePresence>
+                              <motion.div
+                                initial={{ y: -10, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -10, opacity: 0 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
+                                className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
+                                <ul className="text-sm">
+                                  <li
+                                    onClick={() => {
+                                      setSelectedRetirement(row);
+                                      setEditRetirement(true);
+                                      setActiveRowId(null);
+                                    }}
+                                    className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                                    <Icon
+                                      icon={"ph:pencil-simple-line"}
+                                      height={20}
+                                      width={20}
+                                    />
+                                    Edit
+                                  </li>
+                                  <li
+                                    onClick={() => {
+                                      setSelectedRetirement(row);
+                                      setRemoveRetirement(true);
+                                      setActiveRowId(null);
+                                    }}
+                                    className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
+                                    <Icon
+                                      icon={"pixelarticons:trash"}
+                                      height={20}
+                                      width={20}
+                                    />
+                                    Remove
+                                  </li>
+                                  <Link
+                                    href={`/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}&viewOnly=true`}
+                                    className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                                    <Icon
+                                      icon={"hugeicons:view"}
+                                      height={20}
+                                      width={20}
+                                    />
+                                    View Retirement
+                                  </Link>
+                                </ul>
+                              </motion.div>
+                            </AnimatePresence>
+                          )}
+                        </td>
+                      </>
+                    )}
+                  />
+                </div>
+              ))}
+          </motion.div>
         </AnimatePresence>
       </CardComponent>
 
@@ -398,11 +560,33 @@ export default function ProjectRequest() {
         />
       )}
 
-      <ViewActivityRequestModal 
-         isOpen={viewRequestOpen} 
-         onClose={() => { setViewRequestOpen(false); setSelectedViewId(null); }} 
-         requestId={selectedViewId} 
-      />
+
+
+      {editRetirement && selectedRetirement && (
+        <EditProjectRequestRetirement
+          isOpen={editRetirement}
+          onClose={() => {
+            setEditRetirement(false);
+            setSelectedRetirement(null);
+            fetchRetirements();
+          }}
+          selectedRequest={data.find((r) => r.requestId === selectedRetirement.requestId)}
+          retirementData={selectedRetirement}
+        />
+      )}
+
+      {selectedRetirement && (
+        <DeleteModal
+          isOpen={removeRetirement}
+          onClose={() => {
+            setRemoveRetirement(false);
+            setSelectedRetirement(null);
+          }}
+          heading="Do you want to remove this Retirement Request?"
+          onDelete={() => deleteRetirement(selectedRetirement.retirementId)}
+          isDeleting={isDeleting}
+        />
+      )}
     </div>
   );
 }

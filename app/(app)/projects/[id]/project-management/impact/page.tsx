@@ -12,7 +12,7 @@ import ProjectImpactModal from "@/components/project-management-components/proje
 import axios from "axios";
 import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
 import { toSentenceCase } from "@/utils/ui-utility";
@@ -25,6 +25,7 @@ export default function ProjectImpact() {
   const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const projectId = (params?.id as string) || "";
+  const router = useRouter();
 
   const head = [
     "Project Impact Statement",
@@ -108,12 +109,13 @@ export default function ProjectImpact() {
             tableData={data}
             checkbox
             idKey={"impactId"}
+            onClick={(row) => router.push(`/projects/${projectId}`)}
             renderRow={(row) => (
               <>
                 <td className="px-6">{toSentenceCase(row.statement ?? "")}</td>
                 <td className="px-6">{toSentenceCase(row.thematicArea ?? "")}</td>
                 <td className="px-6">{toSentenceCase(row.responsiblePerson ?? "")}</td>
-                <td className="px-6 relative">
+                <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
                   <Icon
                     icon={"uiw:more"}
                     width={22}

@@ -17,8 +17,10 @@ import { ProjectApiResponse } from "@/types/admin-types";
 import { useProjects } from "@/context/ProjectsContext";
 import Modal from "@/ui/popup-modal";
 import Button from "@/ui/form/button";
+import { useRouter } from "next/navigation";
 
 export default function ProjectsTable() {
+  const router = useRouter();
   const { projects: data, isLoading: loading, refreshProjects } = useProjects();
   const [query, setQuery] = useState("");
   const [filteredData, setFilteredData] = useState<ProjectApiResponse[]>([]);
@@ -181,6 +183,7 @@ export default function ProjectsTable() {
           tableHead={head}
           tableData={filteredData}
           idKey={"projectId"}
+          onClick={(row) => router.push(`/projects/${row.projectId}`)}
           checkbox={user?.role === "super-admin"}
           renderRow={(row) => (
             <>
@@ -221,7 +224,7 @@ export default function ProjectsTable() {
                   {row.thematicAreasOrPillar || "N/A"}
                 </div>
               </td>
-              <td className="px-4 py-3 relative">
+              <td className="px-4 py-3 relative" onClick={(e) => e.stopPropagation()}>
                 <div className="flex justify-center items-center">
                   <Icon
                     icon={"uiw:more"}

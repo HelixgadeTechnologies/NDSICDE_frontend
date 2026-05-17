@@ -18,9 +18,11 @@ import { Icon } from "@iconify/react";
 import { convertDateToISO8601, formatDate } from "@/utils/dates-format-utility";
 import { ActivityRequestType, RetirementRequestType } from "@/types/retirement-request";
 import { useProjects } from "@/context/ProjectsContext";
+import { useRouter } from "next/navigation";
 
 
 function ActivityFinancialRequestTable({ type }: { type?: string }) {
+  const router = useRouter();
   const activityFinancialRequestHead = [
     "Activity Description",
     "Total Budget (₦)",
@@ -110,6 +112,7 @@ function ActivityFinancialRequestTable({ type }: { type?: string }) {
         tableData={data}
         checkbox
         idKey={"requestId"}
+        onClick={(row) => router.push(`/request-approvals/requests/${row.requestId}`)}
         renderRow={(row) => (
           <>
             <td className="px-6 cursor-pointer hover:underline">
@@ -144,6 +147,7 @@ function ActivityFinancialRequestTable({ type }: { type?: string }) {
 }
 
 function ActivityFinancialRetirement() {
+  const router = useRouter();
   const head = [
     "Activity Line Description",
     "Quantity",
@@ -195,6 +199,8 @@ function ActivityFinancialRetirement() {
 
     return () => clearTimeout(debounceId);
   }, [search, status, project, journalId, dates]);
+
+
 
   return (
     <div className="space-y-5">
@@ -248,6 +254,7 @@ function ActivityFinancialRetirement() {
         tableData={data}
         checkbox
         idKey={"retirementId"}
+        onClick={(row) => router.push(`/request-approvals/retirement/${row.retirementId}`)}
         renderRow={(row) => (
           <>
             <td className="px-6">
@@ -267,11 +274,7 @@ function ActivityFinancialRetirement() {
           </>
         )}
       />}
-      <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-        <p>Total Activity Cost (₦): {data.reduce((acc, curr) => acc + (curr.actualCost || 0), 0).toLocaleString()}</p>
-        <p>Amount to reimburse to NDSICDE (₦): 0</p>
-        <p>Amount to reimburse to Staff (₦): 0</p>
-      </div>
+
     </div>
   );
 }

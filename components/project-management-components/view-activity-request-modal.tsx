@@ -23,6 +23,7 @@ import InfoItem from "@/ui/info-item";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import { getToken } from "@/lib/api/credentials";
+import { ProjectRequestType, RequestLineItemType } from "@/types/project-management-types";
 
 type ViewActivityRequestProps = {
   isOpen: boolean;
@@ -31,7 +32,7 @@ type ViewActivityRequestProps = {
 };
 
 export default function ViewActivityRequestModal({ isOpen, onClose, requestId }: ViewActivityRequestProps) {
-  const [requestDetails, setRequestDetails] = useState<any>(null);
+  const [requestDetails, setRequestDetails] = useState<ProjectRequestType | null>(null);
   const [outputDetails, setOutputDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const token = getToken();
@@ -157,23 +158,23 @@ export default function ViewActivityRequestModal({ isOpen, onClose, requestId }:
                 </h3>
                 <Table
                   tableHead={head}
-                  tableData={[``]}
-                  renderRow={(row) => (
+                  tableData={requestDetails.lineItems || []}
+                  renderRow={(row: RequestLineItemType) => (
                     <>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        <p className="w-40 truncate">{requestDetails.activityLineDescription}</p>
+                        <p className="w-40 truncate">{row.description}</p>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {requestDetails.quantity}
+                        {row.quantity}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {requestDetails.frequency}
+                        {row.frequency}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        ₦{requestDetails.unitCost?.toLocaleString() || 0}
+                        ₦{row.unitCost?.toLocaleString() || 0}
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                        ₦{requestDetails.total?.toLocaleString() || 0}
+                        ₦{row.totalBudget?.toLocaleString() || 0}
                       </td>
                     </>
                   )}
@@ -181,7 +182,11 @@ export default function ViewActivityRequestModal({ isOpen, onClose, requestId }:
                 <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Grand Total</p>
-                    <p className="text-2xl font-bold text-gray-900">₦{requestDetails.total?.toLocaleString() || 0}</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      ₦{(requestDetails.lineItems || [])
+                        .reduce((sum, item) => sum + (item.totalBudget || 0), 0)
+                        .toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </div>
