@@ -26,7 +26,7 @@ export default function Sidebar({ className }: BaseSidebarProps) {
   const handleItemClick = (
     item: SidebarItem,
     index: number,
-    e: React.MouseEvent
+    e: React.MouseEvent,
   ) => {
     // If item is a header, do nothing
     if (item.isHeader) {
@@ -56,7 +56,6 @@ export default function Sidebar({ className }: BaseSidebarProps) {
 
   const handleChildClick = (child: SidebarItem) => {
     closeMobile();
-
   };
 
   // for active on settings

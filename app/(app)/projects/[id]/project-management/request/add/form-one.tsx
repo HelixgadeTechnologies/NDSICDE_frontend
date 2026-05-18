@@ -30,32 +30,30 @@ export default function FormOne({
   updateFormData,
 }: FormOneProps) {
   const params = useParams();
-  const [outputsOptions, setOutputsOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [activitiesOptions, setActivitiesOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const projectId = params.id as string;
+  const [outputsOptions, setOutputsOptions] = useState<{ label: string; value: string }[]>([]);
+  const [allActivities, setAllActivities] = useState<{ label: string; value: string; outputId: string }[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(false);
 
+  // Activities filtered to the selected output
+  const activitiesForOutput = formData.outputId
+    ? allActivities.filter((a) => a.outputId === formData.outputId)
+    : [];
+
   useEffect(() => {
+    const token = getToken();
+    const headers = { Authorization: `Bearer ${token}` };
+
     const fetchOutputs = async () => {
       try {
-        const token = getToken();
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs/project/${projectId}`,
+          { headers },
         );
         const data = res.data?.data || [];
-        const options = data.map((item: any) => ({
-          label: item.outputStatement,
-          value: item.outputId,
-        }));
-        setOutputsOptions(options);
+        setOutputsOptions(
+          data.map((item: any) => ({ label: item.outputStatement, value: item.outputId })),
+        );
       } catch (error) {
         console.error("Error fetching outputs:", error);
       }
@@ -63,50 +61,29 @@ export default function FormOne({
 
     const fetchActivities = async () => {
       setIsLoadingActivities(true);
-      const projectId = params.id as string;
       try {
-        const token = getToken();
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities/project/${projectId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
+          { headers },
         );
+        const raw: any[] = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+            ? response.data.data
+            : response.data?.data
+              ? [response.data.data]
+              : [];
 
+        const seen = new Set<string>();
+        const mapped = raw.reduce<{ label: string; value: string; outputId: string }[]>((acc, act) => {
+          const id = act.activityId || act.id || act._id;
+          if (!act.activityStatement || !id || seen.has(id)) return acc;
+          seen.add(id);
+          acc.push({ label: act.activityStatement, value: id, outputId: act.outputId || "" });
+          return acc;
+        }, []);
 
-        let activitiesData = [];
-        if (Array.isArray(response.data)) {
-          activitiesData = response.data;
-        } else if (response.data?.data && Array.isArray(response.data.data)) {
-          activitiesData = response.data.data;
-        } else if (response.data?.data) {
-          activitiesData = [response.data.data];
-        }
-
-        const transformedOptions = activitiesData
-          .map((act: any) => {
-            const statement = act.activityStatement;
-            const id = act.activityId || act.id || act._id;
-            if (!statement || !id) return null;
-            return {
-              label: statement,
-              value: id,
-            };
-          })
-          .filter((option: any) => option !== null);
-
-
-
-        // Remove duplicates
-        const uniqueOptions = Array.from(
-          new Map(
-            transformedOptions.map((item: any) => [item.value, item]),
-          ).values(),
-        ) as { label: string; value: string }[];
-
-        setActivitiesOptions(uniqueOptions);
+        setAllActivities(mapped);
       } catch (error) {
         console.error("Error fetching activities:", error);
       } finally {
@@ -116,7 +93,7 @@ export default function FormOne({
 
     fetchOutputs();
     fetchActivities();
-  }, [params.id]);
+  }, [projectId]);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,35 +168,44 @@ export default function FormOne({
           requestDate={formData.requestDate}
           budgetName={formData.budgetName}
           setBudgetName={(val) => updateFormData({ budgetName: val })}
-          budgetCode={formData.activityBudgetCode}
-          setBudgetCode={(val) => updateFormData({ activityBudgetCode: val })}
+          budgetCode={formData.budgetCode}
+          setBudgetCode={(val) => updateFormData({ budgetCode: val })}
         />
 
         <DropDown
           label="Output"
           name="outputId"
           value={formData.outputId}
-          onChange={(value) => updateFormData({ outputId: value })}
+          onChange={(value) => updateFormData({ outputId: value, activityId: "", activityTitle: "" })}
           options={outputsOptions}
         />
-        <DropDown
-          label="Activity Title"
-          name="activityTitle"
-          value={formData.activityId}
-          placeholder={
-            isLoadingActivities
-              ? "Loading activities..."
-              : "Select an activity title"
-          }
-          onChange={(value) => {
-            const selected = activitiesOptions.find((o) => o.value === value);
-            updateFormData({
-              activityId: value,
-              activityTitle: selected?.label || "",
-            });
-          }}
-          options={activitiesOptions}
-        />
+        {formData.outputId && !isLoadingActivities && activitiesForOutput.length === 0 ? (
+          <div className="flex items-start gap-2 p-3 rounded-lg border border-amber-200 bg-amber-50 text-sm text-amber-800">
+            <Icon icon="mdi:alert-circle-outline" className="text-lg mt-0.5 shrink-0" />
+            <span>No activity for this output. Add an activity in the required form.</span>
+          </div>
+        ) : (
+          <DropDown
+            label="Activity Title"
+            name="activityTitle"
+            value={formData.activityId}
+            placeholder={
+              !formData.outputId
+                ? "Select an output first"
+                : isLoadingActivities
+                  ? "Loading activities..."
+                  : "Select an activity title"
+            }
+            onChange={(value) => {
+              const selected = activitiesForOutput.find((o) => o.value === value);
+              updateFormData({
+                activityId: value,
+                activityTitle: selected?.label || "",
+              });
+            }}
+            options={activitiesForOutput}
+          />
+        )}
         <TagInput
           label="Activity Location(s)"
           value={
@@ -331,7 +317,7 @@ export default function FormOne({
                 <button
                   type="button"
                   onClick={() => handleRemoveLineItem(index)}
-                  className={`text-red-500 hover:text-red-700 transition-colors ${index === 0 ? "mt-[34px]" : "mt-3"}`}>
+                  className={`text-red-500 hover:text-red-700 transition-colors ${index === 0 ? "mt-8.5" : "mt-3"}`}>
                   <Icon icon="mdi:close-circle" className="text-xl" />
                 </button>
               )}
@@ -345,7 +331,7 @@ export default function FormOne({
               className="text-sm flex items-center gap-1 text-[#D2091E] font-medium hover:text-[#a00014] transition-colors">
               <Icon icon="mdi:plus" className="text-lg" /> Add line item
             </button>
-            <div className="text-right pt-2 w-[280px]">
+            <div className="text-right pt-2 w-70">
               <span className="text-sm text-gray-500 mr-4">Total Amount:</span>
               <span className="text-lg font-bold text-gray-900">
                 ₦ {totalSum.toFixed(2)}

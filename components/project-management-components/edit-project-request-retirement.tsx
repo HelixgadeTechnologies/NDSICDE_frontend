@@ -9,14 +9,14 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter, useParams } from "next/navigation";
-import { ProjectRequestType } from "@/types/project-management-types";
+import { ProjectRequestResponseType } from "@/types/project-management-types";
 import { RetirementRequestType } from "@/types/retirement-request";
 import { getToken } from "@/lib/api/credentials";
 
 type EditProps = {
   isOpen: boolean;
   onClose: () => void;
-  selectedRequest?: ProjectRequestType;
+  selectedRequest?: ProjectRequestResponseType;
   retirementData: RetirementRequestType;
 };
 
@@ -129,13 +129,13 @@ export default function EditProjectRequestRetirement({
       isCreate: false,
       payload: {
         retirementId: retirementData.retirementId,
-        activityLineDescription: selectedRequest?.activityLineDescription || retirementData.activityLineDescription || "string",
+        activityLineDescription: selectedRequest?.lineItems?.[0]?.description || retirementData.activityLineDescription || "string",
         lineItem: combinedLineItems,
-        quantity: selectedRequest?.quantity || retirementData.quantity || 0,
-        frequency: selectedRequest?.frequency || retirementData.frequency || 0,
-        unitCost: selectedRequest?.unitCost || retirementData.unitCost || 0,
+        quantity: selectedRequest?.lineItems?.[0]?.quantity || retirementData.quantity || 0,
+        frequency: selectedRequest?.lineItems?.[0]?.frequency || retirementData.frequency || 0,
+        unitCost: selectedRequest?.lineItems?.[0]?.unitCost || retirementData.unitCost || 0,
         actualCost: numericCost,
-        totalBudget: selectedRequest?.total || retirementData.totalBudget || 0,
+        totalBudget: selectedRequest?.lineItems?.[0]?.totalBudget || retirementData.totalBudget || 0,
         actualCostOfLineItem: numericCost,
         documentName: selectedRequest?.documentName || retirementData.documentName || "string",
         documentURL: selectedRequest?.documentURL || retirementData.documentURL || "string",

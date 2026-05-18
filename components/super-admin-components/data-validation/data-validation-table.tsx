@@ -11,7 +11,7 @@ import Button from "@/ui/form/button";
 import FileDisplay from "@/ui/file-display";
 import TextareaInput from "@/ui/form/textarea";
 import CommentsTab from "@/ui/comments-tab";
-import { ProjectRequestType } from "@/types/project-management-types";
+import { ProjectRequestResponseType } from "@/types/project-management-types";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import { formatDate } from "@/utils/dates-format-utility";
@@ -37,7 +37,7 @@ export default function DataValidationTable({
     "Status",
     "Actions",
   ];
-  const [data, setData] = useState<ProjectRequestType[]>([]);
+  const [data, setData] = useState<ProjectRequestResponseType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSubmittingApproval, setIsSubmittingApproval] =
     useState<boolean>(false);
@@ -78,7 +78,7 @@ export default function DataValidationTable({
   }, [startDate, endDate, activeTab]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [details, setDetails] = useState<ProjectRequestType | undefined>(
+  const [details, setDetails] = useState<ProjectRequestResponseType | undefined>(
     undefined,
   );
   const handleModalOpen = (index: string) => {
@@ -234,7 +234,7 @@ export default function DataValidationTable({
               />
               <TitleAndContent
                 title="Activity Line Description"
-                content={details?.activityLineDescription || "N/A"}
+                content={details?.lineItems?.[0]?.description || "N/A"}
               />
               <TitleAndContent
                 title="Location"
@@ -253,15 +253,15 @@ export default function DataValidationTable({
               <div className="grid grid-cols-2 gap-4">
                 <TitleAndContent
                   title="Quantity"
-                  content={details?.quantity?.toString() || "N/A"}
+                  content={details?.lineItems?.[0]?.quantity?.toString() || "N/A"}
                 />
                 <TitleAndContent
                   title="Frequency"
-                  content={details?.frequency?.toString() || "N/A"}
+                  content={details?.lineItems?.[0]?.frequency?.toString() || "N/A"}
                 />
                 <TitleAndContent
                   title="Unit Cost"
-                  content={details?.unitCost?.toString() || "N/A"}
+                  content={details?.lineItems?.[0]?.unitCost?.toString() || "N/A"}
                 />
                 <TitleAndContent
                   title="Budget Code"
@@ -270,7 +270,7 @@ export default function DataValidationTable({
               </div>
               <TitleAndContent
                 title="Total"
-                content={details?.total?.toString() || "N/A"}
+                content={details?.lineItems?.[0]?.totalBudget?.toString() || "N/A"}
               />
 
               {/* Transport Details (if applicable) */}

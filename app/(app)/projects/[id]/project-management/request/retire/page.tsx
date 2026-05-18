@@ -12,8 +12,9 @@ import AddProjectRequestRetirement from "@/components/project-management-compone
 import EditProjectRequestRetirement from "@/components/project-management-components/edit-project-request-retirement";
 import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
 import FileDisplay from "@/ui/file-display";
+import TextInput from "@/ui/form/text-input";
 import InfoItem from "@/ui/info-item";
-import { ProjectRequestType, ProjectOutputTypes } from "@/types/project-management-types";
+import { ProjectRequestResponseType, ProjectOutputTypes } from "@/types/project-management-types";
 import { RetirementRequestType } from "@/types/retirement-request";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
@@ -30,13 +31,111 @@ import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
 import { useParams } from "next/navigation";
 
+function AddRetirementInlineForm({ selectedRequest, onSuccess }: { selectedRequest: ProjectRequestResponseType; onSuccess: () => void }) {
+  const [actualCost, setActualCost] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lineItems, setLineItems] = useState([{ id: 1, value: "" }]);
+  const token = typeof window !== 'undefined' ? localStorage.getItem("token") || sessionStorage.getItem("token") : ""; // Quick way to get token or use getToken() if available. Wait, getToken is from @/lib/api/credentials! Let's import it.
+
+  const addLineItem = () => {
+    const newId = Math.max(...lineItems.map((l) => l.id), 0) + 1;
+    setLineItems([...lineItems, { id: newId, value: "" }]);
+  };
+
+  const removeLineItem = (id: number) => {
+    setLineItems(lineItems.filter((l) => l.id !== id));
+  };
+
+  const updateLineItem = (id: number, value: string) => {
+    setLineItems(lineItems.map((l) => (l.id === id ? { ...l, value } : l)));
+  };
+
+  const submitRetirement = async () => {
+    setIsSubmitting(true);
+    const combinedLineItems = lineItems.map(l => l.value).filter(Boolean).join(", ") || "0";
+    const numericCost = Number(actualCost) || 0;
+
+    const payload = {
+      isCreate: true,
+      payload: {
+        retirementId: "",
+        activityLineDescription: selectedRequest.lineItems?.[0]?.description || "string",
+        lineItem: combinedLineItems,
+        quantity: selectedRequest.lineItems?.[0]?.quantity || 0,
+        frequency: selectedRequest.lineItems?.[0]?.frequency || 0,
+        unitCost: selectedRequest.lineItems?.[0]?.unitCost || 0,
+        actualCost: numericCost,
+        totalBudget: selectedRequest.lineItems?.[0]?.totalBudget || 0,
+        actualCostOfLineItem: numericCost,
+        documentName: selectedRequest.documentName || "string",
+        documentURL: selectedRequest.documentURL || "string",
+        requestId: selectedRequest.requestId,
+        status: "Pending"
+      }
+    };
+
+    try {
+      const { getToken } = await import("@/lib/api/credentials");
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement`, payload,
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      toast.success("Retirement added successfully.");
+      onSuccess();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create retirement request.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <button onClick={addLineItem} className="text-sm font-semibold text-blue-600">Add Line Items</button>
+      {lineItems.map((lineItem) => (
+        <div key={lineItem.id} className="flex items-end gap-2">
+          <div className="flex-1">
+            <TextInput
+              name="lineItem"
+              label="Line Item"
+              placeholder="---"
+              value={lineItem.value}
+              onChange={(e: any) => updateLineItem(lineItem.id, e.target.value)}
+              isBigger
+            />
+          </div>
+          {lineItems.length > 1 && (
+            <button
+              type="button"
+              onClick={() => removeLineItem(lineItem.id)}
+              className="text-red-500 hover:text-red-700 mb-4">
+              <Icon icon="material-symbols:close-rounded" height={20} width={20} />
+            </button>
+          )}
+        </div>
+      ))}
+      <TextInput
+        name="actualCost"
+        value={actualCost}
+        onChange={(e: any) => setActualCost(e.target.value)}
+        placeholder="---"
+        label="Actual Cost of Line Item (₦)"
+        isBigger
+      />
+      <div className="flex items-center gap-6 mt-4">
+        <Button content={isSubmitting ? "Submitting..." : "Submit for Review"} onClick={submitRetirement} isDisabled={isSubmitting} />
+      </div>
+    </div>
+  );
+}
 
 export default function ProjectRequestRetirementPage() {
   const searchParams = useSearchParams();
   const requestId = searchParams.get("requestId");
   const viewOnly = searchParams.get("viewOnly") === "true";
   const { requests, fetchRetirements } = useRequests();
-  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestType | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestResponseType | null>(null);
   const [outputDetails, setOutputDetails] = useState<ProjectOutputTypes | null>(null);
   const [requestRetirements, setRequestRetirements] = useState<RetirementRequestType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,12 +153,7 @@ export default function ProjectRequestRetirementPage() {
     if (!requestId) return;
     try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirements`,
-          {
-            params: {
-              projectId: projectId,
-            },
-          }
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/project/${projectId}`,
         );
         const allRetirements = res.data?.data || [];
         const matchingRetirements = allRetirements.filter((r: RetirementRequestType) => r.requestId === requestId);
@@ -177,7 +271,7 @@ export default function ProjectRequestRetirementPage() {
           isReadOnly
           staff={selectedRequest.staff}
           requestDate={selectedRequest.requestDate || (selectedRequest.activityStartDate ? formatDate(selectedRequest.activityStartDate, "date-only") : "N/A")}
-          budgetName={selectedRequest.budgetName || "N/A"}
+          budgetName={selectedRequest.project?.projectName || "N/A"}
           budgetCode={selectedRequest.activityBudgetCode?.toString() || "N/A"}
         />
       </div>
@@ -223,8 +317,20 @@ export default function ProjectRequestRetirementPage() {
         </div>
       </div>
 
-      {/* table */}
-      <CardComponent>
+      {requestRetirements.length === 0 && !viewOnly ? (
+        <CardComponent>
+          <div className="p-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              Add Retirement
+            </h3>
+            <AddRetirementInlineForm 
+              selectedRequest={selectedRequest} 
+              onSuccess={() => fetchLocalRetirements()} 
+            />
+          </div>
+        </CardComponent>
+      ) : (
+        <CardComponent>
         <Table
           tableHead={head}
           tableData={requestRetirements}
@@ -325,6 +431,7 @@ export default function ProjectRequestRetirementPage() {
           <p>Amount to reimburse to Staff (₦): {reimburseToStaff.toLocaleString()}</p>
         </div>
       </CardComponent>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
          <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -343,7 +450,7 @@ export default function ProjectRequestRetirementPage() {
     {/* add retirement button */}
       <div className="flex gap-3 items-center w-100 print:hidden">
         <Button content="Print Report" isSecondary onClick={() => window.print()} />
-        {!viewOnly && (
+        {!viewOnly && requestRetirements.length > 0 && (
           <Button
             content="Retire Request"
             icon="si:add-fill"

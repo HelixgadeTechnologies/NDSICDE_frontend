@@ -85,9 +85,10 @@ export default function FormThree({
         !formData.vehicleMake ||
         !formData.vehicleModel ||
         !formData.vehiclePlateNumber ||
-        !formData.vehicleColor
+        !formData.vehicleColor ||
+        !formData.returnDate
       ) {
-        toast.error("Please fill in all required driver and vehicle details.");
+        toast.error("Please fill in all required driver, vehicle, and return details.");
         return;
       }
     }
@@ -284,6 +285,7 @@ export default function FormThree({
                     />
                   </div>
                 </div>
+
               </>
             )}
 
@@ -479,6 +481,13 @@ export default function FormThree({
                   value={formData.departureDate}
                   onChange={(val) => updateFormData({ departureDate: val })}
                 />
+                {formData.modeOfTransport === "Road" && (
+                  <DateInput
+                    label="Return Date"
+                    value={formData.returnDate}
+                    onChange={(val) => updateFormData({ returnDate: val })}
+                  />
+                )}
                 <TextInput
                   label="Departure Location & Time"
                   name="departureLocationAndTime"

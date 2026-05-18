@@ -25,14 +25,14 @@ import InfoItem from "@/ui/info-item";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import { getToken } from "@/lib/api/credentials";
-import { ProjectRequestType, RequestLineItemType } from "@/types/project-management-types";
+import { ProjectRequestResponseType, RequestLineItemType } from "@/types/project-management-types";
 import { useSearchParams } from "next/navigation";
 import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
 
 export default function ViewActivityRequestPage() {
   const searchParams = useSearchParams();
   const requestId = searchParams.get("requestId");
-  const [requestDetails, setRequestDetails] = useState<ProjectRequestType | null>(null);
+  const [requestDetails, setRequestDetails] = useState<ProjectRequestResponseType | null>(null);
   const [outputDetails, setOutputDetails] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const token = getToken();
@@ -112,7 +112,7 @@ export default function ViewActivityRequestPage() {
                 isReadOnly
                 staff={requestDetails.staff}
                 requestDate={requestDetails.requestDate || formatDate(requestDetails.activityStartDate, "date-only")}
-                budgetName={requestDetails.budgetName || requestDetails.project?.projectName || "N/A"}
+                budgetName={requestDetails.project?.projectName || "N/A"}
                 budgetCode={requestDetails.activityBudgetCode?.toString() || "N/A"}
               />
             </div>
@@ -206,43 +206,47 @@ export default function ViewActivityRequestPage() {
             <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
               Journey Management
             </h3>
-            <div className="grid grid-cols-1 gap-6">
-              <InfoItem
-                label="Mode of Transport"
-                value={requestDetails.modeOfTransport}
-                icon={<BusFront className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Driver's Name"
-                value={requestDetails.driverName}
-                icon={<User className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Driver's Phone Number"
-                value={requestDetails.driversPhoneNumber}
-                icon={<Phone className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Vehicle Color"
-                value={requestDetails.vehicleColor}
-                icon={<Paintbrush className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Departure Date"
-                value={formatDate(requestDetails.departureTime, "date-only")}
-                icon={<Calendar className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Recipient's Phone Number"
-                value={requestDetails.recipientPhoneNumber}
-                icon={<Phone className="w-4 h-4" />}
-              />
-              <InfoItem
-                label="Route"
-                value={requestDetails.route}
-                icon={<MapPin className="w-4 h-4" />}
-              />
-            </div>
+            {!!requestDetails.isJourneyManagementRequired ? (
+              <div className="grid grid-cols-1 gap-6">
+                <InfoItem
+                  label="Mode of Transport"
+                  value={requestDetails.modeOfTransport}
+                  icon={<BusFront className="w-4 h-4" />}
+                />
+                <InfoItem
+                  label="Driver's Name"
+                  value={requestDetails.driverName}
+                  icon={<User className="w-4 h-4" />}
+                />
+                <InfoItem
+                  label="Driver's Phone Number"
+                  value={requestDetails.driversPhoneNumber}
+                  icon={<Phone className="w-4 h-4" />}
+                />
+                <InfoItem
+                  label="Vehicle Color"
+                  value={requestDetails.vehicleColor}
+                  icon={<Paintbrush className="w-4 h-4" />}
+                />
+                <InfoItem
+                  label="Departure Date"
+                  value={formatDate(requestDetails.departureTime, "date-only")}
+                  icon={<Calendar className="w-4 h-4" />}
+                />
+                {/* <InfoItem
+                  label="Recipient's Phone Number"
+                  value={requestDetails.recipientPhoneNumber}
+                  icon={<Phone className="w-4 h-4" />}
+                /> */}
+                <InfoItem
+                  label="Route"
+                  value={requestDetails.route}
+                  icon={<MapPin className="w-4 h-4" />}
+                />
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">Journey management was omitted for this request.</p>
+            )}
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

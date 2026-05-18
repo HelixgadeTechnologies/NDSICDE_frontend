@@ -9,13 +9,13 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter, useParams } from "next/navigation";
-import { ProjectRequestType } from "@/types/project-management-types";
+import { ProjectRequestResponseType } from "@/types/project-management-types";
 import { getToken } from "@/lib/api/credentials";
 
 type AddProps = {
   isOpen: boolean;
   onClose: () => void;
-  selectedRequest?: ProjectRequestType;
+  selectedRequest?: ProjectRequestResponseType;
 };
 
 type LineItem = {
@@ -112,13 +112,13 @@ export default function AddProjectRequestRetirement({
       isCreate: true,
       payload: {
         retirementId: "",
-        activityLineDescription: selectedRequest.activityLineDescription || "string",
+        activityLineDescription: selectedRequest.lineItems?.[0]?.description || "string",
         lineItem: combinedLineItems,
-        quantity: selectedRequest.quantity || 0,
-        frequency: selectedRequest.frequency || 0,
-        unitCost: selectedRequest.unitCost || 0,
+        quantity: selectedRequest.lineItems?.[0]?.quantity || 0,
+        frequency: selectedRequest.lineItems?.[0]?.frequency || 0,
+        unitCost: selectedRequest.lineItems?.[0]?.unitCost || 0,
         actualCost: numericCost,
-        totalBudget: selectedRequest.total || 0,
+        totalBudget: selectedRequest.lineItems?.[0]?.totalBudget || 0,
         actualCostOfLineItem: numericCost,
         documentName: selectedRequest.documentName || "string",
         documentURL: selectedRequest.documentURL || "string",

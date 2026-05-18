@@ -13,12 +13,12 @@ import RadioInput from "@/ui/form/radio";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
-import { ProjectRequestType } from "@/types/project-management-types";
+import { ProjectRequestResponseType } from "@/types/project-management-types";
 
 type EditProps = {
   isOpen: boolean;
   onClose: () => void;
-  initialData?: ProjectRequestType;
+  initialData?: ProjectRequestResponseType;
   projectId: string;
 };
 
@@ -94,12 +94,12 @@ export default function EditActivityRequest({ isOpen, onClose, initialData, proj
         activityPurposeDescription: initialData.activityPurposeDescription || "",
         activityStartDate: initialData.activityStartDate || "",
         activityEndDate: initialData.activityEndDate || "",
-        activityLineDescription: initialData.activityLineDescription || "",
-        quantity: initialData.quantity?.toString() || "",
-        frequency: initialData.frequency?.toString() || "",
-        unitCost: initialData.unitCost?.toString() || "",
+        activityLineDescription: initialData.lineItems?.[0]?.description || "",
+        quantity: initialData.lineItems?.[0]?.quantity?.toString() || "",
+        frequency: initialData.lineItems?.[0]?.frequency?.toString() || "",
+        unitCost: initialData.lineItems?.[0]?.unitCost?.toString() || "",
         budgetCode: initialData.budgetCode?.toString() || "",
-        total: initialData.total?.toString() || "",
+        total: initialData.lineItems?.[0]?.totalBudget?.toString() || "",
         modeOfTransport: initialData.modeOfTransport || "Road",
         driverName: initialData.driverName || "",
         driversPhoneNumber: initialData.driversPhoneNumber || "",
@@ -174,7 +174,7 @@ export default function EditActivityRequest({ isOpen, onClose, initialData, proj
     try {
       const payload = {
         isCreate: false,
-        data: {
+        payload: {
           requestId: initialData?.requestId,
           staff: formData.staff,
           outputId: formData.outputId,
@@ -184,12 +184,7 @@ export default function EditActivityRequest({ isOpen, onClose, initialData, proj
           activityPurposeDescription: formData.activityPurposeDescription,
           activityStartDate: formData.activityStartDate ? new Date(formData.activityStartDate).toISOString() : new Date().toISOString(),
           activityEndDate: formData.activityEndDate ? new Date(formData.activityEndDate).toISOString() : new Date().toISOString(),
-          activityLineDescription: formData.activityLineDescription,
-          quantity: Number(formData.quantity) || 0,
-          frequency: Number(formData.frequency) || 0,
-          unitCost: Number(formData.unitCost) || 0,
           budgetCode: Number(formData.budgetCode) || 0,
-          total: Number(formData.total) || 0,
           modeOfTransport: formData.modeOfTransport,
           driverName: formData.driverName,
           driversPhoneNumber: formData.driversPhoneNumber,
@@ -199,9 +194,19 @@ export default function EditActivityRequest({ isOpen, onClose, initialData, proj
           route: formData.route,
           recipientPhoneNumber: formData.recipientPhoneNumber,
           documentName: formData.documentName,
-          documentURL: formData.documentURL || "string",
+          documentURL: formData.documentURL || "",
           projectId: projectId,
-          status: initialData?.status || "Pending"
+          status: initialData?.status || "Pending",
+          isJourneyManagementRequired: true,
+          lineItems: [
+            {
+              description: formData.activityLineDescription,
+              quantity: Number(formData.quantity) || 0,
+              frequency: Number(formData.frequency) || 0,
+              unitCost: Number(formData.unitCost) || 0,
+              totalBudget: Number(formData.total) || 0,
+            },
+          ],
         }
       };
 

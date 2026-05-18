@@ -28,7 +28,7 @@ import TextareaInput from "@/ui/form/textarea";
 import InfoItem from "@/ui/info-item";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { ProjectRequestType } from "@/types/project-management-types";
+import { ProjectRequestResponseType, RequestLineItemType } from "@/types/project-management-types";
 import { formatDate } from "@/utils/dates-format-utility";
 import { useRequests } from "@/context/RequestsContext";
 import { ProjectOutputTypes } from "@/types/project-management-types";
@@ -51,8 +51,8 @@ export default function FinancialRequestModal() {
   // real stuff
   const params = useParams();
   const { requestId } = params;
-  const { requests, fetchRequests } = useRequests();
-  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestType | null>(null);
+  const { requests } = useRequests();
+  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestResponseType | null>(null);
   const [outputDetails, setOutputDetails] = useState<ProjectOutputTypes | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -200,23 +200,23 @@ export default function FinancialRequestModal() {
                 </h3>
                 <Table
                   tableHead={head}
-                  tableData={[``]}
-                  renderRow={(row) => (
+                  tableData={selectedRequest.lineItems || []}
+                  renderRow={(item: RequestLineItemType) => (
                     <>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        <p className="w-40 truncate">{selectedRequest.activityLineDescription}</p>
+                        <p className="w-40 truncate">{item.description}</p>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {selectedRequest.quantity}
+                        {item.quantity}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {selectedRequest.frequency}
+                        {item.frequency}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        ₦{selectedRequest.unitCost.toLocaleString()}
+                        ₦{(item.unitCost ?? 0).toLocaleString()}
                       </td>
                       <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                        ₦{selectedRequest.total.toLocaleString()}
+                        ₦{(item.totalBudget ?? 0).toLocaleString()}
                       </td>
                     </>
                   )}
@@ -225,7 +225,9 @@ export default function FinancialRequestModal() {
                 <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
                   <div className="text-right">
                     <p className="text-sm text-gray-600">Grand Total</p>
-                    <p className="text-2xl font-bold text-gray-900">₦{selectedRequest.unitCost + selectedRequest.total} </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      ₦{(selectedRequest.lineItems || []).reduce((sum, item) => sum + (item.totalBudget ?? 0), 0).toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </CardComponent>
@@ -238,45 +240,48 @@ export default function FinancialRequestModal() {
                 <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
                   Journey Management
                 </h3>
-
-                <div className="space-y-6">
-                  <InfoItem
-                    label="Mode of Transport"
-                    value={selectedRequest.modeOfTransport}
-                    icon={<BusFront className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Driver's Name"
-                    value={selectedRequest.driverName}
-                    icon={<User className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Driver's Phone Number"
-                    value={selectedRequest.driversPhoneNumber}
-                    icon={<Phone className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Vehicle Color"
-                    value={selectedRequest.vehicleColor}
-                    icon={<Paintbrush className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Departure Date"
-                    value={formatDate(selectedRequest.departureTime, "date-only")}
-                    icon={<Calendar className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Recipient's Phone Number"
-                    value={selectedRequest.recipientPhoneNumber}
-                    icon={<Phone className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Route"
-                    value={selectedRequest.route}
-                    icon={<MapPin className="w-4 h-4" />}
-                    className="col-span-2"
-                  />
-                </div>
+                {!!selectedRequest.isJourneyManagementRequired ? (
+                  <div className="space-y-6">
+                    <InfoItem
+                      label="Mode of Transport"
+                      value={selectedRequest.modeOfTransport}
+                      icon={<BusFront className="w-4 h-4" />}
+                    />
+                    <InfoItem
+                      label="Driver's Name"
+                      value={selectedRequest.driverName}
+                      icon={<User className="w-4 h-4" />}
+                    />
+                    <InfoItem
+                      label="Driver's Phone Number"
+                      value={selectedRequest.driversPhoneNumber}
+                      icon={<Phone className="w-4 h-4" />}
+                    />
+                    <InfoItem
+                      label="Vehicle Color"
+                      value={selectedRequest.vehicleColor}
+                      icon={<Paintbrush className="w-4 h-4" />}
+                    />
+                    <InfoItem
+                      label="Departure Date"
+                      value={formatDate(selectedRequest.departureTime, "date-only")}
+                      icon={<Calendar className="w-4 h-4" />}
+                    />
+                    {/* <InfoItem
+                      label="Recipient's Phone Number"
+                      value={selectedRequest.recipientPhoneNumber}
+                      icon={<Phone className="w-4 h-4" />}
+                    /> */}
+                    <InfoItem
+                      label="Route"
+                      value={selectedRequest.route}
+                      icon={<MapPin className="w-4 h-4" />}
+                      className="col-span-2"
+                    />
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">Journey management was omitted for this request.</p>
+                )}
               </CardComponent>
               {/* Supporting Documents Card */}
               <CardComponent>

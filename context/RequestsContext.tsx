@@ -2,33 +2,33 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import axios from "axios";
-import { ProjectRequestType } from "@/types/project-management-types";
+import { ProjectRequestResponseType } from "@/types/project-management-types";
 import { RetirementRequestType } from "@/types/retirement-request";
 
 type RequestsContextType = {
-  requests: ProjectRequestType[];
+  requests: ProjectRequestResponseType[];
   retirements: RetirementRequestType[];
-  selectedRequest: ProjectRequestType | null;
+  selectedRequest: ProjectRequestResponseType | null;
   selectedRetirement: RetirementRequestType | null;
   isLoading: boolean;
   error: string | null;
-  fetchRequests: (params?: any) => Promise<ProjectRequestType[]>;
+  fetchRequests: (params?: any) => Promise<ProjectRequestResponseType[]>;
   fetchRetirements: (params?: any) => Promise<RetirementRequestType[]>;
-  fetchRequestById: (id: string) => Promise<ProjectRequestType | null>;
+  fetchRequestById: (id: string) => Promise<ProjectRequestResponseType | null>;
   fetchRetirementById: (id: string) => Promise<RetirementRequestType | null>;
 };
 
 const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
 
 export function RequestsProvider({ children }: { children: ReactNode }) {
-  const [requests, setRequests] = useState<ProjectRequestType[]>([]);
+  const [requests, setRequests] = useState<ProjectRequestResponseType[]>([]);
   const [retirements, setRetirements] = useState<RetirementRequestType[]>([]);
-  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestType | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestResponseType | null>(null);
   const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRequestById = async (id: string): Promise<ProjectRequestType | null> => {
+  const fetchRequestById = async (id: string): Promise<ProjectRequestResponseType | null> => {
     setIsLoading(true);
     setError(null);
     try {
@@ -71,7 +71,7 @@ export function RequestsProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const fetchRequests = async (params?: any): Promise<ProjectRequestType[]> => {
+  const fetchRequests = async (params?: any): Promise<ProjectRequestResponseType[]> => {
     setIsLoading(true);
     setError(null);
     try {

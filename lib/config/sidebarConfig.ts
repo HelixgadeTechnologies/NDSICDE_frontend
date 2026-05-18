@@ -39,12 +39,12 @@ const extractProjectId = (path: string): string | undefined => {
 const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
   const pid = projectId ?? "1"; // fallback if none
   return [
-     {
-    id: "dashboard",
-    name: "Home",
-    href: "/dashboard",
-    icon: "lucide:home",
-  },
+    {
+      id: "dashboard",
+      name: "Home",
+      href: "/dashboard",
+      icon: "lucide:home",
+    },
     {
       id: "project-details-header",
       name: "Project Details",
@@ -124,11 +124,16 @@ const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
           href: `/projects/${pid}/project-management/request`,
           icon: "",
         },
+        {
+          id: "approve-request",
+          name: "Approve Requests & Retirement",
+          href: `/projects/${pid}/project-management/approve-request`,
+          icon: "",
+        },
       ],
     },
   ];
 };
-
 
 export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
   "super-admin": {
@@ -240,16 +245,16 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
             id: "requests",
             name: "Requests",
             href: "/request-and-retirement/requests",
-            icon: ""
+            icon: "",
           },
-           {
+          {
             id: "retirements",
             name: "Retirements",
             href: "/request-and-retirement/retirements",
             icon: "",
-            badge: "2"
+            badge: "2",
           },
-        ]
+        ],
       },
       {
         id: "organizational-kpi",
@@ -267,25 +272,31 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
 
   admin: {
     role: "admin",
-    items: [ ...getBaseItems(),  {
+    items: [
+      ...getBaseItems(),
+      {
         id: "request-approvals",
         name: "Request and Retirement Approvals",
         href: "/request-approvals",
         icon: "mdi:approval",
-      },],
+      },
+    ],
   },
 };
 
 export const getSidebarConfig = (
   role: UserRole,
-  currentPath: string
+  currentPath: string,
 ): SidebarConfig => {
   const baseConfig = SIDEBAR_CONFIGS[role];
   const projectId = extractProjectId(currentPath);
 
   const isProjectContext = currentPath.includes("/projects/");
 
-  if (isProjectContext && ["admin", "super-admin", "team-member"].includes(role)) {
+  if (
+    isProjectContext &&
+    ["admin", "super-admin", "team-member"].includes(role)
+  ) {
     return {
       ...baseConfig,
       items: getProjectDetailsItems(projectId),

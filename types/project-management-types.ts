@@ -29,8 +29,9 @@ export type ProjectImpactTypes = {
   resultTypeId: string;
 };
 
+// What you send to the API
 export type ProjectRequestType = {
-  requestId: string;
+  requestId?: string; // optional on create, required on update
   staff: string;
   outputId: string;
   activityTitle: string;
@@ -39,12 +40,7 @@ export type ProjectRequestType = {
   activityPurposeDescription: string;
   activityStartDate: string;
   activityEndDate: string;
-  activityLineDescription: string;
-  quantity: number;
-  frequency: number;
-  unitCost: number;
   budgetCode: number;
-  total: number;
   modeOfTransport: string;
   driverName: string;
   driversPhoneNumber: string;
@@ -57,37 +53,12 @@ export type ProjectRequestType = {
   documentURL: string;
   projectId: string;
   status: string;
-  budgetName?: string;
-  requestDate?: string;
-  project?: {
-    projectName: string;
-  }
-  approval_A?: null | "string",
-  approval_B?: null | "string",
-  approval_C?: null | "string",
-  approval_D?: null | "string",
-  approval_E?: null | "string",
-  approvedBy_A?: null | "string",
-  approvedBy_B?: null | "string",
-  approvedBy_C?: null | "string",
-  approvedBy_D?: null | "string",
-  approvedBy_E?: null | "string",
-  comment_A?: null | "string",
-  comment_B?: null | "string",
-  comment_C?: null | "string",
-  comment_D?: null | "string",
-  comment_E?: null | "string",
-  createAt?: string,
+  isJourneyManagementRequired: boolean;
   lineItems: RequestLineItemType[];
-  // New fields
+  // conditional journey management fields
   purposeOfTrip?: string;
   vehicleMake?: string;
   vehicleModel?: string;
-  otherPersonnel?: {
-    name: string;
-    company: string;
-    phoneNumber: string;
-  }[];
   departureDate?: string;
   departureLocationAndTime?: string;
   destination?: string;
@@ -102,22 +73,55 @@ export type ProjectRequestType = {
   returnTime?: string;
   airportDropoffOfficerName?: string;
   airportPickupOfficerName?: string;
+  otherPersonnel?: {
+    name: string;
+    company: string;
+    phoneNumber: string;
+  }[];
+};
+
+// What the API sends back — extends the payload with server-generated fields
+export type ProjectRequestResponseType = ProjectRequestType & {
+  requestId: string; // always present in a response
+  createdBy?: string;
+  requestDate?: string;
+  createAt?: string;
+  project?: {
+    projectName: string;
+  };
   approvalStep?: number;
+  approval_A?: null | string;
+  approval_B?: null | string;
+  approval_C?: null | string;
+  approval_D?: null | string;
+  approval_E?: null | string;
+  approvedBy_A?: null | string;
+  approvedBy_B?: null | string;
+  approvedBy_C?: null | string;
+  approvedBy_D?: null | string;
+  approvedBy_E?: null | string;
+  comment_A?: null | string;
+  comment_B?: null | string;
+  comment_C?: null | string;
+  comment_D?: null | string;
+  comment_E?: null | string;
 };
 
 export type RequestLineItemType = {
-  lineItemId: string;
-  requestId: string;
-  activityId: string;
+  // payload fields (required)
   description: string;
   quantity: number;
   frequency: number;
   unitCost: number;
   totalBudget: number;
-  totalSpent: number | null;
-  variance: number | null;
-  createAt: string;
-  updateAt: string;
+  activityId: string;
+  // server-response-only fields
+  lineItemId?: string;
+  requestId?: string;
+  totalSpent?: number | null;
+  variance?: number | null;
+  createAt?: string;
+  updateAt?: string;
 };
 
 export type ProjectActivityTypes = {

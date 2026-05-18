@@ -6,7 +6,7 @@ import Table from "@/ui/table";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ProjectRequestType } from "@/types/project-management-types";
+import { ProjectRequestResponseType } from "@/types/project-management-types";
 import { useEntityModal } from "@/utils/project-management-utility";
 import DeleteModal from "@/ui/generic-delete-modal";
 import Link from "next/link";
@@ -67,7 +67,7 @@ export default function ProjectRequest() {
     { tabName: "Activity Financial Retirement", id: 2 },
   ];
   const [activeTab, setActiveTab] = useState(1);
-  const [data, setData] = useState<ProjectRequestType[]>([]);
+  const [data, setData] = useState<ProjectRequestResponseType[]>([]);
   const [retirementData, setRetirementData] = useState<RetirementRequestType[]>(
     [],
   );
@@ -107,7 +107,7 @@ export default function ProjectRequest() {
     { value: "Rejected", label: "Rejected" },
   ] : [
     { value: "", label: "All Statuses" },
-    { value: "Pending", label: "Pending" },
+    { value: "Pending", label: "Pending Retirement" },
     { value: "In Review", label: "In Review" },
     { value: "Approved", label: "Approved and Closed" },
     { value: "Rejected", label: "Rejected" },
@@ -125,15 +125,19 @@ export default function ProjectRequest() {
     return true;
   });
 
-  const filteredRetirements = retirementData.filter((row) => {
+  const filteredRetirements = data.filter((row) => {
+    if (row.status !== "Approved") return false;
+
+    const reqRetirements = retirementData.filter(r => r.requestId === row.requestId);
+    const retirementStatus = reqRetirements.length > 0 ? (reqRetirements[0].retirementStatus || "Pending") : "Pending";
+
     if (statusFilter) {
-      const s = row.retirementStatus?.toLowerCase() || "pending";
       const f = statusFilter.toLowerCase();
-      if (s !== f) return false;
+      const s = retirementStatus.toLowerCase();
+      if (s !== f && !(f === "pending" && s === "unretired")) return false;
     }
     if (dateRangeFilter) {
-      const rowDate = row.activityStartDate || row.createAt;
-      if (!isDateInRange(rowDate)) return false;
+      if (!isDateInRange(row.activityStartDate)) return false;
     }
     return true;
   });
@@ -244,7 +248,7 @@ export default function ProjectRequest() {
     setRemoveEntity: setRemoveRequest,
     handleRemoveEntity: handleRemoveRequest,
     selectedEntity: selectedRequest,
-  } = useEntityModal<ProjectRequestType>();
+  } = useEntityModal<ProjectRequestResponseType>();
 
   const fetchRequests = async () => {
     setIsLoading(true);
@@ -265,12 +269,7 @@ export default function ProjectRequest() {
     setIsLoadingRetirements(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirements`,
-        {
-          params: {
-            projectId: projectId,
-          },
-        },
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/project/${projectId}`,
       );
       setRetirementData(res.data?.data || []);
     } catch (error) {
@@ -520,18 +519,8 @@ export default function ProjectRequest() {
                                   Remove
                                 </li>
                                 <Link
-                                  href={`/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`}
-                                  className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
-                                  <Icon
-                                    icon={"si:add-fill"}
-                                    height={20}
-                                    width={20}
-                                  />
-                                  Retire
-                                </Link>
-                                <Link
                                   href={`/projects/${projectId}/project-management/request/view?requestId=${row.requestId}`}
-                                  className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                                  className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
                                   <Icon
                                     icon={"hugeicons:view"}
                                     height={20}
@@ -558,134 +547,114 @@ export default function ProjectRequest() {
                     tableHead={retirementHead}
                     tableData={filteredRetirements}
                     checkbox
-                    idKey={"retirementId"}
+                    idKey={"requestId"}
                     onClick={(row) =>
                       router.push(
                         `/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`,
                       )
                     }
-                    renderRow={(row: RetirementRequestType) => (
-                      <>
-                        <td className="px-6">
-                          {toSentenceCase(row.requestActivityTitle || row.activityLineDescription || "")}
-                        </td>
-                        <td className="px-6">
-                          ₦{(row.totalBudget || 0).toLocaleString()}
-                        </td>
-                        <td className="px-6">
-                          ₦{(row.actualCost || 0).toLocaleString()}
-                        </td>
-                        <td className="px-6 font-medium">
-                          {(() => {
-                            const diff = (row.totalBudget || 0) - (row.actualCost || 0);
-                            if (diff < 0) {
-                              return (
-                                <span className="text-red-500">
-                                  -₦{Math.abs(diff).toLocaleString()}
-                                </span>
-                              );
-                            } else if (diff > 0) {
-                              return (
-                                <span className="text-green-500">
-                                  ₦{diff.toLocaleString()}
-                                </span>
-                              );
-                            } else {
-                              return (
-                                <span className="text-gray-500">
-                                  ₦0
-                                </span>
-                              );
-                            }
-                          })()}
-                        </td>
-                        <td className="px-6">
-                          {getRetirementApprovalStatus(row.approvalStep)}
-                        </td>
-                        <td
-                          className={`px-6 font-semibold ${
-                            row.retirementStatus === "Approved"
-                              ? "text-green-600"
-                              : row.retirementStatus === "Pending"
-                                ? "text-yellow-600"
-                                : row.retirementStatus === "In Review"
-                                  ? "text-blue-600"
-                                  : row.retirementStatus === "Rejected"
-                                    ? "text-red-600"
-                                    : "text-gray-600"
-                          }`}>
-                          {row.retirementStatus === "Approved" ? "Approved and Closed" : (row.retirementStatus || "Pending")}
-                        </td>
-                        <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex justify-center items-center">
-                            <Icon
-                              icon={"uiw:more"}
-                              width={22}
-                              height={22}
-                              className="cursor-pointer"
-                              color="#909CAD"
-                              onClick={() =>
-                                setActiveRowId((prev) =>
-                                  prev === row.retirementId ? null : row.retirementId,
-                                )
-                              }
-                            />
-                          </div>
+                    renderRow={(row: ProjectRequestResponseType) => {
+                      const reqRetirements = retirementData.filter(r => r.requestId === row.requestId);
+                      const actualCost = reqRetirements.reduce((sum, r) => sum + (r.actualCost || 0), 0);
+                      const totalBudget = (row.lineItems || []).reduce((sum, item) => sum + (item.totalBudget || 0), 0);
+                      const retirementStatus = reqRetirements.length > 0 ? reqRetirements[0].retirementStatus : "Pending";
+                      const approvalStep = reqRetirements.length > 0 ? reqRetirements[0].approvalStep : undefined;
 
-                          {activeRowId === row.retirementId && (
-                            <AnimatePresence>
-                              <motion.div
-                                initial={{ y: -10, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -10, opacity: 0 }}
-                                transition={{ duration: 0.2, ease: "easeOut" }}
-                                className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                                <ul className="text-sm">
-                                  <li
-                                    onClick={() => {
-                                      setSelectedRetirement(row);
-                                      setEditRetirement(true);
-                                      setActiveRowId(null);
-                                    }}
-                                    className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                                    <Icon
-                                      icon={"ph:pencil-simple-line"}
-                                      height={20}
-                                      width={20}
-                                    />
-                                    Edit
-                                  </li>
-                                  <li
-                                    onClick={() => {
-                                      setSelectedRetirement(row);
-                                      setRemoveRetirement(true);
-                                      setActiveRowId(null);
-                                    }}
-                                    className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
-                                    <Icon
-                                      icon={"pixelarticons:trash"}
-                                      height={20}
-                                      width={20}
-                                    />
-                                    Remove
-                                  </li>
-                                  <Link
-                                    href={`/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}&viewOnly=true`}
-                                    className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                                    <Icon
-                                      icon={"hugeicons:view"}
-                                      height={20}
-                                      width={20}
-                                    />
-                                    View Retirement
-                                  </Link>
-                                </ul>
-                              </motion.div>
-                            </AnimatePresence>
-                          )}
-                        </td>
-                      </>
-                    )}
+                      return (
+                        <>
+                          <td className="px-6">
+                            {toSentenceCase(row.activityTitle || "")}
+                          </td>
+                          <td className="px-6">
+                            ₦{(totalBudget || 0).toLocaleString()}
+                          </td>
+                          <td className="px-6">
+                            ₦{(actualCost || 0).toLocaleString()}
+                          </td>
+                          <td className="px-6 font-medium">
+                            {(() => {
+                              const diff = totalBudget - actualCost;
+                              if (diff < 0) {
+                                return (
+                                  <span className="text-red-500">
+                                    -₦{Math.abs(diff).toLocaleString()}
+                                  </span>
+                                );
+                              } else if (diff > 0) {
+                                return (
+                                  <span className="text-green-500">
+                                    ₦{diff.toLocaleString()}
+                                  </span>
+                                );
+                              } else {
+                                return (
+                                  <span className="text-gray-500">
+                                    ₦0
+                                  </span>
+                                );
+                              }
+                            })()}
+                          </td>
+                          <td className="px-6">
+                            {reqRetirements.length > 0 ? getRetirementApprovalStatus(approvalStep) : "Awaiting Finance Officer Approval"}
+                          </td>
+                          <td
+                            className={`px-6 font-semibold ${
+                              retirementStatus === "Approved"
+                                ? "text-green-600"
+                                : retirementStatus === "Pending"
+                                  ? "text-yellow-600"
+                                  : retirementStatus === "In Review"
+                                    ? "text-blue-600"
+                                    : retirementStatus === "Rejected"
+                                      ? "text-red-600"
+                                      : "text-gray-600"
+                            }`}>
+                            {retirementStatus === "Approved" ? "Approved and Closed" : (retirementStatus || "Pending")}
+                          </td>
+                          <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex justify-center items-center">
+                              <Icon
+                                icon={"uiw:more"}
+                                width={22}
+                                height={22}
+                                className="cursor-pointer"
+                                color="#909CAD"
+                                onClick={() =>
+                                  setActiveRowId((prev) =>
+                                    prev === row.requestId ? null : row.requestId,
+                                  )
+                                }
+                              />
+                            </div>
+
+                            {activeRowId === row.requestId && (
+                              <AnimatePresence>
+                                <motion.div
+                                  initial={{ y: -10, opacity: 0 }}
+                                  animate={{ y: 0, opacity: 1 }}
+                                  exit={{ y: -10, opacity: 0 }}
+                                  transition={{ duration: 0.2, ease: "easeOut" }}
+                                  className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
+                                  <ul className="text-sm">
+                                    <Link
+                                      href={`/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`}
+                                      className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                                      <Icon
+                                        icon={"hugeicons:view"}
+                                        height={20}
+                                        width={20}
+                                      />
+                                      {reqRetirements.length > 0 ? "View Retirement" : "Add Retirement"}
+                                    </Link>
+                                  </ul>
+                                </motion.div>
+                              </AnimatePresence>
+                            )}
+                          </td>
+                        </>
+                      );
+                    }}
                   />
                 </div>
               ))}

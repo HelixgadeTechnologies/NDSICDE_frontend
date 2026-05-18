@@ -28,8 +28,8 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
   const token = getToken();
   const router = useRouter();
   const { projects } = useProjects();
-  const currentProject = projects.find((p) => p.projectId === projectId);
-  const projectName = currentProject?.projectName || "N/A";
+  // const currentProject = projects.find((p) => p.projectId === projectId);
+  // const projectName = currentProject?.projectName || "N/A";
 
   const handleFormSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -38,15 +38,12 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
       const payload = {
         isCreate: true,
         payload: {
-          requestId: crypto.randomUUID(),
+          requestId: "",
           staff: formData.staff,
           outputId: formData.outputId,
           activityTitle: formData.activityTitle,
-          activityBudgetCode: isNaN(Number(formData.activityBudgetCode)) || formData.activityBudgetCode === ""
-            ? formData.activityBudgetCode
-            : Number(formData.activityBudgetCode),
-          budgetName: formData.budgetName || "",
-          requestDate: formData.requestDate || "",
+          budgetName: formData.budgetName,
+          requestDate: formData.requestDate,
           activityLocation: formData.activityLocation,
           activityPurposeDescription: formData.activityPurposeDescription,
           activityStartDate: formData.activityStartDate
@@ -55,9 +52,7 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           activityEndDate: formData.activityEndDate
             ? new Date(formData.activityEndDate).toISOString()
             : new Date().toISOString(),
-          budgetCode: isNaN(Number(formData.activityBudgetCode)) || formData.activityBudgetCode === ""
-            ? formData.activityBudgetCode
-            : Number(formData.activityBudgetCode),
+          budgetCode: Number(formData.budgetCode) || 0,
           modeOfTransport: formData.modeOfTransport,
           driverName: formData.driverName,
           driversPhoneNumber: formData.driversPhoneNumber,
@@ -68,12 +63,11 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
             : new Date().toISOString(),
           route: formData.route,
           recipientPhoneNumber: formData.recipientPhoneNumber,
-          // New fields in payload
           purposeOfTrip: formData.purposeOfTrip,
           vehicleMake: formData.vehicleMake,
           vehicleModel: formData.vehicleModel,
           otherPersonnel: formData.otherPersonnel,
-          departureDate: formData.departureDate,
+          departureDate: formData.departureDate ? new Date(formData.departureDate).toISOString() : undefined,
           departureLocationAndTime: formData.departureLocationAndTime,
           destination: formData.destination,
           contactPersonPhoneNumberAtDestination: formData.contactPersonPhoneNumberAtDestination,
@@ -83,13 +77,13 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           flightArrivalTime: formData.flightArrivalTime,
           hotelAccommodationName: formData.hotelAccommodationName,
           hotelAddress: formData.hotelAddress,
-          returnDate: formData.returnDate,
+          returnDate: formData.returnDate ? new Date(formData.returnDate).toISOString() : undefined,
           returnTime: formData.returnTime,
           airportDropoffOfficerName: formData.airportDropoffOfficerName,
           airportPickupOfficerName: formData.airportPickupOfficerName,
-          isJourneyRequired: formData.isJourneyRequired,
+          isJourneyManagementRequired: formData.isJourneyRequired,
           documentName: formData.documentName,
-          documentURL: formData.documentURL || "string",
+          documentURL: formData.documentURL,
           projectId: projectId,
           createdBy: formData.createdBy,
           status: "Pending",
@@ -147,7 +141,7 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
             staff={formData.staff}
             requestDate={formData.requestDate}
             budgetName={formData.budgetName}
-            budgetCode={formData.activityBudgetCode}
+            budgetCode={formData.budgetCode}
           />
 
           <div className="space-y-3 mb-5 border-t border-gray-100 pt-4">
