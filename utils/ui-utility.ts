@@ -1,3 +1,10 @@
+export function sortByCreatedAt<T extends { createAt?: string }>(arr: T[]): T[] {
+  return [...arr].sort(
+    (a, b) =>
+      new Date(a.createAt || 0).getTime() - new Date(b.createAt || 0).getTime(),
+  );
+}
+
 export const typeChecker = (row: { status: string }) => {
     if (row.status === "On Track") {
       return "text-yellow-500 px-6";

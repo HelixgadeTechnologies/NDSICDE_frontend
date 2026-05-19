@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 import axios from "axios";
 import { ProjectRequestResponseType } from "@/types/project-management-types";
 import { RetirementRequestType } from "@/types/retirement-request";
+import { sortByCreatedAt } from "@/utils/ui-utility";
 
 type RequestsContextType = {
   requests: ProjectRequestResponseType[];
@@ -89,7 +90,7 @@ export function RequestsProvider({ children }: { children: ReactNode }) {
         { params: queryParams }
       );
       
-      const data = res.data?.data || [];
+      const data = sortByCreatedAt(res.data?.data || []);
       setRequests(data);
       return data;
     } catch (err) {
@@ -120,7 +121,7 @@ export function RequestsProvider({ children }: { children: ReactNode }) {
         { params: queryParams }
       );
       
-      const data = res.data?.data || [];
+      const data = sortByCreatedAt(res.data?.data || []);
       setRetirements(data);
       return data;
     } catch (err) {

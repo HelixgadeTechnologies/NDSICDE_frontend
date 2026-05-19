@@ -20,6 +20,7 @@ import { formatDate } from "@/utils/dates-format-utility";
 import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
 import { useParams } from "next/navigation";
+import { sortByCreatedAt } from "@/utils/ui-utility";
 
 // Define the type for role from API
 interface ApiRole {
@@ -69,7 +70,7 @@ export default function ProjectPartner() {
 
       // Ensure data is an array
       const partners = response.data?.data || [];
-      setData(Array.isArray(partners) ? partners : []);
+      setData(sortByCreatedAt(Array.isArray(partners) ? partners : []));
     } catch (error) {
       console.error("Error fetching partners:", error);
       toast.error("Failed to load project partners");

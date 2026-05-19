@@ -15,7 +15,7 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
-import { toSentenceCase } from "@/utils/ui-utility";
+import { toSentenceCase, sortByCreatedAt } from "@/utils/ui-utility";
 
 export default function ProjectOutcome() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export default function ProjectOutcome() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outcomes/project/${projectId}`,
       );
-      setData(response.data.data);
+      setData(sortByCreatedAt(response.data.data || []));
     } catch (error) {
       console.error(`Error fetching outcome: ${error}`);
     } finally {

@@ -15,7 +15,7 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
-import { toSentenceCase } from "@/utils/ui-utility";
+import { toSentenceCase, sortByCreatedAt } from "@/utils/ui-utility";
 
 export default function ProjectOutput() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export default function ProjectOutput() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs/project/${projectId}`,
       );
       const result = res.data.data;
-      setData(Array.isArray(result) ? result : result ? [result] : []);
+      setData(sortByCreatedAt(Array.isArray(result) ? result : result ? [result] : []));
     } catch (error) {
       console.error(`Error fetching outputs: ${error}`);
     } finally {

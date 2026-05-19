@@ -16,7 +16,7 @@ import { useParams } from "next/navigation";
 import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 import DeleteModal from "@/ui/generic-delete-modal";
-import { toSentenceCase } from "@/utils/ui-utility";
+import { toSentenceCase, sortByCreatedAt } from "@/utils/ui-utility";
 
 type LogicalFramework = {
   logicalFrameworkId: string;
@@ -69,7 +69,7 @@ export default function ProjectLogicalFramework() {
           },
         },
       );
-      setData(response.data.data);
+      setData(sortByCreatedAt(response.data.data || []));
     } catch (error) {
       console.error(`Error fetching logical frameworks:`, error);
       toast.error("Failed to fetch logical frameworks");

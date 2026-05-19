@@ -17,6 +17,7 @@ import { getToken } from "@/lib/api/credentials";
 import { formatDate } from "@/utils/dates-format-utility";
 import { useRoleStore } from "@/store/role-store";
 import { toast } from "react-toastify";
+import { sortByCreatedAt } from "@/utils/ui-utility";
 
 type DataValidationTableProps = {
   startDate: string;
@@ -64,7 +65,7 @@ export default function DataValidationTable({
           },
         },
       );
-      setData(response.data.data);
+      setData(sortByCreatedAt(response.data.data || []));
 
     } catch (error) {
       console.error("Error fetching data validation records:", error);

@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
 import { useParams } from "next/navigation";
+import { sortByCreatedAt } from "@/utils/ui-utility";
 
 
 // Define the type for role from API
@@ -58,7 +59,7 @@ export default function ProjectTeam() {
       );
       // Ensure data is an array
       const teamMembers = res.data.data || [];
-      setData(Array.isArray(teamMembers) ? teamMembers : []);
+      setData(sortByCreatedAt(Array.isArray(teamMembers) ? teamMembers : []));
     } catch (error) {
       console.error(`Error fetching team members: ${error}`);
       setData([]);

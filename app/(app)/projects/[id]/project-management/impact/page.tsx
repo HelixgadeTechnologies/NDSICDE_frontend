@@ -15,7 +15,7 @@ import { getToken } from "@/lib/api/credentials";
 import { useParams, useRouter } from "next/navigation";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
-import { toSentenceCase } from "@/utils/ui-utility";
+import { toSentenceCase, sortByCreatedAt } from "@/utils/ui-utility";
 
 export default function ProjectImpact() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export default function ProjectImpact() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/impacts/project/${projectId}`,
       );
-      setData(response.data.data);
+      setData(sortByCreatedAt(response.data.data || []));
     } catch (error) {
       console.log(`Error fetching impacts: ${error}`);
     } finally {

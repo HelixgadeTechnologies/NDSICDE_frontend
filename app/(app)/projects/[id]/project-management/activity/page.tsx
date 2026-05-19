@@ -17,6 +17,7 @@ import { useParams, useRouter } from "next/navigation";
 import { formatDate } from "@/utils/dates-format-utility";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
+import { sortByCreatedAt } from "@/utils/ui-utility";
 
 export default function ProjectActivity() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -56,7 +57,7 @@ export default function ProjectActivity() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/activities/project/${projectId}`,
       );
-      setData(response.data.data);
+      setData(sortByCreatedAt(response.data.data || []));
     } catch (error) {
     } finally {
       setIsLoading(false);

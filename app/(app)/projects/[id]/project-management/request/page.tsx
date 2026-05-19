@@ -20,7 +20,7 @@ import { toast } from "react-toastify";
 import { formatDate } from "@/utils/dates-format-utility";
 import { RetirementRequestType } from "@/types/retirement-request";
 import LoadingSpinner from "@/ui/loading-spinner";
-import { toSentenceCase } from "@/utils/ui-utility";
+import { toSentenceCase, sortByCreatedAt } from "@/utils/ui-utility";
 import DropDown from "@/ui/form/select-dropdown";
 import DateRangePicker from "@/ui/form/date-range";
 import { useUIStore } from "@/store/ui-store";
@@ -256,7 +256,7 @@ export default function ProjectRequest() {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/getRequestByProjectId/${projectId}`,
       );
-      setData(res.data?.data || []);
+      setData(sortByCreatedAt(res.data?.data || []));
       console.log(res.data.data);
     } catch (error) {
       toast.error("Error retrieving requests. Please try again.");

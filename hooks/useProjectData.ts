@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { ProjectRequestResponseType } from "@/types/project-management-types";
 import { RetirementRequestType } from "@/types/retirement-request";
+import { sortByCreatedAt } from "@/utils/ui-utility";
 
 export function useProjectRequests(projectId: string) {
   const [requests, setRequests] = useState<ProjectRequestResponseType[]>([]);
@@ -16,7 +17,7 @@ export function useProjectRequests(projectId: string) {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/getRequestByProjectId/${projectId}`,
       );
-      setRequests(res.data?.data || []);
+      setRequests(sortByCreatedAt(res.data?.data || []));
     } catch (err) {
       console.error("Failed to fetch requests:", err);
       setError("Failed to fetch requests");
@@ -45,7 +46,7 @@ export function useProjectRetirements(projectId: string) {
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/retirement/retirement/project/${projectId}`,
       );
-      setRetirements(res.data?.data || []);
+      setRetirements(sortByCreatedAt(res.data?.data || []));
     } catch (err) {
       console.error("Failed to fetch retirements:", err);
       setError("Failed to fetch retirements");
