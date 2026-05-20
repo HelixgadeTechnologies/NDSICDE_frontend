@@ -177,7 +177,7 @@ function FormOne({ onClick, formData, updateFormData, isEditMode }: FormOneProps
             />
           </div>
           <div className="w-3/5">
-            <Button content="Next" onClick={handleNext} />
+            <Button content="Next" onClick={handleNext} type="button" />
           </div>
         </div>
       </form>
@@ -333,13 +333,14 @@ function FormTwo({
         />
         <div className="flex gap-6 items-center mt-8">
           <div className="w-2/5">
-            <Button isSecondary content="Back" onClick={onClick} />
+            <Button isSecondary content="Back" onClick={onClick} type="button" />
           </div>
           <div className="w-3/5">
             <Button
               content={isEditMode ? "Save Changes" : "Create Project"}
               onClick={handleSubmit}
               isLoading={isSubmitting}
+              type="button"
             />
           </div>
         </div>
