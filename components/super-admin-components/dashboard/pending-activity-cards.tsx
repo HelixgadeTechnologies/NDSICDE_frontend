@@ -62,7 +62,7 @@ export default function PendingActivityCards() {
   }, [])
 
   return (
-    <section className="flex gap-7 items-start w-4/5">
+    <section className="flex flex-col lg:flex-row gap-7 items-stretch lg:items-start w-full lg:w-4/5">
       <CardComponent className="flex-1">
         <Heading heading="Pending Activity Fund Request" />
         {loadingFunds ? (

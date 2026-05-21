@@ -74,7 +74,7 @@ export default function EditProjectActivity({
 
   // Fetch outputs for dropdown and initialize form
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && projectId) {
       fetchOutputs();
 
       if (mode === "edit" && initialData) {
@@ -145,7 +145,7 @@ export default function EditProjectActivity({
         resetForm();
       }
     }
-  }, [isOpen, mode, initialData]);
+  }, [isOpen, mode, initialData, projectId]);
 
   const resetForm = () => {
     setFormData({
@@ -173,7 +173,7 @@ export default function EditProjectActivity({
     setIsLoadingOutputs(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs/project/${projectId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

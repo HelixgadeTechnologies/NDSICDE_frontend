@@ -180,11 +180,11 @@ export default function FormParent() {
   };
 
   return (
-    <section className="flex gap-6">
-      <div className="w-[65%]">
+    <section className="flex flex-col-reverse lg:flex-row gap-6">
+      <div className="w-full lg:w-[65%]">
         <CardComponent height="100%">{formSteps[activeTab]}</CardComponent>
       </div>
-      <div className="w-[35%]">
+      <div className="w-full lg:w-[35%]">
         <CardComponent height="100%">
           <div className="space-y-6">
             {tabs.map((tab) => {

@@ -119,7 +119,7 @@ export default function EditActivityRequest({ isOpen, onClose, initialData, proj
     const fetchOutputs = async () => {
       try {
         const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs/project/${projectId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -136,10 +136,10 @@ export default function EditActivityRequest({ isOpen, onClose, initialData, proj
         console.error("Error fetching outputs:", error);
       }
     };
-    if (isOpen) {
+    if (isOpen && projectId) {
       fetchOutputs();
     }
-  }, [isOpen, token]);
+  }, [isOpen, token, projectId]);
 
   const updateFormData = (data: Partial<RequestFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));

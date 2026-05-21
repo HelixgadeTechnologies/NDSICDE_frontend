@@ -230,8 +230,8 @@ export default function ManagementAndStaffDashboard() {
       </div>
 
       {/* charts */}
-      <section className="flex gap-4 items-start">
-        <div className="w-3/5">
+      <section className="flex flex-col lg:flex-row gap-4 items-start">
+        <div className="w-full lg:w-3/5">
           <CardComponent>
             <div className="flex justify-between items-center mb-4">
               <Heading heading="KPI Performance" />
@@ -246,7 +246,7 @@ export default function ManagementAndStaffDashboard() {
                 />
               </div>
             </div>
-            <div className="h-112.5">
+            <div className="h-72 md:h-112.5">
               <LineChartComponent
                 lines={kpiLines}
                 data={kpiChartData}
@@ -257,7 +257,7 @@ export default function ManagementAndStaffDashboard() {
             </div>
           </CardComponent>
         </div>
-        <div className="w-2/5 space-y-4">
+        <div className="w-full lg:w-2/5 space-y-4">
           <CardComponent>
             <Heading
               heading="Budget Utilization"

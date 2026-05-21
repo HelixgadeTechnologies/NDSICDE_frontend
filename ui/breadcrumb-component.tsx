@@ -121,14 +121,14 @@ export default function Breadcrumb({ fallbackTitle = "" }: Props) {
 
   return (
     <section className={`${hiddenRoutes.includes(pathname) ? "hidden" : ""} no-print`}>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <h2 className="font-bold text-base md:text-[22px] text-[#242424]">
           {matched?.header || fallbackTitle}
         </h2>
 
         {/* Render matched action if available */}
         {matched?.href && actionComponents[matched.href] && (
-          <div className="min-w-57">{actionComponents[matched.href]}</div>
+          <div className="w-full sm:w-auto sm:min-w-57">{actionComponents[matched.href]}</div>
         )}
       </div>
     </section>

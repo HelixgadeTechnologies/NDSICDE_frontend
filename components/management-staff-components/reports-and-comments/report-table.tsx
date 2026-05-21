@@ -158,8 +158,8 @@ export default function ReportsTable() {
   return (
     <section>
       <CardComponent>
-        <div className="flex items-end gap-4 mb-6">
-          <div className="w-1/2">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-4 mb-6">
+          <div className="w-full lg:w-1/2">
             <SearchInput
               placeholder="Search reports by title or projects.."
               value={searchTerm}
@@ -169,7 +169,7 @@ export default function ReportsTable() {
           </div>
 
           {/* Filter dropdowns - simplified to just Status and Result Type */}
-          <div className="w-1/2 flex justify-end items-end gap-4">
+          <div className="w-full lg:w-1/2 flex flex-col sm:flex-row lg:justify-end items-stretch sm:items-end gap-4">
             <DropDown
               name="status"
               value={statusFilter}

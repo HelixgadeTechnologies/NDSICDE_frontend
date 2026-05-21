@@ -143,7 +143,7 @@ function FormOne({ onClick, formData, updateFormData, isEditMode }: FormOneProps
           onChange={(e) => handleChange("totalBudgetAmount", e.target.value)}
           error={errors.totalBudgetAmount}
         />
-        <div className="flex items-center gap-4.5 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4.5 w-full">
           <DateInput
             label="Start Date"
             placeholder="Start Date"
@@ -525,8 +525,8 @@ export default function CreateNewProject() {
   ];
 
   return (
-    <section className="flex gap-6">
-      <div className="w-3/5">
+    <section className="flex flex-col-reverse lg:flex-row gap-6">
+      <div className="w-full lg:w-3/5">
         <CardComponent height="100%">
           <Heading
               heading={isEditMode ? "Edit Project" : "Create New Project"}
@@ -568,7 +568,7 @@ export default function CreateNewProject() {
       </div>
 
       {/* Step indicators */}
-      <div className="w-2/5">
+      <div className="w-full lg:w-2/5">
         <CardComponent height="100%">
           <div className="space-y-6">
             {tabs.map((tab) => {

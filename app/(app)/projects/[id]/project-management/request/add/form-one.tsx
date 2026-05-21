@@ -230,7 +230,7 @@ export default function FormOne({
             updateFormData({ activityPurposeDescription: e.target.value })
           }
         />
-        <div className="flex items-center gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <DateInput
             label="Activity Start Date"
             value={formData.activityStartDate}
@@ -250,88 +250,110 @@ export default function FormOne({
           </label>
 
           {formData.budgetLineItems?.map((item, index) => (
-            <div key={index} className="flex gap-2 items-start relative w-full">
-              <div className="flex-1">
-                <TextInput
-                  label={index === 0 ? "Activity Description" : ""}
-                  name={`activityLineDescription-${index}`}
-                  value={item.activityLineDescription}
-                  onChange={(e) =>
-                    updateLineItem(
-                      index,
-                      "activityLineDescription",
-                      e.target.value,
-                    )
-                  }
-                  placeholder="Description"
-                />
+            <div key={index} className="relative md:border-0 border border-gray-200 rounded-lg md:rounded-none md:p-0 p-3">
+              {/* Mobile header with line-item number + remove button */}
+              <div className="md:hidden flex justify-between items-center mb-3">
+                <span className="text-xs font-semibold text-gray-500 uppercase">
+                  Line Item #{index + 1}
+                </span>
+                {formData.budgetLineItems.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveLineItem(index)}
+                    className="text-red-500 hover:text-red-700 transition-colors flex items-center gap-1 text-xs font-medium">
+                    <Icon icon="mdi:close-circle" className="text-base" /> Remove
+                  </button>
+                )}
               </div>
 
-              <div className="w-24">
-                <TextInput
-                  label={index === 0 ? "Quantity" : ""}
-                  name={`quantity-${index}`}
-                  value={item.quantity}
-                  onChange={(e) =>
-                    updateLineItem(index, "quantity", e.target.value)
-                  }
-                  placeholder="Qty"
-                />
-              </div>
+              <div
+                className={`flex flex-col md:flex-row md:gap-2 md:items-start gap-3 w-full ${
+                  index > 0 ? "md:[&_label]:hidden" : ""
+                }`}>
+                <div className="md:flex-1">
+                  <TextInput
+                    label="Activity Description"
+                    name={`activityLineDescription-${index}`}
+                    value={item.activityLineDescription}
+                    onChange={(e) =>
+                      updateLineItem(
+                        index,
+                        "activityLineDescription",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="Description"
+                  />
+                </div>
 
-              <div className="w-28">
-                <TextInput
-                  label={index === 0 ? "Frequency" : ""}
-                  name={`frequency-${index}`}
-                  value={item.frequency}
-                  onChange={(e) =>
-                    updateLineItem(index, "frequency", e.target.value)
-                  }
-                  placeholder="Freq"
-                />
-              </div>
+                <div className="grid grid-cols-2 gap-3 md:contents">
+                  <div className="md:w-24">
+                    <TextInput
+                      label="Quantity"
+                      name={`quantity-${index}`}
+                      value={item.quantity}
+                      onChange={(e) =>
+                        updateLineItem(index, "quantity", e.target.value)
+                      }
+                      placeholder="Qty"
+                    />
+                  </div>
 
-              <div className="w-32">
-                <TextInput
-                  label={index === 0 ? "Unit Cost (₦)" : ""}
-                  name={`unitCost-${index}`}
-                  value={item.unitCost}
-                  onChange={(e) =>
-                    updateLineItem(index, "unitCost", e.target.value)
-                  }
-                  placeholder="Unit Cost"
-                />
-              </div>
+                  <div className="md:w-28">
+                    <TextInput
+                      label="Frequency"
+                      name={`frequency-${index}`}
+                      value={item.frequency}
+                      onChange={(e) =>
+                        updateLineItem(index, "frequency", e.target.value)
+                      }
+                      placeholder="Freq"
+                    />
+                  </div>
 
-              <div className="w-32">
-                <TextInput
-                  label={index === 0 ? "Total" : ""}
-                  name={`total-${index}`}
-                  value={Number(item.total || 0).toFixed(2)}
-                  onChange={() => {}}
-                  placeholder="0.00"
-                />
-              </div>
+                  <div className="md:w-32">
+                    <TextInput
+                      label="Unit Cost (₦)"
+                      name={`unitCost-${index}`}
+                      value={item.unitCost}
+                      onChange={(e) =>
+                        updateLineItem(index, "unitCost", e.target.value)
+                      }
+                      placeholder="Unit Cost"
+                    />
+                  </div>
 
-              {formData.budgetLineItems.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => handleRemoveLineItem(index)}
-                  className={`text-red-500 hover:text-red-700 transition-colors ${index === 0 ? "mt-8.5" : "mt-3"}`}>
-                  <Icon icon="mdi:close-circle" className="text-xl" />
-                </button>
-              )}
+                  <div className="md:w-32">
+                    <TextInput
+                      label="Total"
+                      name={`total-${index}`}
+                      value={Number(item.total || 0).toFixed(2)}
+                      onChange={() => {}}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                {formData.budgetLineItems.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveLineItem(index)}
+                    className={`hidden md:block text-red-500 hover:text-red-700 transition-colors ${index === 0 ? "mt-8.5" : "mt-3"}`}>
+                    <Icon icon="mdi:close-circle" className="text-xl" />
+                  </button>
+                )}
+              </div>
             </div>
           ))}
 
-          <div className="flex justify-between pt-2">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 pt-2">
             <button
               type="button"
               onClick={handleAddLineItem}
               className="text-sm flex items-center gap-1 text-[#D2091E] font-medium hover:text-[#a00014] transition-colors">
               <Icon icon="mdi:plus" className="text-lg" /> Add line item
             </button>
-            <div className="text-right pt-2 w-70">
+            <div className="text-right">
               <span className="text-sm text-gray-500 mr-4">Total Amount:</span>
               <span className="text-lg font-bold text-gray-900">
                 ₦ {totalSum.toFixed(2)}

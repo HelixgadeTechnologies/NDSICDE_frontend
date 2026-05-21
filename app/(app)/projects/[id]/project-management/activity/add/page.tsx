@@ -60,7 +60,7 @@ export default function AddProjectActivity() {
       setIsLoadingOutputs(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outputs/project/${projectId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

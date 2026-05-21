@@ -37,9 +37,9 @@ export default function TabComponent({
   }
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 min-w-0">
       {/* Tabs */}
-      <div className={`w-full relative h-14 flex items-center gap-4 p-2 bg-[#f1f5f9] rounded-lg`} style={{width: width ? width : '100%' }}>
+      <div className={`relative h-14 flex items-center gap-2 md:gap-4 p-2 bg-[#f1f5f9] rounded-lg overflow-x-auto custom-scrollbar`} style={{width: width ? width : '100%' }}>
         {data.map((d) => {
           const isActive = activeTab === d.id;
           return (

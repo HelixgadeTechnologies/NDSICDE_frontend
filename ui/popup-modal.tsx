@@ -31,8 +31,8 @@ export default function Modal({
           >
             {/* Modal */}
             <motion.div
-              className="bg-white rounded-2xl shadow-xl p-6 z-50 relative text-black"
-              style={{ 
+              className="bg-white rounded-2xl shadow-xl p-4 md:p-6 z-50 relative text-black max-h-[90vh] overflow-y-auto custom-scrollbar"
+              style={{
                 width: width,
                 maxWidth: maxWidth,
               }}

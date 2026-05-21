@@ -155,9 +155,9 @@ export default function ProjectTeam() {
   };
 
   return (
-    <div className="relative mt-12">
+    <div className="relative md:mt-12">
       {/* add button */}
-      <div className="absolute right-0 -top-18.75">
+      <div className="md:absolute md:right-0 md:-top-18.75 mb-4 md:mb-0">
         <Button
           content="Add Team Member"
           icon="si:add-fill"
@@ -166,8 +166,8 @@ export default function ProjectTeam() {
       </div>
 
       <CardComponent>
-        <div className="flex items-end justify-between gap-4 mb-5">
-          <div className="w-3/5">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-5">
+          <div className="w-full lg:w-3/5">
             <SearchInput
               name="search"
               value=""
@@ -175,7 +175,7 @@ export default function ProjectTeam() {
               onChange={() => {}}
             />
           </div>
-          <div className="w-2/5 flex items-end gap-4">
+          <div className="w-full lg:w-2/5 flex flex-col sm:flex-row items-stretch sm:items-end gap-4">
             <DropDown
               value=""
               name="role"

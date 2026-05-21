@@ -54,10 +54,10 @@ export default function ProjectOutputModal({
 
   // fetch outcomes when modal opens
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && projectId) {
       fetchOutcome();
     }
-  }, [isOpen]);
+  }, [isOpen, projectId]);
 
   // initialize form when modal opens and mode changes
   useEffect(() => {
@@ -107,7 +107,7 @@ export default function ProjectOutputModal({
     setIsLoadingOutcome(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outcomes`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/outcomes/project/${projectId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

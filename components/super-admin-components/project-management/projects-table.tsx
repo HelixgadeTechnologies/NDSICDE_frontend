@@ -134,8 +134,8 @@ export default function ProjectsTable() {
 
   return (
     <CardComponent>
-      <div className="flex justify-between items-end gap-4 mb-4">
-        <div className="w-2/5">
+      <div className="flex flex-col lg:flex-row lg:justify-between items-stretch lg:items-end gap-4 mb-4">
+        <div className="w-full lg:w-2/5">
           <SearchInput
             value={query}
             name="search"
@@ -143,7 +143,7 @@ export default function ProjectsTable() {
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-        <div className="w-3/5 flex items-end gap-4">
+        <div className="w-full lg:w-3/5 flex flex-col sm:flex-row items-stretch sm:items-end gap-4">
           <DropDown
             name="status"
             value={filters.status}

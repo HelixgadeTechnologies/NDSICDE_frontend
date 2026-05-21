@@ -44,12 +44,16 @@ export default function AllUserSettingsLayout({
     <>
       <ToastContainer position="top-right" />
       <div className="flex min-h-screen flex-col md:flex-row">
-        <div className="w-64 flex-none transition-all duration-300 ease-in-out no-print">
+        <div className="hidden md:block md:w-64 md:flex-none transition-all duration-300 ease-in-out no-print">
           <Sidebar />
         </div>
-        <section className="grow flex flex-col overflow-hidden">
+        {/* Sidebar still renders on mobile (it's fixed-positioned with its own open/close state) */}
+        <div className="md:hidden">
+          <Sidebar />
+        </div>
+        <section className="grow flex flex-col overflow-hidden min-w-0">
           <Navigation />
-          <div className="grow overflow-y-auto p-6 bg-white custom-scrollbar">
+          <div className="grow overflow-y-auto p-3 md:p-6 bg-white custom-scrollbar">
             <Breadcrumb />
             {children}
           </div>

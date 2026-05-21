@@ -16,7 +16,7 @@ export default function CardComponent({
 }: CardProps) {
   return (
     <div
-      className={`rounded-lg bg-white px-3 md:px-6 py-[35px] shadow-md border border-gray-200 w-full ${fitWidth ? "w-fit" : "w-full"} ${className}`}
+      className={`rounded-lg bg-white px-3 md:px-6 py-5 md:py-[35px] shadow-md border border-gray-200 w-full ${fitWidth ? "w-fit" : "w-full"} ${className}`}
       style={{ height }}
     >
       {children}

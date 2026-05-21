@@ -102,7 +102,7 @@ export default function Table<T>({
   const isEmpty = safeTableData.length === 0;
 
   return (
-    <div className="w-full h-fit overflow-visible rounded-lg border border-[#E5E7EB]">
+    <div className="w-full h-fit rounded-lg border border-[#E5E7EB] overflow-x-auto">
       {isEmpty ? (
         // Empty State
         <div className="w-full min-h-50 flex flex-col items-center justify-center p-8 text-center">

@@ -33,8 +33,8 @@ export default function StrategicObjectivesAndKPIToggle() {
 
   return (
     <CardComponent>
-      <div className="flex justify-between items-center gap-4 mb-4">
-        <div className="w-3/5">
+      <div className="flex flex-col lg:flex-row lg:justify-between items-stretch lg:items-center gap-4 mb-4">
+        <div className="w-full lg:w-3/5">
           <SearchInput
             placeholder="Search KPIs and Objectives"
             value={query}
@@ -42,7 +42,7 @@ export default function StrategicObjectivesAndKPIToggle() {
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-        <div className="w-2/5 flex gap-2 items-center">
+        <div className="w-full lg:w-2/5 flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
           <DropDown 
             name="status" 
             placeholder="All Status"

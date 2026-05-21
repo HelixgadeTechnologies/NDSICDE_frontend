@@ -230,8 +230,8 @@ export default function TeamMembersTable() {
       <CardComponent>
         <div className="relative">
           {/* Search and filters - always visible */}
-          <div className="flex items-end gap-4 mb-6">
-            <div className="w-3/5">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-4 mb-6">
+            <div className="w-full lg:w-3/5">
               <SearchInput
                 name="search"
                 placeholder="Search Team Members"
@@ -239,7 +239,7 @@ export default function TeamMembersTable() {
                 onChange={(e) => setQuery(e.target.value)}
               />
             </div>
-            <div className="w-2/5 flex gap-4">
+            <div className="w-full lg:w-2/5 flex flex-col sm:flex-row gap-4">
               <DropDown
                 value={filterRoleId}
                 label="Role"

@@ -26,8 +26,8 @@ export default function ManagementStaffDashboardTable() {
 
   return (
     <CardComponent>
-      <div className="mb-6 flex gap-4 items-end">
-        <div className="w-3/5">
+      <div className="mb-6 flex flex-col lg:flex-row gap-4 items-stretch lg:items-end">
+        <div className="w-full lg:w-3/5">
           <SearchInput
             name="search"
             value=""
@@ -35,7 +35,7 @@ export default function ManagementStaffDashboardTable() {
             placeholder="Search Projects"
           />
         </div>
-        <div className="w-2/5 flex gap-4 items-end">
+        <div className="w-full lg:w-2/5 flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
           <DropDown
             label="Status"
             placeholder="All Status"
