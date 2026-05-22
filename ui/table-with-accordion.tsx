@@ -107,7 +107,7 @@ export default function TableWithAccordion<T, K>({
                     </tr>
                     {isOpen && hasChildren && 
                       children.map((child, childIdx) => (
-                        <tr key={childIdx} className="h-11 text-[#4B5563] bg-white border-t border-[#E5E7EB] hover:bg-gray-50/50 transition-colors">
+                        <tr key={childIdx} className="h-14 text-[#4B5563] bg-white border-t border-[#E5E7EB] hover:bg-gray-50/50 transition-colors">
                           {renderChildRow(child, childIdx)}
                         </tr>
                       ))

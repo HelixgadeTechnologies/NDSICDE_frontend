@@ -35,7 +35,7 @@ export default function ReportActualValue() {
     "Activity Statement",
     "Actual Narrative",
     "Completion (%)",
-    "Actual Cost",
+    // "Actual Cost",
     "Actual Start Date",
     "Actual End Date",
     "Actions",
@@ -139,7 +139,7 @@ export default function ReportActualValue() {
                 <td className="px-6">{row.activityStatement}</td>
                 <td className="px-6">{row.actualNarrative}</td>
                 <td className="px-6">{row.percentageCompletion}%</td>
-                <td className="px-6">₦ {row.actualCost}</td>
+                {/* <td className="px-6">₦ {row.actualCost}</td> */}
                 <td className="px-6">
                   {formatDate(row.actualStartDate, "date-only")}
                 </td>

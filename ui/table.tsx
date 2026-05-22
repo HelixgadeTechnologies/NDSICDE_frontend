@@ -102,7 +102,7 @@ export default function Table<T>({
   const isEmpty = safeTableData.length === 0;
 
   return (
-    <div className="w-full h-fit rounded-lg border border-[#E5E7EB] overflow-x-auto">
+    <div className="w-full h-fit rounded-lg border border-[#E5E7EB] overflow-visible">
       {isEmpty ? (
         // Empty State
         <div className="w-full min-h-50 flex flex-col items-center justify-center p-8 text-center">
@@ -129,7 +129,8 @@ export default function Table<T>({
         </div>
       ) : (
         <>
-          {/* Table Content */}
+          {/* Table Content — horizontally scrolls only on mobile; overflow-visible on desktop so dropdowns (ActionMenu) aren't clipped */}
+          <div className="overflow-x-auto md:overflow-visible">
           <table className="min-w-full text-sm text-left">
             <thead>
               <tr className="bg-[#F5F7FA] h-13 text-[#111928] text-sm font-medium">
@@ -187,6 +188,7 @@ export default function Table<T>({
               })}
             </tbody>
           </table>
+          </div>
 
           {/* Pagination Controls */}
           {pagination && showPaginationControls && totalPages > 1 && (

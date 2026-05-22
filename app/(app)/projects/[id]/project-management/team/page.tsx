@@ -23,7 +23,7 @@ import { toast } from "react-toastify";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
 import { useParams } from "next/navigation";
-import { sortByCreatedAt } from "@/utils/ui-utility";
+import { sortByCreatedAt, toSentenceCase } from "@/utils/ui-utility";
 
 
 // Define the type for role from API
@@ -104,7 +104,7 @@ export default function ProjectTeam() {
   const head = [
     "Full Name",
     "Email Address",
-    "Role",
+    "Designation",
     "Project",
     "Last Active",
     "Actions",
@@ -206,8 +206,8 @@ export default function ProjectTeam() {
               <>
                 <td className="px-6">{row.fullName}</td>
                 <td className="px-6">{row.email}</td>
-                <td className="px-6">{row.roleName}</td>
-                <td className="px-6">{row.projectName}</td>
+                <td className="px-6">{row.roleName || "N/A"}</td>
+                <td className="px-6">{toSentenceCase(row.projectName)}</td>
                 <td className="px-6">{formatDate(row.updateAt, "time")}</td>
                 <td className="px-6 relative">
                   <div className="flex justify-center items-center">

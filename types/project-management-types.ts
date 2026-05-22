@@ -138,6 +138,7 @@ export type ProjectActivityTypes = {
   descriptionAction: string;
   deliveryDate: string;
   projectId: string;
+  createAt?: string;
 };
 
 export type ProjectActivityReportTypes = {

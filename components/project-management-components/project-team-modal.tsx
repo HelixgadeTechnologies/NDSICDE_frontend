@@ -266,8 +266,8 @@ export default function ProjectTeamModal({
           )}
           <DropDown
             name="roleId"
-            label="Role"
-            placeholder="Select Role"
+            label="Designation"
+            placeholder="Select designation"
             options={TEAM_DESIGNATIONS}
             value={formData.roleId}
             onChange={(value) => handleSelectChange("roleId", value)}

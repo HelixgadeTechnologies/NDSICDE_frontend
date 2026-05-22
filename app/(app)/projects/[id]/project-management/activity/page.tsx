@@ -2,22 +2,25 @@
 
 import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
-import Table from "@/ui/table";
-import { useEffect, useState } from "react";
+import TableWithAccordion from "@/ui/table-with-accordion";
+import { useEffect, useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
 import { ProjectActivityTypes } from "@/types/project-management-types";
 import { useEntityModal } from "@/utils/project-management-utility";
-import Link from "next/link";
 import DeleteModal from "@/ui/generic-delete-modal";
 import EditProjectActivity from "@/components/project-management-components/edit-project-activity";
 import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { formatDate } from "@/utils/dates-format-utility";
 import LoadingSpinner from "@/ui/loading-spinner";
 import ActionMenu from "@/ui/action-menu";
 import { sortByCreatedAt } from "@/utils/ui-utility";
+
+type ActivityWithLinkedOutput = ProjectActivityTypes & {
+  linkedOutputs: { outputStatement: string }[];
+};
 
 export default function ProjectActivity() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -27,7 +30,6 @@ export default function ProjectActivity() {
   const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const projectId = (params?.id as string) || "";
-  const router = useRouter();
 
   const head = [
     "Activity Statement",
@@ -38,6 +40,16 @@ export default function ProjectActivity() {
     "Responsible Person(s)",
     "Actions",
   ];
+
+  // Wrap each activity's outputStatement in an array so TableWithAccordion can render it as a child row
+  const tableData: ActivityWithLinkedOutput[] = useMemo(
+    () =>
+      data.map((a) => ({
+        ...a,
+        linkedOutputs: a.outputStatement ? [{ outputStatement: a.outputStatement }] : [],
+      })),
+    [data],
+  );
 
   // states for modals
   const {
@@ -126,19 +138,20 @@ export default function ProjectActivity() {
         {isLoading ? (
           <LoadingSpinner />
         ) : (
-          <Table
+          <TableWithAccordion<ActivityWithLinkedOutput, { outputStatement: string }>
             tableHead={head}
-            tableData={data}
-            checkbox
-            idKey={"activityId"}
-            onClick={(row) => router.push(`/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value`)}
-            renderRow={(row) => (
+            tableData={tableData}
+            childrenKey="linkedOutputs"
+            persistKey={`activity-accordion-${projectId}`}
+            renderRow={(row, _i, isOpen) => (
               <>
                 <td className="px-6">{row.activityStatement}</td>
-                <td className="px-6">{row.subActivity.toLowerCase() === "one off" ? 'One Off' : 'Multiple'}</td>
+                <td className="px-6">{row.subActivity?.toLowerCase() === "one off" ? "One Off" : "Multiple"}</td>
                 <td className="px-6">{row.activityFrequency}</td>
                 <td className="px-6">{row.activityTotalBudget}</td>
-                <td className="px-6">{formatDate(row.startDate, "date-only")} - {formatDate(row.endDate, "date-only")}</td>
+                <td className="px-6">
+                  {formatDate(row.startDate, "date-only")} - {formatDate(row.endDate, "date-only")}
+                </td>
                 <td className="px-6">{row.responsiblePerson}</td>
                 <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
                   <Icon
@@ -186,6 +199,20 @@ export default function ProjectActivity() {
                 </td>
               </>
             )}
+            renderChildRow={(child) => (
+              <td colSpan={head.length} className="px-6 py-4">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Linked Output
+                  </p>
+                  <p className="text-sm text-gray-900">
+                    {child.outputStatement || "No output linked to this activity."}
+                  </p>
+                </div>
+              </td>
+            )}
+            emptyStateMessage="No activities yet"
+            emptyStateSubMessage="There are no activities for this project yet. Click 'Add Activity' to create one."
           />
         )}
       </CardComponent>

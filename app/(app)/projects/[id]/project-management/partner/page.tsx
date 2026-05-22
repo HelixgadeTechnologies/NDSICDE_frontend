@@ -20,7 +20,7 @@ import { formatDate } from "@/utils/dates-format-utility";
 import { toast } from "react-toastify";
 import { getToken } from "@/lib/api/credentials";
 import { useParams } from "next/navigation";
-import { sortByCreatedAt } from "@/utils/ui-utility";
+import { sortByCreatedAt, toSentenceCase } from "@/utils/ui-utility";
 
 // Define the type for role from API
 interface ApiRole {
@@ -45,7 +45,7 @@ export default function ProjectPartner() {
   const head = [
     "Partner Organization Name",
     "Email Address",
-    "Role",
+    "Designation",
     "Project",
     "Last Active",
     "Actions",
@@ -182,7 +182,7 @@ export default function ProjectPartner() {
             <DropDown
               value=""
               name="role"
-              placeholder={rolesLoading ? "Loading roles..." : "All Role"}
+              placeholder={rolesLoading ? "Loading designations..." : "All Designation"}
               onChange={() => {}}
               options={roles}
               isDisabled={rolesLoading}
@@ -214,7 +214,7 @@ export default function ProjectPartner() {
                 <td className="px-6">{row.organizationName || "N/A"}</td>
                 <td className="px-6">{row.email}</td>
                 <td className="px-6">{row.roleName || "N/A"}</td>
-                <td className="px-6">{row.projectName || "N/A"}</td>
+                <td className="px-6">{toSentenceCase(row.projectName || "N/A")}</td>
                 <td className="px-6">{formatDate(row.updateAt, "time")}</td>
                 <td className="px-6 relative">
                   <div className="flex justify-center items-center">
