@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, KeyboardEvent, useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import { toSentenceCase } from '@/utils/ui-utility';
 
 interface TagInputProps {
   label?: string;
@@ -169,7 +170,7 @@ const TagInput: React.FC<TagInputProps> = ({
                 key={index}
                 className="inline-flex items-center gap-1 bg-gray-200 text-gray-700 px-2 py-1 rounded text-sm"
               >
-                {tag}
+                {tag.substring(0, 50) + '...'}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

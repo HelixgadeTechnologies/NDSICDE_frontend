@@ -11,7 +11,7 @@ export type CreateProjectFormDataType = {
   targetCommunities: string[];
   thematicAreas: string[];
   assignedManagers: string[];
-  strategicObjective: string;
+  strategicObjective: string[];
   status: string;
 };
 
@@ -24,14 +24,14 @@ export type ProjectApiResponse = {
   startDate: string;
   endDate: string;
   country: string;
+  // state/localGovernment/community are single strings today;
+  // backend will return comma-separated values once multi is supported
   state: string;
   localGovernment: string;
   community: string;
   thematicAreasOrPillar: string;
   strategicObjectiveId: string;
-  strategicObjective: {
-    statement: string
-  };
+  strategicObjectiveStatement: string;
   status: string;
   createAt: string;
   updateAt: string;

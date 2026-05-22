@@ -23,7 +23,6 @@ import { useRoleStore } from "@/store/role-store";
 import { convertDateToISO8601 } from "@/utils/dates-format-utility";
 import { getStrategicObjectives } from "@/lib/api/admin-api-calls";
 import { useSearchParams } from "next/navigation";
-import { useProjects } from "@/context/ProjectsContext";
 
 // ─── Sub-form prop types 
 
@@ -234,8 +233,8 @@ function FormTwo({
       newErrors.status = "Status is required";
     }
 
-    if (!formData.strategicObjective) {
-      newErrors.strategicObjective = "Strategic objective is required";
+    if (!formData.strategicObjective || formData.strategicObjective.length === 0) {
+      newErrors.strategicObjective = "At least one strategic objective is required";
     }
 
     setErrors(newErrors);
@@ -300,23 +299,21 @@ function FormTwo({
           tags={formData.assignedManagers}
           onChange={(managers) => handleChange("assignedManagers", managers)}
         />
-        <DropDown
-          label="Strategic Objective"
-          placeholder="Select a strategic objective"
-          onChange={(value) => handleChange("strategicObjective", value)}
-          options={
+        <TagInput
+          label="Strategic Objective(s)"
+          placeholder={
             isLoadingSO
-              ? [{ label: "Loading objectives...", value: "" }]
+              ? "Loading objectives..."
               : errorSO
-              ? [{ label: `Error: ${errorSO}`, value: "" }]
+              ? `Error: ${errorSO}`
               : strategicObjectives.length === 0
-              ? [{ label: "No objectives available", value: "" }]
-              : strategicObjectives
+              ? "No objectives available"
+              : "Select one or more strategic objectives"
           }
-          name="strategicObjective"
           value={formData.strategicObjective}
+          onChange={(values) => handleChange("strategicObjective", values)}
+          options={strategicObjectives.map((o) => o.label)}
           error={errors.strategicObjective}
-          isDisabled={isLoadingSO || strategicObjectives.length === 0}
         />
         <DropDown
           value={formData.status}
@@ -363,7 +360,7 @@ const EMPTY_FORM: CreateProjectFormDataType = {
   targetCommunities: [],
   thematicAreas: [],
   assignedManagers: [],
-  strategicObjective: "",
+  strategicObjective: [],
   status: "Active",
 };
 
@@ -380,8 +377,9 @@ export default function CreateNewProject() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { token } = useRoleStore();
 
-  // Pull already-loaded projects from context to avoid an extra API call
-  const { projects } = useProjects();
+  // Edit-mode project fetch (only fires when projectId is present)
+  const [isLoadingProject, setIsLoadingProject] = useState(false);
+  const [editProjectError, setEditProjectError] = useState<string | null>(null);
 
   // Strategic objectives
   const [strategicObjectives, setStrategicObjectives] = useState<
@@ -422,41 +420,60 @@ export default function CreateNewProject() {
     fetchStrategicObjectives();
   }, []);
 
-  // ── Pre-fill form when editing ──
+  // ── Fetch full project and pre-fill form when editing ──
   useEffect(() => {
-    if (!isEditMode || !projectId || projects.length === 0) return;
+    if (!isEditMode || !projectId) return;
 
-    const p = (projects as unknown as ProjectApiResponse[]).find(
-      (proj) => proj.projectId === projectId
-    );
+    const fetchProject = async () => {
+      setIsLoadingProject(true);
+      setEditProjectError(null);
+      try {
+        const res = await axios.get<{ data: ProjectApiResponse }>(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/projects/${projectId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-    if (!p) {
-      setSubmitError("Project not found. Please go back and try again.");
-      return;
-    }
+        const p = res.data?.data;
+        if (!p) {
+          setEditProjectError("Project not found. Please go back and try again.");
+          return;
+        }
 
-    // Normalise comma-separated strings into arrays
-    const toArray = (val: string | undefined): string[] => {
-      if (!val) return [];
-      return val.split(",").map((s) => s.trim()).filter(Boolean);
+        // Normalise comma-separated strings into arrays
+        const toArray = (val: string | undefined | null): string[] => {
+          if (!val) return [];
+          return val.split(",").map((s) => s.trim()).filter(Boolean);
+        };
+
+        setFormData({
+          projectName: p.projectName ?? "",
+          budgetCurrency: p.budgetCurrency ?? "",
+          totalBudgetAmount: String(p.totalBudgetAmount ?? ""),
+          startDate: p.startDate ? p.startDate.slice(0, 10) : "",
+          endDate: p.endDate ? p.endDate.slice(0, 10) : "",
+          country: p.country ?? "",
+          targetStates: toArray(p.state),
+          targetLGAs: toArray(p.localGovernment),
+          targetCommunities: toArray(p.community),
+          thematicAreas: toArray(p.thematicAreasOrPillar),
+          assignedManagers: [],
+          strategicObjective: p.strategicObjectiveStatement ? [p.strategicObjectiveStatement] : [],
+          status: p.status ?? "Active",
+        });
+      } catch (error) {
+        console.error("Failed to fetch project for edit:", error);
+        setEditProjectError("Failed to load project. Please try again.");
+      } finally {
+        setIsLoadingProject(false);
+      }
     };
 
-    setFormData({
-      projectName: p.projectName ?? "",
-      budgetCurrency: p.budgetCurrency ?? "",
-      totalBudgetAmount: String(p.totalBudgetAmount ?? ""),
-      startDate: p.startDate ? p.startDate.slice(0, 10) : "",
-      endDate: p.endDate ? p.endDate.slice(0, 10) : "",
-      country: p.country ?? "",
-      targetStates: toArray(p.state),
-      targetLGAs: toArray(p.localGovernment),
-      targetCommunities: toArray(p.community),
-      thematicAreas: toArray(p.thematicAreasOrPillar),
-      assignedManagers: [],
-      strategicObjective: p.strategicObjectiveId ?? "",
-      status: p.status ?? "Active",
-    });
-  }, [isEditMode, projectId, projects]);
+    fetchProject();
+  }, [isEditMode, projectId, token]);
 
   // ── Submit ──
   const handleFormSubmit = async () => {
@@ -464,6 +481,11 @@ export default function CreateNewProject() {
     setSubmitError(null);
 
     try {
+      // Convert selected statement labels back to IDs via the loaded options map
+      const selectedObjectiveIds = formData.strategicObjective
+        .map((stmt) => strategicObjectives.find((o) => o.label === stmt)?.value)
+        .filter((id): id is string => !!id);
+
       const submitData = {
         isCreate: !isEditMode,
         data: {
@@ -479,7 +501,8 @@ export default function CreateNewProject() {
           community: formData.targetCommunities[0] || "",
           thematicAreasOrPillar: formData.thematicAreas.join(", "),
           status: formData.status,
-          strategicObjectiveId: formData.strategicObjective,
+          // Backend currently accepts a single objective id; send only the first until multi is supported
+          strategicObjectiveId: selectedObjectiveIds[0] || "",
         },
       };
 
@@ -544,7 +567,17 @@ export default function CreateNewProject() {
               </div>
             )}
 
-            {activeTab === 1 ? (
+            {editProjectError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-red-600 text-sm">{editProjectError}</p>
+              </div>
+            )}
+
+            {isEditMode && isLoadingProject ? (
+              <div className="flex justify-center items-center py-20">
+                <Loader2 className="animate-spin" size={32} color="#D2091E" />
+              </div>
+            ) : activeTab === 1 ? (
               <FormOne
                 onClick={() => setActiveTab(2)}
                 formData={formData}
