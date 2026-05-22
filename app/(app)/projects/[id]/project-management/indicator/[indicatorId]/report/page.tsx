@@ -43,6 +43,8 @@ function ReportActualValueForm() {
   
   const projectId = params?.id as string;
   const indicatorId = params?.indicatorId as string;
+  const reportId = searchParams.get("reportId") || "";
+  const isEditMode = !!reportId;
   const token = getToken();
 
   const [orgKpiId, setOrgKpiId] = useState(searchParams.get("orgKpiId") || "");
@@ -144,6 +146,45 @@ function ReportActualValueForm() {
       .catch((err) => console.error("Failed to fetch indicator data:", err));
   }, [indicatorId, token]);
 
+  // When editing, fetch the existing report and prefill the actual values
+  useEffect(() => {
+    if (!isEditMode || !indicatorId) return;
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator_report/${indicatorId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      .then((res) => {
+        const payload = res.data;
+        const reports = Array.isArray(payload) ? payload : payload?.data ?? [];
+        const report = reports.find(
+          (r: any) => r.indicatorReportId === reportId,
+        );
+        if (!report) return;
+
+        setFormData((prev) => ({
+          ...prev,
+          actualDate: report.actualDate
+            ? report.actualDate.split("T")[0]
+            : prev.actualDate,
+          cumulativeActual:
+            report.cumulativeActual?.toString() ?? prev.cumulativeActual,
+          actualNarrative: report.actualNarrative ?? prev.actualNarrative,
+          attachmentUrl: report.attachmentUrl ?? prev.attachmentUrl,
+        }));
+
+        if (
+          Array.isArray(report.IndicatorReportDisaggregation) &&
+          report.IndicatorReportDisaggregation.length > 0
+        ) {
+          setActualDisaggItems(report.IndicatorReportDisaggregation);
+        }
+      })
+      .catch((err) =>
+        console.error("Failed to fetch existing report for edit:", err),
+      );
+  }, [isEditMode, reportId, indicatorId, token]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: any) => {
@@ -165,7 +206,7 @@ function ReportActualValueForm() {
     try {
       const payload = {
         payload: {
-          indicatorReportId: "",
+          indicatorReportId: isEditMode ? reportId : "",
           indicatorSource: formData.indicatorSource,
           orgKpiId: orgKpiId,
           thematicAreasOrPillar: formData.thematicArea,
@@ -177,12 +218,12 @@ function ReportActualValueForm() {
             : String(formData.cumulativeActual) || "",
           actualNarrative: formData.actualNarrative,
           attachmentUrl: formData.attachmentUrl,
-          status: "Pending",
+          status: "PENDING",
           indicatorId: indicatorId || "",
           resultTypeId: resultTypeId,
           IndicatorReportDisaggregation: actualDisaggItems.map((item) => ({
-            indicatorReportDisaggregationId: "",
-            indicatorReportId: "",
+            indicatorReportDisaggregationId: item.indicatorReportDisaggregationId || "",
+            indicatorReportId: isEditMode ? reportId : "",
             type: item.type,
             category: item.category,
             actual: formData.unitOfMeasure === "Status"
@@ -190,14 +231,20 @@ function ReportActualValueForm() {
               : Number(item.actual) || 0
           }))
         },
-        isCreate: true
+        isCreate: !isEditMode
       };
 
       const response = await indicatorApi.reportIndicator(payload);
 
       if (response.success) {
-        toast.success("Indicator report submitted successfully.");
-        router.push(`/projects/${projectId}`);
+        toast.success(
+          isEditMode
+            ? "Indicator report updated successfully."
+            : "Indicator report submitted successfully.",
+        );
+        router.push(
+          `/projects/${projectId}/project-management/indicator/${indicatorId}/view`,
+        );
       } else {
         toast.error(response.message || "Failed to submit indicator report.");
       }
@@ -214,7 +261,11 @@ function ReportActualValueForm() {
   return (
     <CardComponent>
       <Heading
-        heading="Indicator Reporting Format and Attributes"
+        heading={
+          isEditMode
+            ? "Edit Indicator Report"
+            : "Indicator Reporting Format and Attributes"
+        }
         className="text-center"
       />
       <form className="space-y-8 my-6" onSubmit={handleSubmit}>
@@ -226,6 +277,7 @@ function ReportActualValueForm() {
             value={formData.indicatorSource}
             name="indicatorSource"
             onChange={() => {}}
+            placeholder="N/A"
             isDisabled
           />
           <TextInput
@@ -233,6 +285,7 @@ function ReportActualValueForm() {
             value={formData.thematicArea}
             name="thematicArea"
             onChange={() => {}}
+            placeholder="N/A"
             isDisabled
           />
           <TextInput
@@ -240,6 +293,7 @@ function ReportActualValueForm() {
             name="statement"
             value={formData.statement}
             onChange={() => {}}
+            placeholder="N/A"
             isDisabled
           />
           <div className="grid grid-cols-2 gap-4">
@@ -248,6 +302,7 @@ function ReportActualValueForm() {
               value={formData.definition}
               name="definition"
               onChange={() => {}}
+              placeholder="N/A"
               isDisabled
             />
             <TextInput
@@ -255,6 +310,7 @@ function ReportActualValueForm() {
               value={formData.unitOfMeasure}
               name="unitOfMeasure"
               onChange={() => {}}
+              placeholder="N/A"
               isDisabled
             />
           </div>
@@ -263,6 +319,7 @@ function ReportActualValueForm() {
             value={formData.responsiblePersons.join(", ")}
             name="responsiblePersons"
             onChange={() => {}}
+            placeholder="N/A"
             isDisabled
           />
         </div>
@@ -278,6 +335,7 @@ function ReportActualValueForm() {
                 value={formData.baseLineDate}
                 name="baseLineDate"
                 onChange={() => {}}
+                placeholder="N/A"
                 isDisabled
               />
               <TextInput
@@ -285,6 +343,7 @@ function ReportActualValueForm() {
                 value={formData.cumulativeValue}
                 name="cumulativeValue"
                 onChange={() => {}}
+                placeholder="N/A"
                 isDisabled
               />
             </div>
@@ -299,6 +358,7 @@ function ReportActualValueForm() {
                 value={formData.targetDate}
                 name="targetDate"
                 onChange={() => {}}
+                placeholder="N/A"
                 isDisabled
               />
               <TextInput
@@ -306,6 +366,7 @@ function ReportActualValueForm() {
                 value={formData.cumulativeTarget}
                 name="cumulativeTarget"
                 onChange={() => {}}
+                placeholder="N/A"
                 isDisabled
               />
             </div>
@@ -383,7 +444,15 @@ function ReportActualValueForm() {
           />
           <div className="w-full">
               <Button
-                content={isSubmitting ? "Submitting..." : "Report Actual"}
+                content={
+                  isSubmitting
+                    ? isEditMode
+                      ? "Saving..."
+                      : "Submitting..."
+                    : isEditMode
+                    ? "Save Changes"
+                    : "Report Actual"
+                }
                 isLoading={isSubmitting}
                 onClick={() => {}}
                 type="submit"

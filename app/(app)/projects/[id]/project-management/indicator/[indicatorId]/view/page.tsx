@@ -5,19 +5,60 @@ import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "framer-motion";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
+import ActionMenu from "@/ui/action-menu";
+import DeleteModal from "@/ui/generic-delete-modal";
+import Modal from "@/ui/popup-modal";
+import Heading from "@/ui/text-heading";
+import { getToken } from "@/lib/api/credentials";
+import { toast } from "react-toastify";
+
+type IndicatorReport = {
+  indicatorReportId: string;
+  indicatorSource: string;
+  orgKpiId: string;
+  thematicAreasOrPillar: string;
+  indicatorStatement: string;
+  responsiblePersons: string;
+  actualDate: string;
+  cumulativeActual: string;
+  actualNarrative: string;
+  attachmentUrl: string;
+  status: string;
+  indicatorId: string;
+  resultTypeId: string;
+  IndicatorReportDisaggregation?: Array<{
+    indicatorReportDisaggregationId: string;
+    indicatorReportId: string;
+    type: string;
+    category: string;
+    actual: number;
+  }>;
+};
+
+const STATUS_STYLES: Record<string, string> = {
+  PENDING: "bg-amber-50 text-amber-700 border border-amber-200",
+  APPROVE: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  DECLINE: "bg-red-50 text-red-700 border border-red-200",
+};
 
 export default function ViewActualValue() {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<IndicatorReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedReport, setSelectedReport] = useState<IndicatorReport | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isApproveOpen, setIsApproveOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
 
   const params = useParams();
+  const router = useRouter();
   const projectId = params?.id as string;
   const indicatorId = params?.indicatorId as string;
+  const token = getToken();
 
   const head = [
     "Indicator Source",
@@ -26,39 +67,128 @@ export default function ViewActualValue() {
     "Responsible Person(s)",
     "Actual Date",
     "Cumulative Actual",
+    "Status",
     "Actions",
   ];
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      if (!indicatorId) return;
-      setIsLoading(true);
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator_report/indicator/${indicatorId}`
-        );
-        if (response.data?.success) {
-          setData(response.data.data || []);
-        } else {
-          console.warn("Failed to fetch reports.");
-        }
-      } catch (error) {
-        console.error("Error fetching reports:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchReports = async () => {
+    if (!indicatorId) return;
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator_report/${indicatorId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const payload = response.data;
+      // Support both `{success, data: [...]}` and a bare array response
+      const reports: IndicatorReport[] = Array.isArray(payload)
+        ? payload
+        : payload?.data ?? [];
+      setData(reports);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      toast.error("Failed to load reports for this indicator.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchReports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [indicatorId]);
 
+  const handleEdit = (report: IndicatorReport) => {
+    setActiveRowId(null);
+    router.push(
+      `/projects/${projectId}/project-management/indicator/${indicatorId}/report?reportId=${report.indicatorReportId}`,
+    );
+  };
+
+  const openDelete = (report: IndicatorReport) => {
+    setSelectedReport(report);
+    setIsDeleteOpen(true);
+    setActiveRowId(null);
+  };
+
+  const openApprove = (report: IndicatorReport) => {
+    setSelectedReport(report);
+    setIsApproveOpen(true);
+    setActiveRowId(null);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedReport) return;
+    setIsDeleting(true);
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator_report/${selectedReport.indicatorReportId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      toast.success("Report deleted successfully.");
+      setIsDeleteOpen(false);
+      setSelectedReport(null);
+      await fetchReports();
+    } catch (error) {
+      console.error("Error deleting report:", error);
+      toast.error("Failed to delete report. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!selectedReport) return;
+    setIsApproving(true);
+    try {
+      // Reuses the same POST endpoint with isCreate: false to update status
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator_report`,
+        {
+          isCreate: false,
+          payload: {
+            ...selectedReport,
+            status: "APPROVE",
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      toast.success("Report approved.");
+      setIsApproveOpen(false);
+      setSelectedReport(null);
+      await fetchReports();
+    } catch (error) {
+      console.error("Error approving report:", error);
+      toast.error("Failed to approve report. Please try again.");
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
   return (
-    <section className="relative mt-12 w-full max-w-[1200px] mx-auto pb-12">
-      <div className="absolute right-0 -top-18.75">
+    <section className="relative md:mt-12 w-full max-w-300 mx-auto pb-12">
+      <div className="md:absolute md:right-0 md:-top-18.75 mb-4 md:mb-0">
         <Button
           content="Report Actual Value"
           icon="si:add-fill"
-          onClick={() => window.location.assign(`/projects/${projectId}/project-management/indicator/${indicatorId}/report`)}
+          onClick={() =>
+            router.push(
+              `/projects/${projectId}/project-management/indicator/${indicatorId}/report`,
+            )
+          }
         />
       </div>
 
@@ -75,73 +205,126 @@ export default function ViewActualValue() {
           <Table
             tableHead={head}
             tableData={data}
-            checkbox
             idKey={"indicatorReportId"}
-            renderRow={(row) => (
-              <>
-                <td className="px-6">{row.indicatorSource || "N/A"}</td>
-                <td className="px-6">{row.thematicAreasOrPillar || "N/A"}</td>
-                <td className="px-6">{row.indicatorStatement || "N/A"}</td>
-                <td className="px-6">{row.responsiblePersons || "N/A"}</td>
-                <td className="px-6">
-                  {row.actualDate ? formatDate(row.actualDate) : "N/A"}
-                </td>
-                <td className="px-6">{row.cumulativeActual || "N/A"}</td>
-                <td className="px-6 relative">
-                  <div className="flex justify-center items-center">
-                    <Icon
-                      icon={"uiw:more"}
-                      width={22}
-                      height={22}
-                      className="cursor-pointer"
-                      color="#909CAD"
-                      onClick={() =>
-                        setActiveRowId((prev) =>
-                          prev === row.indicatorReportId ? null : row.indicatorReportId
-                        )
-                      }
+            emptyStateMessage="No reports yet"
+            emptyStateSubMessage="There are no submitted reports for this indicator. Click 'Report Actual Value' to add one."
+            renderRow={(row) => {
+              const statusKey = (row.status || "").toUpperCase();
+              const statusClass =
+                STATUS_STYLES[statusKey] ||
+                "bg-gray-50 text-gray-600 border border-gray-200";
+              return (
+                <>
+                  <td className="px-6">{row.indicatorSource || "N/A"}</td>
+                  <td className="px-6">{row.thematicAreasOrPillar || "N/A"}</td>
+                  <td className="px-6">{row.indicatorStatement || "N/A"}</td>
+                  <td className="px-6">{row.responsiblePersons || "N/A"}</td>
+                  <td className="px-6">
+                    {row.actualDate ? formatDate(row.actualDate, "date-only") : "N/A"}
+                  </td>
+                  <td className="px-6">{row.cumulativeActual || "N/A"}</td>
+                  <td className="px-6">
+                    <span
+                      className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}`}>
+                      {statusKey || "N/A"}
+                    </span>
+                  </td>
+                  <td
+                    className="px-6 relative"
+                    onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-center items-center">
+                      <Icon
+                        icon={"uiw:more"}
+                        width={22}
+                        height={22}
+                        className="cursor-pointer"
+                        color="#909CAD"
+                        onClick={() =>
+                          setActiveRowId((prev) =>
+                            prev === row.indicatorReportId
+                              ? null
+                              : row.indicatorReportId,
+                          )
+                        }
+                      />
+                    </div>
+                    <ActionMenu
+                      isOpen={activeRowId === row.indicatorReportId}
+                      items={[
+                        {
+                          type: "button",
+                          label: "Edit",
+                          icon: "ph:pencil-simple-line",
+                          onClick: () => handleEdit(row),
+                        },
+                        {
+                          type: "button",
+                          label: "Approve",
+                          icon: "ph:check-circle",
+                          onClick: () => openApprove(row),
+                          className:
+                            "border-y border-gray-300 hover:text-emerald-600",
+                        },
+                        {
+                          type: "button",
+                          label: "Delete",
+                          icon: "pixelarticons:trash",
+                          onClick: () => openDelete(row),
+                          className: "hover:text-(--primary-light)",
+                        },
+                      ]}
                     />
-                  </div>
-                  {activeRowId === row.indicatorReportId && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                        <ul className="text-sm">
-                          <li className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"ph:pencil-simple-line"}
-                              height={20}
-                              width={20}
-                            />
-                            Edit
-                          </li>
-                          <li className="cursor-pointer hover:text-(--primary-light) border-t border-gray-300 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"pixelarticons:trash"}
-                              height={20}
-                              width={20}
-                            />
-                            Remove
-                          </li>
-                        </ul>
-                      </motion.div>
-                    </AnimatePresence>
-                  )}
-                </td>
-              </>
-            )}
+                  </td>
+                </>
+              );
+            }}
           />
         )}
-        {!isLoading && data.length === 0 && (
-          <div className="py-12 flex flex-col items-center justify-center text-center">
-            <p className="text-gray-500 font-medium">No reports found.</p>
-          </div>
-        )}
       </CardComponent>
+
+      <DeleteModal
+        isOpen={isDeleteOpen}
+        onClose={() => {
+          setIsDeleteOpen(false);
+          setSelectedReport(null);
+        }}
+        heading="Delete this indicator report?"
+        subtitle="This action cannot be undone."
+        isDeleting={isDeleting}
+        onDelete={handleDelete}
+      />
+
+      <Modal
+        isOpen={isApproveOpen}
+        onClose={() => {
+          setIsApproveOpen(false);
+          setSelectedReport(null);
+        }}
+        maxWidth="400px">
+        <div className="flex justify-center text-emerald-600 mb-4">
+          <Icon icon="ph:check-circle" width={96} height={96} />
+        </div>
+        <Heading
+          heading="Approve this indicator report?"
+          subtitle="The report's status will be set to APPROVE."
+          className="text-center"
+        />
+        <div className="mt-4 flex justify-center mx-auto gap-2 w-45">
+          <Button
+            content="No"
+            onClick={() => {
+              setIsApproveOpen(false);
+              setSelectedReport(null);
+            }}
+            isSecondary
+          />
+          <Button
+            content="Yes"
+            isLoading={isApproving}
+            onClick={handleApprove}
+          />
+        </div>
+      </Modal>
     </section>
   );
 }

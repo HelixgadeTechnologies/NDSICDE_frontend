@@ -269,7 +269,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
               <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
                 {selectedIndicator.thematicAreasOrPillar || "No Pillar"}
               </span>
-              <div className="flex items-center gap-3 w-[400px]">
+              <div className="flex items-center gap-3 w-100">
                 <Button
                   content="View Report"
                   icon="fluent:eye-24-regular"

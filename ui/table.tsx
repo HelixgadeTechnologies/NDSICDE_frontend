@@ -1,7 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Checkbox from "./form/checkbox";
 import Heading from "./text-heading";
+import { Icon } from "@iconify/react";
+import { downloadTableAsPdf } from "@/utils/pdf-export";
 
 type TableProps<T> = {
   tableHead: Array<string>;
@@ -19,6 +21,9 @@ type TableProps<T> = {
   itemsPerPage?: number;
   showPaginationControls?: boolean;
   onPageChange?: (page: number) => void;
+  // PDF export
+  pdfTitle?: string;
+  enablePdfDownload?: boolean;
 };
 
 export default function Table<T>({
@@ -37,7 +42,11 @@ export default function Table<T>({
   itemsPerPage = 3,
   showPaginationControls = true,
   onPageChange,
+  // PDF export
+  pdfTitle = "Table Export",
+  enablePdfDownload = true,
 }: TableProps<T>) {
+  const tableRef = useRef<HTMLTableElement | null>(null);
   const [selectedIds, setSelectedIds] = useState<Array<T[keyof T]>>([]);
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -131,7 +140,7 @@ export default function Table<T>({
         <>
           {/* Table Content — horizontally scrolls only on mobile; overflow-visible on desktop so dropdowns (ActionMenu) aren't clipped */}
           <div className="overflow-x-auto md:overflow-visible">
-          <table className="min-w-full text-sm text-left">
+          <table ref={tableRef} className="min-w-full text-sm text-left">
             <thead>
               <tr className="bg-[#F5F7FA] h-13 text-[#111928] text-sm font-medium">
                 {checkbox && (
@@ -189,6 +198,19 @@ export default function Table<T>({
             </tbody>
           </table>
           </div>
+
+          {enablePdfDownload && (
+            <div className="flex justify-end border-t border-gray-200 bg-white px-6 py-3 no-print">
+              <button
+                type="button"
+                onClick={() => downloadTableAsPdf(tableRef.current, pdfTitle)}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#D2091E] hover:text-[#a00014] transition-colors cursor-pointer"
+                aria-label="Download table as PDF">
+                <Icon icon="material-symbols:download-rounded" width={16} height={16} />
+                Download as PDF
+              </button>
+            </div>
+          )}
 
           {/* Pagination Controls */}
           {pagination && showPaginationControls && totalPages > 1 && (

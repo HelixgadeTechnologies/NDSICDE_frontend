@@ -1,8 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 import Heading from "./text-heading";
 import { usePersistState } from "@/hooks/usePersistState";
+import { downloadTableAsPdf } from "@/utils/pdf-export";
 
 type TableWithAccordionProps<T, K> = {
   tableHead: Array<string>;
@@ -19,6 +20,9 @@ type TableWithAccordionProps<T, K> = {
   itemsPerPage?: number;
   showPaginationControls?: boolean;
   onPageChange?: (page: number) => void;
+  // PDF export
+  pdfTitle?: string;
+  enablePdfDownload?: boolean;
 };
 
 export default function TableWithAccordion<T, K>({
@@ -35,9 +39,29 @@ export default function TableWithAccordion<T, K>({
   itemsPerPage = 3,
   showPaginationControls = true,
   onPageChange,
+  pdfTitle = "Table Export",
+  enablePdfDownload = true,
 }: TableWithAccordionProps<T, K>) {
   const [openRows, setOpenRows] = usePersistState<number[]>(persistKey, []);
   const [currentPage, setCurrentPage] = useState(1);
+  const tableRef = useRef<HTMLTableElement | null>(null);
+
+  /**
+   * Snapshot of the table that includes all child rows expanded. We briefly
+   * open every row, let React paint, capture the DOM, then restore.
+   */
+  const handlePdfDownload = () => {
+    const previouslyOpen = openRows;
+    const allIndices = safeTableData.map((_, i) => i);
+    setOpenRows(allIndices);
+
+    // Give React a tick to render the expanded children
+    setTimeout(() => {
+      downloadTableAsPdf(tableRef.current, pdfTitle);
+      // Restore previous open state after export
+      setOpenRows(previouslyOpen);
+    }, 50);
+  };
 
   const safeTableData = Array.isArray(tableData) ? tableData : [];
   const totalItems = safeTableData.length;
@@ -82,8 +106,9 @@ export default function TableWithAccordion<T, K>({
           <Heading heading={emptyStateMessage} subtitle={emptyStateSubMessage} />
         </div>
       ) : (
+        <>
         <div className="overflow-x-auto">
-          <table className="min-w-full text-sm text-left">
+          <table ref={tableRef} className="min-w-full text-sm text-left">
             <thead>
               <tr className="bg-[#F5F7FA] h-13 text-[#111928] text-sm font-medium">
                 {tableHead.map((head, index) => (
@@ -124,6 +149,19 @@ export default function TableWithAccordion<T, K>({
               })}
             </tbody>
           </table>
+
+          {enablePdfDownload && (
+            <div className="flex justify-end border-t border-gray-200 bg-white px-6 py-3 no-print">
+              <button
+                type="button"
+                onClick={handlePdfDownload}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#D2091E] hover:text-[#a00014] transition-colors cursor-pointer"
+                aria-label="Download table as PDF">
+                <Icon icon="material-symbols:download-rounded" width={16} height={16} />
+                Download as PDF
+              </button>
+            </div>
+          )}
 
           {/* Pagination Controls */}
           {pagination && showPaginationControls && totalPages > 1 && (
@@ -229,6 +267,7 @@ export default function TableWithAccordion<T, K>({
             </div>
           )}
         </div>
+        </>
       )}
     </div>
   );
