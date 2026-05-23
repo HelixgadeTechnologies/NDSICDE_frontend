@@ -2,8 +2,9 @@
 
 import ActivityOverviewComponent from "@/components/team-member-components/activity-overview-chart-table";
 import CardComponent from "@/ui/card-wrapper";
+import DashboardStat from "@/ui/dashboard-stat-card";
 import Heading from "@/ui/text-heading";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ProjectResultResponse } from "@/types/project-result-dashboard";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -13,6 +14,36 @@ export default function ProjectActivityOverview() {
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const projectId = params.id;
+
+  // Look up the "Due to Start" and "In Progress" buckets from ACTIVITY_OVERVIEW
+  // (lenient match — handles minor wording differences from the API)
+  const activityStats = useMemo(() => {
+    const buckets = resultDashboardData?.ACTIVITY_OVERVIEW ?? [];
+    const findCategory = (needle: string) =>
+      buckets.find((b) =>
+        b.category?.toLowerCase().replace(/\s+/g, "").includes(needle),
+      );
+
+    const dueToStart = findCategory("duetostart") ?? findCategory("yettostart");
+    const inProgress = findCategory("inprogress");
+
+    return [
+      {
+        title: "Due to Start",
+        icon: "fluent:calendar-clock-24-regular",
+        value: dueToStart?.count ?? 0,
+        percentage: dueToStart?.percentage,
+        percentInfo: "of total activities",
+      },
+      {
+        title: "In Progress",
+        icon: "fluent:clock-arrow-circle-24-regular",
+        value: inProgress?.count ?? 0,
+        percentage: inProgress?.percentage,
+        percentInfo: "of total activities",
+      },
+    ];
+  }, [resultDashboardData]);
 
   useEffect(() => {
     const fetchResultDashboardData = async () => {
@@ -56,9 +87,9 @@ export default function ProjectActivityOverview() {
              <div className="h-8 bg-gray-100 animate-pulse rounded w-24"></div>
           </div>
           
-          <div className="h-[300px] flex flex-col md:flex-row gap-8 items-center">
+          <div className="h-75 flex flex-col md:flex-row gap-8 items-center">
             <div className="h-full w-full md:w-1/2 flex items-center justify-center">
-               <div className="h-64 w-64 rounded-full border-[16px] border-gray-50 animate-pulse"></div>
+               <div className="h-64 w-64 rounded-full border-16 border-gray-50 animate-pulse"></div>
             </div>
             <div className="h-full w-full md:w-1/2 flex flex-col justify-center space-y-6">
                {[1, 2, 3, 4, 5].map((i) => (
@@ -93,6 +124,10 @@ export default function ProjectActivityOverview() {
         />
         <ActivityOverviewComponent data={resultDashboardData} />
       </CardComponent>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <DashboardStat data={activityStats} />
+      </div>
     </section>
   );
 }

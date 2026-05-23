@@ -89,14 +89,13 @@ export default function Sidebar({ className }: BaseSidebarProps) {
         <section className="flex flex-col justify-between h-full w-full mt-10">
           <div className="space-y-1 border-b border-gray-200 pb-2">
             {sidebarConfig.items.map((nav, index) => {
-              // Special handling for project result dashboard to match any project ID
-              const isActive =
-                pathname === nav.href ||
-                (pathname.startsWith(nav.href + "/") &&
-                  !pathname.includes("/financial-dashboard") &&
-                  !pathname.includes("/project-management/"));
               const isDropdownOpen = openDropdowns.has(index);
               const hasChildren = nav.children && nav.children.length > 0;
+              // Leaf items must match the path exactly so sub-routes don't light up parents.
+              // Items with children stay active for any descendant route.
+              const isActive = hasChildren
+                ? pathname === nav.href || pathname.startsWith(nav.href + "/")
+                : pathname === nav.href;
 
               // Render header differently
               if (nav.isHeader) {

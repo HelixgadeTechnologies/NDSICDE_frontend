@@ -36,7 +36,6 @@ export default function Login() {
   const router = useRouter();
   const { login } = useRoleStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string>("");
 
   const [userData, setUserData] = useState({
     email: "",
@@ -47,7 +46,6 @@ export default function Login() {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
-    if (error) setError("");
   };
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -59,12 +57,11 @@ export default function Login() {
 
     // Validation
     if (!userData.email || !userData.password) {
-      setError("Please fill in all fields");
+      toast.error("Please fill in all fields");
       return;
     }
 
     setIsLoading(true);
-    setError("");
 
     try {
       // Make API call
@@ -121,8 +118,7 @@ export default function Login() {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      toast.error(`Error: ${error.message}`);
-      setError(
+      toast.error(
         error?.message ||
           "Login failed. Please check your credentials and try again.",
       );
@@ -157,12 +153,6 @@ export default function Login() {
           uppercase
           isBigger
         />
-
-        {error && (
-          <div className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
-            {error}
-          </div>
-        )}
 
         <div className="flex justify-between items-center">
           <Checkbox

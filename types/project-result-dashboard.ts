@@ -24,12 +24,17 @@ export type ProjectResultResponse = {
     percentage: number;
   }[];
   ACTIVITY_TABLE: {
-    activityId: string;
-    activityStatement: string;
-    targetFrequency: number;
-    actualFrequency: number;
-    performance: number;
-    status: string;
+    outputId: string;
+    outputStatement: string;
+    activityCount: number;
+    activities: {
+      activityId: string;
+      activityStatement: string;
+      targetFrequency: number;
+      actualFrequency: number;
+      performance: number;
+      status: string;
+    }[];
   }[];
   KPI_OVERVIEW_CHART: {
     monthly: {
