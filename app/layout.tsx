@@ -6,6 +6,8 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { ProjectsProvider } from "@/context/ProjectsContext";
 import { RequestsProvider } from "@/context/RequestsContext";
 import { StrategicObjectivesProvider } from "@/context/StrategicObjectivesContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const geistSans = Geist({
@@ -48,6 +50,7 @@ export default function RootLayout({
             <RequestsProvider>
               <SidebarProvider>
                 {children}
+                <ToastContainer position="top-right" />
               </SidebarProvider>
             </RequestsProvider>
           </StrategicObjectivesProvider>

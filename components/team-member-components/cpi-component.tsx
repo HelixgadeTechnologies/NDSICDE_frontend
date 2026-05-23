@@ -7,8 +7,10 @@ import DropDown from "@/ui/form/select-dropdown";
 import TabComponent from "@/ui/tab-component";
 import TableWithAccordion from "@/ui/table-with-accordion";
 import Heading from "@/ui/text-heading";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { Icon } from "@iconify/react";
 import { ProjectFinancialDashboardResponse } from "@/types/project-financial-dashboard";
+import { downloadChartAsPdf } from "@/utils/pdf-export";
 
 type OutputRow = ProjectFinancialDashboardResponse["ACTIVITY_FINANCIAL_DATA"][number];
 type ActivityRow = OutputRow["activities"][number];
@@ -58,6 +60,7 @@ function CPIStatusLegend() {
 }
 
 function CPIChart({ data }: { data: OutputRow[] }) {
+  const chartRef = useRef<HTMLDivElement>(null);
   // Chart always shows one bar per activity (flattened) — filtering happens via the Output dropdown.
   const chartData = data.flatMap((output) =>
     (output.activities ?? []).map((a) => {
@@ -72,16 +75,28 @@ function CPIChart({ data }: { data: OutputRow[] }) {
 
   return (
     <div>
-      <div className="flex justify-end mt-3">
-        <CPIStatusLegend />
+      <div ref={chartRef}>
+        <div className="flex justify-end mt-3">
+          <CPIStatusLegend />
+        </div>
+        <div className="h-75 mt-3">
+          <BarChartComponent
+            data={chartData}
+            xKey="name"
+            bars={[{ key: "cpi", label: "CPI", color: "#0047AB" }]}
+            legend={false}
+          />
+        </div>
       </div>
-      <div className="h-75 mt-3">
-        <BarChartComponent
-          data={chartData}
-          xKey="name"
-          bars={[{ key: "cpi", label: "CPI", color: "#0047AB" }]}
-          legend={false}
-        />
+      <div className="flex justify-end mt-3 no-print">
+        <button
+          type="button"
+          onClick={() => downloadChartAsPdf(chartRef.current, "Cost Performance Index (CPI)")}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#D2091E] hover:text-[#a00014] transition-colors cursor-pointer"
+          aria-label="Download chart as PDF">
+          <Icon icon="material-symbols:download-rounded" width={16} height={16} />
+          Download as PDF
+        </button>
       </div>
     </div>
   );

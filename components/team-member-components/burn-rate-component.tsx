@@ -1,9 +1,12 @@
 "use client";
 
+import { useRef } from "react";
+import { Icon } from "@iconify/react";
 import BarChartComponent from "@/ui/bar-chart";
 import TabComponent from "@/ui/tab-component";
 import TableWithAccordion from "@/ui/table-with-accordion";
 import { ProjectFinancialDashboardResponse } from "@/types/project-financial-dashboard";
+import { downloadChartAsPdf } from "@/utils/pdf-export";
 
 type OutputRow = ProjectFinancialDashboardResponse["BURN_RATE"][number];
 type ActivityRow = OutputRow["activities"][number];
@@ -59,6 +62,7 @@ function StatusLegend() {
 }
 
 function BurnRateChart({ burnData }: { burnData: OutputRow[] }) {
+  const chartRef = useRef<HTMLDivElement>(null);
   const isSingleOutput = burnData.length === 1;
 
   const chartData = isSingleOutput
@@ -73,16 +77,28 @@ function BurnRateChart({ burnData }: { burnData: OutputRow[] }) {
 
   return (
     <div>
-      <div className="flex justify-end mt-3">
-        <StatusLegend />
+      <div ref={chartRef}>
+        <div className="flex justify-end mt-3">
+          <StatusLegend />
+        </div>
+        <div className="h-75 mt-3">
+          <BarChartComponent
+            data={chartData}
+            xKey="name"
+            bars={[{ key: "burnRate", label: "Burn Rate (%)", color: "#D2091E" }]}
+            legend={false}
+          />
+        </div>
       </div>
-      <div className="h-75 mt-3">
-        <BarChartComponent
-          data={chartData}
-          xKey="name"
-          bars={[{ key: "burnRate", label: "Burn Rate (%)", color: "#D2091E" }]}
-          legend={false}
-        />
+      <div className="flex justify-end mt-3 no-print">
+        <button
+          type="button"
+          onClick={() => downloadChartAsPdf(chartRef.current, "Burn Rate")}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#D2091E] hover:text-[#a00014] transition-colors cursor-pointer"
+          aria-label="Download chart as PDF">
+          <Icon icon="material-symbols:download-rounded" width={16} height={16} />
+          Download as PDF
+        </button>
       </div>
     </div>
   );

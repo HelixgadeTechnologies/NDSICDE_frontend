@@ -7,7 +7,6 @@ import { useRoleStore } from "@/store/role-store";
 import Loading from "../loading";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ToastContainer } from "react-toastify";
 
 export default function AllUserSettingsLayout({
   children,
@@ -42,7 +41,6 @@ export default function AllUserSettingsLayout({
 
   return (
     <>
-      <ToastContainer position="top-right" />
       <div className="flex min-h-screen flex-col md:flex-row">
         <div className="hidden md:block md:w-64 md:flex-none transition-all duration-300 ease-in-out no-print">
           <Sidebar />

@@ -5,6 +5,7 @@ export type ProjectTeamDetails = {
   email: string;
   roleName: string;
   projectName: string;
+  createAt?: string;
   updateAt: string;
 };
 
@@ -27,6 +28,7 @@ export type ProjectImpactTypes = {
   responsiblePerson: string;
   projectId: string;
   resultTypeId: string;
+  createAt?: string;
 };
 
 // What you send to the API
@@ -168,6 +170,7 @@ export type ProjectOutcomeTypes = {
   responsiblePerson: string;
   projectId: string;
   resultTypeId: string;
+  createAt?: string;
 };
 
 export type ProjectOutputTypes = {
@@ -178,6 +181,7 @@ export type ProjectOutputTypes = {
   thematicAreas: string;
   responsiblePerson: string;
   projectId: string;
+  createAt?: string;
 };
 
 export interface DropdownOption {
