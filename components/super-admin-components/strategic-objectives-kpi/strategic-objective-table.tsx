@@ -1,20 +1,21 @@
 "use client";
 
-import Table from "@/ui/table";
+import TableWithAccordion from "@/ui/table-with-accordion";
+import ActionMenu from "@/ui/action-menu";
 import { useStrategicObjectivesAndKPIsModal } from "@/utils/strategic-objective-kpi-utility";
 import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import AddKPIModal from "./add-kpi-form";
+import EditKPIModal, { KPI } from "./edit-kpi-form";
 import axios from "axios";
 import { getStrategicObjectives } from "@/lib/api/admin-api-calls";
+import { getToken } from "@/lib/api/credentials";
+import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
-import LinkedKPIsModal from "./linked-kpis-modal";
 import { useStrategicObjectivesAndKPIsState } from "@/store/super-admin-store/strategic-objectives-kpi-store";
 import AddStrategicObjectiveModal from "./add-strategic-objective";
 import { toSentenceCase } from "@/utils/ui-utility";
 
-type ExpectedData = {
+type StrategicObjective = {
   createAt: string;
   linkedKpi: number;
   pillarLead: string;
@@ -25,95 +26,41 @@ type ExpectedData = {
   updateAt: string;
 };
 
-export default function SOTable({ searchQuery = "", statusFilter = "", onViewLinkedKPIs }: { searchQuery?: string; statusFilter?: string, onViewLinkedKPIs?: (id: string) => void }) {
-  const head = ["Objective Name", "Linked KPIs", "Status", "Actions"];
-  const [data, setData] = useState<ExpectedData[]>([]);
+type SOWithKPIs = StrategicObjective & { kpis: KPI[] };
+
+type SOTableProps = {
+  searchQuery?: string;
+  statusFilter?: string;
+  typeFilter?: string;
+};
+
+export default function SOTable({
+  searchQuery = "",
+  statusFilter = "",
+  typeFilter = "",
+}: SOTableProps) {
+  const head = ["Objective Name", "Number of KPIs", "Status", "Actions"];
+  const childHead = ["KPI Name", "Type", "Baseline → Target", "Actions"];
+
+  const [objectives, setObjectives] = useState<StrategicObjective[]>([]);
+  const [kpis, setKpis] = useState<KPI[]>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openLinkedKPI, setOpenLinkedKPI] = useState(false);
-  const [selectedObjectiveForKPIs, setSelectedObjectiveForKPIs] =
-    useState<string>("");
 
-  // Delete modal state
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  // SO deletion state
+  const [soToDelete, setSoToDelete] = useState<string | null>(null);
+  const [isDeletingSO, setIsDeletingSO] = useState(false);
 
-  // State to track which objective is being added to
-  const [selectedObjectiveId, setSelectedObjectiveId] = useState<string>("");
+  // KPI deletion state
+  const [kpiToDelete, setKpiToDelete] = useState<string | null>(null);
+  const [isDeletingKpi, setIsDeletingKpi] = useState(false);
 
-  const handleDeleteClick = (id: string) => {
-    setItemToDelete(id);
-    setShowDeleteModal(true);
-    setActiveRowId(null);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!itemToDelete) return;
-
-    try {
-      setIsDeleting(true);
-
-      // Optimistically update UI so it feels snappy, we'll refetch afterwards
-      setData((prev) =>
-        prev.filter((item) => item.strategicObjectiveId !== itemToDelete),
-      );
-
-      // Make DELETE request with proper endpoint and data
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/delete`,
-        {
-          data: {
-            strategicObjectiveId: itemToDelete,
-          },
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (response.status !== 200) {
-        throw new Error("Delete failed");
-      }
-
-      // After successful delete, refresh the table from the server
-      try {
-        const objectives = await getStrategicObjectives();
-        setData(objectives);
-      } catch (refetchError) {
-        console.error("Error refetching data after delete:", refetchError);
-      }
-    } catch (error: any) {
-      // Refetch to ensure we have correct data
-      try {
-        const objectives = await getStrategicObjectives();
-        setData(objectives);
-      } catch (refetchError) {
-        console.error("Error refetching data:", refetchError);
-      }
-
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to delete item";
-      console.error("Delete error:", error);
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-      setItemToDelete(null);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setShowDeleteModal(false);
-    setItemToDelete(null);
-  };
+  // KPI edit state (add is now a dedicated page route)
+  const [kpiToEdit, setKpiToEdit] = useState<KPI | null>(null);
+  const [showEditKpiModal, setShowEditKpiModal] = useState(false);
 
   const {
-    addKPI,
-    setAddKPI,
-    handleAddKPI,
     editStrategicObjective,
     setEditStrategicObjective,
     handleEditSO,
@@ -121,13 +68,33 @@ export default function SOTable({ searchQuery = "", statusFilter = "", onViewLin
 
   const { setField, resetForm } = useStrategicObjectivesAndKPIsState();
 
-  // Modified function to handle KPI addition with the objective ID
-  const handleAddKPIClick = (objectiveId: string) => {
-    setSelectedObjectiveId(objectiveId);
-    handleAddKPI(() => setActiveRowId(null));
+  const fetchAll = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [objectivesData, kpisRes] = await Promise.all([
+        getStrategicObjectives(),
+        axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/kpis`,
+        ),
+      ]);
+      setObjectives(objectivesData ?? []);
+      setKpis(kpisRes.data?.data ?? []);
+    } catch (err) {
+      console.error("Error loading strategic objectives + KPIs:", err);
+      setError("Failed to load strategic objectives");
+      setObjectives([]);
+      setKpis([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleEditClick = (row: ExpectedData) => {
+  useEffect(() => {
+    fetchAll();
+  }, []);
+
+  const handleEditSOClick = (row: StrategicObjective) => {
     setField("strategicObjectiveId", row.strategicObjectiveId);
     setField("strategicObjectiveStatement", row.statement);
     setField("thematicAreas", row.thematicAreas);
@@ -136,39 +103,91 @@ export default function SOTable({ searchQuery = "", statusFilter = "", onViewLin
     setActiveRowId(null);
   };
 
-  // Handle opening linked KPIs modal
-  const handleViewLinkedKPIs = (objectiveId: string) => {
-    if (onViewLinkedKPIs) {
-      onViewLinkedKPIs(objectiveId);
-    } else {
-      setSelectedObjectiveForKPIs(objectiveId);
-      setOpenLinkedKPI(true);
+  const handleDeleteSO = async () => {
+    if (!soToDelete) return;
+    setIsDeletingSO(true);
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/delete`,
+        {
+          data: { strategicObjectiveId: soToDelete },
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+      await fetchAll();
+    } catch (err: any) {
+      console.error("SO delete failed:", err);
+      toast.error(err?.response?.data?.message || "Failed to delete objective.");
+    } finally {
+      setIsDeletingSO(false);
+      setSoToDelete(null);
     }
+  };
+
+  // KPI actions
+  const handleEditKpiClick = (kpi: KPI) => {
+    setKpiToEdit(kpi);
+    setShowEditKpiModal(true);
     setActiveRowId(null);
   };
 
-  // Get strategic objectives data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const objectives = await getStrategicObjectives();
-        setData(objectives);
-      } catch (error) {
-        setError("Failed to load strategic objectives");
-        setData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleRowClick = (id: string) => {
-    setActiveRowId((prev) => (prev === id ? null : id));
+  const handleDeleteKpi = async () => {
+    if (!kpiToDelete) return;
+    setIsDeletingKpi(true);
+    try {
+      const token = getToken();
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/strategic-objectivesAndKpi/deleteKpi`,
+        {
+          data: { kpiId: kpiToDelete },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      await fetchAll();
+    } catch (err) {
+      console.error("KPI delete failed:", err);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsDeletingKpi(false);
+      setKpiToDelete(null);
+    }
   };
+
+  // Filter + group: each SO carries its KPIs (filtered by type + search).
+  // SO row is kept if it matches statusFilter and either matches the search itself
+  // or has at least one matching KPI.
+  const filteredData: SOWithKPIs[] = (() => {
+    const q = searchQuery.toLowerCase();
+
+    return objectives
+      .filter((so) => !statusFilter || so.status === statusFilter)
+      .map((so) => {
+        const linked = kpis
+          .filter((k) => k.strategicObjectiveId === so.strategicObjectiveId)
+          .filter((k) => !typeFilter || k.type === typeFilter)
+          .filter((k) => {
+            if (!q) return true;
+            return (
+              k.statement?.toLowerCase().includes(q) ||
+              k.itemInMeasure?.toLowerCase().includes(q)
+            );
+          });
+
+        return { ...so, kpis: linked };
+      })
+      .filter((so) => {
+        // Keep SO if it matches the search itself, or has matching KPIs after filtering.
+        if (!q && !typeFilter) return true;
+        const soMatches =
+          !q ||
+          so.statement?.toLowerCase().includes(q) ||
+          so.thematicAreas?.toLowerCase().includes(q);
+        return soMatches || so.kpis.length > 0;
+      });
+  })();
 
   if (loading) {
     return (
@@ -187,7 +206,7 @@ export default function SOTable({ searchQuery = "", statusFilter = "", onViewLin
       <div className="p-4 bg-red-50 border border-red-200 rounded-md">
         <p className="text-red-600">{error}</p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={fetchAll}
           className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
           Retry
         </button>
@@ -195,52 +214,38 @@ export default function SOTable({ searchQuery = "", statusFilter = "", onViewLin
     );
   }
 
-  if (data.length === 0) {
-    return (
-      <div className="p-8 text-center">
-        <p className="text-gray-500">No strategic objectives found.</p>
-      </div>
-    );
-  }
-
-  const filteredData = data.filter((item) => {
-    const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = !searchQuery || 
-      item.statement?.toLowerCase().includes(searchLower) ||
-      item.thematicAreas?.toLowerCase().includes(searchLower);
-      
-    const matchesStatus = !statusFilter || item.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
-
   return (
     <section>
-      <Table
-        checkbox
-        idKey="strategicObjectiveId"
+      <TableWithAccordion<SOWithKPIs, KPI>
         tableHead={head}
+        childTableHead={childHead}
         tableData={filteredData}
-        renderRow={(row) => (
+        childrenKey="kpis"
+        persistKey="so-kpi-accordion"
+        pdfTitle="Strategic Objectives & KPIs"
+        emptyStateMessage="No strategic objectives found"
+        emptyStateSubMessage="There are no strategic objectives matching the current filters."
+        renderRow={(so) => (
           <>
-            <td className="px-6 py-4 max-w-125">{toSentenceCase(row.statement ?? "N/A")}</td>
-            <td
-              className="px-6 py-4">
-              {row.linkedKpi !== undefined ? row.linkedKpi : 0}
+            <td className="px-6 py-4 max-w-125 text-sm text-gray-800 font-medium">
+              {toSentenceCase(so.statement ?? "N/A")}
+            </td>
+            <td className="px-6 py-4 text-sm text-gray-700">
+              {so.kpis.length} {so.kpis.length === 1 ? "KPI" : "KPIs"}
             </td>
             <td className="px-6 py-4">
               <span
-                className={`px-2 py-1 rounded-full text-xs ${
-                  row.status === "Active"
+                className={`text-xs font-medium ${
+                  so.status === "Active"
                     ? "text-green-500"
-                    : row.status === "Inactive"
+                    : so.status === "Inactive"
                       ? "text-red-500"
                       : "text-yellow-500"
                 }`}>
-                {toSentenceCase(row.status ?? "Unknown")}
+                {toSentenceCase(so.status ?? "Unknown")}
               </span>
             </td>
-            <td className="px-6 py-4 relative">
+            <td className="px-6 py-4 relative" onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-center items-center">
                 <Icon
                   icon="uiw:more"
@@ -248,86 +253,122 @@ export default function SOTable({ searchQuery = "", statusFilter = "", onViewLin
                   height={22}
                   className="cursor-pointer hover:text-gray-700 transition-colors"
                   color="#909CAD"
-                  onClick={() => handleRowClick(row.strategicObjectiveId)}
+                  onClick={() =>
+                    setActiveRowId((prev) =>
+                      prev === so.strategicObjectiveId ? null : so.strategicObjectiveId,
+                    )
+                  }
                 />
               </div>
-              {activeRowId === row.strategicObjectiveId && (
-                <AnimatePresence>
-                  <motion.div
-                    initial={{ y: -10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -10, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-52.5">
-                    <ul className="text-sm">
-                      <li
-                        onClick={() =>
-                          handleAddKPIClick(row.strategicObjectiveId)
-                        }
-                        className="cursor-pointer hover:bg-gray-50 flex gap-2 p-3 items-center">
-                        <Icon
-                          icon="fluent:arrow-growth-24-regular"
-                          height={20}
-                          width={20}
-                        />
-                        Add Org KPI
-                      </li>
-                      <li
-                        onClick={() => handleViewLinkedKPIs(row.strategicObjectiveId)}
-                        className="cursor-pointer hover:bg-gray-50 flex gap-2 border-y border-gray-200 p-3 items-center">
-                        <Icon
-                          icon="hugeicons:view"
-                          height={20}
-                          width={20}
-                        />
-                        View Linked KPIs
-                      </li>
-                      <li
-                        onClick={() => handleEditClick(row)}
-                        className="cursor-pointer hover:bg-gray-50 flex gap-2 border-y border-gray-200 p-3 items-center">
-                        <Icon
-                          icon="ph:pencil-simple-line"
-                          height={20}
-                          width={20}
-                        />
-                        Edit
-                      </li>
-                      <li
-                        onClick={() =>
-                          handleDeleteClick(row.strategicObjectiveId)
-                        }
-                        className="cursor-pointer hover:bg-red-50 text-red-600 flex gap-2 p-3 items-center">
-                        <Icon
-                          icon="pixelarticons:trash"
-                          height={20}
-                          width={20}
-                        />
-                        Delete
-                      </li>
-                    </ul>
-                  </motion.div>
-                </AnimatePresence>
-              )}
+              <ActionMenu
+                isOpen={activeRowId === so.strategicObjectiveId}
+                items={[
+                  {
+                    type: "link",
+                    label: "Add Org KPI",
+                    icon: "fluent:arrow-growth-24-regular",
+                    href: `/strategic-objectives/add-kpi?soId=${so.strategicObjectiveId}`,
+                  },
+                  {
+                    type: "button",
+                    label: "Edit",
+                    icon: "ph:pencil-simple-line",
+                    onClick: () => handleEditSOClick(so),
+                    className: "border-y border-gray-200",
+                  },
+                  {
+                    type: "button",
+                    label: "Delete",
+                    icon: "pixelarticons:trash",
+                    onClick: () => {
+                      setSoToDelete(so.strategicObjectiveId);
+                      setActiveRowId(null);
+                    },
+                    className: "hover:text-(--primary-light)",
+                  },
+                ]}
+              />
+            </td>
+          </>
+        )}
+        renderChildRow={(kpi) => (
+          <>
+            <td className="px-6 py-3 text-sm text-gray-700 max-w-125">
+              {kpi.statement ?? "—"}
+            </td>
+            <td className="px-6 py-3 text-sm text-gray-700">{kpi.type ?? "—"}</td>
+            <td className="px-6 py-3 text-sm text-gray-700">
+              <span className="text-gray-500">{kpi.cumulativeValue ?? 0}</span>{" "}
+              <span className="text-gray-300">→</span>{" "}
+              <span className="font-medium">{kpi.cumulativeTarget ?? 0}</span>
+            </td>
+            <td className="px-6 py-3 relative" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-center items-center">
+                <Icon
+                  icon="uiw:more"
+                  width={22}
+                  height={22}
+                  className="cursor-pointer hover:text-gray-700 transition-colors"
+                  color="#909CAD"
+                  onClick={() =>
+                    setActiveRowId((prev) =>
+                      prev === kpi.kpiId ? null : kpi.kpiId,
+                    )
+                  }
+                />
+              </div>
+              <ActionMenu
+                isOpen={activeRowId === kpi.kpiId}
+                items={[
+                  {
+                    type: "button",
+                    label: "Edit",
+                    icon: "ph:pencil-simple-line",
+                    onClick: () => handleEditKpiClick(kpi),
+                  },
+                  {
+                    type: "button",
+                    label: "Delete",
+                    icon: "pixelarticons:trash",
+                    onClick: () => {
+                      setKpiToDelete(kpi.kpiId);
+                      setActiveRowId(null);
+                    },
+                    className: "hover:text-(--primary-light) border-t border-gray-200",
+                  },
+                ]}
+              />
             </td>
           </>
         )}
       />
 
-      {addKPI && (
-        <AddKPIModal
-          isOpen={addKPI}
-          onClose={() => setAddKPI(false)}
-          strategicObjectiveId={selectedObjectiveId}
-        />
-      )}
+      <EditKPIModal
+        isOpen={showEditKpiModal}
+        onClose={() => {
+          setShowEditKpiModal(false);
+          setKpiToEdit(null);
+        }}
+        kpiData={kpiToEdit}
+        onSuccess={fetchAll}
+      />
 
       <DeleteModal
-        isOpen={showDeleteModal}
-        onClose={handleDeleteCancel}
+        isOpen={!!soToDelete}
+        onClose={() => setSoToDelete(null)}
         heading="Delete Strategic Objective"
         subtitle="Are you sure you want to delete this strategic objective? This action cannot be undone."
-        onDelete={handleDeleteConfirm}
-        isDeleting={isDeleting}
+        onDelete={handleDeleteSO}
+        isDeleting={isDeletingSO}
+      />
+
+      <DeleteModal
+        isOpen={!!kpiToDelete}
+        onClose={() => setKpiToDelete(null)}
+        heading="Delete KPI"
+        subtitle="Are you sure you want to delete this KPI? This action cannot be undone."
+        onDelete={handleDeleteKpi}
+        isDeleting={isDeletingKpi}
       />
 
       {editStrategicObjective && (
@@ -338,16 +379,7 @@ export default function SOTable({ searchQuery = "", statusFilter = "", onViewLin
             setEditStrategicObjective(false);
             resetForm();
           }}
-          onSubmit={() => window.location.reload()}
-        />
-      )}
-
-      {/* Linked KPI modal */}
-      {openLinkedKPI && (
-        <LinkedKPIsModal
-          isOpen={openLinkedKPI}
-          onClose={() => setOpenLinkedKPI(false)}
-          strategicObjectiveId={selectedObjectiveForKPIs}
+          onSubmit={() => fetchAll()}
         />
       )}
     </section>

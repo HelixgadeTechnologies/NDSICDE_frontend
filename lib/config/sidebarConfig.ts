@@ -152,6 +152,12 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
         icon: "fluent:arrow-growth-24-regular",
       },
       {
+        id: "organizational-kpi",
+        name: "Org KPI Dashboard",
+        href: "/organizational-kpi",
+        icon: "carbon:result-new",
+      },
+      {
         id: "user-management",
         name: "User Management",
         href: "/user-management",
@@ -174,12 +180,6 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
         name: "Project Performance Dashboard",
         href: "/performance-analytics",
         icon: "bi:gear",
-      },
-      {
-        id: "organizational-kpi",
-        name: "Org KPI Dashboard",
-        href: "/organizational-kpi",
-        icon: "carbon:result-new",
       },
     ],
   },

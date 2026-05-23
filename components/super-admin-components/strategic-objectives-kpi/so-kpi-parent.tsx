@@ -4,32 +4,12 @@ import { useState } from "react";
 import CardComponent from "@/ui/card-wrapper";
 import SearchInput from "@/ui/form/search";
 import DropDown from "@/ui/form/select-dropdown";
-import TabComponent from "@/ui/tab-component";
 import SOTable from "./strategic-objective-table";
-import KPITable from "./kpi-table";
 
 export default function StrategicObjectivesAndKPIToggle() {
-  const tabs = [
-    { tabName: "Strategic Objectives", id: 1 },
-    { tabName: "Key Performance Indicators", id: 2 },
-  ];
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
-  const [activeTab, setActiveTab] = useState(1);
-  const [soFilterId, setSoFilterId] = useState("");
-
-  const handleTabChange = (index: number) => {
-    setActiveTab(index);
-    if (index === 2) {
-      setSoFilterId("");
-    }
-  };
-
-  const handleViewLinkedKPIs = (soId: string) => {
-    setSoFilterId(soId);
-    setActiveTab(2);
-  };
 
   return (
     <CardComponent>
@@ -43,33 +23,35 @@ export default function StrategicObjectivesAndKPIToggle() {
           />
         </div>
         <div className="w-full lg:w-2/5 flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
-          <DropDown 
-            name="status" 
+          <DropDown
+            name="status"
             placeholder="All Status"
-            value={statusFilter} 
-            onChange={(val: string) => setStatusFilter(val)} 
-            options={[{label: "All Status", value: ""}, {label: "Active", value: "Active"}, {label: "Inactive", value: "Inactive"}]} 
+            value={statusFilter}
+            onChange={(val: string) => setStatusFilter(val)}
+            options={[
+              { label: "All Status", value: "" },
+              { label: "Active", value: "Active" },
+              { label: "Inactive", value: "Inactive" },
+            ]}
           />
-          <DropDown 
-            name="type" 
-            placeholder="All Types"
-            value={typeFilter} 
-            onChange={(val: string) => setTypeFilter(val)} 
-            options={[{label: "All Types", value: ""}, {label: "Quantitative", value: "Quantitative"}, {label: "Qualitative", value: "Qualitative"}]} 
+          <DropDown
+            name="type"
+            placeholder="All KPI Types"
+            value={typeFilter}
+            onChange={(val: string) => setTypeFilter(val)}
+            options={[
+              { label: "All Types", value: "" },
+              { label: "Quantitative", value: "Quantitative" },
+              { label: "Qualitative", value: "Qualitative" },
+            ]}
           />
         </div>
       </div>
-      <TabComponent
-        data={tabs}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        renderContent={(tabId) => {
-          if (tabId === 1) {
-            return <SOTable searchQuery={query} statusFilter={statusFilter} onViewLinkedKPIs={handleViewLinkedKPIs} />;
-          } else {
-            return <KPITable searchQuery={query} typeFilter={typeFilter} soFilterId={soFilterId} />;
-          }
-        }}
+
+      <SOTable
+        searchQuery={query}
+        statusFilter={statusFilter}
+        typeFilter={typeFilter}
       />
     </CardComponent>
   );

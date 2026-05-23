@@ -206,6 +206,7 @@ function ReportActualValueForm() {
     try {
       const payload = {
         payload: {
+          projectId: projectId,
           indicatorReportId: isEditMode ? reportId : "",
           indicatorSource: formData.indicatorSource,
           orgKpiId: orgKpiId,

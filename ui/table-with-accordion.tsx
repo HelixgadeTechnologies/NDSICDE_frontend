@@ -130,7 +130,18 @@ export default function TableWithAccordion<T, K>({
                     <tr onClick={() => toggleRow(i)} className="h-15 text-[#6B7280] bg-gray-50 transition-colors cursor-pointer">
                       {renderRow(row, i, isOpen, () => toggleRow(i))}
                     </tr>
-                    {isOpen && hasChildren && 
+                    {isOpen && hasChildren && childTableHead && childTableHead.length > 0 && (
+                      <tr className="bg-[#FAFBFC] text-[10px] uppercase tracking-wider text-[#6B7280] font-semibold">
+                        {childTableHead.map((head, idx) => (
+                          <th
+                            key={idx}
+                            className="px-6 py-2 text-left whitespace-nowrap border-t border-[#E5E7EB]">
+                            {head}
+                          </th>
+                        ))}
+                      </tr>
+                    )}
+                    {isOpen && hasChildren &&
                       children.map((child, childIdx) => (
                         <tr key={childIdx} className="h-14 text-[#4B5563] bg-white border-t border-[#E5E7EB] hover:bg-gray-50/50 transition-colors">
                           {renderChildRow(child, childIdx)}

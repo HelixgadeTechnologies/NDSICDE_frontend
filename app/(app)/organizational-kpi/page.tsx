@@ -58,7 +58,7 @@ export default function OrganizationalKPI() {
         {loading ? (
           <>
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-[158px] w-full rounded-lg bg-white border border-gray-200 p-4 flex flex-col justify-between">
+              <div key={i} className="h-40 w-full rounded-lg bg-white border border-gray-200 p-4 flex flex-col justify-between">
                 <div className="flex justify-between items-center">
                   <div className="h-4 bg-gray-200 animate-pulse rounded w-1/3"></div>
                   <div className="h-5 w-5 bg-gray-200 animate-pulse rounded-full"></div>

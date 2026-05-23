@@ -10,6 +10,11 @@ export const breadcrumbs = [
     header: "Account Settings",
   },
   {
+    href: "/strategic-objectives/add-kpi",
+    header: "Add Organizational KPI",
+    subtitle: "Define a KPI under the selected strategic objective",
+  },
+  {
     href: "/strategic-objectives",
     header: "Strategic Objectives and KPIs",
   },

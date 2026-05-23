@@ -37,6 +37,7 @@ export default function AddIndicatorForm() {
   const searchParams = useSearchParams();
   const resultType = searchParams.get("resultType") ?? "impact";
   const resultId = searchParams.get("resultId") ?? "";
+  const projectId = searchParams.get("projectId") ?? "";
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
@@ -255,6 +256,7 @@ export default function AddIndicatorForm() {
     const payload = {
       isCreate: true,
       data: {
+        projectId: projectId,
         indicatorId: formData.indicatorId,
         indicatorSource: formData.indicatorSource,
         orgKpiId: formData.orgKpiId,
