@@ -19,29 +19,36 @@ type RequestsContextType = {
   fetchRetirementById: (id: string) => Promise<RetirementRequestType | null>;
 };
 
-const RequestsContext = createContext<RequestsContextType | undefined>(undefined);
+const RequestsContext = createContext<RequestsContextType | undefined>(
+  undefined,
+);
 
 export function RequestsProvider({ children }: { children: ReactNode }) {
   const [requests, setRequests] = useState<ProjectRequestResponseType[]>([]);
   const [retirements, setRetirements] = useState<RetirementRequestType[]>([]);
-  const [selectedRequest, setSelectedRequest] = useState<ProjectRequestResponseType | null>(null);
-  const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<ProjectRequestResponseType | null>(null);
+  const [selectedRetirement, setSelectedRetirement] =
+    useState<RetirementRequestType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRequestById = async (id: string): Promise<ProjectRequestResponseType | null> => {
+  const fetchRequestById = async (
+    id: string,
+  ): Promise<ProjectRequestResponseType | null> => {
     setIsLoading(true);
     setError(null);
     try {
       // Uses the explicitly requested endpoint for finding single requests
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${id}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${id}`,
       );
       const data = res.data?.data || null;
       setSelectedRequest(data);
       return data;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to load request details";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load request details";
       setError(errorMessage);
       console.error(err);
       setSelectedRequest(null);
@@ -51,18 +58,23 @@ export function RequestsProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const fetchRetirementById = async (id: string): Promise<RetirementRequestType | null> => {
+  const fetchRetirementById = async (
+    id: string,
+  ): Promise<RetirementRequestType | null> => {
     setIsLoading(true);
     setError(null);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/retirement/${id}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/retirement/${id}`,
       );
       const data = res.data?.data || null;
       setSelectedRetirement(data);
       return data;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to load retirement details";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to load retirement details";
       setError(errorMessage);
       console.error(err);
       setSelectedRetirement(null);
@@ -72,29 +84,35 @@ export function RequestsProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const fetchRequests = async (params?: any): Promise<ProjectRequestResponseType[]> => {
+  const fetchRequests = async (
+    params?: any,
+  ): Promise<ProjectRequestResponseType[]> => {
     setIsLoading(true);
     setError(null);
     try {
-      const queryParams: any = { type: 'request' };
+      const queryParams: any = { type: "request" };
       if (params) {
-          if (params.search) queryParams.search = params.search;
-          if (params.status && params.status !== "All") queryParams.status = params.status;
-          if (params.projectId) queryParams.projectId = params.projectId;
-          if (params.startDate) queryParams.startDate = params.startDate;
-          if (params.endDate) queryParams.endDate = params.endDate;
+        if (params.search) queryParams.search = params.search;
+        if (params.status && params.status !== "All")
+          queryParams.status = params.status;
+        if (params.projectId) queryParams.projectId = params.projectId;
+        if (params.startDate) queryParams.startDate = params.startDate;
+        if (params.endDate) queryParams.endDate = params.endDate;
       }
 
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list`,
-        { params: queryParams }
+        { params: queryParams },
       );
-      
-      const data = sortByCreatedAt(res.data?.data || []);
+
+      const data = sortByCreatedAt(
+        res.data?.data || [],
+      ) as ProjectRequestResponseType[];
       setRequests(data);
       return data;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to load requests";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load requests";
       setError(errorMessage);
       console.error(err);
       return [];
@@ -103,29 +121,35 @@ export function RequestsProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const fetchRetirements = async (params?: any): Promise<RetirementRequestType[]> => {
+  const fetchRetirements = async (
+    params?: any,
+  ): Promise<RetirementRequestType[]> => {
     setIsLoading(true);
     setError(null);
     try {
-      const queryParams: any = { type: 'retirement' };
+      const queryParams: any = { type: "retirement" };
       if (params) {
-          if (params.search) queryParams.search = params.search;
-          if (params.status && params.status !== "All") queryParams.status = params.status;
-          if (params.projectId) queryParams.projectId = params.projectId;
-          if (params.startDate) queryParams.startDate = params.startDate;
-          if (params.endDate) queryParams.endDate = params.endDate;
+        if (params.search) queryParams.search = params.search;
+        if (params.status && params.status !== "All")
+          queryParams.status = params.status;
+        if (params.projectId) queryParams.projectId = params.projectId;
+        if (params.startDate) queryParams.startDate = params.startDate;
+        if (params.endDate) queryParams.endDate = params.endDate;
       }
 
       const res = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/request-retirement-dashboard/list`,
-        { params: queryParams }
+        { params: queryParams },
       );
-      
-      const data = sortByCreatedAt(res.data?.data || []);
+
+      const data = sortByCreatedAt(
+        res.data?.data || [],
+      ) as RetirementRequestType[];
       setRetirements(data);
       return data;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to load retirements";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load retirements";
       setError(errorMessage);
       console.error(err);
       return [];
@@ -147,8 +171,7 @@ export function RequestsProvider({ children }: { children: ReactNode }) {
         fetchRetirements,
         fetchRequestById,
         fetchRetirementById,
-      }}
-    >
+      }}>
       {children}
     </RequestsContext.Provider>
   );

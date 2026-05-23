@@ -61,7 +61,7 @@ export default function ProjectsTable() {
           projectName.toLowerCase().includes(lowerQuery) ||
           community.toLowerCase().includes(lowerQuery) ||
           state.toLowerCase().includes(lowerQuery) ||
-          item.strategicObjective.statement
+          item.strategicObjectiveStatement //note
             ?.toLowerCase()
             .includes(lowerQuery) ||
           item.thematicAreasOrPillar?.toLowerCase().includes(lowerQuery)
@@ -83,7 +83,7 @@ export default function ProjectsTable() {
 
     // Apply objective filter
     if (filters.objective) {
-      result = result.filter((item) => item.strategicObjective.statement === filters.objective);
+      result = result.filter((item) => item.strategicObjectiveStatement === filters.objective);
     }
 
     setFilteredData(result);
@@ -92,13 +92,13 @@ export default function ProjectsTable() {
   // Dynamically generate objective options based on current projects data
   const objectiveOptions = [
     { label: "All Objectives", value: "" },
-    ...Array.from(new Set((data as unknown as ProjectApiResponse[])?.map(p => p.strategicObjective?.statement).filter(Boolean)))
+    ...Array.from(new Set((data as unknown as ProjectApiResponse[])?.map(p => p.strategicObjectiveStatement).filter(Boolean)))
       .map(o => ({ label: o as string, value: o as string }))
   ];
 
   const head = [
     "Project Name",
-    "Strategic Objective",
+    // "Strategic Objective",
     "Status",
     "Start Date",
     "End Date",
@@ -194,9 +194,9 @@ export default function ProjectsTable() {
                   {row.projectName}
                 </Link>
               </td>
-              <td className="px-4 py-3">
+              {/* <td className="px-4 py-3">
                 {row.strategicObjective?.statement.substring(0, 25) + "..." || "N/A"}
-              </td>
+              </td> */}
               <td className="px-4 py-3">
                 <span
                   className={`inline-flex items-center text-sm ${
