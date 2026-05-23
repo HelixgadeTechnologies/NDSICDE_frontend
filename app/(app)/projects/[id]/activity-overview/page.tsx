@@ -1,16 +1,19 @@
 "use client";
 
 import ActivityOverviewComponent from "@/components/team-member-components/activity-overview-chart-table";
+import ImplementationTimeAnalysisComponent from "@/components/team-member-components/ita-component";
 import CardComponent from "@/ui/card-wrapper";
 import DashboardStat from "@/ui/dashboard-stat-card";
 import Heading from "@/ui/text-heading";
 import { useState, useEffect, useMemo } from "react";
 import { ProjectResultResponse } from "@/types/project-result-dashboard";
+import { ProjectFinancialDashboardResponse } from "@/types/project-financial-dashboard";
 import axios from "axios";
 import { useParams } from "next/navigation";
 
 export default function ProjectActivityOverview() {
   const [resultDashboardData, setResultDashboardData] = useState<ProjectResultResponse | null>(null);
+  const [financialData, setFinancialData] = useState<ProjectFinancialDashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const projectId = params.id;
@@ -50,9 +53,10 @@ export default function ProjectActivityOverview() {
       if (!projectId) return;
       setLoading(true);
       try {
-        const [fullRes, kpiRes] = await Promise.all([
+        const [fullRes, kpiRes, financialRes] = await Promise.all([
           axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/result_dashboard_full/${projectId}`),
-          axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/result_dashboard_kpi/${projectId}`)
+          axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/result_dashboard_kpi/${projectId}`),
+          axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/project_activity_dashboard/${projectId}`),
         ]);
 
         const combinedData: ProjectResultResponse = {
@@ -63,8 +67,9 @@ export default function ProjectActivityOverview() {
         };
 
         setResultDashboardData(combinedData);
+        setFinancialData(financialRes.data?.data ?? null);
       } catch (error) {
-        console.error("Error fetching result dashboard data:", error);
+        console.error("Error fetching activity overview data:", error);
       } finally {
         setLoading(false);
       }
@@ -128,6 +133,8 @@ export default function ProjectActivityOverview() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <DashboardStat data={activityStats} />
       </div>
+
+      <ImplementationTimeAnalysisComponent statData={financialData} />
     </section>
   );
 }

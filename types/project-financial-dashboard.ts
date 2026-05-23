@@ -18,18 +18,14 @@ export type ProjectFinancialDashboardResponse = {
       percentage: number;
     }[];
     IMPLEMENTATION_TIME_ANALYSIS: {
-      chart: {
-        outputId: string;
-        outputStatement: string;
-        totalPlannedDays: number;
-        totalActualDays: number;
-        activityCount: number;
-      }[];
-      table: {
+      outputId: string;
+      outputStatement: string;
+      activityCount: number;
+      totalPlannedDays: number;
+      totalActualDays: number;
+      activities: {
         activityId: string;
         activityDescription: string;
-        outputId: string;
-        outputStatement: string;
         totalPlannedDays: number;
         totalActivitySpentDays: number;
         percentageDaysSpent: number;
@@ -39,40 +35,46 @@ export type ProjectFinancialDashboardResponse = {
         costVariance: number;
         scheduleVariance: number;
       }[];
-    };
+    }[];
     BURN_RATE: {
       outputId: string;
       outputStatement: string;
-      sumActualCost: number;
-      sumBudget: number;
+      totalBudget: number;
+      totalSpent: number;
       burnRate: number;
+      activities: {
+        activityId: string;
+        activityStatement: string;
+        totalBudget: number;
+        totalSpent: number;
+        burnRate: number;
+      }[];
     }[];
     ACTIVITY_FINANCIAL_DATA: {
-      activityId: string;
-      activityStatement: string;
       outputId: string;
       outputStatement: string;
-      projectId: string;
-      activityPlannedStartDate: string;
-      activityPlannedEndDate: string;
-      activityActualStartDate: string;
-      activityActualEndDate: string;
-      totalPlannedDays: number;
-      totalDaysSpent: number;
-      remainingDays: number;
-      percentageDaysSpent: number;
-      budgetAtCompletion: number;
-      actualCost: number;
-      percentageCompletion: number;
-      earnedValue: number;
-      plannedValue: number;
-      costVariance: number;
-      scheduleVariance: number;
-      costPerformanceIndex: number;
-      schedulePerformanceIndex: number;
-      costPerformanceStatus: string;
-      schedulePerformanceStatus: string;
-      burnRate: number;
-      implementationTimeAnalysis: string;
+      activityCount: number;
+      activities: {
+        activityId: string;
+        activityStatement: string;
+        targetFrequency: number;
+        actualFrequency: number;
+        budgetAtCompletion: number;
+        actualCost: number;
+        percentageCompletion: number;
+        earnedValue: number;
+        plannedValue: number;
+        costVariance: number;
+        scheduleVariance: number;
+        costPerformanceIndex: number;
+        schedulePerformanceIndex: number;
+        costPerformanceStatus: string;
+        schedulePerformanceStatus: string;
+        lineItemTotalBudget: number;
+        lineItemTotalSpent: number;
+        lineItemBurnRate: number;
+        burnRate: number;
+        implementationTimeAnalysis: string;
+      }[];
     }[];
 };
