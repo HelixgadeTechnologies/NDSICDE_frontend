@@ -116,7 +116,7 @@ export default function ChartsComponent({
         </div>
 
         {/* Chart section */}
-        <div className="h-[417px]">
+        <div className="h-105">
           <BarChartComponent
             data={getDisplayData()}
             xKey="name"
