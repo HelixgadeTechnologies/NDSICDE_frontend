@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import IndicatorSourceSelector, {
   IndicatorSourceData,
 } from "@/ui/indicator-source-selector";
@@ -35,9 +35,10 @@ const STATUS_OPTIONS = [
 
 export default function AddIndicatorForm() {
   const searchParams = useSearchParams();
+  const params = useParams();
   const resultType = searchParams.get("resultType") ?? "impact";
   const resultId = searchParams.get("resultId") ?? "";
-  const projectId = searchParams.get("projectId") ?? "";
+   const projectId = (params?.id as string) ?? "";
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
@@ -77,7 +78,7 @@ export default function AddIndicatorForm() {
     targetNarrative: "",
     targetType: "cumulative",
     responsiblePersons: [],
-    result: resultId,
+    resultId: resultId,
     resultTypeId: "",
     isPeriodic: false,
     PeriodicTarget: [],
@@ -101,14 +102,14 @@ export default function AddIndicatorForm() {
           setFormData((prev) => ({
             ...prev,
             // resultId from URL is the actual entity ID; resultTypeId comes from the matched result type
-            result: resultId || prev.result,
+            result: resultId || prev.resultId,
             resultTypeId: matched.resultTypeId,
           }));
         } else if (results.length > 0) {
           // Fallback: use first result type if no match found
           setFormData((prev) => ({
             ...prev,
-            result: resultId || prev.result,
+            result: resultId || prev.resultId,
             resultTypeId: results[0].resultTypeId,
           }));
         }
@@ -276,7 +277,7 @@ export default function AddIndicatorForm() {
         targetType: formData.targetType,
         responsiblePersons: formData.responsiblePersons.join(", "),
         // `result` is the actual entity ID (impactId / outcomeId / outputId) from the URL
-        result: resultId || formData.result,
+        result: resultId || formData.resultId,
         resultTypeId: formData.resultTypeId,
         PeriodicTarget: formData.isPeriodic
           ? (formData.PeriodicTarget || []).map((pt) => ({
@@ -330,7 +331,7 @@ export default function AddIndicatorForm() {
         targetNarrative: "",
         targetType: "cumulative",
         responsiblePersons: [],
-        result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
+        resultId: resultTypes.length > 0 ? resultTypes[0].resultName : "",
         resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
         isPeriodic: false,
         PeriodicTarget: [],
@@ -372,7 +373,7 @@ export default function AddIndicatorForm() {
       targetNarrative: "",
       targetType: "cumulative",
       responsiblePersons: [],
-      result: resultTypes.length > 0 ? resultTypes[0].resultName : "",
+      resultId: resultTypes.length > 0 ? resultTypes[0].resultName : "",
       resultTypeId: resultTypes.length > 0 ? resultTypes[0].resultTypeId : "",
       isPeriodic: false,
       PeriodicTarget: [],

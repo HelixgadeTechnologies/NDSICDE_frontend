@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import CardComponent from "@/ui/card-wrapper";
 import DateRangePicker from "@/ui/form/date-range";
+import DropDown from "@/ui/form/select-dropdown";
+import { useUIStore } from "@/store/ui-store";
 import { format } from "date-fns";
 
 type Stats = {
@@ -28,6 +30,20 @@ export default function DataValidation() {
     { tabName: "Activity Financial Retirement", id: 2 },
   ];
   const [activeTab, setActiveTab] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("");
+  const { resetDateRange } = useUIStore();
+
+  const statusOptions = activeTab === 1 ? [
+    { value: "", label: "All Statuses" },
+    { value: "Pending", label: "Pending" },
+    { value: "In Review", label: "In Review" },
+    { value: "Approved", label: "Approved" },
+    { value: "Rejected", label: "Rejected" },
+  ] : [
+    { value: "", label: "All Statuses" },
+    { value: "Approved", label: "Approved" },
+    { value: "Rejected", label: "Rejected" },
+  ];
 
   const [isLoadingStats, setIsLoadingStats] = useState<boolean>(false);
   const [stats, setStats] = useState<Stats>({
@@ -67,6 +83,11 @@ export default function DataValidation() {
     fetchStats(selectedDates.startDate, selectedDates.endDate);
   }, [selectedDates.startDate, selectedDates.endDate, activeTab]);
 
+  // Reset status filter when switching tabs (options differ per tab)
+  useEffect(() => {
+    setStatusFilter("");
+  }, [activeTab]);
+
   // Function to fetch statistics from the API
   const fetchStats = async (startDate: string, endDate: string) => {
     setIsLoadingStats(true);
@@ -104,33 +125,35 @@ export default function DataValidation() {
   const handleDateRangeChange = (range: { startDate: string; endDate: string }) => {
     setSelectedDates(range);
   };
+
+  console.log(stats);
   
   const dashboardData = [
     {
-      title: "Total Submissions",
+      title: "Total Submitted Request",
       value: isLoadingStats ? "..." : stats.totalSubmissions,
       percentage: stats.percentageFromLastMonth,
       percentInfo: "from last month",
       icon: "proicons:graph",
     },
+    // {
+    //   title: "Pending Review",
+    //   value: isLoadingStats ? "..." : stats.pendingReview,
+    //   percentage: stats.pendingReview && stats.totalSubmissions
+    //     ? (stats.pendingReview / stats.totalSubmissions) * 100
+    //     : 0,
+    //   percentInfo: " of total submissions",
+    //   icon: "material-symbols:planner-review-rounded",
+    // },
     {
-      title: "Pending Review",
-      value: isLoadingStats ? "..." : stats.pendingReview,
-      percentage: stats.pendingReview && stats.totalSubmissions
-        ? (stats.pendingReview / stats.totalSubmissions) * 100
-        : 0,
-      percentInfo: " of total submissions",
-      icon: "material-symbols:planner-review-rounded",
-    },
-    {
-      title: "Approved",
+      title: "Approved Requests",
       value: isLoadingStats ? "..." : stats.approved,
       percentage: stats.approvalRate,
       percentInfo: "approval rate",
       icon: "duo-icons:approved",
     },
     {
-      title: "Rejected",
+      title: "Rejected Requests",
       value: isLoadingStats ? "..." : stats.rejected,
       percentage: stats.rejectionRate,
       percentInfo: "rejection rate",
@@ -187,6 +210,30 @@ export default function DataValidation() {
           })}
         </div>
 
+        {/* Status filter (date filter lives in the top-right DateRangePicker) */}
+        <div className="flex flex-wrap items-center justify-end gap-3 mb-6">
+          <div className="w-full sm:w-48">
+            <DropDown
+              name="statusFilter"
+              value={statusFilter}
+              onChange={(val) => setStatusFilter(val)}
+              options={statusOptions}
+              placeholder="All Statuses"
+            />
+          </div>
+
+          {statusFilter && (
+            <button
+              onClick={() => {
+                setStatusFilter("");
+                resetDateRange();
+              }}
+              className="h-10 px-4 w-full sm:w-auto text-sm font-semibold text-gray-555 hover:text-red-550 hover:bg-red-50 border border-gray-200 hover:border-red-100 rounded-md transition-all flex items-center justify-center gap-1.5">
+              Clear
+            </button>
+          )}
+        </div>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -194,7 +241,12 @@ export default function DataValidation() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25 }}>
-            <DataValidationTable startDate={selectedDates.startDate} endDate={selectedDates.endDate} activeTab={activeTab} />
+            <DataValidationTable
+              startDate={selectedDates.startDate}
+              endDate={selectedDates.endDate}
+              activeTab={activeTab}
+              statusFilter={statusFilter}
+            />
           </motion.div>
         </AnimatePresence>
       </CardComponent>

@@ -23,12 +23,14 @@ type DataValidationTableProps = {
   startDate: string;
   endDate: string;
   activeTab: number;
+  statusFilter?: string;
 };
 
 export default function DataValidationTable({
   startDate,
   endDate,
   activeTab,
+  statusFilter,
 }: DataValidationTableProps) {
   const head = [
     "Submission Name/Type",
@@ -65,8 +67,10 @@ export default function DataValidationTable({
           },
         },
       );
-      setData(sortByCreatedAt(response.data.data || []));
-
+      setData(
+        sortByCreatedAt<ProjectRequestResponseType>(response.data.data || []),
+      );
+      console.log(response.data.data)
     } catch (error) {
       console.error("Error fetching data validation records:", error);
     } finally {
@@ -77,6 +81,17 @@ export default function DataValidationTable({
   useEffect(() => {
     fetchData();
   }, [startDate, endDate, activeTab]);
+
+  const filteredData = data.filter((row) => {
+    // Retirement tab only shows requests fully approved (all 5 steps complete)
+    if (activeTab === 2 && row.status !== "Approved") return false;
+    if (statusFilter) {
+      const s = (row.status ?? "").toLowerCase();
+      const f = statusFilter.toLowerCase();
+      if (s !== f && !(f === "approved" && s === "active")) return false;
+    }
+    return true;
+  });
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [details, setDetails] = useState<ProjectRequestResponseType | undefined>(
@@ -149,7 +164,7 @@ export default function DataValidationTable({
         ) : (
           <Table
             tableHead={head}
-            tableData={data}
+            tableData={filteredData}
             checkbox
             idKey="requestId"
             renderRow={(row) => (

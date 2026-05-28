@@ -168,7 +168,12 @@ export default function ProjectKpiChartsTableParent({
               const indRes = await axios.get(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${resultId}`
               );
-              indicators = indRes.data?.data || [];
+              // Tag each indicator with its parent result's entity ID so downstream
+              // links (e.g. Report Actual) can pass it without re-deriving.
+              indicators = (indRes.data?.data || []).map((ind: RawIndicator) => ({
+                ...ind,
+                resultId,
+              }));
             } catch {
               // leave indicators empty on fetch failure
             }
@@ -200,6 +205,7 @@ export default function ProjectKpiChartsTableParent({
     const params = new URLSearchParams({
       orgKpiId: indicator.orgKpiId || "",
       resultTypeId: indicator.resultTypeId || "",
+      resultId: indicator.resultId || "",
       indicatorSource: indicator.indicatorSource || "",
       thematicArea: indicator.thematicAreasOrPillar || "",
       statement: indicator.statement || "",

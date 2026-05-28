@@ -75,6 +75,20 @@ export default function ProjectRequest() {
   const [isLoadingRetirements, setIsLoadingRetirements] = useState(false);
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+  const [openActionEl, setOpenActionEl] = useState<HTMLTableCellElement | null>(null);
+
+  // Close action menu when clicking outside the active row's action cell
+  useEffect(() => {
+    if (!activeRowId || !openActionEl) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!openActionEl.contains(event.target as Node)) {
+        setActiveRowId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [activeRowId, openActionEl]);
+
   const [statusFilter, setStatusFilter] = useState("");
   const [dateRangeFilter, setDateRangeFilter] = useState<{ startDate: string; endDate: string } | null>(null);
   const { resetDateRange } = useUIStore();
@@ -469,7 +483,10 @@ export default function ProjectRequest() {
                       <td className="px-6">
                         {formatDate(row.activityEndDate, "date-only")}
                       </td>
-                      <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
+                      <td
+                        ref={activeRowId === row.requestId ? setOpenActionEl : null}
+                        className="px-6 relative"
+                        onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-center items-center">
                           <Icon
                             icon={"uiw:more"}
@@ -612,7 +629,10 @@ export default function ProjectRequest() {
                             }`}>
                             {retirementStatus === "Approved" ? "Approved and Closed" : (retirementStatus || "Pending")}
                           </td>
-                          <td className="px-6 relative" onClick={(e) => e.stopPropagation()}>
+                          <td
+                            ref={activeRowId === row.requestId ? setOpenActionEl : null}
+                            className="px-6 relative"
+                            onClick={(e) => e.stopPropagation()}>
                             <div className="flex justify-center items-center">
                               <Icon
                                 icon={"uiw:more"}

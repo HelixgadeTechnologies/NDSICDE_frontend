@@ -64,9 +64,9 @@ export default function DeleteTeamMember({
       <div className="space-y-3">
         <Heading
           heading="Remove Team Member"
-          subtitle={`Are you sure you want to remove ${user.fullName} from the team?`}
+          subtitle={`Are you sure you want to remove ${user.fullName}?`}
         />
-        <div className="h-[112px] w-full rounded-2xl bg-black/5 flex gap-2 items-center p-4">
+        <div className="h-28 w-full rounded-2xl bg-black/5 flex gap-2 items-center p-4">
           <div className="h-20 w-20 rounded-full bg-[#EAEAEA] flex justify-center items-center">
             <Icon icon={"radix-icons:avatar"} height={60} width={60} />
           </div>

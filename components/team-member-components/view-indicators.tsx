@@ -50,6 +50,8 @@ type IndicatorData = {
   performance?: number;
   target?: number;
   resultTypeId?: string;
+  /** Parent result's entity ID (impactId / outcomeId / outputId) — attached at fetch time. */
+  resultId?: string;
   IndicatorDisaggregation: IndicatorDisaggregation[];
 };
 
@@ -156,7 +158,11 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
               `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${specificResultId}`
             );
             if (indRes.data?.success && indRes.data?.data) {
-              allIndicators = [...allIndicators, ...indRes.data.data];
+              const tagged = (indRes.data.data as IndicatorData[]).map((ind) => ({
+                ...ind,
+                resultId: specificResultId,
+              }));
+              allIndicators = [...allIndicators, ...tagged];
             }
           } catch (err) {
              // ignore failures for individual results
@@ -287,6 +293,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                     const query = new URLSearchParams({
                       orgKpiId: selectedIndicator.orgKpiId || "",
                       resultTypeId: selectedIndicator.resultTypeId || "",
+                      resultId: selectedIndicator.resultId || "",
                       indicatorSource: selectedIndicator.indicatorSource || "",
                       thematicArea: selectedIndicator.thematicAreasOrPillar || "",
                       statement: selectedIndicator.statement || "",

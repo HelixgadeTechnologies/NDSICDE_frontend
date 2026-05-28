@@ -21,7 +21,7 @@ export interface UserManagementCredentials {
   password: string;
 }
 
-// Data structure for creating/updating users (matches API screenshot)
+// Data structure for creating/updating users (matches API schema)
 export interface CreateUserData {
   userId?: string; // Optional for create, required for update
   fullName: string;
@@ -31,6 +31,11 @@ export interface CreateUserData {
   phoneNumber: string;
   status: string;
   assignedProjectId: string;
+  designation: string;
+  activityKpiApproval: number;
+  retirementApproval: number;
+  signature: string;
+  signatureMimeType: string;
 }
 
 // Generic API response type
@@ -92,6 +97,11 @@ export async function createUser(
       phoneNumber: userData.phoneNumber,
       status: userData.status,
       assignedProjectId: userData.assignedProjectId,
+      designation: userData.designation,
+      activityKpiApproval: userData.activityKpiApproval,
+      retirementApproval: userData.retirementApproval,
+      signature: userData.signature,
+      signatureMimeType: userData.signatureMimeType,
     },
   };
 
@@ -135,6 +145,11 @@ export async function updateUser(
       phoneNumber: userData.phoneNumber,
       status: userData.status,
       assignedProjectId: userData.assignedProjectId,
+      designation: userData.designation,
+      activityKpiApproval: userData.activityKpiApproval,
+      retirementApproval: userData.retirementApproval,
+      signature: userData.signature,
+      signatureMimeType: userData.signatureMimeType,
     },
   };
 

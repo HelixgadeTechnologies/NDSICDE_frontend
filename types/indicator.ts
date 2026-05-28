@@ -41,7 +41,7 @@ export type IndicatorFormData = {
   targetNarrative: string;
   targetType: string;
   responsiblePersons: string[];
-  result: string;
+  resultId: string;
   resultTypeId: string;
   isPeriodic: boolean;
   PeriodicTarget: PeriodicTargetItem[];

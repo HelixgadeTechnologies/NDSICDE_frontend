@@ -5,15 +5,18 @@ interface UserManagementState {
   email: string;
   department: string;
   phoneNumber: string;
+  /** Role UUID captured from the Designation dropdown's selected option. */
   roleId: string;
+  /** Human-readable role name captured alongside roleId (the dropdown's label). */
+  designation: string;
   status: string;
   assignedProjects: string[];
   requestRetirementApprovalRole: string;
   activityKpiApprovalRole: string;
-  
+
   // Actions
   setField: <K extends keyof UserManagementState>(
-    field: K, 
+    field: K,
     value: UserManagementState[K]
   ) => void;
   resetForm: () => void;
@@ -25,6 +28,7 @@ const initialState = {
   department: '',
   phoneNumber: '',
   roleId: '',
+  designation: '',
   status: 'Active',
   assignedProjects: [],
   requestRetirementApprovalRole: '',

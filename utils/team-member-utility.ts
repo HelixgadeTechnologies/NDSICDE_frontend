@@ -38,6 +38,21 @@ export const ACTIVITY_KPI_APPROVAL_ROLE = [
  {label:"Grant access", value:"grant access"}
 ]
 
+export const getRetirementApprovalNumber = (value: string): number => {
+  switch (value) {
+    case "layer 1": return 1;
+    case "layer 2": return 2;
+    case "layer 3": return 3;
+    case "layer 4": return 4;
+    case "layer 5": return 5;
+    case "none":
+    default: return 0;
+  }
+};
+
+export const getActivityKpiApprovalNumber = (value: string): number =>
+  value === "grant access" ? 1 : 0;
+
 export interface TeamMemberModalStates {
   editTeamMember: boolean;
   viewTeamMember: boolean;

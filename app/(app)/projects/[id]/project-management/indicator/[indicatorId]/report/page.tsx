@@ -49,6 +49,7 @@ function ReportActualValueForm() {
 
   const [orgKpiId, setOrgKpiId] = useState(searchParams.get("orgKpiId") || "");
   const [resultTypeId, setResultTypeId] = useState(searchParams.get("resultTypeId") || "");
+  const [resultId, setResultId] = useState(searchParams.get("resultId") || "");
 
   const [formData, setFormData] = useState({
     indicatorSource: searchParams.get("indicatorSource") || "",
@@ -101,6 +102,7 @@ function ReportActualValueForm() {
 
         setOrgKpiId(currentIndicator.orgKpiId || "");
         setResultTypeId((prev) => currentIndicator.resultTypeId || prev);
+        setResultId((prev) => currentIndicator.resultId || currentIndicator.result || prev);
         
         setFormData((prev) => ({
           ...prev,
@@ -222,6 +224,7 @@ function ReportActualValueForm() {
           status: "PENDING",
           indicatorId: indicatorId || "",
           resultTypeId: resultTypeId,
+          resultId: resultId,
           IndicatorReportDisaggregation: actualDisaggItems.map((item) => ({
             indicatorReportDisaggregationId: item.indicatorReportDisaggregationId || "",
             indicatorReportId: isEditMode ? reportId : "",

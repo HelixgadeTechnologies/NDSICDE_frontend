@@ -25,7 +25,7 @@ export const head = [
     "Email Address",
     "Role",
     "Status",
-    "Last Active",
+    // "Last Active",
     "Department",
     "Actions",
   ];

@@ -64,6 +64,8 @@ type FileUploaderProps = {
   uploadEndpoint?: string;
   token?: string;
   successMessageDuration?: number;
+  /** Hide the internal "Upload N File(s)" button — use when the parent serialises the file itself (e.g. base64-inline submit). */
+  hideUploadButton?: boolean;
 };
 
 export default function FileUploader({
@@ -77,6 +79,7 @@ export default function FileUploader({
   uploadEndpoint = `${process.env.NEXT_PUBLIC_BASE_URL}/api/upload/file-upload`,
   token,
   successMessageDuration = 3000,
+  hideUploadButton = false,
 }: FileUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -498,7 +501,7 @@ export default function FileUploader({
       )}
 
       {/* Upload Button (when not auto-uploading) */}
-      {!autoUpload && selectedFiles.length > 0 && !uploading && !uploadSuccess && (
+      {!autoUpload && !hideUploadButton && selectedFiles.length > 0 && !uploading && !uploadSuccess && (
         <div className="mt-6 flex gap-3">
           <button
             onClick={handleSubmit}

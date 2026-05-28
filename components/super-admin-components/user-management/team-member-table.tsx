@@ -161,7 +161,7 @@ export default function TeamMembersTable() {
               }`}>
               <span>{toSentenceCase(row.status ?? "")}</span>
             </td>
-            <td className="px-6">{formatDate(row.loginLast, "time")}</td>
+            {/* <td className="px-6">{formatDate(row.loginLast, "time")}</td> */}
             <td className="px-6">{row.department}</td>
             <td className="px-6 relative">
               <div className="flex justify-center items-center">
