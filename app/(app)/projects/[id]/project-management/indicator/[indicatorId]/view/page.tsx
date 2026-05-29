@@ -5,7 +5,7 @@ import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import ActionMenu from "@/ui/action-menu";
@@ -56,8 +56,10 @@ export default function ViewActualValue() {
 
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const projectId = params?.id as string;
   const indicatorId = params?.indicatorId as string;
+  const resultId = searchParams.get("resultId") || "";
   const token = getToken();
 
   const head = [
@@ -72,11 +74,11 @@ export default function ViewActualValue() {
   ];
 
   const fetchReports = async () => {
-    if (!indicatorId) return;
+    if (!resultId) return;
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator_report/${indicatorId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator-report/getByResultId/${resultId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -85,9 +87,11 @@ export default function ViewActualValue() {
       );
       const payload = response.data;
       // Support both `{success, data: [...]}` and a bare array response
-      const reports: IndicatorReport[] = Array.isArray(payload)
+      const allReports: IndicatorReport[] = Array.isArray(payload)
         ? payload
         : payload?.data ?? [];
+      // Endpoint returns every report under the parent result — narrow to this indicator
+      const reports = allReports.filter((r) => r.indicatorId === indicatorId);
       setData(reports);
     } catch (error) {
       console.error("Error fetching reports:", error);
@@ -100,12 +104,12 @@ export default function ViewActualValue() {
   useEffect(() => {
     fetchReports();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [indicatorId]);
+  }, [resultId, indicatorId]);
 
   const handleEdit = (report: IndicatorReport) => {
     setActiveRowId(null);
     router.push(
-      `/projects/${projectId}/project-management/indicator/${indicatorId}/report?reportId=${report.indicatorReportId}`,
+      `/projects/${projectId}/project-management/indicator/${indicatorId}/report?reportId=${report.indicatorReportId}&resultId=${resultId}`,
     );
   };
 
@@ -125,8 +129,9 @@ export default function ViewActualValue() {
     if (!selectedReport) return;
     setIsDeleting(true);
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator_report/${selectedReport.indicatorReportId}`,
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator-report/delete`,
+        { id: selectedReport.indicatorReportId },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -186,7 +191,7 @@ export default function ViewActualValue() {
           icon="si:add-fill"
           onClick={() =>
             router.push(
-              `/projects/${projectId}/project-management/indicator/${indicatorId}/report`,
+              `/projects/${projectId}/project-management/indicator/${indicatorId}/report?resultId=${resultId}`,
             )
           }
         />
@@ -257,20 +262,20 @@ export default function ViewActualValue() {
                           icon: "ph:pencil-simple-line",
                           onClick: () => handleEdit(row),
                         },
-                        {
-                          type: "button",
-                          label: "Approve",
-                          icon: "ph:check-circle",
-                          onClick: () => openApprove(row),
-                          className:
-                            "border-y border-gray-300 hover:text-emerald-600",
-                        },
+                        // {
+                        //   type: "button",
+                        //   label: "Approve",
+                        //   icon: "ph:check-circle",
+                        //   onClick: () => openApprove(row),
+                        //   className:
+                        //     "border-y border-gray-300 hover:text-emerald-600",
+                        // },
                         {
                           type: "button",
                           label: "Delete",
                           icon: "pixelarticons:trash",
                           onClick: () => openDelete(row),
-                          className: "hover:text-(--primary-light)",
+                          className: "hover:text-(--primary-light) border-t border-gray-300",
                         },
                       ]}
                     />

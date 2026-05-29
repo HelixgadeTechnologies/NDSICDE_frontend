@@ -8,6 +8,7 @@ import { formatDate } from "@/utils/dates-format-utility";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
 import { getResultTypeById } from "@/lib/api/result-types";
+import { getToken } from "@/lib/api/credentials";
 import MeterPieChart from "@/ui/meter-pie-chart";
 import { indicatorApi } from "@/lib/api/indicatorApi";
 import GenericDeleteModal from "@/ui/generic-delete-modal";
@@ -148,20 +149,50 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
       );
       const rows: any[] = res.data?.data || [];
 
-      // For each result row, fetch its indicators
+      // For each result row, fetch its indicators in parallel with its reports
+      const token = getToken();
       let allIndicators: IndicatorData[] = [];
       await Promise.all(
         rows.map(async (row) => {
           const specificResultId = row[idKey];
           try {
-            const indRes = await axios.get(
-              `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${specificResultId}`
-            );
+            const [indRes, reportRes] = await Promise.all([
+              axios.get(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${specificResultId}`
+              ),
+              axios
+                .get(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator-report/getByResultId/${specificResultId}`,
+                  { headers: { Authorization: `Bearer ${token}` } },
+                )
+                // Reports may not exist yet for some results — fall back to empty
+                .catch(() => ({ data: null })),
+            ]);
+
+            const reportPayload = reportRes?.data;
+            const reports: any[] = Array.isArray(reportPayload)
+              ? reportPayload
+              : reportPayload?.data ?? [];
+
             if (indRes.data?.success && indRes.data?.data) {
-              const tagged = (indRes.data.data as IndicatorData[]).map((ind) => ({
-                ...ind,
-                resultId: specificResultId,
-              }));
+              const tagged = (indRes.data.data as IndicatorData[]).map((ind) => {
+                // Use the first matching report's cumulativeActual as the indicator's actual
+                const firstReport = reports.find(
+                  (r: any) => r.indicatorId === ind.indicatorId,
+                );
+                const reportedActual =
+                  firstReport?.cumulativeActual != null
+                    ? Number(firstReport.cumulativeActual)
+                    : undefined;
+                return {
+                  ...ind,
+                  resultId: specificResultId,
+                  actual:
+                    reportedActual !== undefined && !Number.isNaN(reportedActual)
+                      ? reportedActual
+                      : ind.actual,
+                };
+              });
               allIndicators = [...allIndicators, ...tagged];
             }
           } catch (err) {
@@ -189,7 +220,6 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
     console.log("Attempting to delete indicator:", indicatorToDelete);
     try {
       const res = await indicatorApi.deleteIndicator(indicatorToDelete);
-      console.log("Delete response:", res);
       toast.success("Indicator deleted successfully.");
       setIndicatorToDelete(null);
       await fetchIndicators(); // Refresh the list
@@ -282,7 +312,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
                   isSecondary={true}
                   onClick={() =>
                     router.push(
-                      `/projects/${projectId}/project-management/indicator/${selectedIndicator.indicatorId}/view`,
+                      `/projects/${projectId}/project-management/indicator/${selectedIndicator.indicatorId}/view?resultId=${selectedIndicator.resultId || ""}`,
                     )
                   }
                 />

@@ -247,7 +247,7 @@ function ReportActualValueForm() {
             : "Indicator report submitted successfully.",
         );
         router.push(
-          `/projects/${projectId}/project-management/indicator/${indicatorId}/view`,
+          `/projects/${projectId}/project-management/indicator/${indicatorId}/view?resultId=${resultId}`,
         );
       } else {
         toast.error(response.message || "Failed to submit indicator report.");

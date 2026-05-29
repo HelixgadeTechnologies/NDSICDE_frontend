@@ -72,8 +72,9 @@ export const indicatorApi = {
 
   deleteIndicator: async (indicatorId: string) => {
     const token = getToken();
-    const response = await axios.delete(
+    const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator/${indicatorId}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${token}`,
