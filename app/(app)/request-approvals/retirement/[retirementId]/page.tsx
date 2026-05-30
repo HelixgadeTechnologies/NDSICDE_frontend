@@ -1,34 +1,19 @@
 "use client";
 
-// import Modal from "@/ui/popup-modal";
 import Button from "@/ui/form/button";
 import FileDisplay from "@/ui/file-display";
 import Table from "@/ui/table";
-import {
-  FileText,
-  Calendar,
-  Navigation,
-  ActivityIcon,
-  User,
-  FileOutput,
-} from "lucide-react";
-import CardComponent from "@/ui/card-wrapper";
 import BackButton from "@/ui/back-button";
-// import DeleteModal from "@/ui/generic-delete-modal";
-import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 import Heading from "@/ui/text-heading";
-import InfoItem from "@/ui/info-item";
+import SignatureComponenet from "@/ui/signature-component";
 import { RetirementRequestType } from "@/types/retirement-request";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { useRequests } from "@/context/RequestsContext";
+import { signatures } from "@/lib/config/demo-signatures";
 
 export default function FinancialRequestModal() {
-  // const [rejectRequest, setRejectRequest] = useState(false);
-  // const [approveRequest, setApproveRequest] = useState(false);
-  // const [reviewRequest, setReviewRequest] = useState(false);
-
   const head = [
     "Activity Line Description",
     "Quantity",
@@ -54,7 +39,6 @@ export default function FinancialRequestModal() {
       try {
         let retirementDetails = retirements.find((r) => r.retirementId === retirementId);
         
-        // Setup direct individual fetch in the future if a specific /api/retirement/retirement/{id} analogous endpoint gets built, for now rely on context data filter
         if (!retirementDetails) {
             const fetched = await fetchRetirements();
             retirementDetails = fetched.find((r) => r.retirementId === retirementId);
@@ -109,10 +93,9 @@ export default function FinancialRequestModal() {
     if (retirement) {
       fetchOutput();
     } else {
-       // if retirement is missing or fetching failed, we still want to remove loader
        setIsLoading(false);
     }
-  }, [retirement]);
+  }, [retirement, requestDetails]);
 
   if (isLoading) {
     return (
@@ -143,208 +126,172 @@ export default function FinancialRequestModal() {
 
   return (
     <>
-      <BackButton />
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Header Section */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <Heading
-                  heading="Financial Retirement"
-                  subtitle={`Submitted on ${new Date(retirement.createAt).toLocaleString()}`}
-                />
-              </div>
-              <div className="w-50">
-                <Button
-                  content="Print Retirement"
-                  isSecondary
-                  onClick={() => window.print()}
-                />
-              </div>
+      <div className="print:hidden">
+        <BackButton />
+      </div>
+      <div className="min-h-screen bg-gray-50 p-6 print:bg-white print:p-0">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <div className="flex justify-between items-start print:hidden">
+            <div>
+              <Heading
+                heading="Financial Retirement"
+                subtitle={`Submitted on ${new Date(retirement.createAt).toLocaleString()}`}
+              />
+            </div>
+            <div className="w-40 shrink-0">
+              <Button
+                content="Print Retirement"
+                isSecondary
+                onClick={() => window.print()}
+              />
             </div>
           </div>
 
-          {/* grid details */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Submission Details Card */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  Submission Details
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InfoItem
-                    label="Submitted by"
-                    value={requestDetails?.staff || "N/A"}
-                    icon={<User className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Output"
-                    value={outputDetails?.outputStatement || "N/A"}
-                    icon={<FileOutput className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Activity Title"
-                    value={requestDetails?.activityTitle || "N/A"}
-                    icon={<ActivityIcon className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Activity Location(s)"
-                    value={requestDetails?.activityLocation || "N/A"}
-                    icon={<Navigation className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Activity Start Date"
-                    value={requestDetails?.activityStartDate ? new Date(requestDetails.activityStartDate).toLocaleDateString() : retirement.activityStartDate ? new Date(retirement.activityStartDate).toLocaleDateString() : "N/A"}
-                    icon={<Calendar className="w-4 h-4" />}
-                  />
-                  <InfoItem
-                    label="Activity End Date"
-                    value={requestDetails?.activityEndDate ? new Date(requestDetails.activityEndDate).toLocaleDateString() : retirement.activityEndDate ? new Date(retirement.activityEndDate).toLocaleDateString() : "N/A"}
-                    icon={<Calendar className="w-4 h-4" />}
-                  />
+          <div className="bg-white border border-gray-300 shadow-sm p-10 print:p-0 print:border-none print:shadow-none space-y-10 text-gray-900">
+            <div>
+              <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+                Submission Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Submitted by</span>
+                  <span className="font-medium text-gray-900">{requestDetails?.staff || "N/A"}</span>
                 </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Output</span>
+                  <span className="font-medium text-gray-900">{outputDetails?.outputStatement || "N/A"}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Title</span>
+                  <span className="font-medium text-gray-900">{requestDetails?.activityTitle || "N/A"}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Location(s)</span>
+                  <span className="font-medium text-gray-900">{requestDetails?.activityLocation || "N/A"}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Start Date</span>
+                  <span className="font-medium text-gray-900">
+                    {requestDetails?.activityStartDate ? new Date(requestDetails.activityStartDate).toLocaleDateString() : retirement.activityStartDate ? new Date(retirement.activityStartDate).toLocaleDateString() : "N/A"}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity End Date</span>
+                  <span className="font-medium text-gray-900">
+                    {requestDetails?.activityEndDate ? new Date(requestDetails.activityEndDate).toLocaleDateString() : retirement.activityEndDate ? new Date(retirement.activityEndDate).toLocaleDateString() : "N/A"}
+                  </span>
+                </div>
+              </div>
 
-                <div className="mt-6">
-                  <TitleAndContent
-                    title="Activity Purpose/Description"
-                    content={requestDetails?.activityPurposeDescription || retirement.activityPurposeDescription || "N/A"}
-                  />
+              <div className="mt-8 text-sm">
+                <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide block mb-2">Activity Purpose/Description</span>
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded text-gray-800 leading-relaxed">
+                  {requestDetails?.activityPurposeDescription || retirement.activityPurposeDescription || "N/A"}
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Supporting Documents & Actions */}
-            <div className="lg:col-span-1">
-              {/* Supporting Documents Card */}
-              <CardComponent>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-[#D2091E]" />
-                  Supporting Document (s)
+            <div>
+              <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+                Retirement Table
+              </h3>
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <Table
+                  tableHead={head}
+                  tableData={[retirement]}
+                  renderRow={(row) => (
+                    <>
+                      <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">{row.activityLineDescription || "N/A"}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">{row.quantity || "0"}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">{row.frequency || "0"}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">₦{(row.unitCost || 0).toLocaleString()}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900 border-t border-gray-200">₦{Number(row.totalBudget || 0).toLocaleString()}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">₦{Number(row.actualCost || 0).toLocaleString()}</td>
+                      <td className="px-6 py-4 text-sm font-medium border-t border-gray-200">
+                        {(() => {
+                          const diff = (Number(row.totalBudget) || 0) - (Number(row.actualCost) || 0);
+                          if (diff < 0) {
+                            return (
+                              <span className="text-red-500">
+                                -₦{Math.abs(diff).toLocaleString()}
+                              </span>
+                            );
+                          } else if (diff > 0) {
+                            return (
+                              <span className="text-green-500">
+                                +₦{diff.toLocaleString()}
+                              </span>
+                            );
+                          } else {
+                            return (
+                              <span className="text-gray-500">
+                                ₦0
+                              </span>
+                            );
+                          }
+                        })()}
+                      </td>
+                    </>
+                  )}
+                />
+              </div>
+              <div className="flex flex-col gap-2 pt-6 text-sm font-semibold text-gray-900 mt-4 text-right">
+                <p>Total Activity Cost: <span className="font-bold">₦{totalRetirementActualCost.toLocaleString()}</span></p>
+                <p>Amount to reimburse to NDSICDE: <span className="font-bold">₦{reimburseToNDSICDE.toLocaleString()}</span></p>
+                <p>Amount to reimburse to Staff: <span className="font-bold">₦{reimburseToStaff.toLocaleString()}</span></p>
+              </div>
+            </div>
+
+            <div className="flex justify-center gap-x-16 gap-y-5 items-center flex-wrap">
+              {signatures.map((sign, idx) => (
+                <SignatureComponenet
+                  key={idx}
+                  heading={sign.heading}
+                  name={sign.name}
+                  signature={sign.signature}
+                  date={sign.date}
+                />
+              ))}
+            </div>
+
+            {retirement.documentURL && (
+              <div className="print:hidden">
+                <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+                  Supporting Document(s)
                 </h3>
                 <FileDisplay
                   filename={retirement.documentName}
                   url={retirement.documentURL}
                 />
-              </CardComponent>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="print:hidden mt-8 pt-8 border-t border-gray-300">
+              <h3 className="text-base font-bold uppercase tracking-wider mb-4">Quick Actions</h3>
+              <div className="flex items-center gap-4">
+                <div className="w-1/3">
+                  <Button
+                    content="Approve"
+                  />
+                </div>
+                <div className="w-1/3">
+                  <Button
+                    content="Review"
+                    isSecondary
+                  />
+                </div>
+                <div className="w-1/3">
+                  <Button
+                    content="Reject"
+                    isSecondary
+                  />
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* table */}
-          <CardComponent>
-            <Table
-              tableHead={head}
-              tableData={[retirement]}
-              renderRow={(row) => (
-                <>
-                  <td className="px-6">{row.activityLineDescription || "N/A"}</td>
-                  <td className="px-6">{row.quantity || "0"}</td>
-                  <td className="px-6">{row.frequency || "0"}</td>
-                  <td className="px-6">{row.unitCost || "0"}</td>
-                  <td className="px-6">₦{Number(row.totalBudget || 0).toLocaleString()}</td>
-                  <td className="px-6">₦{Number(row.actualCost || 0).toLocaleString()}</td>
-                  <td className="px-6 font-medium">
-                    {(() => {
-                      const diff = (Number(row.totalBudget) || 0) - (Number(row.actualCost) || 0);
-                      if (diff < 0) {
-                        return (
-                          <span className="text-red-500">
-                            -₦{Math.abs(diff).toLocaleString()}
-                          </span>
-                        );
-                      } else if (diff > 0) {
-                        return (
-                          <span className="text-green-500">
-                            ₦{diff.toLocaleString()}
-                          </span>
-                        );
-                      } else {
-                        return (
-                          <span className="text-gray-500">
-                            ₦0
-                          </span>
-                        );
-                      }
-                    })()}
-                  </td>
-                </>
-              )}
-            />
-            <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-              <p>Total Activity Cost (₦): {totalRetirementActualCost.toLocaleString()}</p>
-              <p>Amount to reimburse to NDSICDE (₦): {reimburseToNDSICDE.toLocaleString()}</p>
-              <p>Amount to reimburse to Staff (₦): {reimburseToStaff.toLocaleString()}</p>
-            </div>
-          </CardComponent>
         </div>
       </div>
-
-      {/* Action Buttons */}
-      <div className="mt-6 pt-6 border-t border-gray-200 flex items-center gap-3 w-[500px]">
-        <Button
-          content="Approve"
-          // onClick={() => setApproveRequest(true)}
-        />
-        <Button
-          content="Review"
-          isSecondary
-          // onClick={() => setReviewRequest(true)}
-        />
-        <Button
-          content="Reject"
-          isSecondary
-          // onClick={() => setRejectRequest(true)}
-        />
-      </div>
-
-      {/* Reject Modal */}
-      {/* <DeleteModal
-        isOpen={rejectRequest}
-        onClose={() => setRejectRequest(false)}
-        heading="Do you want to delete this Request"
-      /> */}
-
-      {/* Approve Modal */}
-      {/* <Modal isOpen={approveRequest} onClose={() => setApproveRequest(false)}>
-        <div className="flex flex-col gap-4 items-center p-6">
-          <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center">
-            <Icon
-              icon="simple-line-icons:check"
-              height={48}
-              width={48}
-              color="#27AE60"
-            />
-          </div>
-          <Heading
-            heading="Congratulations!"
-            subtitle="Request successfully approved!"
-          />
-          <Button content="Close" onClick={() => setApproveRequest(false)} />
-        </div>
-      </Modal> */}
-
-      {/* review modal */}
-      {/* <Modal
-        isOpen={reviewRequest}
-        onClose={() => setReviewRequest(false)}
-        maxWidth="500px">
-        <div className="space-y-6">
-          <TextareaInput
-            label="Review Comment"
-            name="reviewComment"
-            onChange={() => {}}
-            value=""
-            placeholder="Enter comment describing what needs to be reviewed by the request initiator"
-          />
-          <Button
-            content="Enter Comment"
-            onClick={() => setReviewRequest(false)}
-          />
-        </div>
-      </Modal> */}
     </>
   );
 }

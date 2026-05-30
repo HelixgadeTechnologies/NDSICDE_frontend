@@ -24,6 +24,7 @@ type TableProps<T> = {
   // PDF export
   pdfTitle?: string;
   enablePdfDownload?: boolean;
+  height?: string;
 };
 
 export default function Table<T>({
@@ -45,6 +46,7 @@ export default function Table<T>({
   // PDF export
   pdfTitle = "Table Export",
   enablePdfDownload = true,
+  height = '120px'
 }: TableProps<T>) {
   const tableRef = useRef<HTMLTableElement | null>(null);
   const [selectedIds, setSelectedIds] = useState<Array<T[keyof T]>>([]);
@@ -166,7 +168,8 @@ export default function Table<T>({
                     <tr
                       key={i}
                       onClick={() => onClick && onClick(row)}
-                      className={`border-t border-[#E5E7EB] h-30 text-[#6B7280] ${onClick ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""}`}
+                      style={{ height: height }}
+                      className={`border-t border-[#E5E7EB] text-[#6B7280] ${onClick ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""}`}
                     >
                       {renderRow(row, i, false)}
                     </tr>
@@ -180,7 +183,8 @@ export default function Table<T>({
                   <tr
                     key={i}
                     onClick={() => onClick && onClick(row)}
-                    className={`border-t border-[#E5E7EB] h-30 text-[#6B7280] ${onClick ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""}`}
+                    style={{ height: height }}
+                    className={`border-t border-[#E5E7EB] text-[#6B7280] ${onClick ? "cursor-pointer hover:bg-gray-50 transition-colors" : ""}`}
                   >
                     {checkbox && idKey && (
                       <td className="px-6" onClick={(e) => e.stopPropagation()}>

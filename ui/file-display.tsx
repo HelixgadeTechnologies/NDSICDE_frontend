@@ -40,16 +40,25 @@ export default function FileDisplay({ filename, filesize, url }: FileProps) {
 
     return (
         <>
-            <div className="bg-[#F2F2F2] h-13 w-full flex justify-between items-center p-4 text-sm cursor-pointer hover:bg-[#E8E8E8] transition-colors">
+            <div className="bg-[#F2F2F2] h-13 w-full flex justify-between items-center p-4 text-sm hover:bg-[#E8E8E8] transition-colors rounded-md">
                 <p 
-                    className="text-[#475367] hover:underline truncate"
+                    className="text-[#475367] hover:underline truncate cursor-pointer"
                     onClick={() => url && window.open(url, '_blank')}
-                    title={url ? "Click to view" : "No URL available"}
+                    title={url ? "Click to view in new tab" : "No URL available"}
                 >
                     {filename}
                 </p>
                 <div className="flex items-center gap-4">
                     <p className="text-[#475367]">{filesize}</p>
+                    {url && (
+                        <div 
+                            className="h-8 w-fit bg-white rounded-lg p-1 gap-1 flex items-center cursor-pointer hover:bg-gray-50"
+                            onClick={() => setOpenPreview(true)}
+                            title="Preview file"
+                        >
+                            <Icon icon={"material-symbols-light:visibility"} width={22} height={22} />
+                        </div>
+                    )}
                     <div 
                         className="h-8 w-fit bg-white rounded-lg p-1 gap-1 flex items-center cursor-pointer hover:bg-gray-50"
                         onClick={handleDownload}
@@ -59,6 +68,31 @@ export default function FileDisplay({ filename, filesize, url }: FileProps) {
                     </div>
                 </div>
             </div>
+
+            <Modal isOpen={openPreview} onClose={() => setOpenPreview(false)} maxWidth="1000px" width="95%">
+                <div className="flex flex-col h-[80vh]">
+                    <div className="flex justify-between items-center mb-4">
+                        <Heading heading="Document Preview" subtitle={filename} />
+                        <div className="w-24">
+                            <Button content="Close" isSecondary onClick={() => setOpenPreview(false)} />
+                        </div>
+                    </div>
+                    
+                    <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                        {url ? (
+                            <iframe 
+                                src={url} 
+                                className="w-full h-full"
+                                title="Document Preview"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-500">
+                                No document URL available
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </Modal>
         </>
     );
 }

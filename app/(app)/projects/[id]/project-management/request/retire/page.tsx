@@ -1,6 +1,5 @@
 "use client";
 
-import CardComponent from "@/ui/card-wrapper";
 import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { AnimatePresence, motion } from "framer-motion";
@@ -12,30 +11,21 @@ import AddProjectRequestRetirement from "@/components/project-management-compone
 import EditProjectRequestRetirement from "@/components/project-management-components/edit-project-request-retirement";
 import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
 import FileDisplay from "@/ui/file-display";
+import SignatureComponenet from "@/ui/signature-component";
 import TextInput from "@/ui/form/text-input";
-import InfoItem from "@/ui/info-item";
 import { ProjectRequestResponseType, ProjectOutputTypes } from "@/types/project-management-types";
 import { RetirementRequestType } from "@/types/retirement-request";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
-import {
-  ActivityIcon,
-  Calendar,
-  FileOutput,
-  Navigation,
-  User,
-} from "lucide-react";
-import BackButton from "@/ui/back-button";
-import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
 import { useParams } from "next/navigation";
+import { signatures } from "@/lib/config/demo-signatures";
 
 function AddRetirementInlineForm({ selectedRequest, onSuccess }: { selectedRequest: ProjectRequestResponseType; onSuccess: () => void }) {
   const [actualCost, setActualCost] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lineItems, setLineItems] = useState([{ id: 1, value: "" }]);
-  const token = typeof window !== 'undefined' ? localStorage.getItem("token") || sessionStorage.getItem("token") : ""; // Quick way to get token or use getToken() if available. Wait, getToken is from @/lib/api/credentials! Let's import it.
 
   const addLineItem = () => {
     const newId = Math.max(...lineItems.map((l) => l.id), 0) + 1;
@@ -263,192 +253,10 @@ export default function ProjectRequestRetirementPage() {
   const reimburseToNDSICDE = retirementVariance > 0 ? retirementVariance : 0;
   const reimburseToStaff = retirementVariance < 0 ? Math.abs(retirementVariance) : 0;
 
+
   return (
-    <div className="mt-12 space-y-7 pb-12">
-      {/* submission details */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <InternalMemorandum
-          isReadOnly
-          staff={selectedRequest.staff}
-          requestDate={selectedRequest.requestDate || (selectedRequest.activityStartDate ? formatDate(selectedRequest.activityStartDate, "date-only") : "N/A")}
-          budgetName={selectedRequest.project?.projectName || "N/A"}
-          budgetCode={selectedRequest.activityBudgetCode?.toString() || "N/A"}
-        />
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-          Activity Details
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <InfoItem
-            label="Output"
-            value={outputDetails?.outputStatement || "N/A"}
-            icon={<FileOutput className="w-4 h-4" />}
-          />
-          <InfoItem
-            label="Activity Title"
-            value={selectedRequest.activityTitle || "N/A"}
-            icon={<ActivityIcon className="w-4 h-4" />}
-          />
-          <InfoItem
-            label="Activity Locations"
-            value={selectedRequest.activityLocation || "N/A"}
-            icon={<Navigation className="w-4 h-4" />}
-          />
-          <InfoItem
-            label="Activity Start Date"
-            value={selectedRequest.activityStartDate ? formatDate(selectedRequest.activityStartDate, "date-only") : "N/A"}
-            icon={<Calendar className="w-4 h-4" />}
-          />
-          <InfoItem
-            label="Activity End Date"
-            value={selectedRequest.activityEndDate ? formatDate(selectedRequest.activityEndDate, "date-only") : "N/A"}
-            icon={<Calendar className="w-4 h-4" />}
-          />
-        </div>
-
-        <div className="mt-6">
-          <TitleAndContent
-            title="Activity Purpose/Description"
-            content={selectedRequest.activityPurposeDescription || "N/A"}
-          />
-        </div>
-      </div>
-
-      {requestRetirements.length === 0 && !viewOnly ? (
-        <CardComponent>
-          <div className="p-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-              Add Retirement
-            </h3>
-            <AddRetirementInlineForm 
-              selectedRequest={selectedRequest} 
-              onSuccess={() => fetchLocalRetirements()} 
-            />
-          </div>
-        </CardComponent>
-      ) : (
-        <CardComponent>
-        <Table
-          tableHead={head}
-          tableData={requestRetirements}
-          checkbox
-          idKey={"retirementId"}
-          renderRow={(row: RetirementRequestType) => (
-            <>
-             <td className="px-6">{row.activityLineDescription || "N/A"}</td>
-             <td className="px-6">{row.quantity || "0"}</td>
-             <td className="px-6">{row.frequency || "0"}</td>
-             <td className="px-6">₦{(row.unitCost || 0).toLocaleString()}</td>
-             <td className="px-6 font-semibold">
-               ₦{(row.totalBudget || 0).toLocaleString()}
-             </td>
-             <td className="px-6">₦{(row.actualCost || 0).toLocaleString()}</td>
-             <td className="px-6 font-medium">
-               {(() => {
-                 const diff = (row.totalBudget || 0) - (row.actualCost || 0);
-                 if (diff < 0) {
-                   return (
-                     <span className="text-red-500">
-                       -₦{Math.abs(diff).toLocaleString()}
-                     </span>
-                   );
-                 } else if (diff > 0) {
-                   return (
-                     <span className="text-green-500">
-                       +₦{diff.toLocaleString()}
-                     </span>
-                   );
-                 } else {
-                   return (
-                     <span className="text-gray-500">
-                       ₦0
-                     </span>
-                   );
-                 }
-               })()}
-             </td>
-             {!viewOnly && (
-               <td className="px-6 relative">
-                 <Icon
-                   icon={"uiw:more"}
-                   width={22}
-                   height={22}
-                   className="cursor-pointer"
-                   color="#909CAD"
-                   onClick={() =>
-                     setActiveRowId((prev) =>
-                       prev === row.retirementId ? null : row.retirementId
-                     )
-                   }
-                 />
-
-                 {activeRowId === row.retirementId && (
-                   <AnimatePresence>
-                     <motion.div
-                       initial={{ y: -10, opacity: 0 }}
-                       animate={{ y: 0, opacity: 1 }}
-                       exit={{ y: -10, opacity: 0 }}
-                       transition={{ duration: 0.2, ease: "easeOut" }}
-                       className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                       <ul className="text-sm">
-                         <li 
-                           onClick={() => {
-                             setSelectedRetirement(row);
-                             setOpenEditRetirement(true);
-                             setActiveRowId(null);
-                           }}
-                           className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                           <Icon
-                             icon={"ph:pencil-simple-line"}
-                             height={20}
-                             width={20}
-                           />
-                           Edit
-                         </li>
-                         <li onClick={() => setOpenDeleteModal(true)} className="cursor-pointer hover:text-[--primary-light] border-y border-gray-300 flex gap-2 p-3 items-center">
-                           <Icon
-                             icon={"pixelarticons:trash"}
-                             height={20}
-                             width={20}
-                           />
-                           Remove
-                         </li>
-                       </ul>
-                     </motion.div>
-                   </AnimatePresence>
-                 )}
-               </td>
-             )}
-            </>
-          )}
-        />
-        <div className="flex justify-between items-center pt-6 px-10 text-base font-medium">
-          <p>Total Activity Cost (₦): {totalRetirementActualCost.toLocaleString()}</p>
-          <p>Amount to reimburse to NDSICDE (₦): {reimburseToNDSICDE.toLocaleString()}</p>
-          <p>Amount to reimburse to Staff (₦): {reimburseToStaff.toLocaleString()}</p>
-        </div>
-      </CardComponent>
-      )}
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-         <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-            Attached Documents
-         </h3>
-         {selectedRequest.documentURL ? (
-            <FileDisplay
-            filename={selectedRequest.documentName}
-            url={selectedRequest.documentURL}
-            />
-        ) : (
-            <p className="text-sm text-gray-500">No documents attached.</p>
-        )}
-      </div>
-
-    {/* add retirement button */}
-      <div className="flex gap-3 items-center w-100 print:hidden">
+    <div className="mt-8 space-y-6 pb-12">
+      <div className="flex gap-3 justify-end items-center w-100 print:hidden">
         <Button content="Print Report" isSecondary onClick={() => window.print()} />
         {!viewOnly && requestRetirements.length > 0 && (
           <Button
@@ -456,6 +264,197 @@ export default function ProjectRequestRetirementPage() {
             icon="si:add-fill"
             onClick={() => setOpenAddRetirement(true)}
           />
+        )}
+      </div>
+
+      <div className="max-w-5xl mx-auto bg-white border border-gray-300 shadow-sm p-10 print:p-0 print:border-none print:shadow-none space-y-10 text-gray-900">
+        
+        <InternalMemorandum
+          isReadOnly
+          staff={selectedRequest.staff}
+          requestDate={selectedRequest.requestDate || (selectedRequest.activityStartDate ? formatDate(selectedRequest.activityStartDate, "date-only") : "N/A")}
+          budgetName={selectedRequest.project?.projectName || "N/A"}
+          budgetCode={selectedRequest.activityBudgetCode?.toString() || "N/A"}
+        />
+
+        <div>
+          <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+            Activity Details
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Output</span>
+              <span className="font-medium text-gray-900">{outputDetails?.outputStatement || "N/A"}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Title</span>
+              <span className="font-medium text-gray-900">{selectedRequest.activityTitle || "N/A"}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Locations</span>
+              <span className="font-medium text-gray-900">{selectedRequest.activityLocation || "N/A"}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Start Date</span>
+              <span className="font-medium text-gray-900">{selectedRequest.activityStartDate ? formatDate(selectedRequest.activityStartDate, "date-only") : "N/A"}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity End Date</span>
+              <span className="font-medium text-gray-900">{selectedRequest.activityEndDate ? formatDate(selectedRequest.activityEndDate, "date-only") : "N/A"}</span>
+            </div>
+          </div>
+          
+          <div className="mt-8 text-sm">
+            <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide block mb-2">Activity Purpose/Description</span>
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded text-gray-800 leading-relaxed">
+              {selectedRequest.activityPurposeDescription || "N/A"}
+            </div>
+          </div>
+        </div>
+
+        {requestRetirements.length === 0 && !viewOnly ? (
+          <div>
+            <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+              Add Retirement
+            </h3>
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded">
+              <AddRetirementInlineForm 
+                selectedRequest={selectedRequest} 
+                onSuccess={() => fetchLocalRetirements()} 
+              />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+              Retirement Details
+            </h3>
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <Table
+                tableHead={head}
+                tableData={requestRetirements}
+                checkbox
+                idKey={"retirementId"}
+                renderRow={(row: RetirementRequestType) => (
+                  <>
+                   <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">{row.activityLineDescription || "N/A"}</td>
+                   <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">{row.quantity || "0"}</td>
+                   <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">{row.frequency || "0"}</td>
+                   <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">₦{(row.unitCost || 0).toLocaleString()}</td>
+                   <td className="px-6 py-4 text-sm font-semibold text-gray-900 border-t border-gray-200">
+                     ₦{(row.totalBudget || 0).toLocaleString()}
+                   </td>
+                   <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">₦{(row.actualCost || 0).toLocaleString()}</td>
+                   <td className="px-6 py-4 text-sm font-medium border-t border-gray-200">
+                     {(() => {
+                       const diff = (row.totalBudget || 0) - (row.actualCost || 0);
+                       if (diff < 0) {
+                         return (
+                           <span className="text-red-500">
+                             -₦{Math.abs(diff).toLocaleString()}
+                           </span>
+                         );
+                       } else if (diff > 0) {
+                         return (
+                           <span className="text-green-500">
+                             +₦{diff.toLocaleString()}
+                           </span>
+                         );
+                       } else {
+                         return (
+                           <span className="text-gray-500">
+                             ₦0
+                           </span>
+                         );
+                       }
+                     })()}
+                   </td>
+                   {!viewOnly && (
+                     <td className="px-6 py-4 relative border-t border-gray-200">
+                       <Icon
+                         icon={"uiw:more"}
+                         width={22}
+                         height={22}
+                         className="cursor-pointer"
+                         color="#909CAD"
+                         onClick={() =>
+                           setActiveRowId((prev) =>
+                             prev === row.retirementId ? null : row.retirementId
+                           )
+                         }
+                       />
+
+                       {activeRowId === row.retirementId && (
+                         <AnimatePresence>
+                           <motion.div
+                             initial={{ y: -10, opacity: 0 }}
+                             animate={{ y: 0, opacity: 1 }}
+                             exit={{ y: -10, opacity: 0 }}
+                             transition={{ duration: 0.2, ease: "easeOut" }}
+                             className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-32">
+                             <ul className="text-sm">
+                               <li 
+                                 onClick={() => {
+                                   setSelectedRetirement(row);
+                                   setOpenEditRetirement(true);
+                                   setActiveRowId(null);
+                                 }}
+                                 className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
+                                 <Icon
+                                   icon={"ph:pencil-simple-line"}
+                                   height={20}
+                                   width={20}
+                                 />
+                                 Edit
+                               </li>
+                               <li onClick={() => setOpenDeleteModal(true)} className="cursor-pointer hover:text-red-600 border-t border-gray-200 flex gap-2 p-3 items-center">
+                                 <Icon
+                                   icon={"pixelarticons:trash"}
+                                   height={20}
+                                   width={20}
+                                 />
+                                 Remove
+                               </li>
+                             </ul>
+                           </motion.div>
+                         </AnimatePresence>
+                       )}
+                     </td>
+                   )}
+                  </>
+                )}
+              />
+            </div>
+            <div className="flex flex-col gap-2 pt-6 text-sm font-semibold text-gray-900 border-t border-gray-200 mt-4 text-right">
+              <p>Total Activity Cost: <span className="font-bold">₦{totalRetirementActualCost.toLocaleString()}</span></p>
+              <p>Amount to reimburse to NDSICDE: <span className="font-bold">₦{reimburseToNDSICDE.toLocaleString()}</span></p>
+              <p>Amount to reimburse to Staff: <span className="font-bold">₦{reimburseToStaff.toLocaleString()}</span></p>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-center gap-x-16 gap-y-5 items-center flex-wrap">
+          {signatures.map((sign, idx) => (
+            <SignatureComponenet
+              key={idx}
+              heading={sign.heading}
+              name={sign.name}
+              signature={sign.signature}
+              date={sign.date}
+            />
+          ))}
+        </div>
+
+        {selectedRequest.documentURL && (
+          <div className="print:hidden">
+            <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+              Attached Documents
+            </h3>
+            <FileDisplay
+              filename={selectedRequest.documentName}
+              url={selectedRequest.documentURL}
+            />
+          </div>
         )}
       </div>
 

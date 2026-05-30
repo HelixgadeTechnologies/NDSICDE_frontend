@@ -1,33 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CardComponent from "@/ui/card-wrapper";
 import Heading from "@/ui/text-heading";
 import FileDisplay from "@/ui/file-display";
-import TitleAndContent from "@/components/super-admin-components/data-validation/title-content-component";
 import Table from "@/ui/table";
 import Button from "@/ui/form/button";
-import BackButton from "@/ui/back-button";
-import {
-  Calendar,
-  MapPin,
-  User,
-  Phone,
-  FileText,
-  DollarSign,
-  Paintbrush,
-  BusFront,
-  FileOutput,
-  ActivityIcon,
-  Navigation,
-} from "lucide-react";
-import InfoItem from "@/ui/info-item";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
 import { getToken } from "@/lib/api/credentials";
 import { ProjectRequestResponseType, RequestLineItemType } from "@/types/project-management-types";
 import { useSearchParams } from "next/navigation";
 import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
+import SignatureComponenet from "@/ui/signature-component";
+import { signatures } from "@/lib/config/demo-signatures";
 
 export default function ViewActivityRequestPage() {
   const searchParams = useSearchParams();
@@ -93,177 +78,160 @@ export default function ViewActivityRequestPage() {
   }
 
   return (
-    <div className="mt-12 space-y-7 pb-12">
-      <div className="flex justify-between items-center">
+    <div className="mt-8 space-y-6 pb-12">
+      <div className="flex justify-between items-center print:hidden">
         <Heading
           heading="Financial Request Details"
           subtitle={`${requestDetails.activityTitle || "N/A"} - Submitted on ${formatDate(requestDetails.activityStartDate)}`}
         />
-        <div className="print:hidden">
+        <div className="w-50">
           <Button content="Print Request" isSecondary onClick={() => window.print()} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
-        {/* Left column: Submission Details & Budget breakdown */}
-        <div className="lg:col-span-2 space-y-7">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <InternalMemorandum
-                isReadOnly
-                staff={requestDetails.staff}
-                requestDate={requestDetails.requestDate || formatDate(requestDetails.activityStartDate, "date-only")}
-                budgetName={requestDetails.project?.projectName || "N/A"}
-                budgetCode={requestDetails.activityBudgetCode?.toString() || "N/A"}
-              />
+      <div className="max-w-5xl mx-auto bg-white border border-gray-300 shadow-sm p-10 print:p-0 print:border-none print:shadow-none space-y-10 text-gray-900">
+        
+        <InternalMemorandum
+          isReadOnly
+          staff={requestDetails.staff}
+          requestDate={requestDetails.requestDate || formatDate(requestDetails.activityStartDate, "date-only")}
+          budgetName={requestDetails.project?.projectName || "N/A"}
+          budgetCode={requestDetails.activityBudgetCode?.toString() || "N/A"}
+        />
+
+        <div>
+          <h3 className="text-base text-gray-600 font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
+            Activity Details
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Output</span>
+              <span className="font-medium text-gray-900">{outputDetails?.outputStatement || "N/A"}</span>
             </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                Activity Details
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <InfoItem
-                  label="Output"
-                  value={outputDetails?.outputStatement || "N/A"}
-                  icon={<FileOutput className="w-4 h-4" />}
-                />
-                <InfoItem
-                  label="Activity Title"
-                  value={requestDetails.activityTitle}
-                  icon={<ActivityIcon className="w-4 h-4" />}
-                />
-                <InfoItem
-                  label="Activity Location(s)"
-                  value={requestDetails.activityLocation}
-                  icon={<Navigation className="w-4 h-4" />}
-                />
-                <InfoItem
-                  label="Activity Start Date"
-                  value={formatDate(requestDetails.activityStartDate, "date-only")}
-                  icon={<Calendar className="w-4 h-4" />}
-                />
-                <InfoItem
-                  label="Activity End Date"
-                  value={formatDate(requestDetails.activityEndDate, "date-only")}
-                  icon={<Calendar className="w-4 h-4" />}
-                />
-              </div>
-
-              <div className="mt-6">
-                <TitleAndContent
-                  title="Activity Purpose/Description"
-                  content={requestDetails.activityPurposeDescription}
-                />
-              </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Title</span>
+              <span className="font-medium text-gray-900">{requestDetails.activityTitle || "N/A"}</span>
             </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Location(s)</span>
+              <span className="font-medium text-gray-900">{requestDetails.activityLocation || "N/A"}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity Start Date</span>
+              <span className="font-medium text-gray-900">{requestDetails.activityStartDate ? formatDate(requestDetails.activityStartDate, "date-only") : "N/A"}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Activity End Date</span>
+              <span className="font-medium text-gray-900">{requestDetails.activityEndDate ? formatDate(requestDetails.activityEndDate, "date-only") : "N/A"}</span>
+            </div>
+          </div>
+          
+          <div className="mt-8 text-sm">
+            <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide block mb-2">Activity Purpose/Description</span>
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded text-gray-800 leading-relaxed">
+              {requestDetails.activityPurposeDescription || "N/A"}
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center gap-x-16 gap-y-5 items-center flex-wrap">
+         {signatures.map((sign, idx) => (
+            <SignatureComponenet
+            key={idx}
+            heading={sign.heading}
+            name={sign.name}
+            signature={sign.signature}
+            date={sign.date}
+            />
+         ))}
+        </div>
 
-          {/* Budget Breakdown Card */}
-          <CardComponent>
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-[#D2091E]" />
-              Budget Breakdown
-            </h3>
+        <div>
+          <h3 className="text-base text-gray-600 font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
+            Budget Breakdown
+          </h3>
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
             <Table
               tableHead={head}
               tableData={requestDetails.lineItems || []}
+              height="fit-content"
               renderRow={(row: RequestLineItemType) => (
                 <>
-                  <td className="px-6 py-4 text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">
                     <p className="w-40 truncate">{row.description}</p>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">
                     {row.quantity}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">
                     {row.frequency}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-900 border-t border-gray-200">
                     ₦{row.unitCost?.toLocaleString() || 0}
                   </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                  <td className="px-6 py-4 text-sm font-semibold text-gray-900 border-t border-gray-200">
                     ₦{row.totalBudget?.toLocaleString() || 0}
                   </td>
                 </>
               )}
             />
-            <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
-              <div className="text-right">
-                <p className="text-sm text-gray-600">Grand Total</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  ₦{(requestDetails.lineItems || [])
-                    .reduce((sum, item) => sum + (item.totalBudget || 0), 0)
-                    .toLocaleString()}
-                </p>
-              </div>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <div className="text-right">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Grand Total</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ₦{(requestDetails.lineItems || [])
+                  .reduce((sum, item) => sum + (item.totalBudget || 0), 0)
+                  .toLocaleString()}
+              </p>
             </div>
-          </CardComponent>
+          </div>
         </div>
 
-        {/* Right column: Journey Management & Document attachment */}
-        <div className="space-y-7">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+        {!!requestDetails.isJourneyManagementRequired && (
+          <div>
+            <h3 className="text-base text-gray-600 font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
               Journey Management
             </h3>
-            {!!requestDetails.isJourneyManagementRequired ? (
-              <div className="grid grid-cols-1 gap-6">
-                <InfoItem
-                  label="Mode of Transport"
-                  value={requestDetails.modeOfTransport}
-                  icon={<BusFront className="w-4 h-4" />}
-                />
-                <InfoItem
-                  label="Driver's Name"
-                  value={requestDetails.driverName}
-                  icon={<User className="w-4 h-4" />}
-                />
-                <InfoItem
-                  label="Driver's Phone Number"
-                  value={requestDetails.driversPhoneNumber}
-                  icon={<Phone className="w-4 h-4" />}
-                />
-                <InfoItem
-                  label="Vehicle Color"
-                  value={requestDetails.vehicleColor}
-                  icon={<Paintbrush className="w-4 h-4" />}
-                />
-                <InfoItem
-                  label="Departure Date"
-                  value={formatDate(requestDetails.departureTime, "date-only")}
-                  icon={<Calendar className="w-4 h-4" />}
-                />
-                {/* <InfoItem
-                  label="Recipient's Phone Number"
-                  value={requestDetails.recipientPhoneNumber}
-                  icon={<Phone className="w-4 h-4" />}
-                /> */}
-                <InfoItem
-                  label="Route"
-                  value={requestDetails.route}
-                  icon={<MapPin className="w-4 h-4" />}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Mode of Transport</span>
+                <span className="font-medium text-gray-900">{requestDetails.modeOfTransport || "N/A"}</span>
               </div>
-            ) : (
-              <p className="text-sm text-gray-500 italic">Journey management was omitted for this request.</p>
-            )}
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Driver's Name</span>
+                <span className="font-medium text-gray-900">{requestDetails.driverName || "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Driver's Phone Number</span>
+                <span className="font-medium text-gray-900">{requestDetails.driversPhoneNumber || "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Vehicle Color</span>
+                <span className="font-medium text-gray-900">{requestDetails.vehicleColor || "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Departure Date</span>
+                <span className="font-medium text-gray-900">{requestDetails.departureTime ? formatDate(requestDetails.departureTime, "date-only") : "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">Route</span>
+                <span className="font-medium text-gray-900">{requestDetails.route || "N/A"}</span>
+              </div>
+            </div>
           </div>
+        )}
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-[#D2091E]" />
-              Supporting Document
+        {requestDetails.documentURL && (
+          <div className="print:hidden">
+            <h3 className="text-base text-gray-600 font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
+              Supporting Document(s)
             </h3>
-            {requestDetails.documentURL ? (
-              <FileDisplay
-                filename={requestDetails.documentName}
-                url={requestDetails.documentURL}
-              />
-            ) : (
-              <p className="text-sm text-gray-500">No document attached.</p>
-            )}
+            <FileDisplay
+              filename={requestDetails.documentName}
+              url={requestDetails.documentURL}
+            />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

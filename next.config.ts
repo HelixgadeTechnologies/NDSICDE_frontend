@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**', // This allows any path on the hostname
       },
+       {
+        protocol: 'https',
+        hostname: 'imgs.search.brave.com',
+        port: '',
+        pathname: '/**', // This allows any path on the hostname
+      },
       // add other hostnames here if needed
     ],
   },
