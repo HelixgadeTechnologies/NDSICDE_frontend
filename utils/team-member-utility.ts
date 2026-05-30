@@ -53,6 +53,21 @@ export const getRetirementApprovalNumber = (value: string): number => {
 export const getActivityKpiApprovalNumber = (value: string): number =>
   value === "grant access" ? 1 : 0;
 
+export const getRetirementApprovalValue = (num: number | null | undefined): string => {
+  switch (num) {
+    case 1: return "layer 1";
+    case 2: return "layer 2";
+    case 3: return "layer 3";
+    case 4: return "layer 4";
+    case 5: return "layer 5";
+    case 0:
+    default: return "none";
+  }
+};
+
+export const getActivityKpiApprovalValue = (num: number | null | undefined): string =>
+  num === 1 ? "grant access" : "no access";
+
 export interface TeamMemberModalStates {
   editTeamMember: boolean;
   viewTeamMember: boolean;

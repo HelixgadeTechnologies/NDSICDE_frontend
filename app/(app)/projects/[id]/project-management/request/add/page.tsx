@@ -41,6 +41,7 @@ export type RequestFormData = {
   recipientPhoneNumber: string;
   documentName: string;
   documentURL: string;
+  supportingDocuments: { documentName: string; documentURL: string }[];
   activityId: string;
   createdBy: string;
   budgetName: string;
@@ -108,6 +109,7 @@ export default function FormParent() {
     recipientPhoneNumber: "",
     documentName: "",
     documentURL: "",
+    supportingDocuments: [],
     activityId: "",
     createdBy: user?.id || "",
     budgetName: "",

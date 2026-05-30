@@ -6,14 +6,23 @@ import Heading from "@/ui/text-heading";
 import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
-import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
-import { fetchRoles } from "@/lib/api/roles";
-import { DropdownOption } from "@/types/project-management-types";
-import { ChangeEvent, useEffect, useState } from "react";
 import TagInput from "@/ui/form/tag-input";
+import FileUploader from "@/ui/form/file-uploader";
+import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
+import { fetchRoles, RoleData } from "@/lib/api/roles";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { updateUser } from "@/lib/api/user-management";
 import { useRoleStore } from "@/store/role-store";
+import { useProjects } from "@/context/ProjectsContext";
 import { toast } from "react-toastify";
+import {
+  ACTIVITY_KPI_APPROVAL_ROLE,
+  RR_APPROVAL_ROLE,
+  getActivityKpiApprovalNumber,
+  getActivityKpiApprovalValue,
+  getRetirementApprovalNumber,
+  getRetirementApprovalValue,
+} from "@/utils/team-member-utility";
 
 type EditProps = {
   isOpen: boolean;
@@ -22,87 +31,170 @@ type EditProps = {
   onEdit: () => void;
 };
 
+const ALL_LABEL = "All";
+
 export default function EditTeamMember({
   isOpen,
   onClose,
   user,
   onEdit,
 }: EditProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState(1);
+  const [roles, setRoles] = useState<RoleData[]>([]);
+  const [signatureUrl, setSignatureUrl] = useState("");
+  const [signatureMime, setSignatureMime] = useState("");
+
+  const { token } = useRoleStore();
+  const { projects, projectOptions } = useProjects();
+
   const {
     fullName,
     email,
     department,
     phoneNumber,
     roleId,
+    designation,
     status,
-    // assignedProjects,
+    requestRetirementApprovalRole,
+    activityKpiApprovalRole,
     setField,
     resetForm,
   } = useUserManagementState();
 
+  // Tags shown in the UI — either ["All"] or one/more project names
+  const [selectedProjectTags, setSelectedProjectTags] = useState<string[]>([]);
+
+  // name-to-id and id-to-name lookups
+  const projectNameToId = useMemo(
+    () => new Map(projects.map((p) => [p.projectName, p.projectId])),
+    [projects],
+  );
+  const projectIdToName = useMemo(
+    () => new Map(projects.map((p) => [p.projectId, p.projectName])),
+    [projects],
+  );
+
+  const tagOptions = useMemo(
+    () => [ALL_LABEL, ...projectOptions.map((o) => o.label)],
+    [projectOptions],
+  );
+
+  /** Comma-separated IDs derived from the selected tags */
+  const assignedProjectIdString = useMemo(() => {
+    if (selectedProjectTags.includes(ALL_LABEL)) {
+      return projects.map((p) => p.projectId).join(",");
+    }
+    return selectedProjectTags
+      .map((name) => projectNameToId.get(name) ?? "")
+      .filter(Boolean)
+      .join(",");
+  }, [selectedProjectTags, projects, projectNameToId]);
+
+  const handleProjectTagChange = (tags: string[]) => {
+    const lastAdded = tags[tags.length - 1];
+    if (lastAdded === ALL_LABEL) {
+      setSelectedProjectTags([ALL_LABEL]);
+      return;
+    }
+    if (selectedProjectTags.includes(ALL_LABEL) && tags.length > 1) {
+      return;
+    }
+    setSelectedProjectTags(tags.filter((t) => t !== ALL_LABEL));
+  };
+
+  // Fetch roles + prefill form when the modal opens; reset on close.
   useEffect(() => {
-    if (isOpen && user) {
-      setField("fullName", user.fullName || "");
-      setField("email", user.email || "");
-      setField("department", user.department || "");
-      setField("phoneNumber", user.phoneNumber || "");
-      setField("roleId", user.roleId || "");
-      setField("status", user.status || "Active");
+    if (!isOpen) {
+      setStep(1);
+      setSignatureUrl("");
+      setSignatureMime("");
+      setError(null);
+      resetForm();
+      setSelectedProjectTags([]);
+      return;
     }
 
-    // Cleanup when modal closes
-    if (!isOpen) {
-      resetForm();
-    }
+    fetchRoles()
+      .then(setRoles)
+      .catch((err) => console.error("Failed to load roles:", err));
+
+    // Prefill scalar fields from the user record
+    const u = user as UserDetails & {
+      designation?: string;
+      activityKpiApproval?: number;
+      retirementApproval?: number;
+      signature?: string;
+      signatureMimeType?: string;
+    };
+    setField("fullName", u.fullName || "");
+    setField("email", u.email || "");
+    setField("department", u.department || "");
+    setField("phoneNumber", u.phoneNumber || "");
+    setField("roleId", u.roleId || "");
+    setField("designation", u.designation || u.roleName || "");
+    setField("status", u.status || "Active");
+    setField(
+      "activityKpiApprovalRole",
+      getActivityKpiApprovalValue(u.activityKpiApproval),
+    );
+    setField(
+      "requestRetirementApprovalRole",
+      getRetirementApprovalValue(u.retirementApproval),
+    );
+    setSignatureUrl(u.signature || "");
+    setSignatureMime(u.signatureMimeType || "");
   }, [isOpen, user, setField, resetForm]);
 
-  const [roleOptions, setRoleOptions] = useState<DropdownOption[]>([]);
-
+  // Prefill assigned project tags once both the user's IDs and project list are available
   useEffect(() => {
-    const loadRoles = async () => {
-      try {
-        const rolesData = await fetchRoles();
-        const transformedRoles = rolesData.map((role) => ({
-          label: role.roleName,
-          value: role.roleId
-        }));
-        setRoleOptions(transformedRoles);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
-    };
-
-    if (isOpen) {
-      loadRoles();
+    if (!isOpen) return;
+    const idsCsv = user.assignedProjectId ?? "";
+    if (!idsCsv) {
+      setSelectedProjectTags([]);
+      return;
     }
-  }, [isOpen]);
+    const ids = idsCsv.split(",").map((s) => s.trim()).filter(Boolean);
+    // If the user has every project, show the "All" chip
+    if (projects.length > 0 && ids.length === projects.length) {
+      setSelectedProjectTags([ALL_LABEL]);
+      return;
+    }
+    const names = ids
+      .map((id) => projectIdToName.get(id))
+      .filter((n): n is string => Boolean(n));
+    setSelectedProjectTags(names);
+  }, [isOpen, user.assignedProjectId, projects, projectIdToName]);
 
-  const statusOptions = [
-    { label: "Active", value: "Active" },
-    { label: "Inactive", value: "Inactive" },
-  ];
+  const designationOptions = useMemo(
+    () => roles.map((r) => ({ label: r.roleName, value: r.roleId })),
+    [roles],
+  );
 
-  const departmentOptions = [
-    { label: "Banking", value: "Banking" },
-    { label: "Agriculture", value: "Agriculture" },
+  const departments = [
     { label: "Finance", value: "Finance" },
-    { label: "IT support", value: "IT support" },
-    { label: "Operations", value: "Operations" },
-    { label: "Management", value: "Management" },
+    { label: "Admin", value: "Admin" },
+    { label: "Programs", value: "Programs" },
   ];
 
-  const options = [
-    "Healthcare Initiative",
-    "Education Program",
-    "Clean Water Project",
-    "Clean Water One",
-  ];
+  const handleDesignationChange = (selectedRoleId: string) => {
+    setField("roleId", selectedRoleId);
+    const matched = roles.find((r) => r.roleId === selectedRoleId);
+    setField("designation", matched?.roleName ?? "");
+  };
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { token } = useRoleStore();
-
-  const handleEdit = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
+
+    if (!token) {
+      setError("Authentication token not available");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       await updateUser(
         user.userId,
@@ -110,21 +202,27 @@ export default function EditTeamMember({
           fullName,
           email,
           roleId,
+          designation,
           department,
           phoneNumber,
           status,
-          assignedProjectId: "ALL",
+          assignedProjectId: assignedProjectIdString,
+          activityKpiApproval: getActivityKpiApprovalNumber(activityKpiApprovalRole),
+          retirementApproval: getRetirementApprovalNumber(requestRetirementApprovalRole),
+          signature: signatureUrl,
+          signatureMimeType: signatureMime,
         },
-        token ?? ""
+        token,
       );
       toast.success("User updated successfully");
       onEdit();
       onClose();
-    } catch (error) {
-      console.error(error);
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update user"
-      );
+    } catch (err) {
+      console.error(err);
+      const msg =
+        err instanceof Error ? err.message : "Failed to update user";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -133,70 +231,163 @@ export default function EditTeamMember({
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
       <Heading
-        heading="User Profile"
-        subtitle={`Detailed information about ${user.fullName}`}
+        heading="Edit Team Member"
+        subtitle={`Update the details for ${user.fullName}`}
       />
-      <form action="">
-        <div className="grid grid-cols-2 my-4 gap-4">
-          <TextInput
-            value={fullName}
-            label="Full Name"
-            name="fullName"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setField("fullName", e.target.value)
-            }
-          />
-          <TextInput
-            value={email}
-            label="Email Address"
-            name="email"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setField("email", e.target.value)
-            }
-          />
-          <DropDown
-            label="Role"
-            options={roleOptions}
-            name="role"
-            value={roleId}
-            onChange={(value: string) => setField("roleId", value)}
-          />
-          <DropDown
-            label="Department"
-            options={departmentOptions}
-            name="department"
-            value={department}
-            onChange={(value: string) => setField("department", value)}
-          />
-          <TextInput
-            value={phoneNumber}
-            label="Phone Number"
-            name="phoneNumber"
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setField("phoneNumber", e.target.value)
-            }
-          />
-          <DropDown
-            label="Status"
-            options={statusOptions}
-            name="status"
-            value={status}
-            onChange={(value: string) => setField("status", value)}
-          />
-          <div className="col-span-2">
-            <TagInput
-              label="Assigned Projects"
-              options={options}
-              tags={[]}
-              onChange={() => setField("assignedProjects", [])}
-            />
-          </div>
-        </div>
-        <Button
-          content="Save Changes"
-          onClick={handleEdit}
-          isLoading={isSubmitting}
-        />
+      <form onSubmit={handleSave}>
+        {step === 1 ? (
+          <>
+            <div className="grid grid-cols-2 my-4 gap-5">
+              <TextInput
+                value={fullName}
+                label="Full Name"
+                name="fullName"
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setField("fullName", e.target.value)
+                }
+              />
+              <TextInput
+                value={email}
+                label="Email Address"
+                name="email"
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setField("email", e.target.value)
+                }
+              />
+              <DropDown
+                label="Department"
+                options={departments}
+                name="department"
+                value={department}
+                onChange={(value: string) => setField("department", value)}
+              />
+              <DropDown
+                label="Designation"
+                options={designationOptions}
+                name="roleId"
+                value={roleId}
+                placeholder="Select designation"
+                onChange={handleDesignationChange}
+              />
+              <DropDown
+                label="Request and Retirement Approval Role"
+                options={RR_APPROVAL_ROLE}
+                name="requestRetirementApprovalRole"
+                value={requestRetirementApprovalRole}
+                onChange={(value: string) =>
+                  setField("requestRetirementApprovalRole", value)
+                }
+              />
+              <DropDown
+                label="Activity & KPI Report Approval"
+                options={ACTIVITY_KPI_APPROVAL_ROLE}
+                name="activityKpiApprovalRole"
+                value={activityKpiApprovalRole}
+                onChange={(value: string) =>
+                  setField("activityKpiApprovalRole", value)
+                }
+              />
+              <TextInput
+                value={phoneNumber}
+                label="Phone Number"
+                name="phoneNumber"
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setField("phoneNumber", e.target.value)
+                }
+              />
+              <DropDown
+                label="Status"
+                options={[
+                  { label: "Active", value: "Active" },
+                  { label: "Inactive", value: "Inactive" },
+                ]}
+                name="status"
+                value={status}
+                onChange={(value: string) => setField("status", value)}
+              />
+            </div>
+            <div className="col-span-2">
+              <TagInput
+                label="Assigned Projects"
+                placeholder={
+                  selectedProjectTags.includes(ALL_LABEL)
+                    ? "All projects selected"
+                    : "Select projects…"
+                }
+                value={selectedProjectTags}
+                options={
+                  selectedProjectTags.includes(ALL_LABEL)
+                    ? [] // lock further selection when "All" is chosen
+                    : tagOptions
+                }
+                onChange={handleProjectTagChange}
+              />
+            </div>
+            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+            <div className="flex w-full mt-6">
+              <Button content="Next" type="button" onClick={() => setStep(2)} />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="my-4 space-y-3">
+              <h3 className="text-sm font-medium text-gray-700">
+                User's Signature
+              </h3>
+
+              {signatureUrl && (
+                <div className="flex items-center justify-between gap-3 border border-gray-200 rounded-md px-4 py-3">
+                  <span className="text-sm text-gray-700 truncate">
+                    Current signature on file
+                  </span>
+                  <a
+                    href={signatureUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-semibold text-(--primary-light) hover:underline shrink-0">
+                    View
+                  </a>
+                </div>
+              )}
+
+              <p className="text-xs text-gray-500">
+                {signatureUrl
+                  ? "Upload a new file to replace the signature, or leave as is."
+                  : "Upload a signature file."}
+              </p>
+
+              <FileUploader
+                multiple={false}
+                token={token || undefined}
+                onFilesChange={(files) =>
+                  setSignatureMime(files[0]?.type ?? signatureMime)
+                }
+                onUploadComplete={setSignatureUrl}
+                onUploadError={(msg) => setError(msg)}
+              />
+            </div>
+
+            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+            <div className="flex gap-4 mt-6">
+              <div className="w-1/2">
+                <Button
+                  content="Back"
+                  isSecondary
+                  type="button"
+                  onClick={() => setStep(1)}
+                />
+              </div>
+              <div className="w-1/2">
+                <Button
+                  content="Save Changes"
+                  type="submit"
+                  isLoading={isSubmitting}
+                  isDisabled={isSubmitting}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </form>
     </Modal>
   );

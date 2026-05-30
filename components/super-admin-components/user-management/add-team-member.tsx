@@ -31,13 +31,15 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
-  const [signatureFiles, setSignatureFiles] = useState<File[]>([]);
+  const [signatureUrl, setSignatureUrl] = useState("");
+  const [signatureMime, setSignatureMime] = useState("");
   const [roles, setRoles] = useState<RoleData[]>([]);
 
   useEffect(() => {
     if (!isOpen) {
       setStep(1);
-      setSignatureFiles([]);
+      setSignatureUrl("");
+      setSignatureMime("");
       setError(null);
       return;
     }
@@ -131,20 +133,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     }
 
     try {
-      let signature = "";
-      let signatureMimeType = "";
-      const signatureFile = signatureFiles[0];
-      if (signatureFile) {
-        signature = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve((reader.result as string).split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(signatureFile);
-        });
-        signatureMimeType = signatureFile.type;
-      }
-
-      // Prepare the data for API call
+      // Prepare the data for API call — signature is the uploaded file's URL
       const userData = {
         fullName,
         email,
@@ -156,8 +145,8 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         assignedProjectId: assignedProjectIdString,
         activityKpiApproval: getActivityKpiApprovalNumber(activityKpiApprovalRole),
         retirementApproval: getRetirementApprovalNumber(requestRetirementApprovalRole),
-        signature,
-        signatureMimeType,
+        signature: signatureUrl,
+        signatureMimeType: signatureMime,
       };
 
       await createUser(userData, token);
@@ -276,16 +265,18 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
           </>
         ) : (
           <>
-            <div className="my-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
+            <div className="my-4 space-y-2">
+              <h3 className="text-sm font-medium text-gray-700">
                 Upload User's Signature
               </h3>
               <FileUploader
-                maxFiles={1}
                 multiple={false}
-                autoUpload={false}
-                hideUploadButton
-                onFilesChange={(files) => setSignatureFiles(files)}
+                token={token || undefined}
+                onFilesChange={(files) =>
+                  setSignatureMime(files[0]?.type ?? "")
+                }
+                onUploadComplete={setSignatureUrl}
+                onUploadError={(msg) => setError(msg)}
               />
             </div>
             {error && <div className="text-red-500 text-sm mb-4">{error}</div>}

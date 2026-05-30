@@ -106,9 +106,20 @@ function DisaggChips({
 
 // ─── Main component
 
-export default function ViewIndicators({ resultId }: { resultId: string }) {
-  const [indicators, setIndicators] = useState<IndicatorData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+type ViewIndicatorsProps = {
+  resultId: string;
+  /** When provided, skip the internal fetch and render these directly.
+   * Lets a parent feed in a pre-filtered list (e.g. indicators belonging
+   * to one specific result entity) while reusing this component's card UI. */
+  indicatorsOverride?: IndicatorData[];
+};
+
+export default function ViewIndicators({
+  resultId,
+  indicatorsOverride,
+}: ViewIndicatorsProps) {
+  const [fetchedIndicators, setFetchedIndicators] = useState<IndicatorData[]>([]);
+  const [isLoading, setIsLoading] = useState(indicatorsOverride === undefined);
   const [isDeleting, setIsDeleting] = useState(false);
   const [indicatorToDelete, setIndicatorToDelete] = useState<string | null>(null);
   const [selectedIndicator, setSelectedIndicator] =
@@ -118,6 +129,9 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
   const router = useRouter();
   const projectId = params?.id as string;
 
+  // When the parent supplies indicators directly, that list wins.
+  const indicators = indicatorsOverride ?? fetchedIndicators;
+
   const fetchIndicators = async () => {
     if (!resultId || !projectId) return;
     setIsLoading(true);
@@ -125,7 +139,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
       // Fetch the result type first
       const resultType = await getResultTypeById(resultId);
       if (!resultType) {
-         setIndicators([]);
+         setFetchedIndicators([]);
          setIsLoading(false);
          return;
       }
@@ -138,7 +152,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
       else if (name.includes("impact")) { segment = "impacts"; idKey = "impactId"; }
       
       if (!segment) {
-         setIndicators([]);
+         setFetchedIndicators([]);
          setIsLoading(false);
          return;
       }
@@ -201,7 +215,7 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
         })
       );
       
-      setIndicators(allIndicators);
+      setFetchedIndicators(allIndicators);
     } catch (error) {
       console.error("Error fetching indicators:", error);
       toast.error("An error occurred while fetching indicators.");
@@ -211,8 +225,14 @@ export default function ViewIndicators({ resultId }: { resultId: string }) {
   };
 
   useEffect(() => {
+    // If parent supplied indicators directly, no internal fetch needed.
+    if (indicatorsOverride !== undefined) {
+      setIsLoading(false);
+      return;
+    }
     fetchIndicators();
-  }, [resultId, projectId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resultId, projectId, indicatorsOverride === undefined]);
 
   const handleDelete = async () => {
     if (!indicatorToDelete) return;

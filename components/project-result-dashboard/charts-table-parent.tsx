@@ -17,6 +17,7 @@ import { indicatorApi } from "@/lib/api/indicatorApi";
 import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getToken } from "@/lib/api/credentials";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -111,6 +112,15 @@ export default function ProjectKpiChartsTableParent({
   const [indicatorToDelete, setIndicatorToDelete] = useState<RawIndicator | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Charts tab: drill-down into a single result row to view its indicators
+  const [selectedResultRow, setSelectedResultRow] =
+    useState<ResultRow | null>(null);
+
+  // Drop the selection if the underlying resultLevel changes (different dataset)
+  useEffect(() => {
+    setSelectedResultRow(null);
+  }, [resultLevel]);
+
   // Result types (for dropdown)
   const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
 
@@ -158,22 +168,52 @@ export default function ProjectKpiChartsTableParent({
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/${segment}/project/${projectId}`
         );
         const rows: any[] = res.data?.data || [];
+        const token = getToken();
 
-        // For each result row, fetch its indicators
+        // For each result row, fetch its indicators in parallel with its reports
         const withIndicators: ResultWithIndicators[] = await Promise.all(
           rows.map(async (row) => {
             const resultId = row[idKey];
             let indicators: RawIndicator[] = [];
             try {
-              const indRes = await axios.get(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${resultId}`
-              );
-              // Tag each indicator with its parent result's entity ID so downstream
-              // links (e.g. Report Actual) can pass it without re-deriving.
-              indicators = (indRes.data?.data || []).map((ind: RawIndicator) => ({
-                ...ind,
-                resultId,
-              }));
+              const [indRes, reportRes] = await Promise.all([
+                axios.get(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicators/${resultId}`
+                ),
+                axios
+                  .get(
+                    `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/indicator-report/getByResultId/${resultId}`,
+                    { headers: { Authorization: `Bearer ${token}` } },
+                  )
+                  // Reports may not exist yet for some results — fall back to empty
+                  .catch(() => ({ data: null })),
+              ]);
+
+              const reportPayload = reportRes?.data;
+              const reports: any[] = Array.isArray(reportPayload)
+                ? reportPayload
+                : reportPayload?.data ?? [];
+
+              // Tag each indicator with its parent result's entity ID + hydrate
+              // `actual` from the first matching report so performance can be
+              // calculated downstream.
+              indicators = (indRes.data?.data || []).map((ind: RawIndicator) => {
+                const firstReport = reports.find(
+                  (r: any) => r.indicatorId === ind.indicatorId,
+                );
+                const reportedActual =
+                  firstReport?.cumulativeActual != null
+                    ? Number(firstReport.cumulativeActual)
+                    : undefined;
+                return {
+                  ...ind,
+                  resultId,
+                  actual:
+                    reportedActual !== undefined && !Number.isNaN(reportedActual)
+                      ? reportedActual
+                      : ind.actual,
+                };
+              });
             } catch {
               // leave indicators empty on fetch failure
             }
@@ -269,11 +309,19 @@ export default function ProjectKpiChartsTableParent({
     { tabName: "Table", id: 2 },
   ];
 
-  /** Columns — same count used for both parent (result) and child (indicator) rows */
+  /** Parent (result) row columns */
   const tableHead = [
     "Result Statement",
     "Thematic Area",
     "Responsible Person",
+    "",
+    "",
+    "",
+  ];
+
+  /** Child (indicator) row columns — rendered below the parent when expanded */
+  const childTableHead = [
+    "Indicator Statement",
     "Baseline",
     "Target",
     "Actual",
@@ -329,9 +377,119 @@ export default function ProjectKpiChartsTableParent({
           persistKey={`project-${projectId}-tabs`}
           renderContent={(tabId) => {
             if (tabId === 1) {
+              if (loadingRows) {
+                return (
+                  <div className="flex justify-center items-center py-16">
+                    <div className="dots">
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                );
+              }
+              if (!resultLevel) {
+                return (
+                  <div className="py-16 text-center text-sm text-gray-500">
+                    Choose a result level from the dropdown above to view
+                    results and their indicators.
+                  </div>
+                );
+              }
+              if (resultTableRows.length === 0) {
+                return (
+                  <div className="py-16 text-center text-sm text-gray-500">
+                    No results match the selected filters.
+                  </div>
+                );
+              }
+              // Drilled-in view: indicators for the selected result
+              if (selectedResultRow) {
+                // Pull the freshest snapshot from resultTableRows so deletes/
+                // refetches reflect immediately while drilled in.
+                const liveRow =
+                  resultTableRows.find((r) => r.id === selectedResultRow.id) ??
+                  selectedResultRow;
+                return (
+                  <div className="h-115 overflow-auto space-y-4 pr-1">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedResultRow(null)}
+                      className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit">
+                      <Icon
+                        icon="fluent:arrow-left-24-regular"
+                        width={16}
+                        height={16}
+                      />
+                      Back to Results
+                    </button>
+                    <div className="rounded-md border border-gray-200 bg-gray-50 px-5 py-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                            Result Statement
+                          </p>
+                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                            {liveRow.statement}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                            Thematic Area
+                          </p>
+                          <p className="text-sm text-gray-700 mt-0.5">
+                            {liveRow.thematicArea}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                            Responsible Person
+                          </p>
+                          <p className="text-sm text-gray-700 mt-0.5">
+                            {liveRow.responsiblePerson}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <ViewIndicators
+                      // Force a fresh mount per result so the override is picked
+                      // up cleanly and stale indicator state doesn't leak across.
+                      key={liveRow.id}
+                      resultId={resultLevel}
+                      indicatorsOverride={liveRow.childIndicators as any}
+                    />
+                  </div>
+                );
+              }
+
+              // Top-level: list of results
               return (
-                <div className="h-115 overflow-auto">
-                  <ViewIndicators resultId={resultLevel} />
+                <div className="h-115 overflow-auto space-y-3 pr-1">
+                  {resultTableRows.map((result) => (
+                    <button
+                      key={result.id}
+                      type="button"
+                      onClick={() => setSelectedResultRow(result)}
+                      className="w-full flex items-center justify-between gap-4 px-5 py-4 border border-gray-200 bg-white rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <div className="grid grid-cols-3 gap-4 flex-1 items-center">
+                        <p className="text-sm font-semibold text-gray-900 max-w-md">
+                          {result.statement}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {result.thematicArea}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {result.responsiblePerson}
+                        </p>
+                      </div>
+                      <Icon
+                        icon="fluent:chevron-right-24-regular"
+                        width={20}
+                        height={20}
+                        className="text-gray-400 shrink-0"
+                      />
+                    </button>
+                  ))}
                 </div>
               );
             } else {
@@ -348,6 +506,7 @@ export default function ProjectKpiChartsTableParent({
                   ) : (
                     <TableWithAccordion<ResultRow, RawIndicator>
                       tableHead={tableHead}
+                      childTableHead={childTableHead}
                       tableData={resultTableRows}
                       childrenKey="childIndicators"
                       persistKey={`project-${projectId}-accordion`}
@@ -364,9 +523,6 @@ export default function ProjectKpiChartsTableParent({
                           </td>
                           <td className="px-6 py-3 text-xs text-gray-600">{result.thematicArea || ""}</td>
                           <td className="px-6 py-3 text-xs text-gray-600">{result.responsiblePerson || ""}</td>
-                          {/* Indicator-specific metrics don't apply at the result level — left intentionally blank */}
-                          <td className="px-6 py-3" />
-                          <td className="px-6 py-3" />
                           <td className="px-6 py-3" />
                           <td className="px-6 py-3" />
                           <td className="px-6 py-3" />
@@ -377,11 +533,15 @@ export default function ProjectKpiChartsTableParent({
                         const target   = indicator.cumulativeTarget ?? indicator.target ?? null;
                         const actual   = indicator.actual ?? null;
 
+                        // Always compute performance from actual/target — defensive
+                        // against the API sometimes returning strings or nulls.
+                        const numericTarget = typeof target === "number" ? target : Number(target);
+                        const numericActual = typeof actual === "number" ? actual : Number(actual);
                         const computedPerformance =
-                          indicator.performance != null
-                            ? indicator.performance
-                            : target && actual != null
-                            ? Math.round((actual / target) * 100)
+                          !Number.isNaN(numericTarget) &&
+                          numericTarget > 0 &&
+                          !Number.isNaN(numericActual)
+                            ? Math.round((numericActual / numericTarget) * 100)
                             : null;
 
                         return (
@@ -389,14 +549,11 @@ export default function ProjectKpiChartsTableParent({
                             <td className="px-6 py-3 pl-12 text-xs text-gray-700 max-w-xs">
                               {indicator.statement ?? ""}
                             </td>
-                            {/* thematic area & responsible person not on indicator — left blank */}
-                            <td className="px-6 py-3" />
-                            <td className="px-6 py-3" />
                             <td className="px-6 py-3 text-xs text-gray-700">{baseline ?? 0}</td>
                             <td className="px-6 py-3 text-xs text-gray-700">{target ?? 0}</td>
                             <td className="px-6 py-3 text-xs text-gray-700">{actual ?? 0}</td>
                             <td className="px-6 py-3 text-xs text-gray-700">
-                              {computedPerformance != null ? `${computedPerformance}%` : ""}
+                              {computedPerformance != null ? `${computedPerformance}%` : "—"}
                             </td>
                             <td
                               className="px-6 py-2 relative"
@@ -420,7 +577,7 @@ export default function ProjectKpiChartsTableParent({
                                     type: "link",
                                     label: "Edit",
                                     icon: "ph:pencil-simple-line",
-                                    href: `/projects/${projectId}/project-management/indicator?indicatorId=${indicator.indicatorId}&mode=edit&resultId=${indicator.result || ""}&resultTypeId=${indicator.resultTypeId || ""}`,
+                                    href: `/projects/${projectId}/project-management/indicator?indicatorId=${indicator.indicatorId}&mode=edit&resultId=${indicator.resultId || ""}&resultTypeId=${indicator.resultTypeId || ""}`,
                                   },
                                   {
                                     type: "button",

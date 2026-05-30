@@ -172,6 +172,11 @@ export default function FormOne({
           setBudgetCode={(val) => updateFormData({ budgetCode: val })}
         />
 
+        <div className="flex items-center gap-5">
+          <TagInput label="Send to (SPO)" options={[]}/>
+          <TagInput label="Send to (Finance Officer)" options={[]}/>
+        </div>
+
         <DropDown
           label="Output"
           name="outputId"
@@ -338,7 +343,7 @@ export default function FormOne({
                   <button
                     type="button"
                     onClick={() => handleRemoveLineItem(index)}
-                    className={`hidden md:block text-red-500 hover:text-red-700 transition-colors ${index === 0 ? "mt-8.5" : "mt-3"}`}>
+                    className={`hidden md:block text-gray-500 hover:text-gray-700 transition-colors ${index === 0 ? "mt-8.5" : "mt-3"}`}>
                     <Icon icon="mdi:close-circle" className="text-xl" />
                   </button>
                 )}

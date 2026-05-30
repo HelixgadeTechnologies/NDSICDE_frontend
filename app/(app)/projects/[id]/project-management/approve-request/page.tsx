@@ -60,7 +60,7 @@ export default function ApproveRequestPage() {
           },
           {
             title: "In Review",
-            value: requests.filter((r) => r.status === "In Review").length,
+            value: requests.filter((r) => r.status === "InReview").length,
             icon: "mdi:eye-outline",
           },
           {
@@ -181,10 +181,10 @@ export default function ApproveRequestPage() {
                               )}
                               <span
                                 className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${statusColor}`}>
-                                {row.status || "Pending"}
+                                {row.status === "InReview" ? 'In Review' : row.status}
                               </span>
                             </div>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 teadxt-xs text-gray-500">
                               {row.staff && (
                                 <span className="flex items-center gap-1">
                                   <Icon icon="mdi:account-outline" width={13} height={13} />
