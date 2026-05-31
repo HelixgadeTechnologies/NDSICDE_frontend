@@ -5,7 +5,7 @@ import CardComponent from "@/ui/card-wrapper";
 import SearchInput from "@/ui/form/search";
 import DropDown from "@/ui/form/select-dropdown";
 import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "framer-motion";
+import ActionMenu from "@/ui/action-menu";
 import { useState, useEffect } from "react";
 import { useReportsCommentsModal } from "@/utils/reports-and-comments-utility";
 import { reportsHead } from "@/types/reports-and-comments";
@@ -247,47 +247,27 @@ export default function ReportsTable() {
                       />
                     </div>
 
-                    {activeRowId === row.reportId && (
-                      <AnimatePresence>
-                        <motion.div
-                          initial={{ y: -10, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          exit={{ y: -10, opacity: 0 }}
-                          transition={{ duration: 0.2, ease: "easeOut" }}
-                          className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                          <ul className="text-sm">
-                            <li
-                              onClick={() => {
-                                handleAddComments(row, () =>
-                                  setActiveRowId(null),
-                                );
-                              }}
-                              className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                              <Icon
-                                icon={"si:add-fill"}
-                                height={20}
-                                width={20}
-                              />
-                              Add Comments
-                            </li>
-                            <li
-                              onClick={() => {
-                                handleViewAnalytics(row, () =>
-                                  setActiveRowId(null),
-                                );
-                              }}
-                              className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center">
-                              <Icon
-                                icon={"heroicons:eye"}
-                                height={20}
-                                width={20}
-                              />
-                              View Analytics
-                            </li>
-                          </ul>
-                        </motion.div>
-                      </AnimatePresence>
-                    )}
+                    <ActionMenu
+                      isOpen={activeRowId === row.reportId}
+                      onClose={() => setActiveRowId(null)}
+                      items={[
+                        {
+                          type: "button",
+                          label: "Add Comments",
+                          icon: "si:add-fill",
+                          onClick: () =>
+                            handleAddComments(row, () => setActiveRowId(null)),
+                        },
+                        {
+                          type: "button",
+                          label: "View Analytics",
+                          icon: "heroicons:eye",
+                          onClick: () =>
+                            handleViewAnalytics(row, () => setActiveRowId(null)),
+                          className: "border-y border-gray-300",
+                        },
+                      ]}
+                    />
                   </td>
                 </>
               )}

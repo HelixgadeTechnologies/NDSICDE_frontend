@@ -2,15 +2,17 @@
 
 import Button from "@/ui/form/button";
 import TextInput from "@/ui/form/text-input";
+import DropDown from "@/ui/form/select-dropdown";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter, useParams } from "next/navigation";
 import { ProjectRequestResponseType } from "@/types/project-management-types";
 import { getToken } from "@/lib/api/credentials";
+import { getUsers, UserManagementCredentials } from "@/lib/api/user-management";
 
 type AddProps = {
   isOpen: boolean;
@@ -73,6 +75,22 @@ export default function AddProjectRequestRetirement({
     { id: 1, value: "" }
   ]);
 
+  // Layer 3 designated approver (Finance Officer) — stored as a user id.
+  const [sendTo2, setSendTo2] = useState("");
+  const [users, setUsers] = useState<UserManagementCredentials[]>([]);
+
+  useEffect(() => {
+    if (!token) return;
+    getUsers(token)
+      .then((res) => setUsers(res.data ?? []))
+      .catch((e) => console.error("Failed to load users for Send to field", e));
+  }, [token]);
+
+  const userOptions = useMemo(
+    () => users.map((u) => ({ label: u.fullName, value: u.userId })),
+    [users],
+  );
+
   // add line item
   const addLineItem = () => {
     const newId = Math.max(...lineItems.map((l) => l.id), 0) + 1;
@@ -123,6 +141,7 @@ export default function AddProjectRequestRetirement({
         documentName: selectedRequest.documentName || "string",
         documentURL: selectedRequest.documentURL || "string",
         requestId: selectedRequest.requestId,
+        sendTo2,
         status: "Pending"
       }
     };
@@ -165,6 +184,15 @@ export default function AddProjectRequestRetirement({
             onChange={(e: any) => setActualCost(e.target.value)}
             placeholder="---"
             label="Actual Cost of Line Item (₦)"
+            isBigger
+          />
+          <DropDown
+            name="sendTo2"
+            label="Send to (Finance Officer)"
+            placeholder="Select a finance officer"
+            value={sendTo2}
+            onChange={(value) => setSendTo2(value)}
+            options={userOptions}
             isBigger
           />
           <div className="flex items-center gap-6">

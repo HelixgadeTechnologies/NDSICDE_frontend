@@ -5,7 +5,7 @@ import Button from "@/ui/form/button";
 import Table from "@/ui/table";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "framer-motion";
+import ActionMenu from "@/ui/action-menu";
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import FileUploader from "@/ui/form/file-uploader";
@@ -320,53 +320,33 @@ export default function ProjectLogicalFramework() {
                     }
                   />
 
-                  {activeRowId === row.logicalFrameworkId && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                        <ul className="text-sm">
-                          <li
-                            className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center"
-                            onClick={() =>
-                              handleViewFramework(row.logicalFrameworkId)
-                            }>
-                            <Icon
-                              icon={
-                                isLoadingFramework
-                                  ? "pixel:spinner"
-                                  : "hugeicons:view"
-                              }
-                              height={20}
-                              width={20}
-                              className={
-                                isLoadingFramework ? "animate-spin" : ""
-                              }
-                            />
-                            View Framework
-                          </li>
-                          <li
-                            className="cursor-pointer hover:text-red-600 flex gap-2 p-3 items-center"
-                            onClick={() =>
-                              handleDeleteClick(
-                                row.logicalFrameworkId,
-                                row.documentName,
-                              )
-                            }>
-                            <Icon
-                              icon={"pixelarticons:trash"}
-                              height={20}
-                              width={20}
-                            />
-                            Remove
-                          </li>
-                        </ul>
-                      </motion.div>
-                    </AnimatePresence>
-                  )}
+                  <ActionMenu
+                    isOpen={activeRowId === row.logicalFrameworkId}
+                    onClose={() => setActiveRowId(null)}
+                    items={[
+                      {
+                        type: "button",
+                        label: "View Framework",
+                        icon: isLoadingFramework
+                          ? "pixel:spinner"
+                          : "hugeicons:view",
+                        onClick: () =>
+                          handleViewFramework(row.logicalFrameworkId),
+                        className: "border-b border-gray-300",
+                      },
+                      {
+                        type: "button",
+                        label: "Remove",
+                        icon: "pixelarticons:trash",
+                        onClick: () =>
+                          handleDeleteClick(
+                            row.logicalFrameworkId,
+                            row.documentName,
+                          ),
+                        className: "hover:text-red-600",
+                      },
+                    ]}
+                  />
                 </td>
               </>
             )}

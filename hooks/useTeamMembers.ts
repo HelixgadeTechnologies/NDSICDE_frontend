@@ -18,7 +18,7 @@ export function useTeamMembers(token: string | null) {
 
       if (response.success && Array.isArray(response.data)) {
         const mappedUsers: UserDetails[] = response.data.map(
-          (user: UserDetails) => ({
+          (user) => ({
             userId: user.userId,
             fullName: user.fullName,
             email: user.email,
@@ -27,7 +27,8 @@ export function useTeamMembers(token: string | null) {
             roleId: user.roleId,
             roleName: user.roleName,
             status: user.status,
-            assignedProjectId: user.assignedProjectId,
+            // API may return null; UserDetails expects a string id.
+            assignedProjectId: user.assignedProjectId ?? "",
             department: user.department,
             community: user.community,
             state: user.state,

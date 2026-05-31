@@ -203,7 +203,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
                 placeholder="Select designation"
                 onChange={handleDesignationChange}
               />
-              <DropDown
+              {/* <DropDown
                 label="Request and Retirement Approval Role"
                 options={RR_APPROVAL_ROLE}
                 name="requestRetirementApprovalRole"
@@ -211,7 +211,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
                 onChange={(value: string) =>
                   setField("requestRetirementApprovalRole", value)
                 }
-              />
+              /> */}
               <DropDown
                 label="Activity & KPI Report Approval"
                 options={ACTIVITY_KPI_APPROVAL_ROLE}

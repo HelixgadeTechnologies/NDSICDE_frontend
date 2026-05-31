@@ -2,7 +2,7 @@
 
 import Button from "@/ui/form/button";
 import Table from "@/ui/table";
-import { AnimatePresence, motion } from "framer-motion";
+import ActionMenu from "@/ui/action-menu";
 import { Icon } from "@iconify/react";
 import { useSearchParams } from "next/navigation";
 import { useRequests } from "@/context/RequestsContext";
@@ -13,6 +13,7 @@ import InternalMemorandum from "@/components/project-management-components/inter
 import FileDisplay from "@/ui/file-display";
 import SignatureComponenet from "@/ui/signature-component";
 import TextInput from "@/ui/form/text-input";
+import DropDown from "@/ui/form/select-dropdown";
 import { ProjectRequestResponseType, ProjectOutputTypes } from "@/types/project-management-types";
 import { RetirementRequestType } from "@/types/retirement-request";
 import axios from "axios";
@@ -32,10 +33,17 @@ const LAYERS: { key: LayerKey; label: string; designatedField?: "sendTo" | "send
   { key: "E", label: "Layer 5" },
 ];
 
-function AddRetirementInlineForm({ selectedRequest, onSuccess }: { selectedRequest: ProjectRequestResponseType; onSuccess: () => void }) {
+function AddRetirementInlineForm({ selectedRequest, onSuccess, users }: { selectedRequest: ProjectRequestResponseType; onSuccess: () => void; users: UserManagementCredentials[] }) {
   const [actualCost, setActualCost] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lineItems, setLineItems] = useState([{ id: 1, value: "" }]);
+  // Layer 3 designated approver (Finance Officer) — stored as a user id.
+  const [sendTo2, setSendTo2] = useState("");
+
+  const userOptions = useMemo(
+    () => users.map((u) => ({ label: u.fullName, value: u.userId })),
+    [users],
+  );
 
   const addLineItem = () => {
     const newId = Math.max(...lineItems.map((l) => l.id), 0) + 1;
@@ -70,6 +78,7 @@ function AddRetirementInlineForm({ selectedRequest, onSuccess }: { selectedReque
         documentName: selectedRequest.documentName || "string",
         documentURL: selectedRequest.documentURL || "string",
         requestId: selectedRequest.requestId,
+        sendTo2,
         status: "Pending"
       }
     };
@@ -121,6 +130,15 @@ function AddRetirementInlineForm({ selectedRequest, onSuccess }: { selectedReque
         onChange={(e: any) => setActualCost(e.target.value)}
         placeholder="---"
         label="Actual Cost of Line Item (₦)"
+        isBigger
+      />
+      <DropDown
+        name="sendTo2"
+        label="Send to (Finance Officer)"
+        placeholder="Select a finance officer"
+        value={sendTo2}
+        onChange={(value) => setSendTo2(value)}
+        options={userOptions}
         isBigger
       />
       <div className="flex items-center gap-6 mt-4">
@@ -386,9 +404,10 @@ export default function ProjectRequestRetirementPage() {
               Add Retirement
             </h3>
             <div className="p-4 bg-gray-50 border border-gray-200 rounded">
-              <AddRetirementInlineForm 
-                selectedRequest={selectedRequest} 
-                onSuccess={() => fetchLocalRetirements()} 
+              <AddRetirementInlineForm
+                selectedRequest={selectedRequest}
+                onSuccess={() => fetchLocalRetirements()}
+                users={users}
               />
             </div>
           </div>
@@ -452,41 +471,29 @@ export default function ProjectRequestRetirementPage() {
                          }
                        />
 
-                       {activeRowId === row.retirementId && (
-                         <AnimatePresence>
-                           <motion.div
-                             initial={{ y: -10, opacity: 0 }}
-                             animate={{ y: 0, opacity: 1 }}
-                             exit={{ y: -10, opacity: 0 }}
-                             transition={{ duration: 0.2, ease: "easeOut" }}
-                             className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-32">
-                             <ul className="text-sm">
-                               <li 
-                                 onClick={() => {
-                                   setSelectedRetirement(row);
-                                   setOpenEditRetirement(true);
-                                   setActiveRowId(null);
-                                 }}
-                                 className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                                 <Icon
-                                   icon={"ph:pencil-simple-line"}
-                                   height={20}
-                                   width={20}
-                                 />
-                                 Edit
-                               </li>
-                               <li onClick={() => setOpenDeleteModal(true)} className="cursor-pointer hover:text-red-600 border-t border-gray-200 flex gap-2 p-3 items-center">
-                                 <Icon
-                                   icon={"pixelarticons:trash"}
-                                   height={20}
-                                   width={20}
-                                 />
-                                 Remove
-                               </li>
-                             </ul>
-                           </motion.div>
-                         </AnimatePresence>
-                       )}
+                       <ActionMenu
+                         isOpen={activeRowId === row.retirementId}
+                         onClose={() => setActiveRowId(null)}
+                         items={[
+                           {
+                             type: "button",
+                             label: "Edit",
+                             icon: "ph:pencil-simple-line",
+                             onClick: () => {
+                               setSelectedRetirement(row);
+                               setOpenEditRetirement(true);
+                               setActiveRowId(null);
+                             },
+                           },
+                           {
+                             type: "button",
+                             label: "Remove",
+                             icon: "pixelarticons:trash",
+                             onClick: () => setOpenDeleteModal(true),
+                             className: "hover:text-red-600 border-t border-gray-200",
+                           },
+                         ]}
+                       />
                      </td>
                    )}
                   </>

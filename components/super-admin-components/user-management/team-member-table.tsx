@@ -5,8 +5,8 @@ import { head } from "@/types/team-members";
 import { useTeamMemberModal } from "@/utils/team-member-utility";
 import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import Table from "@/ui/table";
+import ActionMenu from "@/ui/action-menu";
 import CardComponent from "@/ui/card-wrapper";
 import DropDown from "@/ui/form/select-dropdown";
 import SearchInput from "@/ui/form/search";
@@ -148,6 +148,8 @@ export default function TeamMembersTable() {
         idKey="userId"
         tableHead={head}
         tableData={filteredData}
+         onClick={(row) => handleViewUser(row, setActiveRowId)}
+        height="60px"
         renderRow={(row) => (
           <>
             <td className="px-6">{row.fullName}</td>
@@ -163,7 +165,9 @@ export default function TeamMembersTable() {
             </td>
             {/* <td className="px-6">{formatDate(row.loginLast, "time")}</td> */}
             <td className="px-6">{row.department}</td>
-            <td className="px-6 relative">
+            <td
+              className="px-6 relative"
+              onClick={(e) => e.stopPropagation()}>
               <div className="flex justify-center items-center">
                 <Icon
                   icon={"uiw:more"}
@@ -179,45 +183,32 @@ export default function TeamMembersTable() {
                 />
               </div>
 
-              {activeRowId === row.userId && (
-                <AnimatePresence>
-                  <motion.div
-                    initial={{ y: -10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -10, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                    <ul className="text-sm">
-                      <li
-                        onClick={() => handleViewUser(row, setActiveRowId)}
-                        className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                        <Icon icon={"hugeicons:view"} height={20} width={20} />
-                        View Profile
-                      </li>
-                      <li
-                        onClick={() => handleEditUser(row, setActiveRowId)}
-                        className="cursor-pointer hover:text-blue-600 flex gap-2 border-y border-gray-300 p-3 items-center">
-                        <Icon
-                          icon={"ph:pencil-simple-line"}
-                          height={20}
-                          width={20}
-                        />
-                        Edit
-                      </li>
-                      <li
-                        onClick={() => handleDeleteUser(row, setActiveRowId)}
-                        className="cursor-pointer hover:text-(--primary-light) flex gap-2 p-3 items-center">
-                        <Icon
-                          icon={"pixelarticons:trash"}
-                          height={20}
-                          width={20}
-                        />
-                        Remove
-                      </li>
-                    </ul>
-                  </motion.div>
-                </AnimatePresence>
-              )}
+              <ActionMenu
+                isOpen={activeRowId === row.userId}
+                onClose={() => setActiveRowId(null)}
+                items={[
+                  {
+                    type: "button",
+                    label: "View Profile",
+                    icon: "hugeicons:view",
+                    onClick: () => handleViewUser(row, setActiveRowId),
+                  },
+                  {
+                    type: "button",
+                    label: "Edit",
+                    icon: "ph:pencil-simple-line",
+                    onClick: () => handleEditUser(row, setActiveRowId),
+                    className: "border-y border-gray-300",
+                  },
+                  {
+                    type: "button",
+                    label: "Remove",
+                    icon: "pixelarticons:trash",
+                    onClick: () => handleDeleteUser(row, setActiveRowId),
+                    className: "hover:text-(--primary-light)",
+                  },
+                ]}
+              />
             </td>
           </>
         )}

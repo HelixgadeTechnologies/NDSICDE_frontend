@@ -572,6 +572,7 @@ export default function ProjectKpiChartsTableParent({
                               />
                               <ActionMenu
                                 isOpen={activeRowId === indicator.indicatorId}
+                                onClose={() => setActiveRowId(null)}
                                 items={[
                                   {
                                     type: "link",

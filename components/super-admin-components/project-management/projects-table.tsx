@@ -6,7 +6,7 @@ import DropDown from "@/ui/form/select-dropdown";
 import Table from "@/ui/table";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-import { AnimatePresence, motion } from "framer-motion";
+import ActionMenu, { ActionMenuItem } from "@/ui/action-menu";
 import { year_options } from "@/lib/config/general-config";
 import Link from "next/link";
 import { useRoleStore } from "@/store/role-store";
@@ -239,45 +239,32 @@ export default function ProjectsTable() {
                     }
                   />
                 </div>
-                {activeRowId === row.projectId && (
-                  <AnimatePresence>
-                    <motion.div
-                      initial={{ y: -10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -10, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50"
-                      onClick={(e) => e.stopPropagation()}>
-                      <ul className="text-sm">
-                        <Link
-                          href={`/dashboard/create-project?projectId=${row.projectId}&mode=edit`}
-                          className="hover:bg-gray-50 hover:text-blue-600 flex gap-2 p-3 items-center">
-                          <Icon
-                            icon={"ph:pencil-simple-line"}
-                            height={20}
-                            width={20}
-                          />
-                          Edit
-                        </Link>
-                        {user?.role === "super-admin" && (
-                          <li
-                            onClick={() => {
+                <ActionMenu
+                  isOpen={activeRowId === row.projectId}
+                  onClose={() => setActiveRowId(null)}
+                  items={[
+                    {
+                      type: "link",
+                      label: "Edit",
+                      icon: "ph:pencil-simple-line",
+                      href: `/dashboard/create-project?projectId=${row.projectId}&mode=edit`,
+                    },
+                    ...(user?.role === "super-admin"
+                      ? [
+                          {
+                            type: "button",
+                            label: "Remove",
+                            icon: "pixelarticons:trash",
+                            onClick: () => {
                               setProjectToDelete(row.projectId); // Store the ID
                               setConfirmDelete(true);
-                            }}
-                            className="cursor-pointer hover:bg-gray-50 hover:text-red-600 border-t border-gray-200 flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"pixelarticons:trash"}
-                              height={20}
-                              width={20}
-                            />
-                            Remove
-                          </li>
-                        )}
-                      </ul>
-                    </motion.div>
-                  </AnimatePresence>
-                )}
+                            },
+                            className: "border-t border-gray-200 hover:text-red-600",
+                          } as ActionMenuItem,
+                        ]
+                      : []),
+                  ]}
+                />
               </td>
             </>
           )}

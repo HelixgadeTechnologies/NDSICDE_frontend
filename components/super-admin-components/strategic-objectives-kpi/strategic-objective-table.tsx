@@ -262,6 +262,7 @@ export default function SOTable({
               </div>
               <ActionMenu
                 isOpen={activeRowId === so.strategicObjectiveId}
+                onClose={() => setActiveRowId(null)}
                 items={[
                   {
                     type: "link",

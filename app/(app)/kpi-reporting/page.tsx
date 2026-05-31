@@ -7,7 +7,7 @@ import Button from "@/ui/form/button";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
-import { AnimatePresence, motion } from "framer-motion";
+import ActionMenu from "@/ui/action-menu";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
@@ -152,61 +152,45 @@ export default function AssignedKPITable() {
                     }
                   />
 
-                  {activeRowId === row.kpiReportId && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-40">
-                        <ul className="text-sm">
-                          <li
-                            onClick={() => {
-                              setKpiToView(row.kpiReportId);
-                              setViewModal(true);
-                              setActiveRowId(null);
-                            }}
-                            className="hover:text-blue-600 border-b border-gray-100 p-3 flex gap-2 items-center cursor-pointer w-full">
-                            <Icon
-                              icon={"hugeicons:view"}
-                              height={20}
-                              width={20}
-                            />
-                            View
-                          </li>
-                          <li
-                            onClick={() => {
-                              setKpiToEdit(row.kpiReportId);
-                              setEditModal(true);
-                              setActiveRowId(null);
-                            }}
-                            className="hover:text-blue-600 border-b border-gray-100 p-3 flex gap-2 items-center cursor-pointer w-full">
-                            <Icon
-                              icon={"ph:pencil-simple-line"}
-                              height={20}
-                              width={20}
-                            />
-                            Edit
-                          </li>
-                          <li
-                            onClick={() => {
-                              setKpiToDelete(row.kpiReportId);
-                              setDeleteModal(true);
-                              setActiveRowId(null);
-                            }}
-                            className={`cursor-pointer hover:text-red-500 flex gap-2 p-3 items-center ${isDeleting ? "opacity-50" : ""}`}>
-                            <Icon
-                              icon={"pixelarticons:trash"}
-                              height={20}
-                              width={20}
-                            />
-                            Delete
-                          </li>
-                        </ul>
-                      </motion.div>
-                    </AnimatePresence>
-                  )}
+                  <ActionMenu
+                    isOpen={activeRowId === row.kpiReportId}
+                    onClose={() => setActiveRowId(null)}
+                    items={[
+                      {
+                        type: "button",
+                        label: "View",
+                        icon: "hugeicons:view",
+                        onClick: () => {
+                          setKpiToView(row.kpiReportId);
+                          setViewModal(true);
+                          setActiveRowId(null);
+                        },
+                        className: "border-b border-gray-100",
+                      },
+                      {
+                        type: "button",
+                        label: "Edit",
+                        icon: "ph:pencil-simple-line",
+                        onClick: () => {
+                          setKpiToEdit(row.kpiReportId);
+                          setEditModal(true);
+                          setActiveRowId(null);
+                        },
+                        className: "border-b border-gray-100",
+                      },
+                      {
+                        type: "button",
+                        label: "Delete",
+                        icon: "pixelarticons:trash",
+                        onClick: () => {
+                          setKpiToDelete(row.kpiReportId);
+                          setDeleteModal(true);
+                          setActiveRowId(null);
+                        },
+                        className: `hover:text-red-500 ${isDeleting ? "opacity-50" : ""}`,
+                      },
+                    ]}
+                  />
                 </td>
               </>
             )}

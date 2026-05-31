@@ -7,7 +7,7 @@ export interface UserDetails {
   roleId: string;
   roleName: string;
   status: "Active" | "Inactive" | "ACTIVE" | "INACTIVE";
-  assignedProjectId: string | null;
+  assignedProjectId: string;
   department: string | null;
   community: string | null;
   state: string | null;

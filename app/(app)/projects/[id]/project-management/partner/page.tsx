@@ -5,7 +5,7 @@ import CardComponent from "@/ui/card-wrapper";
 import SearchInput from "@/ui/form/search";
 import DropDown from "@/ui/form/select-dropdown";
 import Table from "@/ui/table";
-import { motion, AnimatePresence } from "framer-motion";
+import ActionMenu from "@/ui/action-menu";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
 import {
@@ -232,43 +232,26 @@ export default function ProjectPartner() {
                     />
                   </div>
 
-                  {activeRowId === row.partnerId && (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                        <ul className="text-sm">
-                          <li
-                            onClick={() =>
-                              handleEditPartner(row, setActiveRowId)
-                            }
-                            className="cursor-pointer hover:text-blue-600 flex gap-2 border-b border-gray-300 p-3 items-center">
-                            <Icon
-                              icon={"ph:pencil-simple-line"}
-                              height={20}
-                              width={20}
-                            />
-                            Edit
-                          </li>
-                          <li
-                            onClick={() =>
-                              handleRemovePartner(row, setActiveRowId)
-                            }
-                            className="cursor-pointer hover:text-(--primary-light) flex gap-2 p-3 items-center">
-                            <Icon
-                              icon={"pixelarticons:trash"}
-                              height={20}
-                              width={20}
-                            />
-                            Remove
-                          </li>
-                        </ul>
-                      </motion.div>
-                    </AnimatePresence>
-                  )}
+                  <ActionMenu
+                    isOpen={activeRowId === row.partnerId}
+                    onClose={() => setActiveRowId(null)}
+                    items={[
+                      {
+                        type: "button",
+                        label: "Edit",
+                        icon: "ph:pencil-simple-line",
+                        onClick: () => handleEditPartner(row, setActiveRowId),
+                        className: "border-b border-gray-300",
+                      },
+                      {
+                        type: "button",
+                        label: "Remove",
+                        icon: "pixelarticons:trash",
+                        onClick: () => handleRemovePartner(row, setActiveRowId),
+                        className: "hover:text-(--primary-light)",
+                      },
+                    ]}
+                  />
                 </td>
               </>
             )}

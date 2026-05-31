@@ -184,7 +184,7 @@ export default function ApproveRequestPage() {
                                 {row.status === "InReview" ? 'In Review' : row.status}
                               </span>
                             </div>
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 teadxt-xs text-gray-500">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
                               {row.staff && (
                                 <span className="flex items-center gap-1">
                                   <Icon icon="mdi:account-outline" width={13} height={13} />
@@ -202,7 +202,7 @@ export default function ApproveRequestPage() {
                                   <Icon icon="mdi:calendar-outline" width={13} height={13} />
                                   {formatDate(row.activityStartDate, "date-only")}
                                   {row.activityEndDate &&
-                                    ` — ${formatDate(row.activityEndDate, "date-only")}`}
+                                    ` - ${formatDate(row.activityEndDate, "date-only")}`}
                                 </span>
                               )}
                             </div>

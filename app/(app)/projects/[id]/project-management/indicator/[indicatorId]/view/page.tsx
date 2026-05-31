@@ -255,6 +255,7 @@ export default function ViewActualValue() {
                     </div>
                     <ActionMenu
                       isOpen={activeRowId === row.indicatorReportId}
+                      onClose={() => setActiveRowId(null)}
                       items={[
                         {
                           type: "button",

@@ -135,6 +135,7 @@ export default function ProjectOutcome() {
                   />
                   <ActionMenu
                     isOpen={activeRowId === row.outcomeId}
+                    onClose={() => setActiveRowId(null)}
                     items={[
                       {
                         type: "button",

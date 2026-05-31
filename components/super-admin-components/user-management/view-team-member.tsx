@@ -1,7 +1,11 @@
+"use client";
+
 import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
 import { UserDetails } from "@/types/team-members";
+import { useProjects } from "@/context/ProjectsContext";
+import { toSentenceCase } from "@/utils/ui-utility";
 
 type ViewProps = {
   isOpen: boolean;
@@ -10,6 +14,16 @@ type ViewProps = {
 };
 
 export default function ViewTeamMember({ isOpen, onClose, user }: ViewProps) {
+  const { projects } = useProjects();
+
+  // The user record only stores the assigned project's uuid — resolve it to a readable name from the already-loaded projects list.
+  const assignedProjectName =
+    projects.find((p) => p.projectId === user?.assignedProjectId)?.projectName ??
+    "N/A";
+
+  if (!user) return (
+    <p>User not found.</p>
+  )
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="600px">
       <Heading
@@ -18,7 +32,7 @@ export default function ViewTeamMember({ isOpen, onClose, user }: ViewProps) {
       />
       <div className="mt-8">
         <div className="flex flex-col justify-center items-center">
-          <div className="h-[110px] w-[110px] rounded-full bg-[#EAEAEA] p-2 flex justify-center items-center">
+          <div className="size-27.5 rounded-full bg-[#EAEAEA] p-2 flex justify-center items-center">
             <Icon
               icon={"radix-icons:avatar"}
               height={80}
@@ -75,8 +89,8 @@ export default function ViewTeamMember({ isOpen, onClose, user }: ViewProps) {
               <strong className="font-bold text-black text-base leading-8">
                 Assigned Projects:
               </strong>
-              <span className="text-[#7A7A7A] text-sm font-normal leading-5">
-                {user.assignedProjectId || "N/A"}
+              <span title={assignedProjectName} className="text-[#7A7A7A] text-sm font-normal leading-5">
+                {toSentenceCase(assignedProjectName)}
               </span>
             </li>
           </ul>

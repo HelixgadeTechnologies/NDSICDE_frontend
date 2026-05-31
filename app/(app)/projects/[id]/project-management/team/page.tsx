@@ -226,6 +226,7 @@ export default function ProjectTeam() {
                   </div>
                   <ActionMenu
                     isOpen={activeRowId === row.teamMemberId}
+                    onClose={() => setActiveRowId(null)}
                     items={[
                       {
                         type: "button",

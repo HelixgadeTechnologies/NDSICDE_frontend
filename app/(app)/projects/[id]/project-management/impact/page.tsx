@@ -130,6 +130,7 @@ export default function ProjectImpact() {
                   />
                   <ActionMenu
                     isOpen={activeRowId === row.impactId}
+                    onClose={() => setActiveRowId(null)}
                     items={[
                       {
                         type: "button",
