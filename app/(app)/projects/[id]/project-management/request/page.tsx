@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ProjectRequestResponseType } from "@/types/project-management-types";
+import ActionMenu from "@/ui/action-menu";
 import { useEntityModal } from "@/utils/project-management-utility";
 import DeleteModal from "@/ui/generic-delete-modal";
-import Link from "next/link";
 import EditActivityRequest from "@/components/project-management-components/edit-activity-request";
 import EditProjectRequestRetirement from "@/components/project-management-components/edit-project-request-retirement";
 import DashboardStat from "@/ui/dashboard-stat-card";
@@ -75,19 +75,6 @@ export default function ProjectRequest() {
   const [isLoadingRetirements, setIsLoadingRetirements] = useState(false);
 
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-  const [openActionEl, setOpenActionEl] = useState<HTMLTableCellElement | null>(null);
-
-  // Close action menu when clicking outside the active row's action cell
-  useEffect(() => {
-    if (!activeRowId || !openActionEl) return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!openActionEl.contains(event.target as Node)) {
-        setActiveRowId(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [activeRowId, openActionEl]);
 
   const [statusFilter, setStatusFilter] = useState("");
   const [dateRangeFilter, setDateRangeFilter] = useState<{ startDate: string; endDate: string } | null>(null);
@@ -484,7 +471,6 @@ export default function ProjectRequest() {
                         {formatDate(row.activityEndDate, "date-only")}
                       </td>
                       <td
-                        ref={activeRowId === row.requestId ? setOpenActionEl : null}
                         className="px-6 relative"
                         onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-center items-center">
@@ -502,53 +488,35 @@ export default function ProjectRequest() {
                           />
                         </div>
 
-                        {activeRowId === row.requestId && (
-                          <AnimatePresence>
-                            <motion.div
-                              initial={{ y: -10, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              exit={{ y: -10, opacity: 0 }}
-                              transition={{ duration: 0.2, ease: "easeOut" }}
-                              className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                              <ul className="text-sm">
-                                <li
-                                  onClick={() =>
-                                    handleEditRequest(row, setActiveRowId)
-                                  }
-                                  className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                                  <Icon
-                                    icon={"ph:pencil-simple-line"}
-                                    height={20}
-                                    width={20}
-                                  />
-                                  Edit
-                                </li>
-                                <li
-                                  onClick={() =>
-                                    handleRemoveRequest(row, setActiveRowId)
-                                  }
-                                  className="cursor-pointer hover:text-(--primary-light) border-y border-gray-300 flex gap-2 p-3 items-center">
-                                  <Icon
-                                    icon={"pixelarticons:trash"}
-                                    height={20}
-                                    width={20}
-                                  />
-                                  Remove
-                                </li>
-                                <Link
-                                  href={`/projects/${projectId}/project-management/request/view?requestId=${row.requestId}`}
-                                  className="cursor-pointer hover:text-blue-600 border-b border-gray-300 flex gap-2 p-3 items-center">
-                                  <Icon
-                                    icon={"hugeicons:view"}
-                                    height={20}
-                                    width={20}
-                                  />
-                                  View Activity
-                                </Link>
-                              </ul>
-                            </motion.div>
-                          </AnimatePresence>
-                        )}
+                        <ActionMenu
+                          isOpen={activeRowId === row.requestId}
+                          onClose={() => setActiveRowId(null)}
+                          items={[
+                            {
+                              type: "button",
+                              label: "Edit",
+                              icon: "ph:pencil-simple-line",
+                              onClick: () =>
+                                handleEditRequest(row, setActiveRowId),
+                            },
+                            {
+                              type: "button",
+                              label: "Remove",
+                              icon: "pixelarticons:trash",
+                              onClick: () =>
+                                handleRemoveRequest(row, setActiveRowId),
+                              className:
+                                "hover:text-(--primary-light) border-y border-gray-300",
+                            },
+                            {
+                              type: "link",
+                              label: "View Activity",
+                              icon: "hugeicons:view",
+                              href: `/projects/${projectId}/project-management/request/view?requestId=${row.requestId}`,
+                              className: "border-b border-gray-300",
+                            },
+                          ]}
+                        />
                       </td>
                     </>
                   )}
@@ -630,7 +598,6 @@ export default function ProjectRequest() {
                             {retirementStatus === "Approved" ? "Approved and Closed" : (retirementStatus || "Pending")}
                           </td>
                           <td
-                            ref={activeRowId === row.requestId ? setOpenActionEl : null}
                             className="px-6 relative"
                             onClick={(e) => e.stopPropagation()}>
                             <div className="flex justify-center items-center">
@@ -648,29 +615,21 @@ export default function ProjectRequest() {
                               />
                             </div>
 
-                            {activeRowId === row.requestId && (
-                              <AnimatePresence>
-                                <motion.div
-                                  initial={{ y: -10, opacity: 0 }}
-                                  animate={{ y: 0, opacity: 1 }}
-                                  exit={{ y: -10, opacity: 0 }}
-                                  transition={{ duration: 0.2, ease: "easeOut" }}
-                                  className="absolute top-full mt-2 right-0 bg-white z-30 rounded-md border border-[#E5E5E5] shadow-md w-50">
-                                  <ul className="text-sm">
-                                    <Link
-                                      href={`/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`}
-                                      className="cursor-pointer hover:text-blue-600 flex gap-2 p-3 items-center">
-                                      <Icon
-                                        icon={"hugeicons:view"}
-                                        height={20}
-                                        width={20}
-                                      />
-                                      {reqRetirements.length > 0 ? "View Retirement" : "Add Retirement"}
-                                    </Link>
-                                  </ul>
-                                </motion.div>
-                              </AnimatePresence>
-                            )}
+                            <ActionMenu
+                              isOpen={activeRowId === row.requestId}
+                              onClose={() => setActiveRowId(null)}
+                              items={[
+                                {
+                                  type: "link",
+                                  label:
+                                    reqRetirements.length > 0
+                                      ? "View Retirement"
+                                      : "Add Retirement",
+                                  icon: "hugeicons:view",
+                                  href: `/projects/${projectId}/project-management/request/retire?requestId=${row.requestId}`,
+                                },
+                              ]}
+                            />
                           </td>
                         </>
                       );

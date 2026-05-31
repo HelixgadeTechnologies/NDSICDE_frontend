@@ -11,7 +11,6 @@ import Modal from "@/ui/popup-modal";
 import Heading from "@/ui/text-heading";
 import { Icon } from "@iconify/react";
 import { toast } from "react-toastify";
-import { TEAM_DESIGNATIONS } from "@/utils/team-member-utility";
 
 type AddProps = {
   isOpen: boolean;
@@ -268,7 +267,8 @@ export default function ProjectTeamModal({
             name="roleId"
             label="Designation"
             placeholder="Select designation"
-            options={TEAM_DESIGNATIONS}
+            // Role name shows as the label; the roleId is what we store/send.
+            options={roles}
             value={formData.roleId}
             onChange={(value) => handleSelectChange("roleId", value)}
             isBigger

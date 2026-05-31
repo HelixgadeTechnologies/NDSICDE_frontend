@@ -11,6 +11,7 @@ import DisaggregationComponent from "@/ui/disaggregation-component";
 import DateInput from "@/ui/form/date-input";
 import TextareaInput from "@/ui/form/textarea";
 import TagInput from "@/ui/form/tag-input";
+import { useProjectTeam } from "@/context/ProjectTeamContext";
 import Button from "@/ui/form/button";
 import { indicatorApi } from "@/lib/api/indicatorApi";
 import {
@@ -39,6 +40,7 @@ export default function AddIndicatorForm() {
   const resultType = searchParams.get("resultType") ?? "impact";
   const resultId = searchParams.get("resultId") ?? "";
    const projectId = (params?.id as string) ?? "";
+  const { responsiblePersonOptions } = useProjectTeam();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingResults, setIsLoadingResults] = useState(false);
@@ -664,6 +666,7 @@ export default function AddIndicatorForm() {
             onChange={(persons) =>
               handleInputChange("responsiblePersons", persons)
             }
+            options={responsiblePersonOptions}
           />
         </div>
 

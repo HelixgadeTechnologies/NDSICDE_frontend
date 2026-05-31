@@ -9,6 +9,7 @@ import {
 import Button from "@/ui/form/button";
 import DropDown from "@/ui/form/select-dropdown";
 import TagInput from "@/ui/form/tag-input";
+import { useProjectTeam } from "@/context/ProjectTeamContext";
 import TextInput from "@/ui/form/text-input";
 import TextareaInput from "@/ui/form/textarea";
 import Modal from "@/ui/popup-modal";
@@ -41,6 +42,7 @@ export default function ProjectOutcomeModal({
   const [isLoadingImpacts, setIsLoadingImpacts] = useState(false);
   const [outcomeResultTypeId, setOutcomeResultTypeId] = useState<string>("");
   const [responsiblePersons, setResponsiblePersons] = useState<string[]>([]);
+  const { responsiblePersonOptions } = useProjectTeam();
   const [impactOptions, setImpactOptions] = useState<DropdownOption[]>([]);
   const hasInitializedRef = useRef(false);
 
@@ -363,7 +365,8 @@ export default function ProjectOutcomeModal({
           label="Responsible Person(s)"
           tags={responsiblePersons}
           onChange={handleResponsiblePersonsChange}
-          placeholder="Add responsible person and press Enter"
+          placeholder="Select or add a responsible person"
+          options={responsiblePersonOptions}
         />
 
         <div className="flex items-center justify-end gap-4 pt-4">

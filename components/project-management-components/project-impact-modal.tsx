@@ -16,6 +16,7 @@ import { ProjectImpactTypes } from "@/types/project-management-types";
 import TextareaInput from "@/ui/form/textarea";
 import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 import DropDown from "@/ui/form/select-dropdown";
+import { useProjectTeam } from "@/context/ProjectTeamContext";
 
 type AddProps = {
   isOpen: boolean;
@@ -45,6 +46,9 @@ export default function ProjectImpactModal({
   const params = useParams();
   const projectId = propProjectId || (params?.id as string) || "";
   const token = getToken() || undefined;
+
+  // Team-member names for the current project — suggestions for "Responsible Person".
+  const { responsiblePersonOptions } = useProjectTeam();
 
   const [formData, setFormData] = useState({
     statement: "",
@@ -285,9 +289,10 @@ export default function ProjectImpactModal({
 
           <TagInput
             label="Responsible Person"
-            placeholder="Add responsible person and press Enter"
+            placeholder="Select or add a responsible person"
             onChange={handleResponsiblePersonsChange}
             value={responsiblePersons}
+            options={responsiblePersonOptions}
           />
 
           <div className="flex items-center gap-6">

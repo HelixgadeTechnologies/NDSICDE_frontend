@@ -146,6 +146,7 @@ export default function ProjectTeam() {
         },
       );
       setRemoveMember(false);
+      fetchProjectTeam();
     } catch (error) {
       console.error(`Error deleting team member: ${error}`);
       toast.error("An error occured. Team member was not deleted.");

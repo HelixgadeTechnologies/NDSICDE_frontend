@@ -13,6 +13,7 @@ import DateInput from "@/ui/form/date-input";
 import RadioInput from "@/ui/form/radio";
 import DropDown from "@/ui/form/select-dropdown";
 import TagInput from "@/ui/form/tag-input";
+import { useProjectTeam } from "@/context/ProjectTeamContext";
 import TextInput from "@/ui/form/text-input";
 import TextareaInput from "@/ui/form/textarea";
 import Modal from "@/ui/popup-modal";
@@ -60,6 +61,7 @@ export default function EditProjectActivity({
   const [isLoadingOutputs, setIsLoadingOutputs] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responsiblePersons, setResponsiblePersons] = useState<string[]>([]);
+  const { responsiblePersonOptions } = useProjectTeam();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -506,7 +508,8 @@ export default function EditProjectActivity({
           label="Responsible Persons"
           tags={responsiblePersons}
           onChange={handleResponsiblePersonsChange}
-          placeholder="Add responsible person and press Enter"
+          placeholder="Select or add a responsible person"
+          options={responsiblePersonOptions}
         />
 
         <div className="flex items-center gap-2">

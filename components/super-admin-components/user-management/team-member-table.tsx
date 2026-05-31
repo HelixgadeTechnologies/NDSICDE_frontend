@@ -19,7 +19,7 @@ import { formatDate } from "@/utils/dates-format-utility";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { DropdownOption } from "@/types/project-management-types";
 import { fetchRoles } from "@/lib/api/roles";
-import { toSentenceCase } from "@/utils/ui-utility";
+import { toSentenceCase, sortByCreatedAt } from "@/utils/ui-utility";
 // import { TeamMember } from "@/types/team-members";
 
 export default function TeamMembersTable() {
@@ -66,7 +66,7 @@ export default function TeamMembersTable() {
   }, [refetch]);
 
   // Filter data based on search query, role, and status
-  const filteredData = users.filter((item) => {
+  const filteredData = sortByCreatedAt(users).filter((item) => {
     // Search filter
     const matchesSearch = `${item.fullName} ${item.email} ${item.roleName} ${item.assignedProjectId}`
       .toLowerCase()
