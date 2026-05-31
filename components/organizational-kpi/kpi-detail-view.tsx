@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
 import Button from "@/ui/form/button";
 import MeterPieChart from "@/ui/meter-pie-chart";
-import { OrgKpiDetail, OrgKpiResponse } from "@/types/org-kpi";
+import { OrgKpiDetail, OrgKpiRow } from "@/types/org-kpi";
 import { formatDate } from "@/utils/dates-format-utility";
 
-type RawKPI = OrgKpiResponse["KPI_TABLE_DATA"][number];
+type RawKPI = OrgKpiRow;
 
 type KpiDetailViewProps = {
   /** The dashboard row that was clicked — carries baseline/target/actual/performance fallbacks */
@@ -102,15 +102,6 @@ export default function KpiDetailView({ selected, onBack }: KpiDetailViewProps) 
                   {details?.type ?? selected.resultLevel}
                 </span>
               )}
-            </div>
-            <div className="flex items-center gap-3 min-w-70">
-              <Button
-                content="Report Actual"
-                icon="fluent:document-add-24-regular"
-                onClick={() =>
-                  router.push(`/organizational-kpi/${selected.kpiId}/report`)
-                }
-              />
             </div>
           </div>
         </div>

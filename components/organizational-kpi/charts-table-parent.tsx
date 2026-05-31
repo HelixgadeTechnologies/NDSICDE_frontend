@@ -9,29 +9,43 @@ import TableWithAccordion from "@/ui/table-with-accordion";
 import MeterPieChart from "@/ui/meter-pie-chart";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/navigation";
-import { OrgKpiResponse } from "@/types/org-kpi";
+import { OrgKpiResponse, OrgKpiRow } from "@/types/org-kpi";
 import { THEMATIC_AREAS_OPTIONS } from "@/lib/config/admin-settings";
 import {
   fetchResultTypes,
+  ResultType,
   transformResultTypesToOptions,
 } from "@/lib/api/result-types";
 import { useOrgKPIFormState } from "@/store/super-admin-store/organizational-kpi-store";
+import KpiDetailView from "./kpi-detail-view";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type RawKPI = OrgKpiResponse["KPI_TABLE_DATA"][number];
+/** The KPI shape the cards / table / detail view all consume. */
+type RawKPI = OrgKpiRow;
 
+/**
+ * Charts / table parent row = one Strategic Objective.
+ * `childKpis` holds the KPIs (indicators) belonging to it — mirrors the
+ * Result → Indicators relationship in the project result dashboard.
+ */
 type SOGroup = {
   id: string;
   statement: string;
   thematicArea: string;
-  responsiblePerson: string;
+  totalProjects: number;
   childKpis: RawKPI[];
 };
 
-// ─── Card view (mirrors view-indicators in the project dashboard) ─────────────
+// ─── KPI list (mirrors view-indicators' card list in the project dashboard) ───
 
-function KpiCards({ kpis }: { kpis: RawKPI[] }) {
+function KpiCards({
+  kpis,
+  onSelect,
+}: {
+  kpis: RawKPI[];
+  onSelect: (kpi: RawKPI) => void;
+}) {
   if (kpis.length === 0) {
     return (
       <div className="py-12 border border-gray-200 rounded-md flex flex-col items-center justify-center text-center w-fit mx-auto px-12 my-10">
@@ -43,7 +57,7 @@ function KpiCards({ kpis }: { kpis: RawKPI[] }) {
         />
         <p className="text-gray-500 font-medium">No KPIs found.</p>
         <p className="text-gray-400 text-sm mt-1">
-          No KPIs match the selected filters.
+          There are currently no KPIs linked to this strategic objective.
         </p>
       </div>
     );
@@ -62,7 +76,8 @@ function KpiCards({ kpis }: { kpis: RawKPI[] }) {
         return (
           <div
             key={kpi.kpiId}
-            className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white">
+            onClick={() => onSelect(kpi)}
+            className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white hover:shadow-md transition-shadow cursor-pointer">
             <div className="flex items-start justify-between">
               <div className="flex-1 pr-4">
                 <div className="flex items-center gap-3 mb-2">
@@ -82,7 +97,18 @@ function KpiCards({ kpis }: { kpis: RawKPI[] }) {
                   Code: {kpi.code || "—"}
                 </p>
               </div>
-              <MeterPieChart performance={performance} />
+              <div className="flex items-center gap-4">
+                <MeterPieChart performance={performance} />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelect(kpi);
+                  }}
+                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors flex items-center justify-center"
+                  title="View Details">
+                  <Icon icon="fluent:eye-24-regular" width={20} height={20} />
+                </button>
+              </div>
             </div>
             <div className="mt-3 flex gap-6 border-t border-gray-50 pt-3">
               <div>
@@ -126,63 +152,96 @@ export default function ChartsAndTableParent({
 }) {
   const router = useRouter();
   // Reuse the existing store (it already has thematicArea / resultLevel / disaggregation).
-  // We just ignore the SO + indicator fields below.
   const { allThematicArea, resultLevel, disaggregation, setField } =
     useOrgKPIFormState();
 
-  const [resultLevelOptions, setResultLevelOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
+  // Result types (drives the Result Level dropdown + filtering).
+  const [resultTypes, setResultTypes] = useState<ResultType[]>([]);
+
+  // Charts tab drill-down state: SO → KPI (indicator) → KPI details.
+  const [selectedSO, setSelectedSO] = useState<SOGroup | null>(null);
+  const [selectedKpi, setSelectedKpi] = useState<RawKPI | null>(null);
 
   useEffect(() => {
     fetchResultTypes()
-      .then((types) => setResultLevelOptions(transformResultTypesToOptions(types)))
+      .then(setResultTypes)
       .catch((err) => console.error("Failed to load result types:", err));
   }, []);
 
-  const allKpis = statData?.KPI_TABLE_DATA ?? [];
-
-  // Filtered KPI list, used for both card view + table grouping.
-  const filteredKpis = useMemo(() => {
-    let data = allKpis;
-    if (allThematicArea)
-      data = data.filter((k) => k.thematicArea === allThematicArea);
-    if (resultLevel)
-      data = data.filter(
-        (k) => k.resultLevel?.toLowerCase() === resultLevel.toLowerCase(),
-      );
-    return data;
-  }, [allKpis, allThematicArea, resultLevel]);
-
-  // Group filtered KPIs by Strategic Objective for the accordion table.
+  // KPI_TABLE_DATA already arrives grouped by Strategic Objective, each carrying
+  // its own KPIs. Normalise it into our SOGroup shape and enrich each KPI with
+  // the parent's thematic area / SO statement (the detail view needs them).
   const soGroups = useMemo<SOGroup[]>(() => {
-    const map = new Map<string, SOGroup>();
-    filteredKpis.forEach((kpi) => {
-      const key = kpi.strategicObjective || "Unassigned";
-      if (!map.has(key)) {
-        map.set(key, {
-          id: key,
-          statement: key,
-          thematicArea: kpi.thematicArea ?? "—",
-          responsiblePerson: "—",
-          childKpis: [],
-        });
-      }
-      map.get(key)!.childKpis.push(kpi);
-    });
-    return Array.from(map.values());
-  }, [filteredKpis]);
+    const groups = statData?.KPI_TABLE_DATA ?? [];
+    return groups.map((g) => ({
+      id: g.strategicObjectiveId,
+      statement: g.strategicObjective,
+      thematicArea: g.thematicArea ?? "—",
+      totalProjects: g.totalProjects ?? 0,
+      childKpis: (g.kpis ?? []).map((k) => ({
+        ...k,
+        thematicArea: g.thematicArea,
+        strategicObjective: g.strategicObjective,
+      })),
+    }));
+  }, [statData]);
+
+  const resultTypeOptions = useMemo(
+    () => transformResultTypesToOptions(resultTypes),
+    [resultTypes],
+  );
+
+  // The selected result level is a resultTypeId — map it back to its name so we
+  // can match against each KPI's `resultLevel` (Impact / Outcome / Output).
+  const selectedResultName = useMemo(
+    () => resultTypes.find((t) => t.resultTypeId === resultLevel)?.resultName,
+    [resultTypes, resultLevel],
+  );
+
+  // Apply the Thematic Area (SO-level) + Result Level (KPI-level) filters.
+  const filteredGroups = useMemo<SOGroup[]>(() => {
+    return soGroups
+      .filter(
+        (g) =>
+          !allThematicArea ||
+          g.thematicArea?.toLowerCase() === allThematicArea.toLowerCase(),
+      )
+      .map((g) => ({
+        ...g,
+        childKpis: selectedResultName
+          ? g.childKpis.filter(
+              (k) =>
+                k.resultLevel?.toLowerCase() ===
+                selectedResultName.toLowerCase(),
+            )
+          : g.childKpis,
+      }));
+  }, [soGroups, allThematicArea, selectedResultName]);
+
+  // Drop the drill-down selection whenever the filtered dataset changes.
+  useEffect(() => {
+    setSelectedSO(null);
+    setSelectedKpi(null);
+  }, [allThematicArea, resultLevel]);
 
   const tabs = [
     { tabName: "Charts", id: 1 },
     { tabName: "Table", id: 2 },
   ];
 
-  // Matches the project-result table head exactly.
+  /** Parent (Strategic Objective) row columns — mirrors the project result head. */
   const tableHead = [
     "Strategic Objective",
     "Thematic Area",
     "Contributing Projects",
+    "",
+    "",
+    "",
+  ];
+
+  /** Child (KPI / indicator) row columns — rendered below the parent when expanded. */
+  const childTableHead = [
+    "KPI Statement",
     "Baseline",
     "Target",
     "Actual",
@@ -210,7 +269,7 @@ export default function ChartsAndTableParent({
             placeholder="Result Level"
             name="resultLevel"
             onChange={(value: string) => setField("resultLevel", value)}
-            options={resultLevelOptions}
+            options={resultTypeOptions}
           />
 
           <DateRangePicker label="Date Range" />
@@ -239,9 +298,107 @@ export default function ChartsAndTableParent({
           persistKey="org-kpi-tabs"
           renderContent={(tabId) => {
             if (tabId === 1) {
+              if (filteredGroups.length === 0) {
+                return (
+                  <div className="py-16 text-center text-sm text-gray-500">
+                    No strategic objectives match the selected filters.
+                  </div>
+                );
+              }
+
+              // Drilled-in: a KPI (indicator) is open → show its full detail view.
+              if (selectedKpi) {
+                return (
+                  <div className="h-115 overflow-auto pr-1">
+                    <KpiDetailView
+                      selected={selectedKpi}
+                      onBack={() => setSelectedKpi(null)}
+                    />
+                  </div>
+                );
+              }
+
+              // Drilled-in: an SO is open → show its KPIs (indicators).
+              if (selectedSO) {
+                // Pull the freshest snapshot so filter changes reflect while drilled in.
+                const liveSO =
+                  filteredGroups.find((s) => s.id === selectedSO.id) ??
+                  selectedSO;
+                return (
+                  <div className="h-115 overflow-auto space-y-4 pr-1">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSO(null)}
+                      className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors w-fit">
+                      <Icon
+                        icon="fluent:arrow-left-24-regular"
+                        width={16}
+                        height={16}
+                      />
+                      Back to Strategic Objectives
+                    </button>
+                    <div className="rounded-md border border-gray-200 bg-gray-50 px-5 py-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                            Strategic Objective
+                          </p>
+                          <p className="text-sm font-semibold text-gray-900 mt-0.5">
+                            {liveSO.statement}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                            Thematic Area
+                          </p>
+                          <p className="text-sm text-gray-700 mt-0.5">
+                            {liveSO.thematicArea}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
+                            Contributing Projects
+                          </p>
+                          <p className="text-sm text-gray-700 mt-0.5">
+                            {liveSO.totalProjects}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <KpiCards kpis={liveSO.childKpis} onSelect={setSelectedKpi} />
+                  </div>
+                );
+              }
+
+              // Top-level: list of strategic objectives.
               return (
-                <div className="h-115 overflow-auto">
-                  <KpiCards kpis={filteredKpis} />
+                <div className="h-115 overflow-auto space-y-3 pr-1">
+                  {filteredGroups.map((so) => (
+                    <button
+                      key={so.id}
+                      type="button"
+                      onClick={() => setSelectedSO(so)}
+                      className="w-full flex items-center justify-between gap-4 px-5 py-4 border border-gray-200 bg-white rounded-lg hover:bg-gray-50 transition-colors text-left">
+                      <div className="grid grid-cols-3 gap-4 flex-1 items-center">
+                        <p className="text-sm font-semibold text-gray-900 line-clamp-2">
+                          {so.statement}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {so.thematicArea}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {so.childKpis.length} KPI
+                          {so.childKpis.length === 1 ? "" : "s"}
+                        </p>
+                      </div>
+                      <Icon
+                        icon="fluent:chevron-right-24-regular"
+                        width={20}
+                        height={20}
+                        className="text-gray-400 shrink-0"
+                      />
+                    </button>
+                  ))}
                 </div>
               );
             }
@@ -250,7 +407,8 @@ export default function ChartsAndTableParent({
               <div className="mt-4">
                 <TableWithAccordion<SOGroup, RawKPI>
                   tableHead={tableHead}
-                  tableData={soGroups}
+                  childTableHead={childTableHead}
+                  tableData={filteredGroups}
                   childrenKey="childKpis"
                   persistKey="org-kpi-accordion"
                   pdfTitle="Organizational KPI Dashboard"
@@ -265,22 +423,32 @@ export default function ChartsAndTableParent({
                         {so.thematicArea || ""}
                       </td>
                       <td className="px-6 py-3 text-xs text-gray-600">
-                        {so.responsiblePerson || ""}
+                        {so.totalProjects}
                       </td>
                       {/* KPI-level metrics live on the child rows */}
-                      <td className="px-6 py-3" />
-                      <td className="px-6 py-3" />
                       <td className="px-6 py-3" />
                       <td className="px-6 py-3" />
                       <td className="px-6 py-3" />
                     </>
                   )}
                   renderChildRow={(kpi) => {
+                    const baseline = kpi.baseline ?? null;
+                    const target = kpi.target ?? null;
+                    const actual = kpi.actual ?? null;
+
+                    // Compute performance defensively from actual/target when the
+                    // API doesn't supply it directly.
+                    const numericTarget =
+                      typeof target === "number" ? target : Number(target);
+                    const numericActual =
+                      typeof actual === "number" ? actual : Number(actual);
                     const performance =
-                      kpi.performance != null
+                      kpi.performance != null && kpi.performance !== 0
                         ? kpi.performance
-                        : kpi.target && kpi.actual != null
-                          ? Math.round((kpi.actual / kpi.target) * 100)
+                        : !Number.isNaN(numericTarget) &&
+                            numericTarget > 0 &&
+                            !Number.isNaN(numericActual)
+                          ? Math.round((numericActual / numericTarget) * 100)
                           : null;
 
                     return (
@@ -288,19 +456,17 @@ export default function ChartsAndTableParent({
                         <td className="px-6 py-3 pl-12 text-xs text-gray-700 max-w-xs">
                           {kpi.statement ?? ""}
                         </td>
-                        <td className="px-6 py-3" />
-                        <td className="px-6 py-3" />
                         <td className="px-6 py-3 text-xs text-gray-700">
-                          {kpi.baseline ?? 0}
+                          {baseline ?? 0}
                         </td>
                         <td className="px-6 py-3 text-xs text-gray-700">
-                          {kpi.target ?? 0}
+                          {target ?? 0}
                         </td>
                         <td className="px-6 py-3 text-xs text-gray-700">
-                          {kpi.actual ?? 0}
+                          {actual ?? 0}
                         </td>
                         <td className="px-6 py-3 text-xs text-gray-700">
-                          {performance != null ? `${performance}%` : ""}
+                          {performance != null ? `${performance}%` : "—"}
                         </td>
                         <td
                           className="px-6 py-2 relative"

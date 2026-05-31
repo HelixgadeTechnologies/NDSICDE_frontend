@@ -1,3 +1,4 @@
+/** Full KPI detail returned by /api/strategic-objectivesAndKpi/kpi/{id} */
 export type OrgKpiDetail = {
     statement: string;
     definition: string;
@@ -13,6 +14,31 @@ export type OrgKpiDetail = {
     targetDate: string;
     cumulativeTarget: number;
     targetNarrative: string;
+  };
+
+/** A single KPI row nested under a strategic objective in KPI_TABLE_DATA. */
+export type OrgKpiRow = {
+    kpiId: string;
+    code: string;
+    statement: string;
+    resultLevel: string;
+    baseline: number;
+    target: number;
+    actual: number;
+    performance: number;
+    status: string;
+    /** Enriched client-side from the parent SO group (not in the raw payload). */
+    thematicArea?: string;
+    strategicObjective?: string;
+  };
+
+/** One strategic-objective group in KPI_TABLE_DATA, holding its KPIs. */
+export type OrgKpiSOGroup = {
+    strategicObjectiveId: string;
+    strategicObjective: string;
+    thematicArea: string;
+    totalProjects: number;
+    kpis: OrgKpiRow[];
   };
 
 export type OrgKpiResponse = {
@@ -38,28 +64,5 @@ export type OrgKpiResponse = {
       baseline: number;
       annualTarget: number;
     };
-    KPI_TABLE_DATA: {
-      kpiId: string;
-      code: string;
-      statement: string;
-      thematicArea: string;
-      strategicObjective: string;
-      resultLevel: string;
-      baseline: number;
-      target: number;
-      actual: number;
-      performance: number;
-      status: string;
-    }[];
-    PROJECT_INDICATOR_PERFORMANCE: {
-      kpis: {
-        kpiId: string;
-        code: string;
-        statement: string;
-        actual: number;
-        target: number;
-        performance: number;
-      }[];
-      averagePerformance: number;
-    };
+    KPI_TABLE_DATA: OrgKpiSOGroup[];
   };
