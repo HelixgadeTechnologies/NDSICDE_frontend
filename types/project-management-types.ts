@@ -53,6 +53,13 @@ export type ProjectRequestType = {
   recipientPhoneNumber: string;
   documentName: string;
   documentURL: string;
+  /** Layer 1 designated approver — user id */
+  sendTo?: string;
+  /** Layer 3 designated approver — user id */
+  sendTo2?: string;
+  /** Additional title+URL attachments (multi-upload flow). */
+  supportingDocuments?: { documentName: string; documentURL: string }[];
+  budgetName?: string;
   projectId: string;
   status: string;
   isJourneyManagementRequired: boolean;
@@ -107,6 +114,14 @@ export type ProjectRequestResponseType = ProjectRequestType & {
   comment_C?: null | string;
   comment_D?: null | string;
   comment_E?: null | string;
+  approvalDateA?: null | string;
+  approvalDateB?: null | string;
+  approvalDateC?: null | string;
+  approvalDateD?: null | string;
+  approvalDateE?: null | string;
+  sendToName?: null | string;
+  outputStatement?: string;
+  projectName?: string;
 };
 
 export type RequestLineItemType = {

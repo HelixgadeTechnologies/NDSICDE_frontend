@@ -70,6 +70,10 @@ export type RequestFormData = {
   airportDropoffOfficerName: string;
   airportPickupOfficerName: string;
   isJourneyRequired: boolean;
+  /** Layer 1 designated approver — user id */
+  sendTo: string;
+  /** Layer 3 designated approver — user id */
+  sendTo2: string;
 };
 
 
@@ -133,6 +137,8 @@ export default function FormParent() {
     airportDropoffOfficerName: "",
     airportPickupOfficerName: "",
     isJourneyRequired: true,
+    sendTo: "",
+    sendTo2: "",
   });
 
 

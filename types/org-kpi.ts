@@ -1,3 +1,20 @@
+export type OrgKpiDetail = {
+    statement: string;
+    definition: string;
+    type: string;
+    specificArea: string;
+    unitOfMeasure: string;
+    itemInMeasure: string;
+    targetType: string;
+    responsiblePersons: string;
+    baseLineDate: string;
+    cumulativeValue: number;
+    baselineNarrative: string;
+    targetDate: string;
+    cumulativeTarget: number;
+    targetNarrative: string;
+  };
+
 export type OrgKpiResponse = {
     THEMATIC_AREA_SUMMARY: {
       thematicArea: string;

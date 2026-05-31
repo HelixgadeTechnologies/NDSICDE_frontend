@@ -209,7 +209,7 @@ export default function ApproveRequestViewPage() {
           />
 
           <div>
-            <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+            <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
               Activity Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
@@ -282,7 +282,7 @@ export default function ApproveRequestViewPage() {
           </div>
 
           <div>
-            <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+            <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
               Budget Breakdown
             </h3>
             <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -327,7 +327,7 @@ export default function ApproveRequestViewPage() {
 
           {!!requestDetails.isJourneyManagementRequired && (
             <div>
-              <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+              <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
                 Journey Management
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
@@ -387,7 +387,7 @@ export default function ApproveRequestViewPage() {
 
           {requestDetails.documentURL && (
             <div className="print:hidden">
-              <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+              <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
                 Supporting Document
               </h3>
               <FileDisplay
@@ -477,7 +477,7 @@ export default function ApproveRequestViewPage() {
             />
 
             <div>
-              <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+              <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
                 Activity Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
@@ -539,7 +539,7 @@ export default function ApproveRequestViewPage() {
         )}
 
         <div>
-          <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+          <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
             Retirement Details
           </h3>
           <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -622,7 +622,7 @@ export default function ApproveRequestViewPage() {
 
         {req?.documentURL && (
           <div className="print:hidden">
-            <h3 className="text-base font-bold uppercase tracking-wider border-b border-black pb-2 mb-4">
+            <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
               Attached Documents
             </h3>
             <FileDisplay filename={req.documentName} url={req.documentURL} />

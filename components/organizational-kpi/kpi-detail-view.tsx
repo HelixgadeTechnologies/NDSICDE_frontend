@@ -103,7 +103,7 @@ export default function KpiDetailView({ selected, onBack }: KpiDetailViewProps) 
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3 min-w-[280px]">
+            <div className="flex items-center gap-3 min-w-70">
               <Button
                 content="Report Actual"
                 icon="fluent:document-add-24-regular"

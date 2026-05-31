@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Heading from "@/ui/text-heading";
 import FileDisplay from "@/ui/file-display";
 import Table from "@/ui/table";
@@ -12,13 +12,28 @@ import { ProjectRequestResponseType, RequestLineItemType } from "@/types/project
 import { useSearchParams } from "next/navigation";
 import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
 import SignatureComponenet from "@/ui/signature-component";
-import { signatures } from "@/lib/config/demo-signatures";
+import { getUsers, UserManagementCredentials } from "@/lib/api/user-management";
+
+/**
+ * Each layer maps to one approval column (A-E) on the request record.
+ * Layers 1 and 3 also have a designated approver written at request creation
+ * time (`sendTo` and `sendTo2`).
+ */
+type LayerKey = "A" | "B" | "C" | "D" | "E";
+const LAYERS: { key: LayerKey; label: string; designatedField?: "sendTo" | "sendTo2" }[] = [
+  { key: "A", label: "Layer 1", designatedField: "sendTo" },
+  { key: "B", label: "Layer 2" },
+  { key: "C", label: "Layer 3", designatedField: "sendTo2" },
+  { key: "D", label: "Layer 4" },
+  { key: "E", label: "Layer 5" },
+];
 
 export default function ViewActivityRequestPage() {
   const searchParams = useSearchParams();
   const requestId = searchParams.get("requestId");
   const [requestDetails, setRequestDetails] = useState<ProjectRequestResponseType | null>(null);
   const [outputDetails, setOutputDetails] = useState<any>(null);
+  const [users, setUsers] = useState<UserManagementCredentials[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const token = getToken();
 
@@ -35,19 +50,27 @@ export default function ViewActivityRequestPage() {
       if (!requestId) return;
       setIsLoading(true);
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${requestId}`, {
-           headers: { Authorization: `Bearer ${token}` }
-        });
+        // Request, output, and user directory fetch in parallel — users used
+        // to resolve approver / send-to user IDs into names + signatures.
+        const [res, usersRes] = await Promise.all([
+          axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${requestId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          token
+            ? getUsers(token).catch(() => ({ data: [] as UserManagementCredentials[] }))
+            : Promise.resolve({ data: [] as UserManagementCredentials[] }),
+        ]);
         const data = res.data.data;
         setRequestDetails(data);
-        
-        if (data.outputId) {
-            const outputRes = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${data.outputId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setOutputDetails(outputRes.data.data);
-        }
+        setUsers(usersRes.data ?? []);
 
+        if (data.outputId) {
+          const outputRes = await axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/output/${data.outputId}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          );
+          setOutputDetails(outputRes.data.data);
+        }
       } catch (error) {
         console.error("Error fetching request details", error);
       } finally {
@@ -56,6 +79,50 @@ export default function ViewActivityRequestPage() {
     };
     fetchDetails();
   }, [requestId, token]);
+
+  /** O(1) user lookup by id — handy for resolving approver / send-to fields. */
+  const usersById = useMemo(() => {
+    const map = new Map<string, UserManagementCredentials>();
+    users.forEach((u) => map.set(u.userId, u));
+    return map;
+  }, [users]);
+
+  /** Per-layer signature data, derived from the request + user directory.
+   *  Falls back to the designated approver (sendTo / sendTo2) when nobody has
+   *  signed off on that layer yet. Returns null when neither approver exists. */
+  const signatureBlocks = useMemo(() => {
+    if (!requestDetails) return [];
+    return LAYERS.map(({ key, label, designatedField }) => {
+      const approverId =
+        (requestDetails[`approvedBy_${key}` as keyof ProjectRequestResponseType] as
+          | string
+          | null
+          | undefined) ?? null;
+      const designatedId = designatedField
+        ? (requestDetails[designatedField] as string | null | undefined) ?? null
+        : null;
+      const userId = approverId || designatedId;
+      if (!userId) return null;
+
+      const user = usersById.get(userId) as
+        | (UserManagementCredentials & {
+            signature?: string | null;
+            signatureMimeType?: string | null;
+          })
+        | undefined;
+
+      const approvalDate = requestDetails[
+        `approvalDate${key}` as keyof ProjectRequestResponseType
+      ] as string | null | undefined;
+
+      return {
+        heading: label,
+        name: user?.fullName ?? "Pending assignment",
+        signature: (user?.signature ?? "") || "",
+        date: approvalDate ? formatDate(approvalDate, "date-only") : "—",
+      };
+    }).filter((block): block is NonNullable<typeof block> => block !== null);
+  }, [requestDetails, usersById]);
 
   if (isLoading) {
     return (
@@ -133,17 +200,23 @@ export default function ViewActivityRequestPage() {
             </div>
           </div>
         </div>
-        <div className="flex justify-center gap-x-16 gap-y-5 items-center flex-wrap">
-         {signatures.map((sign, idx) => (
-            <SignatureComponenet
-            key={idx}
-            heading={sign.heading}
-            name={sign.name}
-            signature={sign.signature}
-            date={sign.date}
-            />
-         ))}
-        </div>
+        {signatureBlocks.length > 0 ? (
+          <div className="flex justify-center gap-x-16 gap-y-5 items-center flex-wrap">
+            {signatureBlocks.map((sign, idx) => (
+              <SignatureComponenet
+                key={`${sign.heading}-${idx}`}
+                heading={sign.heading}
+                name={sign.name}
+                signature={sign.signature}
+                date={sign.date}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 italic text-center">
+            No signatures added yet
+          </p>
+        )}
 
         <div>
           <h3 className="text-base text-gray-600 font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">

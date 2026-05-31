@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 import { useSearchParams } from "next/navigation";
 import { useRequests } from "@/context/RequestsContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AddProjectRequestRetirement from "@/components/project-management-components/add-project-request-retirement";
 import EditProjectRequestRetirement from "@/components/project-management-components/edit-project-request-retirement";
 import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
@@ -17,10 +17,20 @@ import { ProjectRequestResponseType, ProjectOutputTypes } from "@/types/project-
 import { RetirementRequestType } from "@/types/retirement-request";
 import axios from "axios";
 import { formatDate } from "@/utils/dates-format-utility";
+import { getToken } from "@/lib/api/credentials";
+import { getUsers, UserManagementCredentials } from "@/lib/api/user-management";
 import { toast } from "react-toastify";
 import DeleteModal from "@/ui/generic-delete-modal";
 import { useParams } from "next/navigation";
-import { signatures } from "@/lib/config/demo-signatures";
+
+type LayerKey = "A" | "B" | "C" | "D" | "E";
+const LAYERS: { key: LayerKey; label: string; designatedField?: "sendTo" | "sendTo2" }[] = [
+  { key: "A", label: "Layer 1", designatedField: "sendTo" },
+  { key: "B", label: "Layer 2" },
+  { key: "C", label: "Layer 3", designatedField: "sendTo2" },
+  { key: "D", label: "Layer 4" },
+  { key: "E", label: "Layer 5" },
+];
 
 function AddRetirementInlineForm({ selectedRequest, onSuccess }: { selectedRequest: ProjectRequestResponseType; onSuccess: () => void }) {
   const [actualCost, setActualCost] = useState("");
@@ -135,9 +145,11 @@ export default function ProjectRequestRetirementPage() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openEditRetirement, setOpenEditRetirement] = useState(false);
   const [selectedRetirement, setSelectedRetirement] = useState<RetirementRequestType | null>(null);
-  
+  const [users, setUsers] = useState<UserManagementCredentials[]>([]);
+
   const params = useParams();
   const projectId = (params?.id as string) || "";
+  const token = getToken();
 
   const fetchLocalRetirements = async () => {
     if (!requestId) return;
@@ -174,15 +186,71 @@ export default function ProjectRequestRetirementPage() {
 
             await fetchLocalRetirements();
         }
+
+        // User directory — used to resolve approver / send-to user IDs into
+        // signature blocks. Best-effort; an empty list just hides the section.
+        if (token) {
+          try {
+            const usersRes = await getUsers(token);
+            setUsers(usersRes.data ?? []);
+          } catch (e) {
+            console.error("Failed to load users for signature resolution", e);
+          }
+        }
       } catch (error) {
         console.error("Error finding request specifics:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     loadRequest();
-  }, [requestId, requests, projectId]);
+  }, [requestId, requests, projectId, token]);
+
+  /** O(1) user lookup by id. */
+  const usersById = useMemo(() => {
+    const map = new Map<string, UserManagementCredentials>();
+    users.forEach((u) => map.set(u.userId, u));
+    return map;
+  }, [users]);
+
+  /** Per-layer signature data derived from the request + user directory.
+   *  Layers 1 and 3 fall back to the designated approver (sendTo / sendTo2)
+   *  when nobody has signed off yet. */
+  const signatureBlocks = useMemo(() => {
+    if (!selectedRequest) return [];
+    return LAYERS.map(({ key, label, designatedField }) => {
+      const approverId =
+        (selectedRequest[`approvedBy_${key}` as keyof ProjectRequestResponseType] as
+          | string
+          | null
+          | undefined) ?? null;
+      const designatedId = designatedField
+        ? ((selectedRequest as any)[designatedField] as string | null | undefined) ?? null
+        : null;
+      const userId = approverId || designatedId;
+      if (!userId) return null;
+
+      const user = usersById.get(userId) as
+        | (UserManagementCredentials & {
+            signature?: string | null;
+            signatureMimeType?: string | null;
+          })
+        | undefined;
+
+      const approvalDate = (selectedRequest as any)[`approvalDate${key}`] as
+        | string
+        | null
+        | undefined;
+
+      return {
+        heading: label,
+        name: user?.fullName ?? "Pending assignment",
+        signature: (user?.signature ?? "") || "",
+        date: approvalDate ? formatDate(approvalDate, "date-only") : "—",
+      };
+    }).filter((block): block is NonNullable<typeof block> => block !== null);
+  }, [selectedRequest, usersById]);
 
   const head = viewOnly ? [
     "Item Line Description",
@@ -433,17 +501,23 @@ export default function ProjectRequestRetirementPage() {
           </div>
         )}
 
-        <div className="flex justify-center gap-x-16 gap-y-5 items-center flex-wrap">
-          {signatures.map((sign, idx) => (
-            <SignatureComponenet
-              key={idx}
-              heading={sign.heading}
-              name={sign.name}
-              signature={sign.signature}
-              date={sign.date}
-            />
-          ))}
-        </div>
+        {signatureBlocks.length > 0 ? (
+          <div className="flex justify-center gap-x-16 gap-y-5 items-center flex-wrap">
+            {signatureBlocks.map((sign, idx) => (
+              <SignatureComponenet
+                key={`${sign.heading}-${idx}`}
+                heading={sign.heading}
+                name={sign.name}
+                signature={sign.signature}
+                date={sign.date}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 italic text-center">
+            No signatures added yet
+          </p>
+        )}
 
         {selectedRequest.documentURL && (
           <div className="print:hidden">
