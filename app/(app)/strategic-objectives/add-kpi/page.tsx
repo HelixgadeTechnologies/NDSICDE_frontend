@@ -46,32 +46,6 @@ const STATUS_OPTIONS = [
   { label: "Completed", value: "Completed" },
 ];
 
-const SPECIFIC_AREA_OPTIONS = [
-  { label: "Training", value: "Training" },
-  { label: "Capacity Building", value: "Capacity Building" },
-  { label: "Infrastructure", value: "Infrastructure" },
-];
-
-const ITEM_IN_MEASURE_OPTIONS = [
-  { label: "Participants", value: "Participants" },
-  { label: "Communities", value: "Communities" },
-  { label: "Infrastructure", value: "Infrastructure" },
-];
-
-// Mirrors the project-level indicator form so categories (fixed + pick-and-add)
-// resolve correctly inside DisaggregationComponent.
-const KPI_DISAGG_TYPES = [
-  "Gender & Social Inclusion (Sex)",
-  "Age",
-  "State",
-  "Year",
-  "Donor Type",
-  "Policy Action Type",
-  "Institution Type",
-  "Sector",
-  "None",
-];
-
 type KPIFormData = {
   statement: string;
   definition: string;
@@ -116,10 +90,10 @@ function AddKPIForm() {
   const [formData, setFormData] = useState<KPIFormData>(EMPTY_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Shared disaggregation state — kept in sync across setup / baseline / target
-  // exactly like the project-level indicator form.
+  // Shared disaggregation state — lifted up so all three split-view
+  // DisaggregationComponent instances (setup / baseline / target) stay in sync
   const [disaggCheckboxes, setDisaggCheckboxes] = useState<boolean[]>(
-    Array(KPI_DISAGG_TYPES.length).fill(false),
+    Array(9).fill(false), // 9 = number of DISAGG_TYPES
   );
   type DisaggRow = { category: string; value: string; target: string; actual: string };
   const [disaggRows, setDisaggRows] = useState<Record<string, DisaggRow[]>>({});
@@ -145,7 +119,7 @@ function AddKPIForm() {
 
   const resetForm = () => {
     setFormData(EMPTY_FORM);
-    setDisaggCheckboxes(Array(KPI_DISAGG_TYPES.length).fill(false));
+    setDisaggCheckboxes(Array(9).fill(false));
     setDisaggRows({});
     setDisaggItems([]);
   };
@@ -248,7 +222,7 @@ function AddKPIForm() {
           isBigger
         />
 
-        {/* ── Type / Specific Area / Unit / Item grid */}
+        {/* ── Type / Unit grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <DropDown
             label="KPI Type"
@@ -260,30 +234,12 @@ function AddKPIForm() {
             isBigger
           />
           <DropDown
-            label="Specific Area"
-            name="specificArea"
-            placeholder="Select area"
-            value={formData.specificArea}
-            onChange={handleDropdownChange("specificArea")}
-            options={SPECIFIC_AREA_OPTIONS}
-            isBigger
-          />
-          <DropDown
             label="Unit of Measurement"
             name="unitOfMeasure"
             placeholder="Select unit"
             value={formData.unitOfMeasure}
             onChange={handleDropdownChange("unitOfMeasure")}
             options={UNIT_OPTIONS}
-            isBigger
-          />
-          <DropDown
-            label="Item in Measure"
-            name="itemInMeasure"
-            placeholder="Select item"
-            value={formData.itemInMeasure}
-            onChange={handleDropdownChange("itemInMeasure")}
-            options={ITEM_IN_MEASURE_OPTIONS}
             isBigger
           />
         </div>
@@ -301,7 +257,6 @@ function AddKPIForm() {
         <div className="border-t border-gray-100 pt-5">
           <DisaggregationComponent
             view="setup"
-            customTypes={KPI_DISAGG_TYPES}
             sharedCheckboxes={disaggCheckboxes}
             sharedRows={disaggRows}
             onCheckboxesChange={setDisaggCheckboxes}
@@ -362,7 +317,6 @@ function AddKPIForm() {
 
           <DisaggregationComponent
             view="baseline"
-            customTypes={KPI_DISAGG_TYPES}
             isStatusType={isStatusType}
             sharedCheckboxes={disaggCheckboxes}
             sharedRows={disaggRows}
@@ -432,7 +386,6 @@ function AddKPIForm() {
 
           <DisaggregationComponent
             view="target"
-            customTypes={KPI_DISAGG_TYPES}
             isStatusType={isStatusType}
             sharedCheckboxes={disaggCheckboxes}
             sharedRows={disaggRows}

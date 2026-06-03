@@ -22,6 +22,7 @@ type AddProps = {
     email: string;
     roleId: string;
     teamMemberId?: string;
+    userId?: string;
   };
   projectId?: string;
   onSuccess?: () => void;
@@ -88,7 +89,6 @@ export default function ProjectTeamModal({
           },
         );
 
-
         if (
           response.data &&
           response.data.data &&
@@ -151,7 +151,6 @@ export default function ProjectTeamModal({
       },
     };
 
-
     setIsSubmitting(true);
 
     try {
@@ -164,10 +163,10 @@ export default function ProjectTeamModal({
         },
       });
 
-
-        toast.success(`Team member ${mode === "create" ? "added" : "updated"} successfully!`),
-
-      onClose();
+      (toast.success(
+        `Team member ${mode === "create" ? "added" : "updated"} successfully!`,
+      ),
+        onClose());
       setSuccessModal(true);
 
       if (onSuccess) {
@@ -196,8 +195,6 @@ export default function ProjectTeamModal({
 
   // Handle dropdown changes - KEPT THE SAME
   const handleSelectChange = (name: string, value: string) => {
-
-
     // Special handling for email selection
     if (name === "email" && team && Array.isArray(team)) {
       const selectedMember = team.find((member: any) => member.email === value);

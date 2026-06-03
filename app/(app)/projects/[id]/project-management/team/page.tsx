@@ -106,7 +106,7 @@ export default function ProjectTeam() {
     "Email Address",
     "Designation",
     "Project",
-    "Last Active",
+    // "Last Active",
     "Actions",
   ];
 
@@ -201,15 +201,16 @@ export default function ProjectTeam() {
           <Table
             tableHead={head}
             tableData={data || []}
+            height="60px"
             checkbox
-            idKey="teamMemberId"
+            idKey="userId"
             renderRow={(row) => (
               <>
                 <td className="px-6">{row.fullName}</td>
                 <td className="px-6">{row.email}</td>
-                <td className="px-6">{row.roleName || "N/A"}</td>
+                <td className="px-6">{row.designation || row.role.roleName || "N/A"}</td>
                 <td className="px-6">{toSentenceCase(row.projectName)}</td>
-                <td className="px-6">{formatDate(row.updateAt, "time")}</td>
+                {/* <td className="px-6">{formatDate(row.updateAt, "time")}</td> */}
                 <td className="px-6 relative">
                   <div className="flex justify-center items-center">
                     <Icon
@@ -220,13 +221,13 @@ export default function ProjectTeam() {
                       color="#909CAD"
                       onClick={() =>
                         setActiveRowId((prev) =>
-                          prev === row.teamMemberId ? null : row.teamMemberId,
+                          prev === row.userId ? null : row.userId,
                         )
                       }
                     />
                   </div>
                   <ActionMenu
-                    isOpen={activeRowId === row.teamMemberId}
+                    isOpen={activeRowId === row.userId}
                     onClose={() => setActiveRowId(null)}
                     items={[
                       {
@@ -282,9 +283,9 @@ export default function ProjectTeam() {
           initialData={{
             email: selectedMember.email,
             roleId:
-              roles.find((role) => role.label === selectedMember.roleName)
+              roles.find((role) => role.label === selectedMember.role.roleName)
                 ?.value || "",
-            teamMemberId: selectedMember.teamMemberId,
+            userId: selectedMember.userId,
           }}
         />
       )}
@@ -294,7 +295,7 @@ export default function ProjectTeam() {
           isOpen={removeMember}
           onClose={() => setRemoveMember(false)}
           member={selectedMember}
-          handleDelete={() => handleDelete(selectedMember.teamMemberId)}
+          handleDelete={() => handleDelete(selectedMember.userId)}
           isLoading={isDeleting}
         />
       )}

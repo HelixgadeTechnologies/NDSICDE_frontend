@@ -175,12 +175,12 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
         href: "/financial-reporting",
         icon: "solar:money-bag-linear",
       },
-      {
-        id: "performance-analytics",
-        name: "Project Performance Dashboard",
-        href: "/performance-analytics",
-        icon: "bi:gear",
-      },
+      // {
+      //   id: "performance-analytics",
+      //   name: "Project Performance Dashboard",
+      //   href: "/performance-analytics",
+      //   icon: "bi:gear",
+      // },
     ],
   },
 
