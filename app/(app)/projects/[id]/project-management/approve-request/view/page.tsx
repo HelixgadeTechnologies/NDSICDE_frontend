@@ -20,6 +20,7 @@ import {
 } from "@/types/project-management-types";
 import { RetirementRequestType } from "@/types/retirement-request";
 import { signatures } from "@/lib/config/demo-signatures";
+import { canUserApprove, getApprovalStatusMessage } from "@/utils/request-approval";
 
 export default function ApproveRequestViewPage() {
   const searchParams = useSearchParams();
@@ -476,32 +477,40 @@ export default function ApproveRequestViewPage() {
             <h3 className="text-base font-bold uppercase tracking-wider mb-4">
               Approval Actions
             </h3>
-            <TextareaInput
-              name="comment"
-              label="Comment *"
-              placeholder="Add your review comments here..."
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-            <div className="flex gap-4 pt-2">
-              <Button
-                content={isSubmitting ? "Submitting..." : "Reject"}
-                isSecondary
-                onClick={() => handleAction(2)}
-                isDisabled={isSubmitting}
-              />
-              <Button
-                content={isSubmitting ? "Submitting..." : "Review"}
-                isSecondary
-                onClick={() => handleAction(3)}
-                isDisabled={isSubmitting}
-              />
-              <Button
-                content={isSubmitting ? "Submitting..." : "Approve"}
-                onClick={() => handleAction(1)}
-                isDisabled={isSubmitting}
-              />
-            </div>
+            {canUserApprove(requestDetails, user?.level) ? (
+              <>
+                <TextareaInput
+                  name="comment"
+                  label="Comment *"
+                  placeholder="Add your review comments here..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+                <div className="flex gap-4 pt-2">
+                  <Button
+                    content={isSubmitting ? "Submitting..." : "Reject"}
+                    isSecondary
+                    onClick={() => handleAction(2)}
+                    isDisabled={isSubmitting}
+                  />
+                  <Button
+                    content={isSubmitting ? "Submitting..." : "Review"}
+                    isSecondary
+                    onClick={() => handleAction(3)}
+                    isDisabled={isSubmitting}
+                  />
+                  <Button
+                    content={isSubmitting ? "Submitting..." : "Approve"}
+                    onClick={() => handleAction(1)}
+                    isDisabled={isSubmitting}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-md px-4 py-3">
+                {getApprovalStatusMessage(requestDetails, user?.level)}
+              </p>
+            )}
           </div>
         </div>
       </div>

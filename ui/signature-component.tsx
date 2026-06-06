@@ -33,6 +33,7 @@ export default function SignatureComponenet({
                 className="object-contain object-bottom"
                 />
             )}
+            {signature === "" && <p className="absolute bottom-0 text-center w-full">No signature found.</p>}
             </div>
             <p className="text-xs font-semibold text-center">{name}</p>
             <p className="text-xs font-semibold text-center">{date}</p>
