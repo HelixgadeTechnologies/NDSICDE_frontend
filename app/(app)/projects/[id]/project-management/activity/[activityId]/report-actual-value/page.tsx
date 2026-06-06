@@ -116,10 +116,7 @@ export default function ReportActualValue() {
 
   return (
     <div className="relative mt-12">
-      {/* <div className="absolute right-0 -top-18.75">
-        <Button content="Add Indicator Reporting Formats" icon="si:add-fill" href={`/projects/${projectId}/project-management/activity/report-actual-value/add`} />
-      </div> */}
-      <Heading heading="Activity Report" className="mb-5" />
+      <Heading heading={`Actual Value Report`} className="mb-5" />
 
       <CardComponent>
         {isLoading ? (

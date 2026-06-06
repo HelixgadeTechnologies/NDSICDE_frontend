@@ -188,6 +188,7 @@ export default function ProjectActivity() {
                         label: "Report Actual Value",
                         icon: "si:add-fill",
                         href: `/projects/${projectId}/project-management/activity/${row.activityId}/report-actual-value/add`,
+                        className: "border-b border-gray-300"
                       },
                       {
                         type: "link",

@@ -126,8 +126,6 @@ export default function KpiDetailView({ selected, onBack }: KpiDetailViewProps) 
               <div className="space-y-4">
                 <MetaRow label="Definition" value={details?.definition} />
                 <MetaRow label="Unit of Measure" value={details?.unitOfMeasure} />
-                <MetaRow label="Item in Measure" value={details?.itemInMeasure} />
-                <MetaRow label="Specific Area" value={details?.specificArea} />
                 <MetaRow label="Target Type" value={details?.targetType} />
               </div>
 

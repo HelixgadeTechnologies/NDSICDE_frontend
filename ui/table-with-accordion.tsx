@@ -107,7 +107,7 @@ export default function TableWithAccordion<T, K>({
         </div>
       ) : (
         <>
-        <div className="overflow-x-auto">
+        <div className="">
           <table ref={tableRef} className="min-w-full text-sm text-left">
             <thead>
               <tr className="bg-[#F5F7FA] h-13 text-[#111928] text-sm font-medium">

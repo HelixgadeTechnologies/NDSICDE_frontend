@@ -13,6 +13,8 @@ import TagInput from "@/ui/form/tag-input";
 import stateAndLgaData from "@/lib/config/stateAndLg.json";
 import { CreateProjectFormDataType, ProjectApiResponse } from "@/types/admin-types";
 import axios from "axios";
+import { toast } from "react-toastify";
+
 import {
   CURRENCY_OPTIONS,
   COUNTRY_OPTIONS,
@@ -374,12 +376,10 @@ export default function CreateNewProject() {
   const [activeTab, setActiveTab] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const { token } = useRoleStore();
 
   // Edit-mode project fetch (only fires when projectId is present)
   const [isLoadingProject, setIsLoadingProject] = useState(false);
-  const [editProjectError, setEditProjectError] = useState<string | null>(null);
 
   // Strategic objectives
   const [strategicObjectives, setStrategicObjectives] = useState<
@@ -426,7 +426,6 @@ export default function CreateNewProject() {
 
     const fetchProject = async () => {
       setIsLoadingProject(true);
-      setEditProjectError(null);
       try {
         const res = await axios.get<{ data: ProjectApiResponse }>(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/projects/${projectId}`,
@@ -439,7 +438,7 @@ export default function CreateNewProject() {
 
         const p = res.data?.data;
         if (!p) {
-          setEditProjectError("Project not found. Please go back and try again.");
+          toast.error("Project not found. Please go back and try again.");
           return;
         }
 
@@ -466,7 +465,7 @@ export default function CreateNewProject() {
         });
       } catch (error) {
         console.error("Failed to fetch project for edit:", error);
-        setEditProjectError("Failed to load project. Please try again.");
+        toast.error("Failed to load project. Please try again.");
       } finally {
         setIsLoadingProject(false);
       }
@@ -478,7 +477,6 @@ export default function CreateNewProject() {
   // ── Submit ──
   const handleFormSubmit = async () => {
     setIsSubmitting(true);
-    setSubmitError(null);
 
     try {
       // Convert selected statement labels back to IDs via the loaded options map
@@ -501,10 +499,12 @@ export default function CreateNewProject() {
           community: formData.targetCommunities[0] || "",
           thematicAreasOrPillar: formData.thematicAreas.join(", "),
           status: formData.status,
-          // Backend currently accepts a single objective id; send only the first until multi is supported
-          strategicObjectiveId: selectedObjectiveIds[0] || "",
+          // Send all selected objective ids as a comma-separated string
+          strategicObjectiveId: selectedObjectiveIds.join(", "),
         },
       };
+
+      console.log("Project form submit payload:", JSON.stringify(submitData, null, 2));
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/project`,
@@ -524,7 +524,7 @@ export default function CreateNewProject() {
       }
     } catch (error) {
       console.error(`Error ${isEditMode ? "updating" : "creating"} project:`, error);
-      setSubmitError(
+      toast.error(
         error instanceof Error
           ? error.message
           : `Failed to ${isEditMode ? "update" : "create"} project. Please try again.`
@@ -560,18 +560,6 @@ export default function CreateNewProject() {
               }
               className="text-center"
             />
-
-            {submitError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-red-600 text-sm">{submitError}</p>
-              </div>
-            )}
-
-            {editProjectError && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-red-600 text-sm">{editProjectError}</p>
-              </div>
-            )}
 
             {isEditMode && isLoadingProject ? (
               <div className="flex justify-center items-center py-20">

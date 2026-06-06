@@ -170,10 +170,7 @@ export default function SOTable({
           .filter((k) => !typeFilter || k.type === typeFilter)
           .filter((k) => {
             if (!q) return true;
-            return (
-              k.statement?.toLowerCase().includes(q) ||
-              k.itemInMeasure?.toLowerCase().includes(q)
-            );
+            return k.statement?.toLowerCase().includes(q);
           });
 
         return { ...so, kpis: linked };

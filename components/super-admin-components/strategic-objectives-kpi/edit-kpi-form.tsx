@@ -101,18 +101,6 @@ const KPI_DISAGG_TYPES = [
   "None",
 ];
 
-const SPECIFIC_AREA_OPTIONS = [
-  { label: "Training", value: "Training" },
-  { label: "Capacity Building", value: "Capacity Building" },
-  { label: "Infrastructure", value: "Infrastructure" },
-];
-
-const ITEM_IN_MEASURE_OPTIONS = [
-  { label: "Participants", value: "Participants" },
-  { label: "Communities", value: "Communities" },
-  { label: "Infrastructure", value: "Infrastructure" },
-];
-
 export default function EditKPIModal({
   isOpen,
   onClose,
@@ -223,9 +211,9 @@ export default function EditKPIModal({
           kpiId: formData.kpiId,
           statement: formData.statement,
           definition: formData.definition,
-          specificArea: formData.specificArea,
+          specificArea: "",
           unitOfMeasure: formData.unitOfMeasure,
-          itemInMeasure: formData.itemInMeasure,
+          itemInMeasure: "",
           baseLineDate: formData.baseLineDate ? new Date(formData.baseLineDate).toISOString() : null,
           cumulativeValue: formData.unitOfMeasure === "Status" ? formData.cumulativeValue : (Number(formData.cumulativeValue) || 0),
           baselineNarrative: formData.baselineNarrative,
@@ -312,28 +300,12 @@ export default function EditKPIModal({
               options={KPI_TYPE_OPTIONS}
             />
             <DropDown
-              name="specificArea"
-              value={formData.specificArea}
-              label="Specific Area"
-              placeholder="Select Area"
-              options={SPECIFIC_AREA_OPTIONS}
-              onChange={(value: string) => handleInputChange("specificArea", value)}
-            />
-            <DropDown
               name="unitOfMeasure"
               value={formData.unitOfMeasure}
               label="Unit of Measurement"
               placeholder="Select Unit"
               options={UNIT_OPTIONS}
               onChange={(value: string) => handleInputChange("unitOfMeasure", value)}
-            />
-            <DropDown
-              name="itemInMeasure"
-              value={formData.itemInMeasure}
-              label="Item in Measure"
-              placeholder="Select Item"
-              options={ITEM_IN_MEASURE_OPTIONS}
-              onChange={(value: string) => handleInputChange("itemInMeasure", value)}
             />
             <div className="md:col-span-2">
               <TagInput

@@ -422,14 +422,6 @@ export default function AddIndicatorForm() {
             onChange={(e) => handleInputChange("definition", e.target.value)}
             isBigger
           />
-          {/* <TextInput
-            label="Specific Area"
-            value={formData.specificArea}
-            name="specificArea"
-            placeholder="---"
-            onChange={(e) => handleInputChange("specificArea", e.target.value)}
-            isBigger
-          /> */}
           <DropDown
             label="Unit of Measurement"
             value={formData.unitOfMeasure}

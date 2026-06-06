@@ -7,6 +7,7 @@ import Avatar from "@/ui/avatar";
 import { RecentActivities } from "@/lib/config/charts";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toSentenceCase } from "@/utils/ui-utility";
 
 export default function RecentActivityTab() {
   const [recentActivities, setRecentActivities] = useState<RecentActivities[]>([]);
@@ -74,10 +75,10 @@ export default function RecentActivityTab() {
             <Avatar name={activity?.actor} />
             <div className="space-y-1">
               <p className="text-sm font-medium text-[#242424]">
-                {activity?.actor} ({activity?.activityType})
+                {activity?.actor} - {toSentenceCase(activity?.activityType)}
               </p>
               <span className="text-xs text-[#737373] block">
-                Project: {activity?.projectName?.substring(0, 50) + "..."}
+                Project: {toSentenceCase(activity?.projectName)}
               </span>
               <span className="text-xs text-[#737373] block">
                 {activity?.timeAgo}
