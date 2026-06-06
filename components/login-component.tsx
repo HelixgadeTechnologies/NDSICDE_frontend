@@ -9,6 +9,7 @@ import Button from "@/ui/form/button";
 import { useRoleStore, UserRole } from "@/store/role-store";
 import { useRouter } from "next/navigation";
 import { apiLogin, decodeJWT } from "@/lib/api/auth";
+import { fetchRoles } from "@/lib/api/roles";
 import { toast } from "react-toastify";
 
 // Map role names from API to your UserRole type
@@ -29,7 +30,10 @@ function mapRoleNameToUserRole(roleName: string): UserRole {
   };
 
   const normalizedRole = roleName.toUpperCase();
-  return roleMap[normalizedRole] || "super-admin";
+  // Any designation that isn't one of the fixed buckets above (Country
+  // Director, Program Manager, Finance Officer, etc.) is a "staff" user whose
+  // screens are driven by their approval level.
+  return roleMap[normalizedRole] || "staff";
 }
 
 export default function Login() {
@@ -88,6 +92,17 @@ export default function Login() {
       // Map the role and create user object
       const mappedRole = mapRoleNameToUserRole(decodedToken.roleName);
 
+      // The JWT doesn't carry the approval level, so resolve it from the roles
+      // list by matching the user's roleId. Failure is non-fatal (level stays null).
+      let level: number | null = null;
+      try {
+        const roles = await fetchRoles();
+        const matchedRole = roles.find((r) => r.roleId === decodedToken.roleId);
+        level = matchedRole?.level ?? null;
+      } catch (rolesError) {
+        console.error("Could not resolve user approval level:", rolesError);
+      }
+
       const user = {
         id: decodedToken.userId,
         name: decodedToken.fullName,
@@ -103,6 +118,8 @@ export default function Login() {
         status: decodedToken.status,
         assignedProjectId: decodedToken.assignedProjectId,
         roleId: decodedToken.roleId,
+        roleName: decodedToken.roleName,
+        level,
       };
 
       // Login the user with both user object and token

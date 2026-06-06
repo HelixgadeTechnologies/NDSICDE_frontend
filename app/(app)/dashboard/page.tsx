@@ -35,6 +35,10 @@ export default function Dashboard() {
       return <TeamMemberDashboard />;
     }
 
+    case "staff": {
+      return <TeamMemberDashboard />;
+    }
+
     default: {
       return (
         <section className="space-y-6">

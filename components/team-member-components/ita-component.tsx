@@ -22,10 +22,12 @@ export default function ImplementationTimeAnalysisComponent({
     "Total Activity Planned Days",
     "Total Activity Spent Days",
     "(Days Spent) %",
-    "Earned Value (EV)",
-    "Planned Value (PV)",
+    // "Earned Value (EV)",
+    // "Planned Value (PV)",
     "Status",
     "Cost Variance",
+    "",
+    ""
   ];
 
   return (
@@ -79,12 +81,12 @@ export default function ImplementationTimeAnalysisComponent({
             <td className="px-6 text-sm text-gray-700">
               {activity.percentageDaysSpent ?? 0}%
             </td>
-            <td className="px-6 text-sm text-gray-700">
+            {/* <td className="px-6 text-sm text-gray-700">
               {activity.earnedValue ?? "-"}
             </td>
             <td className="px-6 text-sm text-gray-700">
               {activity.plannedValue ?? "-"}
-            </td>
+            </td> */}
             <td className="px-6 text-sm text-gray-700">
               {activity.status ?? "—"}
             </td>

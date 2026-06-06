@@ -117,7 +117,7 @@ function ActivityOverviewTable({ data }: { data: ProjectResultResponse }) {
           </td>
           <td className="px-6 text-sm text-gray-700">{activity.targetFrequency}</td>
           <td className="px-6 text-sm text-gray-700">{activity.actualFrequency}</td>
-          <td className="px-6 text-sm text-gray-700">{activity.performance}</td>
+          <td className="px-6 text-sm text-gray-700">{activity.performance}%</td>
           <td className="px-6 text-sm text-gray-700">{activity.status || "—"}</td>
         </>
       )}

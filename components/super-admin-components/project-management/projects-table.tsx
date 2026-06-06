@@ -49,6 +49,20 @@ export default function ProjectsTable() {
   // Apply filters whenever query or filters change
   useEffect(() => {
     let result = (data as unknown as ProjectApiResponse[]) || [];
+
+    // Restrict non-privileged users (staff / team members) to only the
+    // project(s) they are assigned to via assignedProjectId. Super-admin and
+    // admin keep full visibility.
+    const restrictToAssigned =
+      user?.role === "staff" || user?.role === "team-member";
+    if (restrictToAssigned) {
+      const assignedIds = (user?.assignedProjectId ?? "")
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean);
+      result = result.filter((item) => assignedIds.includes(item.projectId));
+    }
+
     // Apply search filter
     if (query) {
       const lowerQuery = query.toLowerCase();
@@ -87,7 +101,7 @@ export default function ProjectsTable() {
     }
 
     setFilteredData(result);
-  }, [query, filters, data]);
+  }, [query, filters, data, user]);
 
   // Dynamically generate objective options based on current projects data
   const objectiveOptions = [

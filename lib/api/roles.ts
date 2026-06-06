@@ -6,9 +6,11 @@ export type RoleData = {
   roleId: string;
   roleName: string;
   description: string;
-  permission: string;
+  permission: string | null;
   createAt: string;
   updateAt: string;
+  // Approval layer for this role (1-5). null = no approval rights.
+  level: number | null;
   users: number;
 };
 

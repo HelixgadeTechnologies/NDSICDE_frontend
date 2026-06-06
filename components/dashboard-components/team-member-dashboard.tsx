@@ -1,7 +1,9 @@
 import DashboardStat from "@/ui/dashboard-stat-card";
 import ProjectsTable from "../super-admin-components/project-management/projects-table";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useRoleStore } from "@/store/role-store";
+import { useProjects } from "@/context/ProjectsContext";
 
 export const metadata = {
   title: "Dashboard - NDSICDE",
@@ -10,17 +12,43 @@ export const metadata = {
 
 type Stats = {
   activeProjects: number,
-  completedProjects: number, 
+  completedProjects: number,
   onHoldProjects: number,
   totalProjects: number,
   teamAssignedProjects?: number, // Optional if not returned by API
 }
 
 export default function TeamMemberDashboard() {
+  const { user } = useRoleStore();
+  const { projects, isLoading: projectsLoading } = useProjects();
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<Stats | null>(null);
-  
+
+  // Staff / team members only see the project(s) they're assigned to, so their
+  // stat cards are derived client-side from the assigned projects (there's no
+  // user-scoped stats endpoint). Other roles keep the global stats endpoint.
+  const restrictToAssigned =
+    user?.role === "staff" || user?.role === "team-member";
+
+  const assignedStats = useMemo<Stats | null>(() => {
+    if (!restrictToAssigned) return null;
+    const assignedIds = (user?.assignedProjectId ?? "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+    const mine = projects.filter((p) => assignedIds.includes(p.projectId));
+    return {
+      totalProjects: mine.length,
+      teamAssignedProjects: mine.length,
+      activeProjects: mine.filter((p) => p.status === "Active").length,
+      completedProjects: mine.filter((p) => p.status === "Completed").length,
+      onHoldProjects: mine.filter((p) => p.status === "On Hold").length,
+    };
+  }, [restrictToAssigned, projects, user?.assignedProjectId]);
+
   useEffect(() => {
+    // Skip the global stats endpoint for restricted users (computed locally).
+    if (restrictToAssigned) return;
     const fetchCount = async () => {
       setLoading(true);
       try {
@@ -34,39 +62,42 @@ export default function TeamMemberDashboard() {
     }
 
     fetchCount();
-  }, []);
+  }, [restrictToAssigned]);
+
+  const effectiveStats = restrictToAssigned ? assignedStats : stats;
+  const isLoading = restrictToAssigned ? projectsLoading : loading;
 
   // Create dashboard data using API stats
   const dashboardData = [
     {
       title: "Total Projects",
-      value: stats?.totalProjects || 0,
+      value: effectiveStats?.totalProjects || 0,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "Team Assigned Projects",
-      value: stats?.teamAssignedProjects || 0, // Adjust based on your API response
+      value: effectiveStats?.teamAssignedProjects || 0, // Adjust based on your API response
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "Active Projects",
-      value: stats?.activeProjects || 0,
+      value: effectiveStats?.activeProjects || 0,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "Completed Projects",
-      value: stats?.completedProjects || 0,
+      value: effectiveStats?.completedProjects || 0,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
     {
       title: "On Hold Projects",
-      value: stats?.onHoldProjects || 0,
+      value: effectiveStats?.onHoldProjects || 0,
       icon: "fluent:clipboard-bullet-list-ltr-16-regular",
     },
   ];
 
   // Optional: Loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <section className="space-y-7">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">

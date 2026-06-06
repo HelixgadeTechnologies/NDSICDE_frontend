@@ -36,9 +36,19 @@ const extractProjectId = (path: string): string | undefined => {
   return match ? match[1] : undefined;
 };
 
-const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
+// Approval rights helper.
+// Any project member can CREATE requests/retirements, but only users with a
+// numeric level (>= 1) can approve, so the approve link is gated by this.
+const hasApprovalRights = (level?: number | null): boolean =>
+  typeof level === "number" && level >= 1;
+
+const getProjectDetailsItems = (
+  projectId?: string,
+  role?: UserRole,
+  level?: number | null,
+): SidebarItem[] => {
   const pid = projectId ?? "1"; // fallback if none
-  return [
+  const items: SidebarItem[] = [
     {
       id: "dashboard",
       name: "Home",
@@ -133,6 +143,22 @@ const getProjectDetailsItems = (projectId?: string): SidebarItem[] => {
       ],
     },
   ];
+
+  // Level-based gating only applies to "staff" users. Other roles
+  // (super-admin, admin, team-member) keep the full set of links.
+  if (role !== "staff") return items;
+
+  return items.map((item) => {
+    if (item.id !== "project-management" || !item.children) return item;
+    return {
+      ...item,
+      children: item.children.filter((child) => {
+        // Any project member can create requests/retirements.
+        if (child.id === "approve-request") return hasApprovalRights(level);
+        return true;
+      }),
+    };
+  });
 };
 
 export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
@@ -270,6 +296,14 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
     items: getBaseItems(),
   },
 
+  // Staff get Home (their assigned projects) + Org KPI Dashboard only.
+  // They cannot create strategic objectives/KPIs. Approval-related links
+  // appear inside the project context, gated by their level.
+  staff: {
+    role: "staff",
+    items: getBaseItems(),
+  },
+
   admin: {
     role: "admin",
     items: [
@@ -287,6 +321,7 @@ export const SIDEBAR_CONFIGS: Record<UserRole, SidebarConfig> = {
 export const getSidebarConfig = (
   role: UserRole,
   currentPath: string,
+  level?: number | null,
 ): SidebarConfig => {
   const baseConfig = SIDEBAR_CONFIGS[role];
   const projectId = extractProjectId(currentPath);
@@ -295,11 +330,11 @@ export const getSidebarConfig = (
 
   if (
     isProjectContext &&
-    ["admin", "super-admin", "team-member"].includes(role)
+    ["admin", "super-admin", "team-member", "staff"].includes(role)
   ) {
     return {
       ...baseConfig,
-      items: getProjectDetailsItems(projectId),
+      items: getProjectDetailsItems(projectId, role, level),
     };
   }
 

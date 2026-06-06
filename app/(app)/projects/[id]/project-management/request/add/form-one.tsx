@@ -17,6 +17,7 @@ import naija from "naija-state-local-government";
 import { useParams } from "next/navigation";
 import { useProjects } from "@/context/ProjectsContext";
 import InternalMemorandum from "@/components/project-management-components/internal-memorandum";
+import { useApproverOptions } from "./use-approver-options";
 
 type FormOneProps = {
   onNext: () => void;
@@ -31,6 +32,8 @@ export default function FormOne({
 }: FormOneProps) {
   const params = useParams();
   const projectId = params.id as string;
+  // Project-scoped approver options for the "Send to" TagInputs.
+  const { spo, financeOfficer } = useApproverOptions(projectId);
   const [outputsOptions, setOutputsOptions] = useState<{ label: string; value: string }[]>([]);
   const [allActivities, setAllActivities] = useState<{ label: string; value: string; outputId: string }[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(false);
@@ -172,9 +175,39 @@ export default function FormOne({
           setBudgetCode={(val) => updateFormData({ budgetCode: val })}
         />
 
-        <div className="flex items-center gap-5">
-          <TagInput label="Send to (SPO)" options={[]}/>
-          <TagInput label="Send to (Finance Officer)" options={[]}/>
+        <div className="flex items-start gap-5">
+          <TagInput
+            label="Send to (SPO)"
+            options={spo.options}
+            maxTags={1}
+            placeholder="Select a Senior Project Officer"
+            value={
+              formData.sendTo && spo.toLabel[formData.sendTo]
+                ? [spo.toLabel[formData.sendTo]]
+                : []
+            }
+            onChange={(tags) => {
+              const selected = tags[tags.length - 1];
+              updateFormData({ sendTo: selected ? spo.toId[selected] ?? "" : "" });
+            }}
+          />
+          <TagInput
+            label="Send to (Finance Officer)"
+            options={financeOfficer.options}
+            maxTags={1}
+            placeholder="Select a Finance Officer"
+            value={
+              formData.sendTo2 && financeOfficer.toLabel[formData.sendTo2]
+                ? [financeOfficer.toLabel[formData.sendTo2]]
+                : []
+            }
+            onChange={(tags) => {
+              const selected = tags[tags.length - 1];
+              updateFormData({
+                sendTo2: selected ? financeOfficer.toId[selected] ?? "" : "",
+              });
+            }}
+          />
         </div>
 
         <DropDown

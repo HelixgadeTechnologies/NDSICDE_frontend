@@ -24,7 +24,7 @@ export default function SignatureComponenet({
       <div className="flex items-center gap-2 text-xs">
         <p className="font-semibold">Signature:</p>
         <div className="space-y-1">
-            <div className="w-40 border-b border-gray-700 relative h-12 pb-1">
+            <div className="w-40 border-b border-gray-700 relative h-14 pb-1">
             {signature && (
                 <Image
                 src={signature}

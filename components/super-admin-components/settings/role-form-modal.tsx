@@ -16,7 +16,7 @@ type RoleData = {
   roleId: string;
   roleName: string;
   description: string;
-  permission: string;
+  permission: string | null;
 };
 
 // Define the props
@@ -52,7 +52,7 @@ export default function RoleFormModal({
   useEffect(() => {
     if (mode === "edit" && roleData) {
       // Parse permission string to checkboxes
-      const permissions = roleData.permission.split(",").map(Number);
+      const permissions = (roleData.permission ?? "").split(",").map(Number);
 
       setRoleForm({
         roleId: roleData.roleId || "",

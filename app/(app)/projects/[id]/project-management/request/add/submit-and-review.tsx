@@ -42,7 +42,10 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           staff: formData.staff,
           outputId: formData.outputId,
           activityTitle: formData.activityTitle,
-          activityBudgetCode: Number(formData.activityBudgetCode) || 0,
+          // Backend (Prisma) expects budget codes as String, not Int.
+          activityBudgetCode: String(
+            formData.activityBudgetCode || formData.budgetCode || "",
+          ),
           activityLocation: formData.activityLocation,
           activityPurposeDescription: formData.activityPurposeDescription,
           activityStartDate: formData.activityStartDate
@@ -51,7 +54,7 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           activityEndDate: formData.activityEndDate
             ? new Date(formData.activityEndDate).toISOString()
             : new Date().toISOString(),
-          budgetCode: Number(formData.budgetCode) || 0,
+          budgetCode: String(formData.budgetCode || ""),
           modeOfTransport: formData.modeOfTransport,
           driverName: formData.driverName,
           driversPhoneNumber: formData.driversPhoneNumber,
@@ -62,8 +65,16 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
             : new Date().toISOString(),
           route: formData.route,
           recipientPhoneNumber: formData.recipientPhoneNumber,
-          documentName: formData.documentName,
-          documentURL: formData.documentURL,
+          // The single document fields are stored on the request scalar and read
+          // by the approval view, so mirror the first supporting document into them.
+          documentName:
+            formData.documentName ||
+            formData.supportingDocuments?.[0]?.documentName ||
+            "",
+          documentURL:
+            formData.documentURL ||
+            formData.supportingDocuments?.[0]?.documentURL ||
+            "",
           projectId: projectId,
           createdBy: formData.createdBy,
           sendTo: formData.sendTo,
@@ -174,6 +185,7 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
               content={formData.activityPurposeDescription || "N/A"}
             />
             <Table
+            height="fit-content"
               tableHead={head}
               tableData={data}
               renderRow={(row) => (

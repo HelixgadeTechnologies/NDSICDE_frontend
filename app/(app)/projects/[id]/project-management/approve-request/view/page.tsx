@@ -47,6 +47,11 @@ export default function ApproveRequestViewPage() {
     useState<ProjectRequestResponseType | null>(null);
   const [retirementOutput, setRetirementOutput] = useState<any>(null);
 
+  // userId -> { fullName, signature } for resolving real approver signatures
+  const [usersById, setUsersById] = useState<
+    Record<string, { fullName: string; signature?: string }>
+  >({});
+
   const lineItemHead = [
     "Item Line Description",
     "Quantity",
@@ -68,6 +73,22 @@ export default function ApproveRequestViewPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
+        // Resolve all users so we can show real signatures for the requester
+        // and each approver (approvers may be org-level, not on the project team).
+        try {
+          const usersRes = await axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/userManagement/users`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          );
+          const map: Record<string, { fullName: string; signature?: string }> = {};
+          (usersRes.data?.data ?? []).forEach((u: any) => {
+            if (u?.userId) map[u.userId] = { fullName: u.fullName, signature: u.signature };
+          });
+          setUsersById(map);
+        } catch (usersError) {
+          console.error("Error fetching users for signatures", usersError);
+        }
+
         if (type === "request" && requestId) {
           const res = await axios.get(
             `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${requestId}`,
@@ -115,7 +136,9 @@ export default function ApproveRequestViewPage() {
     fetchData();
   }, [type, requestId, retirementId, projectId, token]);
 
-  const handleAction = async (approvalStatus: 2 | 3) => {
+  // Approval action codes (applied at the approver's level by the backend):
+  // 1 = Approved, 2 = Rejected, 3 = Under Review (resets other levels)
+  const handleAction = async (approvalStatus: 1 | 2 | 3) => {
     if (!comment.trim()) {
       toast.error("Please add a comment before submitting.");
       return;
@@ -140,7 +163,11 @@ export default function ApproveRequestViewPage() {
       });
 
       toast.success(
-        approvalStatus === 2 ? "Request rejected." : "Marked for review.",
+        approvalStatus === 1
+          ? "Approved."
+          : approvalStatus === 2
+            ? "Rejected."
+            : "Marked for review.",
       );
       router.back();
     } catch {
@@ -148,6 +175,53 @@ export default function ApproveRequestViewPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Approval layers (A-E => levels 1-5) mapped to their response fields.
+  const APPROVAL_LAYERS: {
+    approvedBy: keyof ProjectRequestResponseType;
+    date: keyof ProjectRequestResponseType;
+    heading: string;
+  }[] = [
+    { approvedBy: "approvedBy_A", date: "approvalDateA", heading: "Layer 1 Approval" },
+    { approvedBy: "approvedBy_B", date: "approvalDateB", heading: "Layer 2 Approval" },
+    { approvedBy: "approvedBy_C", date: "approvalDateC", heading: "Layer 3 Approval" },
+    { approvedBy: "approvedBy_D", date: "approvalDateD", heading: "Layer 4 Approval" },
+    { approvedBy: "approvedBy_E", date: "approvalDateE", heading: "Layer 5 Approval" },
+  ];
+
+  // Build the signature blocks from real data: the requester plus every layer
+  // that has actually been approved (resolved to the approver's signature).
+  const buildSignatures = (req: ProjectRequestResponseType) => {
+    const blocks: {
+      heading: string;
+      name: string;
+      signature: string;
+      date: string;
+    }[] = [];
+
+    const requester = req.createdBy ? usersById[req.createdBy] : undefined;
+    blocks.push({
+      heading: "Requested By",
+      name: requester?.fullName || req.staff || "N/A",
+      signature: requester?.signature || "",
+      date: req.requestDate ? formatDate(req.requestDate, "date-only") : "",
+    });
+
+    APPROVAL_LAYERS.forEach((layer) => {
+      const approverId = req[layer.approvedBy] as string | null | undefined;
+      if (!approverId) return;
+      const approver = usersById[approverId];
+      const dateValue = req[layer.date] as string | null | undefined;
+      blocks.push({
+        heading: layer.heading,
+        name: approver?.fullName || "N/A",
+        signature: approver?.signature || "",
+        date: dateValue ? formatDate(dateValue, "date-only") : "",
+      });
+    });
+
+    return blocks;
   };
 
   if (isLoading) {
@@ -270,7 +344,7 @@ export default function ApproveRequestViewPage() {
           </div>
 
           <div className="flex justify-center gap-x-16 gap-y-5 items-center flex-wrap">
-            {signatures.map((sign, idx) => (
+            {buildSignatures(requestDetails).map((sign, idx) => (
               <SignatureComponenet
                 key={idx}
                 heading={sign.heading}
@@ -287,6 +361,7 @@ export default function ApproveRequestViewPage() {
             </h3>
             <div className="border border-gray-200 rounded-lg overflow-hidden">
               <Table
+              height="fit-content"
                 tableHead={lineItemHead}
                 tableData={requestDetails.lineItems || []}
                 renderRow={(row: RequestLineItemType) => (
@@ -418,12 +493,12 @@ export default function ApproveRequestViewPage() {
               <Button
                 content={isSubmitting ? "Submitting..." : "Review"}
                 isSecondary
-                onClick={() => handleAction(2)}
+                onClick={() => handleAction(3)}
                 isDisabled={isSubmitting}
               />
               <Button
                 content={isSubmitting ? "Submitting..." : "Approve"}
-                onClick={() => handleAction(3)}
+                onClick={() => handleAction(1)}
                 isDisabled={isSubmitting}
               />
             </div>
@@ -648,8 +723,14 @@ export default function ApproveRequestViewPage() {
               isDisabled={isSubmitting}
             />
             <Button
-              content={isSubmitting ? "Submitting..." : "Approve"}
+              content={isSubmitting ? "Submitting..." : "Review"}
+              isSecondary
               onClick={() => handleAction(3)}
+              isDisabled={isSubmitting}
+            />
+            <Button
+              content={isSubmitting ? "Submitting..." : "Approve"}
+              onClick={() => handleAction(1)}
               isDisabled={isSubmitting}
             />
           </div>

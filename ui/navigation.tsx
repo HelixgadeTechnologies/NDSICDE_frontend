@@ -4,7 +4,7 @@ import { useSidebar } from "@/context/SidebarContext";
 // import NotificationTab from "@/ui/notification-tab";
 import Avatar from "@/ui/avatar";
 import { Icon } from "@iconify/react";
-import { useRoleStore, getRoleDisplayName, User } from "@/store/role-store";
+import { useRoleStore, getRoleHeaderLabel, User } from "@/store/role-store";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -40,7 +40,7 @@ export default function Navigation() {
   return (
     <header className="flex justify-between items-center bg-white px-2 md:pr-10 md:pl-5 py-3 border-b border-gray-200 no-print">
       <h2 className="text-lg md:text-2xl font-semibold text-[#242424]">
-        {user?.role ? getRoleDisplayName(user.role) : "Dashboard"}
+        {getRoleHeaderLabel(user)}
       </h2>
       <div className="flex justify-end items-center gap-1.5 md:gap-3">
         {/* <NotificationTab /> */}

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type UserRole = 'super-admin' | 'partners' | 'management' | 'r-managers' | 'team-member' | 'admin'
+export type UserRole = 'super-admin' | 'partners' | 'management' | 'r-managers' | 'team-member' | 'admin' | 'staff'
 
 export interface User {
   id: string
@@ -18,6 +18,12 @@ export interface User {
   status?: string
   assignedProjectId?: string | null
   roleId?: string
+  // Human-readable role name from the JWT (e.g. "Finance Officer"), shown in
+  // the top nav for staff users.
+  roleName?: string
+  // Approval layer (1-5) derived from the user's role in the roles list.
+  // null/undefined = no approval rights.
+  level?: number | null
 }
 
 interface RoleState {
@@ -84,9 +90,20 @@ export const getRoleDisplayName = (role: UserRole): string => {
     'management': 'Management & Staff',
     'r-managers': 'Request & Retirement Managers',
     'team-member': 'Team Members',
-    'admin': "Admin - Monitoring and Evaluation System"
+    'admin': "Admin - Monitoring and Evaluation System",
+    'staff': 'Staff'
   }
   return names[role]
+}
+
+// Header label shown in the top nav. Staff users display their actual role
+// name (e.g. "Finance Officer") instead of the generic "Staff".
+export const getRoleHeaderLabel = (user: User | null): string => {
+  if (!user) return 'Dashboard'
+  if (user.role === 'staff') {
+    return user.roleName || 'Staff'
+  }
+  return getRoleDisplayName(user.role)
 }
 
 // Utility function to get stored token (now from Zustand store)
