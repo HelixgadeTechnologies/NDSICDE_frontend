@@ -188,7 +188,7 @@ export default function ApproveRequestPage() {
                               {row.staff && (
                                 <span className="flex items-center gap-1">
                                   <Icon icon="mdi:account-outline" width={13} height={13} />
-                                  {toSentenceCase(row.staff)}
+                                  {row.staff}
                                 </span>
                               )}
                               {row.activityLocation && (
