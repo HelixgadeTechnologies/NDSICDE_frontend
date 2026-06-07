@@ -11,6 +11,7 @@ import { formatDate } from "@/utils/dates-format-utility";
 import { Icon } from "@iconify/react";
 import axios from "axios";
 import ActionMenu from "@/ui/action-menu";
+import EditActivityReport from "@/components/project-management-components/edit-activity-report";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -26,6 +27,22 @@ export default function ReportActualValue() {
     id: string;
     name: string;
   } | null>(null);
+
+  // Edit modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [reportToEdit, setReportToEdit] =
+    useState<ProjectActivityReportTypes | null>(null);
+
+  const handleEditClick = (row: ProjectActivityReportTypes) => {
+    setReportToEdit(row);
+    setEditModalOpen(true);
+    setActiveRowId(null);
+  };
+
+  const handleEditModalClose = () => {
+    setEditModalOpen(false);
+    setReportToEdit(null);
+  };
 
   const params = useParams();
   const projectId = (params.id as string) || "";
@@ -165,7 +182,7 @@ export default function ReportActualValue() {
                         type: "button",
                         label: "Edit",
                         icon: "ph:pencil-simple-line",
-                        onClick: () => {},
+                        onClick: () => handleEditClick(row),
                       },
                       {
                         type: "button",
@@ -196,6 +213,15 @@ export default function ReportActualValue() {
           heading="Are you sure you want to delete this report?"
           subtitle={`You are about to delete "${itemToDelete.name}". This action is permanent and CANNOT be reversed.`}
           onDelete={deleteActivity}
+        />
+      )}
+
+      {reportToEdit && (
+        <EditActivityReport
+          isOpen={editModalOpen}
+          onClose={handleEditModalClose}
+          initialData={reportToEdit}
+          onSuccess={fetchActivityReports}
         />
       )}
     </div>
