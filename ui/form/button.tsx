@@ -26,7 +26,9 @@ export default function Button({
 }: ButtonProps) {
   const classes = `${
     isDisabled
-      ? "cursor-not-allowed bg-[#ed9da5] text-white"
+      ? isSecondary
+        ? "cursor-not-allowed bg-white text-[#ed9da5] border border-[#ed9da5]"
+        : "cursor-not-allowed bg-[#ed9da5] text-white"
       : isSecondary
       ? "cursor-pointer bg-white text-[#D2091E] border border-[#D2091E] hover:bg-gray-100"
       : "cursor-pointer bg-[#D2091E] text-white hover:bg-[#C2071A] "

@@ -42,7 +42,6 @@ export default function SubmitAndReview({ formData, onBack, onSubmit }: FormTwoP
           staff: formData.staff,
           outputId: formData.outputId,
           activityTitle: formData.activityTitle,
-          // Backend (Prisma) expects budget codes as String, not Int.
           activityBudgetCode: String(
             formData.activityBudgetCode || formData.budgetCode || "",
           ),
