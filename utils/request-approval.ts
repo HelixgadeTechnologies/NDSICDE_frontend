@@ -49,7 +49,7 @@ const isLayerApproved = (req: ApprovalRecord, index: number): boolean => {
 };
 
 /** Whether journey management is required on this request (defaults to true if absent). */
-const isJourneyRequired = (req: ApprovalRecord): boolean => {
+export const isJourneyRequired = (req: ApprovalRecord): boolean => {
   const val = req.isJourneyManagementRequired;
   // Treat undefined / null as true (safe default)
   if (val === undefined || val === null) return true;
@@ -94,7 +94,8 @@ export function canUserApprove(
   level?: number | null,
 ): boolean {
   if (typeof level !== "number" || level < 1) return false;
-  if (getApprovalState(req) !== "in-progress") return false;
+  const state = getApprovalState(req);
+  if (state !== "in-progress" && state !== "under-review") return false;
   // Security Officer (level 2) is excluded when journey management is not required
   if (level === 2 && !isJourneyRequired(req)) return false;
   return getCurrentApprovalLayer(req) === level;
@@ -112,7 +113,7 @@ export function getApprovalStatusMessage(
 
   // Level 2 (Security Officer) is not part of this chain
   if (level === 2 && !isJourneyRequired(req)) {
-    return "Security Officer approval is not required — journey management was not requested.";
+    return "Security Officer approval is not required — Journey Management was not requested.";
   }
 
   const current = getCurrentApprovalLayer(req);

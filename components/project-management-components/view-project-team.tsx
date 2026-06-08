@@ -57,18 +57,6 @@ export default function ViewProjectTeamModal({
                 Department Name
               </span>
             </li>
-            {/* <li className="flex justify-between items-center">
-              <strong className="font-bold text-black text-base leading-8">
-                Status:
-              </strong>
-              <span
-                className={`text-sm font-normal leading-5 ${
-                  member.status === "Active" ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {member.status || "N/A"}
-              </span>
-            </li> */}
             <li className="flex justify-between items-center">
               <strong className="font-bold text-black text-base leading-8">
                 Phone Number:

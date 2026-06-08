@@ -290,8 +290,9 @@ export default function ProjectRequest() {
   const deleteRequest = async (requestId: string) => {
     setIsDeleting(true);
     try {
-      const res = await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/${requestId}`,
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/request/request/delete`,
+        { requestId },
         {
           headers: {
             "Content-Type": "application/json",
@@ -448,7 +449,7 @@ export default function ProjectRequest() {
                         {getRequestApprovalStatus(row.approvalStep)}
                       </td>
                       <td className="px-6">
-                        {toSentenceCase(row.staff ?? "")}
+                        {row.staff}
                       </td>
                       <td
                         className={`px-6 font-semibold ${
@@ -462,7 +463,7 @@ export default function ProjectRequest() {
                                   ? "text-red-600"
                                   : "text-gray-600"
                         }`}>
-                        {row.status || "Pending"}
+                        {row.status}
                       </td>
                       <td className="px-6">
                         {formatDate(row.activityStartDate, "date-only")}

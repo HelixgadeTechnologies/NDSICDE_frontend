@@ -10,6 +10,8 @@ import CardComponent from "@/ui/card-wrapper";
 import LoadingSpinner from "@/ui/loading-spinner";
 import { Icon } from "@iconify/react";
 import { useProjectRequests, useProjectRetirements } from "@/hooks/useProjectData";
+import { useRoleStore } from "@/store/role-store";
+import { getCurrentApprovalLayer, isJourneyRequired } from "@/utils/request-approval";
 
 const REQUEST_STEPS: Record<number, { label: string; color: string }> = {
   0: { label: "Awaiting SPO", color: "bg-orange-100 text-orange-700" },
@@ -17,7 +19,7 @@ const REQUEST_STEPS: Record<number, { label: string; color: string }> = {
   2: { label: "Finance Officer", color: "bg-cyan-100 text-cyan-700" },
   3: { label: "Finance Manager", color: "bg-purple-100 text-purple-700" },
   4: { label: "Country Director", color: "bg-indigo-100 text-indigo-700" },
-  5: { label: "Approved", color: "bg-green-100 text-green-700" },
+  5: { label: "This request has been approved", color: "bg-gray-100 text-gray-700" },
 };
 
 const RETIREMENT_STEPS: Record<number, { label: string; color: string }> = {
@@ -48,6 +50,7 @@ export default function ApproveRequestPage() {
 
   const { requests, isLoading: isLoadingRequests } = useProjectRequests(projectId);
   const { retirements, isLoading: isLoadingRetirements } = useProjectRetirements(projectId);
+  const { user } = useRoleStore();
 
   const stats =
     activeTab === 1
@@ -137,15 +140,15 @@ export default function ApproveRequestPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {requests.map((row) => {
+                  {requests
+                    .filter((row) => !(user?.level === 2 && !isJourneyRequired(row)))
+                    .map((row) => {
                     const totalBudget = (row.lineItems || []).reduce(
                       (sum, item) => sum + (item.totalBudget || 0),
                       0,
                     );
-                    const stepInfo =
-                      row.approvalStep !== undefined && row.approvalStep !== null
-                        ? REQUEST_STEPS[row.approvalStep]
-                        : REQUEST_STEPS[0];
+                    const currentLayer = getCurrentApprovalLayer(row);
+                    const stepInfo = currentLayer === null ? REQUEST_STEPS[5] : REQUEST_STEPS[currentLayer - 1] || REQUEST_STEPS[0];
                     const statusColor =
                       STATUS_COLORS[row.status || "Pending"] || "bg-gray-100 text-gray-600";
 
