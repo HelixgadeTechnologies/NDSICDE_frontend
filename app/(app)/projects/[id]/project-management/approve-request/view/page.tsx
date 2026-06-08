@@ -401,11 +401,15 @@ export default function ApproveRequestViewPage() {
             </div>
           </div>
 
-          {!!requestDetails.isJourneyManagementRequired && (
-            <div>
-              <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
-                Journey Management
-              </h3>
+          <div>
+            <h3 className="text-base font-bold uppercase tracking-wider border-b border-gray-300 pb-2 mb-4">
+              Journey Management
+            </h3>
+            {!requestDetails.isJourneyManagementRequired ? (
+              <p className="text-sm text-gray-500 bg-gray-50 border border-dashed border-gray-300 rounded-md px-4 py-3">
+                Journey Management is <span className="font-semibold">not required</span> for this request.
+              </p>
+            ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 text-sm">
                 <div className="flex flex-col gap-1">
                   <span className="font-semibold text-gray-500 uppercase text-xs tracking-wide">
@@ -458,8 +462,8 @@ export default function ApproveRequestViewPage() {
                   </span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {requestDetails.documentURL && (
             <div className="print:hidden">

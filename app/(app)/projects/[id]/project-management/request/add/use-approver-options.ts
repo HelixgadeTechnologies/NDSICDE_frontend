@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import { ProjectTeamDetails } from "@/types/project-management-types";
+import { RoleData } from "@/lib/api/roles";
 
 /**
  * A group of "send to" options for a single TagInput.
@@ -17,23 +18,27 @@ export type ApproverOptionGroup = {
   toLabel: Record<string, string>;
 };
 
-// Build a TagInput-ready option group from the project's team members,
-// filtered to the given role name(s) (matched against role.roleName/designation).
-const buildGroup = (
+/**
+ * Build a TagInput-ready option group from the project's team members,
+ * filtered to members whose role has the given approval `level` (1-5).
+ * This is level-based rather than name-based so it works regardless of
+ * what a role is called (e.g. "Senior Project Officer", "Programs Manager").
+ */
+const buildGroupByLevel = (
   members: ProjectTeamDetails[],
-  roleNames: string[],
+  roleNameToLevel: Record<string, number | null>,
+  targetLevel: number,
 ): ApproverOptionGroup => {
-  const wanted = roleNames.map((r) => r.toLowerCase());
   const group: ApproverOptionGroup = { options: [], toId: {}, toLabel: {} };
 
   members.forEach((m) => {
-    const memberRole = (m.role?.roleName || m.designation || "").toLowerCase();
-    if (!wanted.includes(memberRole) || !m.userId || !m.fullName) return;
+    if (!m.userId || !m.fullName) return;
+    const roleName = m.role?.roleName || m.designation || "";
+    const memberLevel = roleNameToLevel[roleName];
+    if (memberLevel !== targetLevel) return;
 
     // Disambiguate same-named people by appending the role.
-    const label = m.role?.roleName
-      ? `${m.fullName} (${m.role.roleName})`
-      : m.fullName;
+    const label = roleName ? `${m.fullName} (${roleName})` : m.fullName;
 
     group.options.push(label);
     group.toId[label] = m.userId;
@@ -44,50 +49,88 @@ const buildGroup = (
 };
 
 /**
- * Fetches the team members assigned to a project and exposes "send to" option
- * groups for the request form's approver TagInputs (SPO → layer 1 approver,
- * Finance Officer → layer 3 approver).
+ * Fetches the team members assigned to a project AND the global roles list
+ * (which carries the `level` field per role), then exposes "send to" option
+ * groups for the request form's approver TagInputs:
+ *
+ *   layer1  → sendTo  : all project team members whose role has level === 1
+ *                        (e.g. Senior Project Officer, Programs Manager, …)
+ *   layer3  → sendTo2 : all project team members whose role has level === 3
+ *                        (e.g. Finance Officer, …)
  */
 export function useApproverOptions(projectId: string) {
   const [members, setMembers] = useState<ProjectTeamDetails[]>([]);
+  // Map of roleName → approval level (null = no approval rights)
+  const [roleNameToLevel, setRoleNameToLevel] = useState<Record<string, number | null>>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
     let active = true;
 
-    const fetchMembers = async () => {
+    const fetchAll = async () => {
       setLoading(true);
       try {
         const token = getToken();
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-members/project/${projectId}`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-        const data = res.data?.data ?? [];
-        if (active) setMembers(Array.isArray(data) ? data : []);
+        const headers = { Authorization: `Bearer ${token}` };
+
+        // Fetch both in parallel
+        const [membersRes, rolesRes] = await Promise.all([
+          axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/projectManagement/team-members/project/${projectId}`,
+            { headers },
+          ),
+          axios.get(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/settings/roles`,
+            { headers },
+          ),
+        ]);
+
+        if (!active) return;
+
+        const membersData: ProjectTeamDetails[] = Array.isArray(membersRes.data?.data)
+          ? membersRes.data.data
+          : [];
+        setMembers(membersData);
+
+        // Build a roleName → level lookup from the roles list
+        const rolesData: RoleData[] = Array.isArray(rolesRes.data?.data)
+          ? rolesRes.data.data
+          : [];
+        const nameToLevel: Record<string, number | null> = {};
+        rolesData.forEach((r) => {
+          nameToLevel[r.roleName] = r.level ?? null;
+        });
+        setRoleNameToLevel(nameToLevel);
       } catch (error) {
-        console.error("Error fetching project team for approvers:", error);
-        if (active) setMembers([]);
+        console.error("Error fetching project team or roles for approvers:", error);
+        if (active) {
+          setMembers([]);
+          setRoleNameToLevel({});
+        }
       } finally {
         if (active) setLoading(false);
       }
     };
 
-    fetchMembers();
+    fetchAll();
     return () => {
       active = false;
     };
   }, [projectId]);
 
-  const spo = useMemo(
-    () => buildGroup(members, ["Senior Project Officer"]),
-    [members],
-  );
-  const financeOfficer = useMemo(
-    () => buildGroup(members, ["Finance Officer"]),
-    [members],
+  // Layer 1 approvers — any role with level === 1 (SPO, Programs Manager, etc.)
+  const layer1 = useMemo(
+    () => buildGroupByLevel(members, roleNameToLevel, 1),
+    [members, roleNameToLevel],
   );
 
-  return { loading, spo, financeOfficer };
+  // Layer 3 approvers — any role with level === 3 (Finance Officer, etc.)
+  const layer3 = useMemo(
+    () => buildGroupByLevel(members, roleNameToLevel, 3),
+    [members, roleNameToLevel],
+  );
+
+  // Keep legacy aliases so existing consumers (form-one.tsx) don't break
+  return { loading, spo: layer1, financeOfficer: layer3, layer1, layer3 };
 }

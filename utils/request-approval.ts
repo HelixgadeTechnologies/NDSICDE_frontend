@@ -10,6 +10,10 @@
 //
 // A user at level N may act only when it's their layer's turn — i.e. every layer
 // before N is approved and layer N itself hasn't been approved yet.
+//
+// Special rule: Level 2 = Security Officer. This layer is ONLY required when
+// `isJourneyManagementRequired` is true on the request. When it is false, layer
+// 2 is skipped and the chain jumps directly from layer 1 to layer 3.
 
 const STATUS_KEYS = [
   "approval_A",
@@ -44,15 +48,30 @@ const isLayerApproved = (req: ApprovalRecord, index: number): boolean => {
   return code === 1 || (code === null && !!req[APPROVED_BY_KEYS[index]]);
 };
 
+/** Whether journey management is required on this request (defaults to true if absent). */
+const isJourneyRequired = (req: ApprovalRecord): boolean => {
+  const val = req.isJourneyManagementRequired;
+  // Treat undefined / null as true (safe default)
+  if (val === undefined || val === null) return true;
+  return Boolean(val);
+};
+
 /**
  * The layer (1-5) currently awaiting action, derived from the per-layer fields.
  * Returns null when every layer has been approved.
+ *
+ * Layer 2 (Security Officer) is skipped entirely when journey management is not
+ * required — so the chain goes 1 → 3 → 4 → 5 in that case.
  */
 export function getCurrentApprovalLayer(req: ApprovalRecord): number | null {
+  const journeyRequired = isJourneyRequired(req);
   for (let i = 0; i < STATUS_KEYS.length; i++) {
-    if (!isLayerApproved(req, i)) return i + 1;
+    const layer = i + 1; // layers are 1-indexed
+    // Skip layer 2 (Security Officer) when journey management is not required
+    if (layer === 2 && !journeyRequired) continue;
+    if (!isLayerApproved(req, i)) return layer;
   }
-  return null; // all five layers approved
+  return null; // all applicable layers approved
 }
 
 /** Overall chain state. Rejected/under-review (from approvalStep) take precedence. */
@@ -66,6 +85,9 @@ export function getApprovalState(req: ApprovalRecord): ApprovalState {
 /**
  * Whether the logged-in user (by their approval `level`) may act on this item
  * right now — the chain is still in progress and it's their layer's turn.
+ *
+ * A level-2 user (Security Officer) can never act when journey management is
+ * not required, even if it's technically "their turn" in the index.
  */
 export function canUserApprove(
   req: ApprovalRecord,
@@ -73,6 +95,8 @@ export function canUserApprove(
 ): boolean {
   if (typeof level !== "number" || level < 1) return false;
   if (getApprovalState(req) !== "in-progress") return false;
+  // Security Officer (level 2) is excluded when journey management is not required
+  if (level === 2 && !isJourneyRequired(req)) return false;
   return getCurrentApprovalLayer(req) === level;
 }
 
@@ -85,6 +109,11 @@ export function getApprovalStatusMessage(
   if (state === "approved") return "This request has been fully approved.";
   if (state === "rejected") return "This request has been rejected.";
   if (state === "under-review") return "This request is under review.";
+
+  // Level 2 (Security Officer) is not part of this chain
+  if (level === 2 && !isJourneyRequired(req)) {
+    return "Security Officer approval is not required — journey management was not requested.";
+  }
 
   const current = getCurrentApprovalLayer(req);
   if (typeof level === "number" && current !== null && current > level) {

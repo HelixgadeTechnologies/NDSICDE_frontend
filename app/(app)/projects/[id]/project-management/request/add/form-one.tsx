@@ -177,10 +177,10 @@ export default function FormOne({
 
         <div className="flex items-start gap-5">
           <TagInput
-            label="Send to (SPO)"
+            label="Send to (Layer 1 Approver)"
             options={spo.options}
             maxTags={1}
-            placeholder="Select a Senior Project Officer"
+            placeholder="Select a Programs Manager / SPO"
             value={
               formData.sendTo && spo.toLabel[formData.sendTo]
                 ? [spo.toLabel[formData.sendTo]]

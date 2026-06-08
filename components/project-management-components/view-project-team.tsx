@@ -46,7 +46,7 @@ export default function ViewProjectTeamModal({
                 Role:
               </strong>
               <span className="text-[#7A7A7A] text-sm font-normal leading-5">
-                {member.roleName || "N/A"}
+                {member.designation || "N/A"}
               </span>
             </li>
             <li className="flex justify-between items-center">
