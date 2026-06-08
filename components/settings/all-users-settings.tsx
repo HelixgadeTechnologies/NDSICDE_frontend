@@ -98,8 +98,12 @@ export default function GeneralSettings() {
           },
         },
       );
+      toast.success("Password updated successfully");
+      setField("currentPassword", "");
+      setField("newPassword", "");
+      setField("confirmPassword", "");
     } catch (error) {
-      toast.error('Error updating password')
+      toast.error('Error updating password');
     } finally {
       setIsLoading(false);
     }

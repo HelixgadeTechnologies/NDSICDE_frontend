@@ -300,6 +300,7 @@ export default function ProjectRequest() {
           },
         },
       );
+      setRemoveRequest(false);
       fetchRequests();
     } catch (error) {
       console.error(`Error deleting request: ${error}`);

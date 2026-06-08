@@ -15,6 +15,9 @@ import { useRoleStore } from "@/store/role-store";
 import { Icon } from "@iconify/react";
 import Modal from "@/ui/popup-modal";
 import Loading from "@/app/loading";
+import PasswordInput from "@/ui/form/password-input";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function GeneralSettings() {
   const {
@@ -40,6 +43,11 @@ export default function GeneralSettings() {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [openConfirmReset, setOpenConfirmReset] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const { token } = useRoleStore();
 
@@ -168,6 +176,45 @@ export default function GeneralSettings() {
     setSuccessMessage("Settings reset to default values");
     setIsEditMode(false);
     setOpenConfirmReset(false);
+  };
+
+  const handleChangePassword = async () => {
+    const payload = {
+      oldPassword: currentPassword,
+      newPassword: newPassword,
+      confirmPassword: confirmPassword,
+    };
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/change-password`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      toast.success("Password updated successfully");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      toast.error("Error updating password");
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   if (isFetching) {
@@ -330,6 +377,42 @@ export default function GeneralSettings() {
           </div>
         </CardComponent>
       </form>
+
+      {/* password */}
+      <CardComponent className="relative mt-5">
+        <Heading heading="Change Password" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 mt-6">
+          <PasswordInput
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            label="Current Password"
+            name="currentPassword"
+            placeholder="Enter Current Password"
+          />
+          <PasswordInput
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            label="New Password"
+            name="newPassword"
+            placeholder="Enter New Password"
+          />
+          <PasswordInput
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            label="Confirm New Password"
+            name="confirmPassword"
+            placeholder="Re-enter New Password"
+          />
+        </div>
+        <div className="w-full md:w-50 mt-5 absolute right-5 bottom-7">
+          <Button
+            content="Save Password"
+            isDisabled={isChangingPassword}
+            isLoading={isChangingPassword}
+            onClick={handleChangePassword}
+          />
+        </div>
+      </CardComponent>
 
       <Modal
         isOpen={openConfirmReset}
