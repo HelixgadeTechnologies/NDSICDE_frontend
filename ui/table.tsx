@@ -64,10 +64,25 @@ export default function Table<T>({
     ? safeTableData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
     : safeTableData;
   
-  // Reset to page 1 when tableData changes
+  // Reset to page 1 only when the underlying rows actually change (filter /
+  // search / refetch) — not on every new array reference. Parents often pass a
+  // freshly-computed array on each render (e.g. inline .filter()/.map()); keying
+  // the reset off the data identity would bounce the user back to page 1 whenever
+  // they opened a row's action menu on a later page.
+  const dataSignature = idKey
+    ? safeTableData.map((row) => String(row[idKey])).join("|")
+    : `len:${safeTableData.length}`;
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [tableData]);
+  }, [dataSignature]);
+
+  // Keep the current page in range if the dataset shrinks (e.g. after a delete).
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const isAllSelected =
     checkbox && safeTableData.length > 0 && selectedIds.length === safeTableData.length;

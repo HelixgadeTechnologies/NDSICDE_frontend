@@ -177,7 +177,7 @@ export default function FormOne({
 
         <div className="flex items-start gap-5">
           <TagInput
-            label="Send to (Layer 1 Approver)"
+            label="Send to (SPO)"
             options={spo.options}
             maxTags={1}
             placeholder="Select a Programs Manager / SPO"

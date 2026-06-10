@@ -124,3 +124,51 @@ export function getApprovalStatusMessage(
     ? `This request is awaiting approval at Layer ${current}.`
     : "This request has been fully approved.";
 }
+
+// ── "Send to" designated recipients ───────────────────────────────────────────
+// The request form lets the creator designate specific approvers for the two
+// layers that have a chooser:
+//   Layer 1 (SPO)             -> sendTo
+//   Layer 3 (Finance Officer) -> sendTo2
+// Each field may hold a single user id today, or a comma-separated list of ids
+// once the backend supports multiple recipients.
+
+/** Parse a "send to" field that may hold one id or a comma-separated list of ids. */
+export function parseRecipientIds(value: unknown): string[] {
+  if (!value) return [];
+  return String(value)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/** Whether the user is named in either "send to" field (SPO or Finance Officer). */
+export function isUserInSendTo(
+  req: ApprovalRecord,
+  userId?: string | null,
+): boolean {
+  if (!userId) return false;
+  return (
+    parseRecipientIds(req.sendTo).includes(userId) ||
+    parseRecipientIds(req.sendTo2).includes(userId)
+  );
+}
+
+/**
+ * Whether the user may take an approval action right now. Extends canUserApprove
+ * (correct layer, chain in progress) by enforcing the "Send to" designation on
+ * the layers that have one — so only the chosen SPO/Finance Officer can act,
+ * not every approver who happens to hold that level. Layers without a designated
+ * recipient (2, 4, 5) fall back to plain level matching.
+ */
+export function canUserActOnRequest(
+  req: ApprovalRecord,
+  level?: number | null,
+  userId?: string | null,
+): boolean {
+  if (!canUserApprove(req, level)) return false;
+  const layer = getCurrentApprovalLayer(req);
+  if (layer === 1) return parseRecipientIds(req.sendTo).includes(userId ?? "");
+  if (layer === 3) return parseRecipientIds(req.sendTo2).includes(userId ?? "");
+  return true;
+}

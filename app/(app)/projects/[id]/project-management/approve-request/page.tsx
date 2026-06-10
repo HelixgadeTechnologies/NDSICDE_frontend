@@ -11,7 +11,11 @@ import LoadingSpinner from "@/ui/loading-spinner";
 import { Icon } from "@iconify/react";
 import { useProjectRequests, useProjectRetirements } from "@/hooks/useProjectData";
 import { useRoleStore } from "@/store/role-store";
-import { getCurrentApprovalLayer, isJourneyRequired } from "@/utils/request-approval";
+import {
+  getCurrentApprovalLayer,
+  isJourneyRequired,
+  parseRecipientIds,
+} from "@/utils/request-approval";
 
 const REQUEST_STEPS: Record<number, { label: string; color: string }> = {
   0: { label: "Awaiting SPO", color: "bg-orange-100 text-orange-700" },
@@ -51,6 +55,19 @@ export default function ApproveRequestPage() {
   const { requests, isLoading: isLoadingRequests } = useProjectRequests(projectId);
   const { retirements, isLoading: isLoadingRetirements } = useProjectRetirements(projectId);
   const { user } = useRoleStore();
+
+  // Requests this user is allowed to see (see filter rationale below).
+  const visibleRequests = requests.filter((row) => {
+    // Security Officers (level 2) only see requests that require journey management.
+    if (user?.level === 2 && !isJourneyRequired(row)) return false;
+    // Layer 1 (SPO) users only see requests they were designated for in "Send to (SPO)".
+    if (user?.level === 1)
+      return parseRecipientIds(row.sendTo).includes(user?.id ?? "");
+    // Layer 3 (Finance Officer) users only see requests designated in "Send to (Finance Officer)".
+    if (user?.level === 3)
+      return parseRecipientIds(row.sendTo2).includes(user?.id ?? "");
+    return true;
+  });
 
   const stats =
     activeTab === 1
@@ -138,10 +155,16 @@ export default function ApproveRequestPage() {
                   <Icon icon="mdi:inbox-outline" width={48} height={48} />
                   <p className="text-sm font-medium">No requests found</p>
                 </div>
+              ) : visibleRequests.length === 0 ? (
+                <div className="py-16 flex flex-col items-center gap-3 text-gray-400">
+                  <Icon icon="mdi:inbox-outline" width={48} height={48} />
+                  <p className="text-sm font-medium">
+                    There are no requests addressed to you yet
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-3">
-                  {requests
-                    .filter((row) => !(user?.level === 2 && !isJourneyRequired(row)))
+                  {visibleRequests
                     .map((row) => {
                     const totalBudget = (row.lineItems || []).reduce(
                       (sum, item) => sum + (item.totalBudget || 0),
