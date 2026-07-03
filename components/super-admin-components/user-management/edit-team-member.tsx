@@ -7,7 +7,6 @@ import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
 import TagInput from "@/ui/form/tag-input";
-import FileUploader from "@/ui/form/file-uploader";
 import { useUserManagementState } from "@/store/super-admin-store/user-management-store";
 import { fetchRoles, RoleData } from "@/lib/api/roles";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
@@ -41,10 +40,7 @@ export default function EditTeamMember({
 }: EditProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState(1);
   const [roles, setRoles] = useState<RoleData[]>([]);
-  const [signatureUrl, setSignatureUrl] = useState("");
-  const [signatureMime, setSignatureMime] = useState("");
 
   const { token } = useRoleStore();
   const { projects, projectOptions } = useProjects();
@@ -107,9 +103,6 @@ export default function EditTeamMember({
   // Fetch roles + prefill form when the modal opens; reset on close.
   useEffect(() => {
     if (!isOpen) {
-      setStep(1);
-      setSignatureUrl("");
-      setSignatureMime("");
       setError(null);
       resetForm();
       setSelectedProjectTags([]);
@@ -125,8 +118,6 @@ export default function EditTeamMember({
       designation?: string;
       activityKpiApproval?: number;
       retirementApproval?: number;
-      signature?: string;
-      signatureMimeType?: string;
     };
     setField("fullName", u.fullName || "");
     setField("email", u.email || "");
@@ -143,8 +134,6 @@ export default function EditTeamMember({
       "requestRetirementApprovalRole",
       getRetirementApprovalValue(u.retirementApproval),
     );
-    setSignatureUrl(u.signature || "");
-    setSignatureMime(u.signatureMimeType || "");
   }, [isOpen, user, setField, resetForm]);
 
   // Prefill assigned project tags once both the user's IDs and project list are available
@@ -196,6 +185,8 @@ export default function EditTeamMember({
     }
 
     try {
+      // Signature is intentionally omitted — users manage their own signature
+      // from their settings page, so an admin edit must not overwrite it.
       await updateUser(
         user.userId,
         {
@@ -209,8 +200,6 @@ export default function EditTeamMember({
           assignedProjectId: assignedProjectIdString,
           activityKpiApproval: getActivityKpiApprovalNumber(activityKpiApprovalRole),
           retirementApproval: getRetirementApprovalNumber(requestRetirementApprovalRole),
-          signature: signatureUrl,
-          signatureMimeType: signatureMime,
         },
         token,
       );
@@ -235,159 +224,101 @@ export default function EditTeamMember({
         subtitle={`Update the details for ${user.fullName}`}
       />
       <form onSubmit={handleSave}>
-        {step === 1 ? (
-          <>
-            <div className="grid grid-cols-2 my-4 gap-5">
-              <TextInput
-                value={fullName}
-                label="Full Name"
-                name="fullName"
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setField("fullName", e.target.value)
-                }
-              />
-              <TextInput
-                value={email}
-                label="Email Address"
-                name="email"
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setField("email", e.target.value)
-                }
-              />
-              <DropDown
-                label="Department"
-                options={departments}
-                name="department"
-                value={department}
-                onChange={(value: string) => setField("department", value)}
-              />
-              <DropDown
-                label="Designation"
-                options={designationOptions}
-                name="roleId"
-                value={roleId}
-                placeholder="Select designation"
-                onChange={handleDesignationChange}
-              />
-              <DropDown
-                label="Request and Retirement Approval Role"
-                options={RR_APPROVAL_ROLE}
-                name="requestRetirementApprovalRole"
-                value={requestRetirementApprovalRole}
-                onChange={(value: string) =>
-                  setField("requestRetirementApprovalRole", value)
-                }
-              />
-              <DropDown
-                label="Activity & KPI Report Approval"
-                options={ACTIVITY_KPI_APPROVAL_ROLE}
-                name="activityKpiApprovalRole"
-                value={activityKpiApprovalRole}
-                onChange={(value: string) =>
-                  setField("activityKpiApprovalRole", value)
-                }
-              />
-              <TextInput
-                value={phoneNumber}
-                label="Phone Number"
-                name="phoneNumber"
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setField("phoneNumber", e.target.value)
-                }
-              />
-              <DropDown
-                label="Status"
-                options={[
-                  { label: "Active", value: "Active" },
-                  { label: "Inactive", value: "Inactive" },
-                ]}
-                name="status"
-                value={status}
-                onChange={(value: string) => setField("status", value)}
-              />
-            </div>
-            <div className="col-span-2">
-              <TagInput
-                label="Assigned Projects"
-                placeholder={
-                  selectedProjectTags.includes(ALL_LABEL)
-                    ? "All projects selected"
-                    : "Select projects…"
-                }
-                value={selectedProjectTags}
-                options={
-                  selectedProjectTags.includes(ALL_LABEL)
-                    ? [] // lock further selection when "All" is chosen
-                    : tagOptions
-                }
-                onChange={handleProjectTagChange}
-              />
-            </div>
-            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
-            <div className="flex w-full mt-6">
-              <Button content="Next" type="button" onClick={() => setStep(2)} />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="my-4 space-y-3">
-              <h3 className="text-sm font-medium text-gray-700">
-                User's Signature
-              </h3>
-
-              {signatureUrl && (
-                <div className="flex items-center justify-between gap-3 border border-gray-200 rounded-md px-4 py-3">
-                  <span className="text-sm text-gray-700 truncate">
-                    Current signature on file
-                  </span>
-                  <a
-                    href={signatureUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-semibold text-(--primary-light) hover:underline shrink-0">
-                    View
-                  </a>
-                </div>
-              )}
-
-              <p className="text-xs text-gray-500">
-                {signatureUrl
-                  ? "Upload a new file to replace the signature, or leave as is."
-                  : "Upload a signature file."}
-              </p>
-
-              <FileUploader
-                multiple={false}
-                token={token || undefined}
-                onFilesChange={(files) =>
-                  setSignatureMime(files[0]?.type ?? signatureMime)
-                }
-                onUploadComplete={setSignatureUrl}
-                onUploadError={(msg) => setError(msg)}
-              />
-            </div>
-
-            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
-            <div className="flex gap-4 mt-6">
-              <div className="w-1/2">
-                <Button
-                  content="Back"
-                  isSecondary
-                  type="button"
-                  onClick={() => setStep(1)}
-                />
-              </div>
-              <div className="w-1/2">
-                <Button
-                  content="Save Changes"
-                  type="submit"
-                  isLoading={isSubmitting}
-                  isDisabled={isSubmitting}
-                />
-              </div>
-            </div>
-          </>
-        )}
+        <div className="grid grid-cols-2 my-4 gap-5">
+          <TextInput
+            value={fullName}
+            label="Full Name"
+            name="fullName"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setField("fullName", e.target.value)
+            }
+          />
+          <TextInput
+            value={email}
+            label="Email Address"
+            name="email"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setField("email", e.target.value)
+            }
+          />
+          <DropDown
+            label="Department"
+            options={departments}
+            name="department"
+            value={department}
+            onChange={(value: string) => setField("department", value)}
+          />
+          <DropDown
+            label="Designation"
+            options={designationOptions}
+            name="roleId"
+            value={roleId}
+            placeholder="Select designation"
+            onChange={handleDesignationChange}
+          />
+          <DropDown
+            label="Request and Retirement Approval Role"
+            options={RR_APPROVAL_ROLE}
+            name="requestRetirementApprovalRole"
+            value={requestRetirementApprovalRole}
+            onChange={(value: string) =>
+              setField("requestRetirementApprovalRole", value)
+            }
+          />
+          <DropDown
+            label="Activity & KPI Report Approval"
+            options={ACTIVITY_KPI_APPROVAL_ROLE}
+            name="activityKpiApprovalRole"
+            value={activityKpiApprovalRole}
+            onChange={(value: string) =>
+              setField("activityKpiApprovalRole", value)
+            }
+          />
+          <TextInput
+            value={phoneNumber}
+            label="Phone Number"
+            name="phoneNumber"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setField("phoneNumber", e.target.value)
+            }
+          />
+          <DropDown
+            label="Status"
+            options={[
+              { label: "Active", value: "Active" },
+              { label: "Inactive", value: "Inactive" },
+            ]}
+            name="status"
+            value={status}
+            onChange={(value: string) => setField("status", value)}
+          />
+        </div>
+        <div className="col-span-2">
+          <TagInput
+            label="Assigned Projects"
+            placeholder={
+              selectedProjectTags.includes(ALL_LABEL)
+                ? "All projects selected"
+                : "Select projects…"
+            }
+            value={selectedProjectTags}
+            options={
+              selectedProjectTags.includes(ALL_LABEL)
+                ? [] // lock further selection when "All" is chosen
+                : tagOptions
+            }
+            onChange={handleProjectTagChange}
+          />
+        </div>
+        {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+        <div className="flex w-full mt-6">
+          <Button
+            content="Save Changes"
+            type="submit"
+            isLoading={isSubmitting}
+            isDisabled={isSubmitting}
+          />
+        </div>
       </form>
     </Modal>
   );

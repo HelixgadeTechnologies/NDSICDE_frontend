@@ -34,6 +34,15 @@ export interface CreateUserData {
   designation: string;
   activityKpiApproval: number;
   retirementApproval: number;
+  // Signatures are managed by the user themselves (save-signature endpoint),
+  // so these are optional here and omitted from create/update requests.
+  signature?: string;
+  signatureMimeType?: string;
+}
+
+// Payload for a user saving/updating their own signature
+export interface SaveSignatureData {
+  userId: string;
   signature: string;
   signatureMimeType: string;
 }
@@ -100,8 +109,12 @@ export async function createUser(
       designation: userData.designation,
       activityKpiApproval: userData.activityKpiApproval,
       retirementApproval: userData.retirementApproval,
-      signature: userData.signature,
-      signatureMimeType: userData.signatureMimeType,
+      // Signature is managed by the user from their own settings page
+      // (save-signature endpoint), so it is only sent when explicitly set.
+      ...(userData.signature !== undefined && {
+        signature: userData.signature,
+        signatureMimeType: userData.signatureMimeType ?? "",
+      }),
     },
   };
 
@@ -148,8 +161,13 @@ export async function updateUser(
       designation: userData.designation,
       activityKpiApproval: userData.activityKpiApproval,
       retirementApproval: userData.retirementApproval,
-      signature: userData.signature,
-      signatureMimeType: userData.signatureMimeType,
+      // Signature is managed by the user from their own settings page
+      // (save-signature endpoint); omitted here so an admin edit never
+      // overwrites the user's own signature.
+      ...(userData.signature !== undefined && {
+        signature: userData.signature,
+        signatureMimeType: userData.signatureMimeType ?? "",
+      }),
     },
   };
 
@@ -198,6 +216,34 @@ export async function deleteUser(
     throw new Error(
       errorData.message ||
         `Failed to delete user with status ${response.status}`
+    );
+  }
+
+  return await response.json();
+}
+
+// Save or update the logged-in user's own signature
+export async function saveSignature(
+  data: SaveSignatureData,
+  token: string
+): Promise<UserManagementResponse> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/userManagement/save-signature`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.message ||
+        `Failed to save signature with status ${response.status}`
     );
   }
 

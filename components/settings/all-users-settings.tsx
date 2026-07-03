@@ -16,6 +16,12 @@ import axios from "axios";
 import { getToken } from "@/lib/api/credentials";
 import { toast } from "react-toastify";
 import Modal from "@/ui/popup-modal";
+import FileUploader from "@/ui/form/file-uploader";
+import {
+  saveSignature,
+  getUsers,
+  UserManagementCredentials,
+} from "@/lib/api/user-management";
 
 export default function GeneralSettings() {
   const {
@@ -59,6 +65,73 @@ export default function GeneralSettings() {
   const [openModal, setOpenModal] = useState(false);
   const [password, setPassword] = useState("");
   const token = getToken();
+
+  // for the user's own signature
+  const [currentSignature, setCurrentSignature] = useState("");
+  const [signatureUrl, setSignatureUrl] = useState("");
+  const [signatureMime, setSignatureMime] = useState("");
+  const [signatureError, setSignatureError] = useState<string | null>(null);
+  const [isSavingSignature, setIsSavingSignature] = useState(false);
+  // When a signature already exists we show it; this toggles the replace form.
+  const [isEditingSignature, setIsEditingSignature] = useState(false);
+
+  // Load the user's existing signature (if any) so we can preview it
+  useEffect(() => {
+    const loadSignature = async () => {
+      if (!user?.id || !token) return;
+      try {
+        // The signature ships with the user's directory record under `signature`.
+        const res = await getUsers(token);
+        const me = res.data?.find((u) => u.userId === user.id) as
+          | (UserManagementCredentials & {
+              signature?: string;
+              signatureMimeType?: string;
+            })
+          | undefined;
+        if (me?.signature) {
+          setCurrentSignature(me.signature);
+          setSignatureMime(me.signatureMimeType ?? "");
+        }
+      } catch (error) {
+        console.error("Failed to load signature: ", error);
+      }
+    };
+    loadSignature();
+  }, [user?.id, token]);
+
+  // Save the uploaded signature against the logged-in user
+  const handleSaveSignature = async () => {
+    if (!signatureUrl) {
+      toast.error("Please upload a signature first");
+      return;
+    }
+    if (!user?.id || !token) {
+      toast.error("Unable to determine your account");
+      return;
+    }
+
+    setIsSavingSignature(true);
+    try {
+      await saveSignature(
+        {
+          userId: user.id,
+          signature: signatureUrl,
+          signatureMimeType: signatureMime,
+        },
+        token,
+      );
+      toast.success("Signature saved successfully");
+      setCurrentSignature(signatureUrl);
+      setSignatureUrl("");
+      setSignatureError(null);
+      setIsEditingSignature(false);
+    } catch (error) {
+      console.error("Error saving signature: ", error);
+      toast.error("Error saving signature");
+    } finally {
+      setIsSavingSignature(false);
+    }
+  };
 
   // Load user details into the form on mount or when user changes
   useEffect(() => {
@@ -337,6 +410,90 @@ export default function GeneralSettings() {
             onClick={handleChangePassword}
           />
         </div>
+      </CardComponent>
+
+      {/* signature */}
+      <CardComponent>
+        <Heading heading="Signature" />
+        <p className="text-sm mt-1">
+          {currentSignature && !isEditingSignature
+            ? "This signature is used when you approve requests and reports."
+            : "Upload your signature. It is used when you approve requests and reports."}
+        </p>
+
+        {currentSignature && !isEditingSignature ? (
+          // A signature already exists — show it, with the option to replace it.
+          <>
+            <div className="mt-4">
+              <p className="text-xs font-semibold text-gray-600 mb-2">
+                Your signature
+              </p>
+              <div className="w-40 h-20 border border-gray-200 rounded-md relative bg-white">
+                <Image
+                  src={currentSignature}
+                  alt="Your signature"
+                  fill
+                  className="object-contain p-2"
+                />
+              </div>
+            </div>
+            <div className="flex w-full justify-end">
+              <div className="w-full md:w-50 mt-5">
+                <Button
+                  content="Update Signature"
+                  isSecondary
+                  onClick={() => {
+                    setSignatureUrl("");
+                    setSignatureError(null);
+                    setIsEditingSignature(true);
+                  }}
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          // No signature yet, or the user chose to replace it — show the uploader.
+          <>
+            <div className="mt-4">
+              <FileUploader
+                multiple={false}
+                token={token || undefined}
+                onFilesChange={(files) => setSignatureMime(files[0]?.type ?? "")}
+                onUploadComplete={setSignatureUrl}
+                onUploadError={(msg) => setSignatureError(msg)}
+              />
+            </div>
+
+            {signatureError && (
+              <div className="text-red-500 text-sm mt-3">{signatureError}</div>
+            )}
+
+            <div className="flex w-full justify-end gap-3">
+              {currentSignature && (
+                <div className="w-full md:w-50 mt-5">
+                  <Button
+                    content="Cancel"
+                    isSecondary
+                    isDisabled={isSavingSignature}
+                    onClick={() => {
+                      setIsEditingSignature(false);
+                      setSignatureUrl("");
+                      setSignatureError(null);
+                    }}
+                  />
+                </div>
+              )}
+              <div className="w-full md:w-50 mt-5">
+                <Button
+                  content="Save Signature"
+                  isDisabled={isSavingSignature || !signatureUrl}
+                  isLoading={isSavingSignature}
+                  onClick={handleSaveSignature}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </CardComponent>
 
       <Modal isOpen={openModal} onClose={() => setOpenModal(false)}>

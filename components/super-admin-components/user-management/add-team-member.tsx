@@ -8,14 +8,12 @@ import TextInput from "@/ui/form/text-input";
 import DropDown from "@/ui/form/select-dropdown";
 import Button from "@/ui/form/button";
 import TagInput from "@/ui/form/tag-input";
-import FileUploader from "@/ui/form/file-uploader";
 import { useRoleStore } from "@/store/role-store";
 import { createUser } from "@/lib/api/user-management";
 import { useProjects } from "@/context/ProjectsContext";
 import { fetchRoles, RoleData } from "@/lib/api/roles";
 import {
   ACTIVITY_KPI_APPROVAL_ROLE,
-  RR_APPROVAL_ROLE,
   getActivityKpiApprovalNumber,
   getRetirementApprovalNumber,
 } from "@/utils/team-member-utility";
@@ -30,16 +28,10 @@ const ALL_LABEL = "All";
 export default function AddTeamMember({ isOpen, onClose }: AddProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState(1);
-  const [signatureUrl, setSignatureUrl] = useState("");
-  const [signatureMime, setSignatureMime] = useState("");
   const [roles, setRoles] = useState<RoleData[]>([]);
 
   useEffect(() => {
     if (!isOpen) {
-      setStep(1);
-      setSignatureUrl("");
-      setSignatureMime("");
       setError(null);
       return;
     }
@@ -133,7 +125,8 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
     }
 
     try {
-      // Prepare the data for API call — signature is the uploaded file's URL
+      // The new user adds their own signature later from their settings page,
+      // so it is not part of this form anymore.
       const userData = {
         fullName,
         email,
@@ -145,8 +138,6 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         assignedProjectId: assignedProjectIdString,
         activityKpiApproval: getActivityKpiApprovalNumber(activityKpiApprovalRole),
         retirementApproval: getRetirementApprovalNumber(requestRetirementApprovalRole),
-        signature: signatureUrl,
-        signatureMimeType: signatureMime,
       };
 
       await createUser(userData, token);
@@ -168,138 +159,94 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
         subtitle="Fill in the details to add a new team member"
       />
       <form onSubmit={addUser}>
-        {step === 1 ? (
-          <>
-            <div className="grid grid-cols-2 my-4 gap-5">
-              <TextInput
-                value={fullName}
-                label="Full Name"
-                name="fullName"
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setField("fullName", e.target.value)
-                }
-              />
-              <TextInput
-                value={email}
-                label="Email Address"
-                name="email"
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setField("email", e.target.value)
-                }
-              />
-              <DropDown
-                label="Department"
-                options={departments}
-                name="department"
-                value={department}
-                onChange={(value: string) => setField("department", value)}
-              />
+        <div className="grid grid-cols-2 my-4 gap-5">
+          <TextInput
+            value={fullName}
+            label="Full Name"
+            name="fullName"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setField("fullName", e.target.value)
+            }
+          />
+          <TextInput
+            value={email}
+            label="Email Address"
+            name="email"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setField("email", e.target.value)
+            }
+          />
+          <DropDown
+            label="Department"
+            options={departments}
+            name="department"
+            value={department}
+            onChange={(value: string) => setField("department", value)}
+          />
 
-              <DropDown
-                label="Designation"
-                options={designationOptions}
-                name="roleId"
-                value={roleId}
-                placeholder="Select designation"
-                onChange={handleDesignationChange}
-              />
-              {/* <DropDown
-                label="Request and Retirement Approval Role"
-                options={RR_APPROVAL_ROLE}
-                name="requestRetirementApprovalRole"
-                value={requestRetirementApprovalRole}
-                onChange={(value: string) =>
-                  setField("requestRetirementApprovalRole", value)
-                }
-              /> */}
-              <DropDown
-                label="Activity & KPI Report Approval"
-                options={ACTIVITY_KPI_APPROVAL_ROLE}
-                name="activityKpiApprovalRole"
-                value={activityKpiApprovalRole}
-                onChange={(value: string) =>
-                  setField("activityKpiApprovalRole", value)
-                }
-              />
+          <DropDown
+            label="Designation"
+            options={designationOptions}
+            name="roleId"
+            value={roleId}
+            placeholder="Select designation"
+            onChange={handleDesignationChange}
+          />
+          <DropDown
+            label="Activity & KPI Report Approval"
+            options={ACTIVITY_KPI_APPROVAL_ROLE}
+            name="activityKpiApprovalRole"
+            value={activityKpiApprovalRole}
+            onChange={(value: string) =>
+              setField("activityKpiApprovalRole", value)
+            }
+          />
 
-              <TextInput
-                value={phoneNumber}
-                label="Phone Number"
-                name="phoneNumber"
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setField("phoneNumber", e.target.value)
-                }
-              />
-              <DropDown
-                label="Status"
-                options={[
-                  { label: "Active", value: "Active" },
-                  { label: "Inactive", value: "Inactive" },
-                ]}
-                name="status"
-                value={status}
-                onChange={(value: string) => setField("status", value)}
-              />
-            </div>
-            <div className="col-span-2">
-              <TagInput
-                label="Assigned Projects"
-                placeholder={
-                  selectedProjectTags.includes(ALL_LABEL)
-                    ? "All projects selected"
-                    : "Select projects…"
-                }
-                value={selectedProjectTags}
-                options={
-                  selectedProjectTags.includes(ALL_LABEL)
-                    ? [] // lock further selection when "All" is chosen
-                    : tagOptions
-                }
-                onChange={handleProjectTagChange}
-              />
-            </div>
-            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
-            <div className="flex w-full mt-6">
-              <Button content="Next" type="button" onClick={() => setStep(2)} />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="my-4 space-y-2">
-              <h3 className="text-sm font-medium text-gray-700">
-                Upload User's Signature
-              </h3>
-              <FileUploader
-                multiple={false}
-                token={token || undefined}
-                onFilesChange={(files) =>
-                  setSignatureMime(files[0]?.type ?? "")
-                }
-                onUploadComplete={setSignatureUrl}
-                onUploadError={(msg) => setError(msg)}
-              />
-            </div>
-            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
-            <div className="flex gap-4 mt-6">
-              <div className="w-1/2">
-                <Button
-                  content="Back"
-                  isSecondary
-                  type="button"
-                  onClick={() => setStep(1)}
-                />
-              </div>
-              <div className="w-1/2">
-                <Button
-                  content="Save Changes"
-                  type="submit"
-                  isLoading={isLoading}
-                  isDisabled={isLoading}
-                />
-              </div>
-            </div>
-          </>
-        )}
+          <TextInput
+            value={phoneNumber}
+            label="Phone Number"
+            name="phoneNumber"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setField("phoneNumber", e.target.value)
+            }
+          />
+          <DropDown
+            label="Status"
+            options={[
+              { label: "Active", value: "Active" },
+              { label: "Inactive", value: "Inactive" },
+            ]}
+            name="status"
+            value={status}
+            onChange={(value: string) => setField("status", value)}
+          />
+        </div>
+        <div className="col-span-2">
+          <TagInput
+            label="Assigned Projects"
+            placeholder={
+              selectedProjectTags.includes(ALL_LABEL)
+                ? "All projects selected"
+                : "Select projects…"
+            }
+            value={selectedProjectTags}
+            options={
+              selectedProjectTags.includes(ALL_LABEL)
+                ? [] // lock further selection when "All" is chosen
+                : tagOptions
+            }
+            onChange={handleProjectTagChange}
+          />
+        </div>
+        {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+        <div className="flex w-full mt-6">
+          <Button
+            content="Save Changes"
+            type="submit"
+            isLoading={isLoading}
+            isDisabled={isLoading}
+          />
+        </div>
       </form>
     </Modal>
   );
