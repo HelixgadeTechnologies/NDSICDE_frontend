@@ -17,6 +17,7 @@ import {
   getActivityKpiApprovalNumber,
   getRetirementApprovalNumber,
 } from "@/utils/team-member-utility";
+import { toast } from "react-toastify";
 
 type AddProps = {
   isOpen: boolean;
@@ -143,6 +144,7 @@ export default function AddTeamMember({ isOpen, onClose }: AddProps) {
       await createUser(userData, token);
 
       onClose();
+      toast.success('User Created!')
       window.dispatchEvent(new CustomEvent("teamMemberUpdated"));
     } catch (error) {
       console.error(error);
